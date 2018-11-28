@@ -6,10 +6,14 @@
 
 Installing the extension is done via [composer](https://getcomposer.org/). 
 
+##use the following cammand to install
+
+composer require altapay/magento2-community
+
 Once this is done, run the following commands:
 
 <pre>
-php bin/magento module:enable Module_Name
+php bin/magento module:enable SDM_Altapay
 php bin/magento setup:upgrade
 php bin/magento setup:di:compile
 </pre>

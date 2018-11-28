@@ -1,18 +1,6 @@
 {
   "name": "altapay/magento2-community",
   "license": "MIT",
-  "authors": [
-    {
-      "name": "Martin Aarhof",
-      "email": "maa@scandesigns.dk",
-      "role": "Developer"
-    },
-    {
-      "name": "Saif Ali Rehman",
-      "email": "sar@embrace-it.com",
-      "role": "Developer"
-    }
-  ],
   "description": "Altapay payment",
   "require": {
     "php": "^5.5|^7.0",
