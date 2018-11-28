@@ -1,0 +1,51 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Altapay Module version 3.0.1 for Magento 2.x.
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ *
+ * @copyright 2018 Altapay
+ * @category  payment
+ * @package   altapay
+ */
+-->
+
+<include xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_include.xsd">
+ <group id="terminal3" translate="label" type="text" sortOrder="300" showInDefault="1" showInWebsite="1" showInStore="1">
+    <label>Terminal #3</label>
+
+    <field id="active" translate="label" type="select" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
+        <label>Enabled</label>
+        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+        <config_path>payment/terminal3/active</config_path>
+    </field>
+
+    <field id="title" translate="label" type="text" sortOrder="5" showInDefault="1" showInWebsite="1" showInStore="1">
+        <label>Title</label>
+        <config_path>payment/terminal3/title</config_path>
+    </field>
+
+    <field id="terminalname" translate="label comment" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+        <label>Terminal name</label>
+        <comment>Select terminal - Remember to save configuration after you have added your API login and password, to get your terminals</comment>
+        <config_path>payment/terminal3/terminalname</config_path>
+        <source_model>SDM\Altapay\Model\Config\Source\Terminals</source_model>
+    </field>
+
+    <field id="language" translate="label comment" type="select" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+        <label>Force language</label>
+        <comment>Force the language of the payment page</comment>
+        <source_model>SDM\Altapay\Model\Config\Source\Languages</source_model>
+        <config_path>payment/terminal3/language</config_path>
+    </field>
+
+    <field id="capture" translate="label comment" type="select" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
+        <label>Auto capture</label>
+        <comment>If you only sell download products, which are delivered immediately you can turn this on</comment>
+        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+        <config_path>payment/terminal3/capture</config_path>
+    </field>
+ </group>
+</include>

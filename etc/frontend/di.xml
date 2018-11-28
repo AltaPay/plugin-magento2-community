@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Altapay Module version 3.0.1 for Magento 2.x.
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ *
+ * @copyright 2018 Altapay
+ * @category  payment
+ * @package   altapay
+ */
+-->
+
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <type name="Magento\Checkout\Model\CompositeConfigProvider">
+        <arguments>
+            <argument name="configProviders" xsi:type="array">
+                <item name="sdm_altapay_config_provider" xsi:type="object">SDM\Altapay\Model\ConfigProvider</item>
+            </argument>
+        </arguments>
+    </type>
+</config>

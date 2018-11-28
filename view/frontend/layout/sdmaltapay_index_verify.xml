@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Altapay Module version 3.0.1 for Magento 2.x.
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ *
+ * @copyright 2018 Altapay
+ * @category  payment
+ * @package   altapay
+ */
+-->
+
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" layout="1column" xsi:noNamespaceSchemaLocation="../../../../../../../lib/internal/Magento/Framework/View/Layout/etc/page_configuration.xsd">
+    <referenceBlock name="content">
+        <block
+            template="callback_verify.phtml"
+            class="SDM\Altapay\Block\Callback\Verify"
+            name="sdm_altapay_callback_verify"
+        />
+    </referenceBlock>
+</page>

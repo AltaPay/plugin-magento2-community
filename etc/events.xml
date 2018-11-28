@@ -1,0 +1,36 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Altapay Module version 3.0.1 for Magento 2.x.
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ *
+ * @copyright 2018 Altapay
+ * @category  payment
+ * @package   altapay
+ */
+-->
+
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Event/etc/events.xsd">
+    <event name="sales_order_payment_place_start">
+        <observer name="SDM_Altapay_Order_Before_Payment" instance="SDM\Altapay\Observer\BeforePaymentObserver" />
+    </event>
+
+    <event name="order_cancel_after">
+        <observer name="SDM_Altapay_OrderCancel" instance="SDM\Altapay\Observer\OrderCancelObserver" />
+    </event>
+
+    <event name="sales_order_payment_capture">
+        <observer name="SDM_Altapay_Capture" instance="SDM\Altapay\Observer\CaptureObserver" />
+    </event>
+
+    <event name="sales_order_creditmemo_refund">
+        <observer name="SDM_Altapay_Creditmemo_Refund" instance="SDM\Altapay\Observer\CreditmemoRefundObserver" />
+    </event>
+
+    <event name="controller_action_predispatch_checkout_cart_index">
+        <observer name="SDM_Altapay_Checkout_Cart_Index" instance="SDM\Altapay\Observer\CheckoutCartIndex" />
+    </event>
+
+</config>

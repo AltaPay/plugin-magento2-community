@@ -1,0 +1,55 @@
+input#pensioCreditCardPaymentSubmitButton {
+    background-image: none;
+    background: #1979c3;
+    border: 1px solid #1979c3;
+    color: #ffffff;
+    cursor: pointer;
+    display: inline-block;
+    font-family: 'Open Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-weight: 600;
+    padding: 7px 15px;
+    font-size: 1.4rem;
+    box-sizing: border-box;
+    vertical-align: middle;
+    margin-bottom: 5%;
+}
+
+select#emonth {
+    width: 50%;
+}
+
+select#eyear {
+    width: 48%;
+}
+
+.pensio_payment_form_row.expiry_row {
+    padding-bottom: 24px;
+}
+
+input#pensioCreditCardPaymentSubmitButton:disabled {
+    opacity: 0.4;
+}
+
+aside.modal-custom.opc-sidebar.opc-summary-wrapper {
+    margin: 0px;
+}
+
+.opc-block-summary .minicart-items-wrapper{
+    max-height: 250px;
+}
+
+footer.page-footer, .sections.nav-sections, .panel.header, .block.block-search, .minicart-wrapper {
+    display: none;
+}
+
+.pensio_payment_form_cvc_cell img {
+    width: 20%;
+}
+
+@media (min-width: 768px) {
+.creaditcard-callback-form {
+    margin:0px;
+    width: 33.33333333%;
+    float: left;
+ }
+}
