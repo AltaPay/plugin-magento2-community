@@ -6,7 +6,7 @@
 
 Installing the extension is done via [composer](https://getcomposer.org/). 
 
-##use the following cammand to install
+##use the following command to install
 
 composer require altapay/magento2-community
 
