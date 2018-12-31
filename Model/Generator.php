@@ -11,23 +11,14 @@
  */
 namespace SDM\Altapay\Model;
 
-use Altapay\Api\Ecommerce\Callback;
-use Altapay\Api\Ecommerce\PaymentRequest;
-use Altapay\Api\Test\TestAuthentication;
-use Altapay\Exceptions\ClientException;
-use Altapay\Exceptions\ResponseHeaderException;
-use Altapay\Exceptions\ResponseMessageException;
-use Altapay\Request\Address;
-use Altapay\Request\Config;
-use Altapay\Request\Customer;
-use Altapay\Request\OrderLine;
-use Altapay\Response\CallbackResponse;
+use SDM\Altapay\Api\Ecommerce\Callback;
+use SDM\Altapay\Request\Config;
+use SDM\Altapay\Response\CallbackResponse;
 use SDM\Altapay\Model\ConstantConfig;
 use Magento\Checkout\Model\Session;
 use Magento\Framework\App\Request\Http;
 use Magento\Framework\App\RequestInterface;
 use SDM\Altapay\Logger\Logger;
-use Magento\Framework\UrlInterface;
 use Magento\Payment\Helper\Data as PaymentData;
 use Magento\Quote\Model\Quote;
 use Magento\Sales\Model\Order;
@@ -45,11 +36,6 @@ class Generator
      * @var Quote
      */
     private $quote;
-
-    /**
-     * @var UrlInterface
-     */
-    private $urlInterface;
 
     /**
      * @var PaymentData
@@ -99,7 +85,6 @@ class Generator
     /**
      * Generator constructor.
      * @param Quote $quote
-     * @param UrlInterface $urlInterface
      * @param PaymentData $paymentData
      * @param Session $checkoutSession
      * @param Http $request
@@ -112,7 +97,6 @@ class Generator
      */
     public function __construct(
         Quote $quote,
-        UrlInterface $urlInterface,
         PaymentData $paymentData,
         Session $checkoutSession,
         Http $request,
@@ -124,7 +108,6 @@ class Generator
         OrderLoaderInterface $orderLoader
     ) {
         $this->quote = $quote;
-        $this->urlInterface = $urlInterface;
         $this->paymentData = $paymentData;
         $this->checkoutSession = $checkoutSession;
         $this->request = $request;
@@ -134,155 +117,6 @@ class Generator
         $this->altapayLogger = $altapayLogger;
         $this->transactionRepository = $transactionRepository;
         $this->orderLoader = $orderLoader;
-    }
-
-    /**
-     * Generate parameters
-     *
-     * @param int $terminalId
-     * @param string $orderId
-     * @return array
-     */
-    public function createRequest($terminalId, $orderId)
-    {
-        $order = $this->order->load($orderId);
-        if ($order->getId()) {
-            $storeScope = \Magento\Store\Model\ScopeInterface::SCOPE_STORE;
-            $storeCode = $order->getStore()->getCode();
-            //Test the conn with the Payment Gateway
-            $auth = $this->systemConfig->getAuth($storeCode);
-            $api = new TestAuthentication($auth);
-            $response = $api->call();
-
-            $terminalName = $this->systemConfig->getTerminalConfig($terminalId, 'terminalname', $storeScope, $storeCode);
-            if (! $response) {
-                $this->restoreOrderFromOrderId($order->getIncrementId());
-                $requestParams['result'] = __(ConstantConfig::ERROR);
-                $requestParams['message'] = __(ConstantConfig::AUTH_MESSAGE);
-                return $requestParams;
-            }
-
-            $request = new PaymentRequest($auth);
-            $request
-                ->setTerminal($terminalName)
-                ->setShopOrderId($order->getIncrementId())
-                ->setAmount((float) $order->getGrandTotal())
-                ->setCurrency($order->getOrderCurrencyCode())
-                ->setCustomerInfo($this->setCustomer($order))
-                ->setConfig($this->setConfig());
-
-            if ($fraud = $this->systemConfig->getTerminalConfig($terminalId, 'fraud', $storeScope, $storeCode)) {
-                $request->setFraudService($fraud);
-            }
-
-            if ($lang = $this->systemConfig->getTerminalConfig($terminalId, 'language', $storeScope, $storeCode)) {
-                $langArr = explode('_', $lang, 2);
-                if (isset($langArr[0])) {
-                    $language = $langArr[0];
-                    $request->setLanguage($language);
-                }
-            }
-
-            if ($this->systemConfig->getTerminalConfig($terminalId, 'capture', $storeScope, $storeCode)) {
-                $request->setType('paymentAndCapture');
-            }
-
-            $orderlines = [];
-            /** @var \Magento\Sales\Model\Order\Item $item */
-            foreach ($order->getAllVisibleItems() as $item) {
-                $taxAmount = ($item->getQtyOrdered() * $item->getPriceInclTax()) - ($item->getQtyOrdered() * $item->getPrice());
-                $orderline = new OrderLine(
-                    $item->getName(),
-                    $item->getSku(),
-                    $item->getQtyOrdered(),
-                    $item->getPrice()
-                );
-                $orderline->setGoodsType('item');
-                $orderline->taxAmount = $taxAmount;
-                //$orderline->taxPercent = $item->getTaxPercent();
-                $orderlines[] = $orderline;
-            }
-            if ($order->getDiscountAmount() > 0) {
-                // Handling price reductions
-                $orderline = new OrderLine(
-                    $order->getDiscountDescription(),
-                    'discount',
-                    1,
-                    $order->getDiscountAmount()
-                );
-                $orderline->setGoodsType('handling');
-                $orderlines[] = $orderline;
-            }
-
-            // Handling orderline
-            $data = $order->getShippingMethod(true);
-            $orderlines[] = (new OrderLine(
-                $data['method'],
-                $data['carrier_code'],
-                1,
-                $order->getShippingInclTax()
-            ))->setGoodsType('shipment');
-            $request->setOrderLines($orderlines);
-            try {
-                /** @var \Altapay\Response\PaymentRequestResponse $response */
-                $response = $request->call();
-                $requestParams['result'] = __(ConstantConfig::SUCCESS);
-                $requestParams['formurl'] = $response->Url;
-                // set before payment status
-                $this->setCustomOrderStatus($order, Order::STATE_NEW, 'before');
-                // set notification
-                $order->addStatusHistoryComment(__(ConstantConfig::REDIRECT_TO_ALTAPAY) . $response->PaymentRequestId);
-
-                $extensionAttribute = $order->getExtensionAttributes();
-                if ($extensionAttribute && $extensionAttribute->getAltapayPaymentFormUrl()) {
-                    $extensionAttribute->setAltapayPaymentFormUrl($response->Url);
-                }
-
-                $order->setAltapayPaymentFormUrl($response->Url);
-
-                $order->getResource()->save($order);
-
-                return $requestParams;
-            } catch (ClientException $e) {
-                $requestParams['result'] = __(ConstantConfig::ERROR);
-                $requestParams['message'] = $e->getResponse()->getBody();
-            } catch (ResponseHeaderException $e) {
-                $requestParams['result'] = __(ConstantConfig::ERROR);
-                $requestParams['message'] = $e->getHeader()->ErrorMessage;
-            } catch (ResponseMessageException $e) {
-                $requestParams['result'] = __(ConstantConfig::ERROR);
-                $requestParams['message'] = $e->getMessage();
-            } catch (\Exception $e) {
-                $requestParams['result'] = __(ConstantConfig::ERROR);
-                $requestParams['message'] = $e->getMessage();
-            }
-
-            $this->restoreOrderFromOrderId($order->getIncrementId());
-            return $requestParams;
-        }
-
-        $this->restoreOrderFromOrderId($order->getIncrementId());
-        $requestParams['result']  = __(ConstantConfig::ERROR);
-        $requestParams['message'] = __(ConstantConfig::ERROR_MESSAGE);
-        return $requestParams;
-    }
-
-    /**
-     * @param $orderId
-     * @throws \Exception
-     * @throws \Magento\Framework\Exception\AlreadyExistsException
-     */
-    public function restoreOrderFromOrderId($orderId)
-    {
-        $order = $this->orderLoader->getOrderByOrderIncrementId($orderId);
-        if ($order->getId()) {
-            $quote = $this->quote->loadByIdWithoutStore($order->getQuoteId());
-            $quote
-                ->setIsActive(1)
-                ->setReservedOrderId(null);
-            $quote->getResource()->save($quote);
-            $this->checkoutSession->replaceQuote($quote);
-        }
     }
 
     /**
@@ -363,24 +197,33 @@ class Generator
      */
     public function handleFailedStatusAction(RequestInterface $request)
     {
-        $formUrl = '';
         $historyComment = __(ConstantConfig::CONSUMER_PAYMENT_FAILED);
         $transInfo = null;
         $callback = new Callback($request->getPostValue());
         $response = $callback->call();
         if ($response) {
             $order = $this->orderLoader->getOrderByOrderIncrementId($response->shopOrderId);
-            $formUrl = $order->getAltapayPaymentFormUrl();
             $transInfo = sprintf(
                 "Transaction ID: %s - Payment ID: %s - Credit card token: %s",
                 $response->transactionId,
                 $response->paymentId,
                 $response->creditCardToken
             );
+            
+            //save transaction data for failure
+            $parametersData = json_encode($request->getPostValue());
+            $transactionData = json_encode($response);
+            $this->transactionRepository->addTransactionData($response->shopOrderId, $response->transactionId, $response->paymentId, $transactionData, $parametersData);
         }
-        //TODO: fetch the MerchantErrorMessage and use it as historyComment
-        $this->handleOrderStateAction($request, Order::STATE_PENDING_PAYMENT, Order::STATE_PENDING_PAYMENT, $historyComment, $transInfo);
-        return $formUrl;
+
+        $customFirstOrderStatus = $this->systemConfig->getStatusConfig('before', $storeScope, $storeCode);
+        if ($customFirstOrderStatus) {
+            $orderStatus = $customFirstOrderStatus;
+        } else {
+            $orderStatus = Order::STATE_PENDING_PAYMENT;
+        }
+
+        $this->handleOrderStateAction($request, Order::STATE_PENDING_PAYMENT, $orderStatus, $historyComment, $transInfo);
     }
 
     /**
@@ -509,67 +352,6 @@ class Generator
             $order->setStatus($status);
         }
         $order->getResource()->save($order);
-    }
-
-    /**
-     * @return Config
-     */
-    private function setConfig()
-    {
-        $config = new Config();
-        $config->setCallbackOk($this->urlInterface->getDirectUrl(ConstantConfig::ALTAPAY_OK));
-        $config->setCallbackFail($this->urlInterface->getDirectUrl(ConstantConfig::ALTAPAY_FAIL));
-        $config->setCallbackRedirect($this->urlInterface->getDirectUrl(ConstantConfig::ALTAPAY_REDIRECT));
-        $config->setCallbackOpen($this->urlInterface->getDirectUrl(ConstantConfig::ALTAPAY_OPEN));
-        $config->setCallbackNotification($this->urlInterface->getDirectUrl(ConstantConfig::ALTAPAY_NOTIFICATION));
-        //$config->setCallbackVerifyOrder($this->urlInterface->getDirectUrl(ConstantConfig::VERIFY_ORDER));
-        $config->setCallbackForm($this->urlInterface->getDirectUrl(ConstantConfig::ALTAPAY_CALLBACK));
-        return $config;
-    }
-
-    /**
-     * @param Order $order
-     * @return Customer
-     */
-    private function setCustomer(Order $order)
-    {
-        $billingAddress = new Address();
-        if ($order->getBillingAddress()) {
-            $address = $order->getBillingAddress()->convertToArray();
-            $billingAddress->Email = $order->getBillingAddress()->getEmail();
-            $billingAddress->Firstname = $address['firstname'];
-            $billingAddress->Lastname = $address['lastname'];
-            $billingAddress->Address = $address['street'];
-            $billingAddress->City = $address['city'];
-            $billingAddress->PostalCode = $address['postcode'];
-            $billingAddress->Region = $address['region'] ?: '0';
-            $billingAddress->Country = $address['country_id'];
-        }
-        $customer = new Customer($billingAddress);
-
-        if ($order->getShippingAddress()) {
-            $address = $order->getShippingAddress()->convertToArray();
-            $shippingAddress = new Address();
-            $shippingAddress->Email = $order->getShippingAddress()->getEmail();
-            $shippingAddress->Firstname = $address['firstname'];
-            $shippingAddress->Lastname = $address['lastname'];
-            $shippingAddress->Address = $address['street'];
-            $shippingAddress->City = $address['city'];
-            $shippingAddress->PostalCode = $address['postcode'];
-            $shippingAddress->Region = $address['region'] ?: '0';
-            $shippingAddress->Country = $address['country_id'];
-            $customer->setShipping($shippingAddress);
-        }
-
-        if ($order->getBillingAddress()) {
-            $customer->setEmail($order->getBillingAddress()->getEmail());
-            $customer->setPhone($order->getBillingAddress()->getTelephone());
-        } elseif ($order->getShippingAddress()) {
-            $customer->setEmail($order->getShippingAddress()->getEmail());
-            $customer->setPhone($order->getShippingAddress()->getTelephone());
-        }
-
-        return $customer;
     }
 
     /**

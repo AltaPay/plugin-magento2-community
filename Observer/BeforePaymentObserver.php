@@ -58,9 +58,11 @@ class BeforePaymentObserver implements ObserverInterface
             if ($customFirstOrderStatus) {
                 $orderStatus = $customFirstOrderStatus;
             }
+ 
             $order->setState($orderState)->setStatus($orderStatus);
             // Do not send any mails until payment is complete
             $order->setCanSendNewEmailFlag(false);
+            $order->setIsNotified(false);
             $order->getResource()->save($order);
         }
     }

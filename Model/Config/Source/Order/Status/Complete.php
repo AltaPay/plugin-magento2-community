@@ -24,7 +24,7 @@ class Complete extends Status
     /**
      * @var string[]
      */
-    protected $stateStatuses = [
+    protected $_stateStatuses = [
         Order::STATE_COMPLETE,
         Order::STATE_CLOSED,
     ];

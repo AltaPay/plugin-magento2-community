@@ -24,7 +24,7 @@ class Processing extends Status
     /**
      * @var string[]
      */
-    protected $stateStatuses = [
+    protected $_stateStatuses = [
         Order::STATE_PROCESSING,
     ];
 }

@@ -11,7 +11,7 @@
  */
 namespace SDM\Altapay\Model\Config\Source;
 
-use Altapay\Api\Test\TestConnection;
+use SDM\Altapay\Api\Test\TestConnection;
 use Magento\Framework\Option\ArrayInterface;
 use SDM\Altapay\Model\SystemConfig;
 

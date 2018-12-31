@@ -42,10 +42,6 @@ footer.page-footer, .sections.nav-sections, .panel.header, .block.block-search, 
     display: none;
 }
 
-.pensio_payment_form_cvc_cell img {
-    width: 20%;
-}
-
 @media (min-width: 768px) {
 .creaditcard-callback-form {
     margin:0px;

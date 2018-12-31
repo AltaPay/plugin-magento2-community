@@ -25,7 +25,7 @@ interface OrderLoaderInterface
      *
      * @return string
      */
-    public function getLastOrderIncrementIdFromSession(): string;
+    public function getLastOrderIncrementIdFromSession();
 
     /**
      * getOrderByOrderIncrementId
@@ -34,5 +34,5 @@ interface OrderLoaderInterface
      *
      * @return Order
      */
-    public function getOrderByOrderIncrementId(string $orderId): Order;
+    public function getOrderByOrderIncrementId(string $orderId);
 }

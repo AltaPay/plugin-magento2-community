@@ -5,9 +5,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  *
- * @copyright 2018 Altapay
- * @category  payment
- * @package   altapay
  */
 
 namespace SDM\Altapay\Model\Handler;
@@ -15,16 +12,19 @@ namespace SDM\Altapay\Model\Handler;
 use Magento\Checkout\Model\Session;
 use Magento\Sales\Model\Order;
 use Magento\Sales\Model\OrderFactory;
-use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Message\ManagerInterface;
 use Magento\Quote\Model\QuoteFactory;
 use SDM\Altapay\Model\ConstantConfig;
 use Magento\SalesRule\Model\Coupon;
 use Magento\SalesRule\Model\ResourceModel\Coupon\Usage as CouponUsage;
 use SDM\Altapay\Api\OrderLoaderInterface;
+use Magento\CatalogInventory\Api\StockManagementInterface;
+use SDM\Altapay\Model\SystemConfig;
+use Magento\Framework\App\ResourceConnection;
 
 /**
  * Class RestoreQuote
+ *
  * @package SDM\Altapay\Model\Handler
  */
 class RestoreQuote
@@ -43,10 +43,14 @@ class RestoreQuote
      */
     protected $orderFactory;
 
-    /** @var QuoteFactory */
+    /**
+     * @var QuoteFactory
+     */
     protected $quoteFactory;
 
-     /** @var ManagerInterface */
+     /**
+      * @var ManagerInterface
+      */
     protected $messageManager;
 
     /**
@@ -64,16 +68,36 @@ class RestoreQuote
     private $orderLoader;
 
     /**
-     * RestoreQuote Constructor
-     * @param Session            $checkoutSession
-     * @param OrderFactory       $orderFactory
-     * @param QuoteFactory       $quoteFactory
-     * @param ManagerInterface   $messageManager
-     * @param Coupon             $coupon
-     * @param CouponUsage        $couponUsage
-     * @param OrderLoaderInterface $orderLoader
+     * @var StockManagementInterface
      */
-    public function __construct(Session $checkoutSession, OrderFactory $orderFactory, QuoteFactory $quoteFactory, ManagerInterface $messageManager, Coupon $coupon, CouponUsage $couponUsage, OrderLoaderInterface $orderLoader)
+    protected $stockManagement;
+    
+    /**
+     * @var SystemConfig
+     */
+    protected $systemConfig;
+
+   /**
+     * @var ResourceConnection
+     */
+    protected $modelResource;
+
+
+    /**
+     * RestoreQuote Constructor
+     *
+     * @param Session                  $checkoutSession
+     * @param OrderFactory             $orderFactory
+     * @param QuoteFactory             $quoteFactory
+     * @param ManagerInterface         $messageManager
+     * @param Coupon                   $coupon
+     * @param CouponUsage              $couponUsage
+     * @param OrderLoaderInterface     $orderLoader
+     * @param StockManagementInterface $stockManagement
+     * @param SystemConfig             $systemConfig
+     * @param ResourceConnection       $modelResource
+     */
+    public function __construct(Session $checkoutSession, OrderFactory $orderFactory, QuoteFactory $quoteFactory, ManagerInterface $messageManager, Coupon $coupon, CouponUsage $couponUsage, OrderLoaderInterface $orderLoader, StockManagementInterface $stockManagement, SystemConfig $systemConfig, ResourceConnection $modelResource)
     {
         $this->checkoutSession = $checkoutSession;
         $this->orderFactory    = $orderFactory;
@@ -82,6 +106,9 @@ class RestoreQuote
         $this->coupon          = $coupon;
         $this->couponUsage     = $couponUsage;
         $this->orderLoader     = $orderLoader;
+        $this->stockManagement = $stockManagement;
+        $this->systemConfig    = $systemConfig;
+        $this->modelResource   = $modelResource;
     }
 
     /**
@@ -89,33 +116,67 @@ class RestoreQuote
      */
     public function handleQuote()
     {
-        if ($this->orderLoader->getLastOrderIncrementIdFromSession()) {
-            try {
-                $orderId = $this->orderLoader->getLastOrderIncrementIdFromSession();
-                $order = $orderId ? $this->orderFactory->create()->load($orderId) : false;
-                if ($order) {
-                    $quote = $this->quoteFactory->create()->loadByIdWithoutStore($order->getQuoteId());
-                    //get quote Id from order and set as active
-                    $quote->setIsActive(1)->setReservedOrderId(null)->save();
-                    $this->checkoutSession->replaceQuote($quote)->unsLastRealOrderId();
+        //check if customer redirect from altapay
+        if ($this->checkoutSession->getAltapayCustomerRedirect()) {
+            //get last order Id from inteface
+             $orderId = $this->orderLoader->getLastOrderIncrementIdFromSession();
+             $order = $this->checkoutSession->getLastRealOrder();
+             $quote = $this->quoteFactory->create()->loadByIdWithoutStore($order->getQuoteId());
 
-                    $order->setState(Order::STATE_CANCELED);
-                    $order->setIsNotified(false);
-                    $order->addStatusHistoryComment(__(ConstantConfig::BROWSER_BK_BUTTON_COMMENT), Order::STATE_CANCELED);
+            //Default history and message
+             $history = __(ConstantConfig::BROWSER_BK_BUTTON_COMMENT);
+             $message = __(ConstantConfig::BROWSER_BK_BUTTON_MSG);
 
-                    if ($order->getCouponCode()) {
-                        $this->resetCouponAfterCancellation($order);
-                    }
 
-                    $order->getResource()->save($order);
+             //get transaction details if faliure and redirect to cart
+             $getTransactionData = $this->getTransactionData($orderId);
+             
+              //if fail set message and history
+            if (!empty($getTransactionData)) {
+                $getTransactionDataDecode = json_decode($getTransactionData);
+
+                if ($getTransactionDataDecode->error_message) {
+                    $history = $getTransactionDataDecode->error_message.' '.$getTransactionDataDecode->merchant_error_message;
+                    $message = $getTransactionDataDecode->error_message.' '.$getTransactionDataDecode->merchant_error_message;
                 }
-            } catch (LocalizedException $e) {
-                // catch and continue - do something when needed
-            } catch (\Exception $e) {
-                // catch and continue - do something when needed
             }
+ 
+            //set before state set in admin configuration
+            $storeScope = \Magento\Store\Model\ScopeInterface::SCOPE_STORE;
+            $storeCode = $order->getStore()->getCode();
+            $orderStatus = $this->systemConfig->getStatusConfig('before', $storeScope, $storeCode);
 
-            $this->messageManager->addErrorMessage(__(ConstantConfig::BROWSER_BK_BUTTON_MSG));
+            //echo $orderStatus.'---'.$order->getStatus();exit;
+            //if quote id exist and order status is from config
+            if ($quote->getId() && $order->getStatus() == $orderStatus) {
+                //get quote Id from order and set as active
+                $quote->setIsActive(1)->setReservedOrderId(null)->save();
+                $this->checkoutSession->replaceQuote($quote)->unsLastRealOrderId();
+                //set order status and comments
+                $order->setState(Order::STATE_CANCELED);
+                $order->setIsNotified(false);
+                $order->addStatusHistoryComment($history, Order::STATE_CANCELED);
+
+                //if coupon applied revert it
+                if ($order->getCouponCode()) {
+                     $this->resetCouponAfterCancellation($order);
+                }
+
+                //revert quantity when cancel order
+                $orderItems = $order->getAllItems();
+                foreach ($orderItems as $item) {
+                     $children = $item->getChildrenItems();
+                     $qty = $item->getQtyOrdered() - max($item->getQtyShipped(), $item->getQtyInvoiced()) - $item->getQtyCanceled();
+                    if ($item->getId() && $item->getProductId() && empty($children) && $qty) {
+                        $this->stockManagement->backItemQty($item->getProductId(), $qty, $item->getStore()->getWebsiteId());
+                    }
+                }
+
+                $order->getResource()->save($order);
+                //show fail message
+                $this->messageManager->addErrorMessage($message);
+            }
+            $this->checkoutSession->unsAltapayCustomerRedirect();
         }
     }
 
@@ -135,5 +196,13 @@ class RestoreQuote
                 $this->couponUsage->updateCustomerCouponTimesUsed($customerId, $this->coupon->getId(), false);
             }
         }
+    }
+
+    public function getTransactionData($orderid)
+    {
+
+        $connection = $this->modelResource->getConnection();
+        $sql = "SELECT parametersdata FROM sdm_altapay WHERE orderid = '$orderid'";
+        return $result = $connection->fetchOne($sql);
     }
 }

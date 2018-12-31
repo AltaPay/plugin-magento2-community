@@ -11,10 +11,10 @@
  */
 namespace SDM\Altapay\Observer;
 
-use Altapay\Api\Payments\RefundCapturedReservation;
-use Altapay\Exceptions\ResponseHeaderException;
-use Altapay\Response\RefundResponse;
-use Altapay\Request\OrderLine;
+use SDM\Altapay\Api\Payments\RefundCapturedReservation;
+use SDM\Altapay\Exceptions\ResponseHeaderException;
+use SDM\Altapay\Response\RefundResponse;
+use SDM\Altapay\Request\OrderLine;
 use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
 use SDM\Altapay\Logger\Logger;

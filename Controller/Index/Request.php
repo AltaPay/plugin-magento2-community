@@ -32,7 +32,7 @@ class Request extends Index
         $this->writeLog();
 
         if ($this->checkPost()) {
-            $params = $this->generator->createRequest(
+            $params = $this->gateway->createRequest(
                 $this->getRequest()->getParam('paytype'),
                 $this->getRequest()->getParam('orderid')
             );

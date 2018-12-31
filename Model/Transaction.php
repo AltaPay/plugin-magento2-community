@@ -58,7 +58,7 @@ class Transaction extends AbstractModel implements TransactionInterface, Identit
      * @return string
      * @see TransactionInterface
      */
-    public function getTransactionid(): string
+    public function getTransactionid()
     {
         return (string)$this->getData(TransactionInterface::TRANSACTION_ID);
     }
@@ -76,7 +76,7 @@ class Transaction extends AbstractModel implements TransactionInterface, Identit
      * @return string
      * @see TransactionInterface
      */
-    public function getPaymentid(): string
+    public function getPaymentid()
     {
         return (string)$this->getData(TransactionInterface::PAYMENT_ID);
     }
@@ -94,7 +94,7 @@ class Transaction extends AbstractModel implements TransactionInterface, Identit
      * @return string
      * @see TransactionInterface
      */
-    public function getOrderid(): string
+    public function getOrderid()
     {
         return (string)$this->getData(TransactionInterface::ORDER_ID);
     }
@@ -112,7 +112,7 @@ class Transaction extends AbstractModel implements TransactionInterface, Identit
      * @return string
      * @see TransactionInterface
      */
-    public function getTransactiondata(): string
+    public function getTransactiondata()
     {
         return $this->getData(TransactionInterface::TRANSACTION_DATA);
     }
@@ -130,7 +130,7 @@ class Transaction extends AbstractModel implements TransactionInterface, Identit
      * @return string
      * @see TransactionInterface
      */
-    public function getParametersdata(): string
+    public function getParametersdata()
     {
         return $this->getData(TransactionInterface::PARAMETERS_DATA);
     }

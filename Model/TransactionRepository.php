@@ -47,7 +47,7 @@ class TransactionRepository implements TransactionRepositoryInterface
     }
 
     /**
-     * It creates the entity and saves the XML request.
+     * It creates the entity and saves the JSON request.
      *
      * @param string $orderid
      * @param string $transactionid

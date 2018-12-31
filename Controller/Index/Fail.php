@@ -46,10 +46,8 @@ class Fail extends Index
                     $msg = "Payment canceled";
                     $this->generator->handleCancelStatusAction($this->getRequest());
                     break;
-                case 'failed':
-                    $formUrl = $this->generator->handleFailedStatusAction($this->getRequest());
-                    $url = $formUrl;
-                    $this->generator->getCheckoutSession()->setPaymentMessageForCallbackForm($msg.''.'Payment Failed');
+                case ('failed' || 'error'):
+                    $this->generator->handleFailedStatusAction($this->getRequest());
                     break;
                 default:
                     $this->generator->handleOrderStateAction($this->getRequest());
@@ -57,7 +55,13 @@ class Fail extends Index
         } catch (\Exception $e) {
             $msg = $e->getMessage();
         }
-        $resultRedirect = $this->prepareRedirect('checkout', ['_fragment' => 'payment'], $msg, $url);
+
+        if ($post['status'] == 'failed' || $post['status'] == 'error') {
+            $resultRedirect = $this->prepareRedirect('checkout/cart', array(), $msg);
+        } else {
+            $resultRedirect = $this->prepareRedirect('checkout', array('_fragment' => 'payment'), $msg);
+        }
+
 
         return $resultRedirect;
     }
@@ -68,16 +72,13 @@ class Fail extends Index
      * @param string $message
      * @return mixed
      */
-    private function prepareRedirect($routePath, $routeParams = null, $message = '', $url)
+    private function prepareRedirect($routePath, $routeParams = null, $message = '')
     {
         if ($message != '') {
             $this->messageManager->addErrorMessage(__($message));
         }
         $resultRedirect = $this->resultRedirectFactory->create();
         $customerRedirUrl = $this->_url->getUrl($routePath, $routeParams);
-        if ($url) {
-            $customerRedirUrl = $url;
-        }
         $resultRedirect->setPath($customerRedirUrl);
 
         return $resultRedirect;

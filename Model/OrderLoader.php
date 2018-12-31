@@ -47,7 +47,7 @@ class OrderLoader implements OrderLoaderInterface
      * getLastOrderIncrementIdFromSession
      * @return string
      */
-    public function getLastOrderIncrementIdFromSession(): string
+    public function getLastOrderIncrementIdFromSession()
     {
         return (string)$this->checkoutSession->getLastRealOrder()->getIncrementId();
     }
@@ -56,7 +56,7 @@ class OrderLoader implements OrderLoaderInterface
      * @param string $orderId
      * @return Order
      */
-    public function getOrderByOrderIncrementId(string $orderId): Order
+    public function getOrderByOrderIncrementId(string $orderId)
     {
         return $this->orderFactory
             ->create()

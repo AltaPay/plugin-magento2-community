@@ -19,6 +19,7 @@ use Magento\Quote\Model\Quote;
 use Magento\Sales\Model\Order;
 use SDM\Altapay\Logger\Logger;
 use SDM\Altapay\Model\Generator;
+use SDM\Altapay\Model\Gateway;
 
 /**
  * Class Index
@@ -48,6 +49,11 @@ abstract class Index extends Action
     protected $generator;
 
     /**
+     * @var Gateway
+     */
+    protected $gateway;
+
+    /**
      * @var Logger
      */
     protected $altapayLogger;
@@ -65,6 +71,7 @@ abstract class Index extends Action
      * @param Quote $quote
      * @param Session $checkoutSession
      * @param Generator $generator
+     * @param Gateway $gateway
      * @param Logger $altapayLogger
      */
     public function __construct(
@@ -74,6 +81,7 @@ abstract class Index extends Action
         Quote $quote,
         Session $checkoutSession,
         Generator $generator,
+        Gateway $gateway,
         Logger $altapayLogger
     ) {
         parent::__construct($context);
@@ -81,6 +89,7 @@ abstract class Index extends Action
         $this->quote = $quote;
         $this->checkoutSession = $checkoutSession;
         $this->generator = $generator;
+        $this->gateway = $gateway;
         $this->altapayLogger = $altapayLogger;
         $this->pageFactory = $pageFactory;
     }
@@ -93,7 +102,6 @@ abstract class Index extends Action
     {
         return $this->getRequest()->isPost();
     }
-
 
     /**
      *

@@ -71,12 +71,12 @@ define(
                     })
                         .done(function (jsonResponse) {
                             console.log(jsonResponse);
+                            $('#altapay-error-message').html('');
                             if (jsonResponse.result == 'success') {
                                 window.location.href = jsonResponse.formurl;
                             } else {
                                 fullScreenLoader.stopLoader();
-                                alert(jsonResponse.message);
-                                window.location.href = '/checkout/cart/';
+                                $('#altapay-error-message').html(jsonResponse.message);
                             }
                         });
                 })

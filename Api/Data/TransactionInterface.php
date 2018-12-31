@@ -38,7 +38,7 @@ interface TransactionInterface
     /**
      * @return string
      */
-    public function getPaymentid(): string;
+    public function getPaymentid();
 
     /**
      * @param string $transactionid
@@ -48,7 +48,7 @@ interface TransactionInterface
     /**
      * @return string
      */
-    public function getTransactionid(): string;
+    public function getTransactionid();
 
     /**
      * @param string $orderid
@@ -58,7 +58,7 @@ interface TransactionInterface
     /**
      * @return string
      */
-    public function getOrderid(): string;
+    public function getOrderid();
 
     /**
      * @param string $parametersdata
@@ -68,7 +68,7 @@ interface TransactionInterface
     /**
      * @return string
      */
-    public function getParametersdata(): string;
+    public function getParametersdata();
 
     /**
      * @param string $transactiondata
@@ -78,5 +78,5 @@ interface TransactionInterface
     /**
      * @return string
      */
-    public function getTransactiondata(): string;
+    public function getTransactiondata();
 }

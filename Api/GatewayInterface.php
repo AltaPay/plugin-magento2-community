@@ -14,9 +14,11 @@ namespace SDM\Altapay\Api;
 
 interface GatewayInterface
 {
-    /**
-     * createRequest to altapay
-     * @return void
+   /**
+     * Createrequest to altapay in order to generate for url
+     * @param int $terminalId
+     * @param string $orderId
+     * @return array
      */
-    public function createRequest();
+    public function createRequest(int $terminalId, string $orderId);
 }

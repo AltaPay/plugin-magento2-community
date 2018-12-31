@@ -11,10 +11,10 @@
  */
 namespace SDM\Altapay\Observer;
 
-use Altapay\Api\Payments\CaptureReservation;
-use Altapay\Exceptions\ResponseHeaderException;
-use Altapay\Request\OrderLine;
-use Altapay\Response\CaptureReservationResponse;
+use SDM\Altapay\Api\Payments\CaptureReservation;
+use SDM\Altapay\Exceptions\ResponseHeaderException;
+use SDM\Altapay\Request\OrderLine;
+use SDM\Altapay\Response\CaptureReservationResponse;
 use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
 use SDM\Altapay\Logger\Logger;

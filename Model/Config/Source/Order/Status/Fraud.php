@@ -24,7 +24,7 @@ class Fraud extends Status
     /**
      * @var string[]
      */
-    protected $stateStatuses = [
+    protected $_stateStatuses = [
         Order::STATE_PAYMENT_REVIEW,
         Order::STATE_HOLDED,
     ];
