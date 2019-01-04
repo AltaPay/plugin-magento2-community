@@ -34,5 +34,5 @@ interface OrderLoaderInterface
      *
      * @return Order
      */
-    public function getOrderByOrderIncrementId(string $orderId);
+    public function getOrderByOrderIncrementId($orderId);
 }

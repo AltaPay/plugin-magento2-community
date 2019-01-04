@@ -56,7 +56,7 @@ class OrderLoader implements OrderLoaderInterface
      * @param string $orderId
      * @return Order
      */
-    public function getOrderByOrderIncrementId(string $orderId)
+    public function getOrderByOrderIncrementId($orderId)
     {
         return $this->orderFactory
             ->create()

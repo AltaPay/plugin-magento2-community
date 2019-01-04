@@ -76,6 +76,7 @@ define(
                                 window.location.href = jsonResponse.formurl;
                             } else {
                                 fullScreenLoader.stopLoader();
+                                $('#altapay-error-message').css('display','block');
                                 $('#altapay-error-message').html(jsonResponse.message);
                             }
                         });

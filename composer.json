@@ -1,5 +1,5 @@
 {
-  "name": "altapay/magento2-community",
+  "name": "altapay/magento2-payment",
   "license": "MIT",
   "authors": [
     {
@@ -14,10 +14,15 @@
     }
   ],
   "description": "Altapay payment",
-  "require": {
-    "php": "^5.5|^7.0",
-    "lsv/altapay-php-api": "^1.0"
-  },
+   "require": {
+        "php": ">=5.5",
+        "guzzlehttp/promises": "^1.3",
+        "guzzlehttp/psr7": "^1.5",
+        "guzzlehttp/guzzle": "^6.3",
+        "psr/http-message": "^1.0",
+        "ralouphie/getallheaders": "^2.0",
+        "symfony/options-resolver": "^3.4"
+  }, 
   "type": "magento2-module",
   "version": "1.0.1",
   "autoload": {

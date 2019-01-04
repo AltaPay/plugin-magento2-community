@@ -95,7 +95,7 @@ class Gateway implements GatewayInterface
      * @param string $orderId
      * @return array
      */
-    public function createRequest(int $terminalId, string $orderId)
+    public function createRequest($terminalId,$orderId)
     {
         $order = $this->order->load($orderId);
         if ($order->getId()) {

@@ -28,5 +28,5 @@ interface TransactionRepositoryInterface
      * @param string $transactiondata
      * @param string $parametersdata
      */
-    public function addTransactionData(string $orderid, string $transactionid, string $paymentid, string $transactiondata, string $parametersdata);
+    public function addTransactionData($orderid,$transactionid,$paymentid,$transactiondata,  $parametersdata);
 }

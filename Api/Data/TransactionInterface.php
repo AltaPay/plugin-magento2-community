@@ -33,7 +33,7 @@ interface TransactionInterface
     /**
      * @param string $paymentid
      */
-    public function setPaymentid(string $paymentid);
+    public function setPaymentid($paymentid);
 
     /**
      * @return string
@@ -43,7 +43,7 @@ interface TransactionInterface
     /**
      * @param string $transactionid
      */
-    public function setTransactionid(string $transactionid);
+    public function setTransactionid($transactionid);
 
     /**
      * @return string
@@ -53,7 +53,7 @@ interface TransactionInterface
     /**
      * @param string $orderid
      */
-    public function setOrderid(string $orderid);
+    public function setOrderid($orderid);
 
     /**
      * @return string
@@ -63,7 +63,7 @@ interface TransactionInterface
     /**
      * @param string $parametersdata
      */
-    public function setParametersdata(string $parametersdata);
+    public function setParametersdata($parametersdata);
 
     /**
      * @return string
@@ -73,7 +73,7 @@ interface TransactionInterface
     /**
      * @param string $transactiondata
      */
-    public function setTransactiondata(string $transactiondata);
+    public function setTransactiondata($transactiondata);
     
     /**
      * @return string
