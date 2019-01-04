@@ -1,5 +1,5 @@
 {
-  "name": "altapay/magento2-payment",
+  "name": "altapay/magento2-community",
   "license": "MIT",
   "authors": [
     {
@@ -22,7 +22,7 @@
         "psr/http-message": "^1.0",
         "ralouphie/getallheaders": "^2.0",
         "symfony/options-resolver": "^3.4"
-  }, 
+  },
   "type": "magento2-module",
   "version": "1.0.1",
   "autoload": {
