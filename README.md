@@ -6,6 +6,10 @@ web shop.
 
 == Change log ==
 
+** Version 1.1.1
+
+    * alert popups into div
+
 ** Version 1.1.0
 
     * Added support for PHP 5.5 and 5.6
