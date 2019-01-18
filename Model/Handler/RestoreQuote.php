@@ -146,9 +146,8 @@ class RestoreQuote
             $storeCode = $order->getStore()->getCode();
             $orderStatus = $this->systemConfig->getStatusConfig('before', $storeScope, $storeCode);
 
-            //echo $orderStatus.'---'.$order->getStatus();exit;
             //if quote id exist and order status is from config
-            if ($quote->getId() && $order->getStatus() == $orderStatus) {
+            if ($quote->getId() && $order) {
                 //get quote Id from order and set as active
                 $quote->setIsActive(1)->setReservedOrderId(null)->save();
                 $this->checkoutSession->replaceQuote($quote)->unsLastRealOrderId();
