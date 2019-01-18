@@ -6,6 +6,10 @@ web shop.
 
 == Change log ==
 
+** Version 1.1.2
+
+    * update dependency version in composer.json
+
 ** Version 1.1.1
 
     * alert popups into div
