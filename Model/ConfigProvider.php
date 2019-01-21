@@ -56,7 +56,7 @@ class ConfigProvider implements ConfigProviderInterface
      * @param ScopeConfigInterface $scopeConfig
      */
     public function __construct(Data $data, Escaper $escaper, UrlInterface $urlInterface,         SystemConfig $systemConfig
-)
+    )
     {
         $this->data = $data;
         $this->escaper = $escaper;
@@ -71,7 +71,7 @@ class ConfigProvider implements ConfigProviderInterface
      */
     public function getConfig()
     {
-    	$store = null;
+        $store = null;
         return [
             'payment' => [
                 self::CODE => [
@@ -85,15 +85,15 @@ class ConfigProvider implements ConfigProviderInterface
 
     public function checkAuth()
     {
-    	$auth = 0;
-    	$response = new TestAuthentication($this->systemConfig->getAuth());
-    	 if (!$response) {
-           $result = false;
+        $auth = 0;
+        $response = new TestAuthentication($this->systemConfig->getAuth());
+        if (!$response) {
+            $result = false;
         } else {
-           $result = $response->call();
+            $result = $response->call();
         }
-        if($result){
-          $auth = 1;
+        if ($result) {
+            $auth = 1;
         }
 
         return $auth;
@@ -101,15 +101,15 @@ class ConfigProvider implements ConfigProviderInterface
 
     public function checkConn()
     {
-    	$conn = 0;
-    	$response = new TestConnection($this->systemConfig->getApiConfig('productionurl'));
+        $conn = 0;
+        $response = new TestConnection($this->systemConfig->getApiConfig('productionurl'));
         if (!$response) {
-           $result = false;
+            $result = false;
         } else {
-           $result = $response->call();
+            $result = $response->call();
         }
-        if($result){
-          $conn = 1;
+        if ($result) {
+            $conn = 1;
         }
         return $conn;
     }
