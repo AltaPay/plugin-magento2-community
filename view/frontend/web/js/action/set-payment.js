@@ -75,7 +75,6 @@ define(
                             if (jsonResponse.result == 'success') {
                                 window.location.href = jsonResponse.formurl;
                             } else {
-                                console.log(jsonResponse.message);
                                 fullScreenLoader.stopLoader();
                                 $(".payment-method._active").find('#altapay-error-message').css('display','block');
                                 $(".payment-method._active").find('#altapay-error-message').text(jsonResponse.message);

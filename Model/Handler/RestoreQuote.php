@@ -136,8 +136,8 @@ class RestoreQuote
                 $getTransactionDataDecode = json_decode($getTransactionData);
 
                 if ($getTransactionDataDecode->error_message) {
-                    $history = $getTransactionDataDecode->error_message.' '.$getTransactionDataDecode->merchant_error_message;
-                    $message = $getTransactionDataDecode->error_message.' '.$getTransactionDataDecode->merchant_error_message;
+                    $history = $getTransactionDataDecode->error_message;
+                    $message = $getTransactionDataDecode->error_message;
                 }
             }
  
@@ -146,7 +146,7 @@ class RestoreQuote
             $storeCode = $order->getStore()->getCode();
             $orderStatus = $this->systemConfig->getStatusConfig('before', $storeScope, $storeCode);
 
-            //if quote id exist and order status is from config
+            //if quote id and order exist
             if ($quote->getId() && $order) {
                 //get quote Id from order and set as active
                 $quote->setIsActive(1)->setReservedOrderId(null)->save();
