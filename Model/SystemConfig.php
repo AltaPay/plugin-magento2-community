@@ -109,6 +109,7 @@ class SystemConfig
         if (is_null($storeCode)) {
             $storeCode = $this->resolveCurrentStoreCode();
         }
+
         $login = $this->getApiConfig('api_log_in', $storeScope, $storeCode);
         $password = $this->encrypter->processValue($this->getApiConfig('api_pass_word', $storeScope, $storeCode));
         $baseurl = $this->getApiConfig('productionurl', $storeScope, $storeCode);
@@ -213,7 +214,7 @@ class SystemConfig
             $storeId = (int) $this->request->getParam('store', 0);
         } else {
             //Frontend area
-            $storeId = $this->storeResolver->getCurrentStoreId();
+            $storeId = $this->storeManager->getStore()->getId();
         }
 
         return $this->storeManager->getStore($storeId)->getCode();

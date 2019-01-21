@@ -15,6 +15,10 @@ use Magento\Checkout\Model\ConfigProviderInterface;
 use Magento\Framework\Escaper;
 use Magento\Framework\UrlInterface;
 use Magento\Payment\Helper\Data;
+use SDM\Altapay\Api\Test\TestAuthentication;
+use SDM\Altapay\Api\Test\TestConnection;
+use SDM\Altapay\Model\SystemConfig;
+use SDM\Altapay\Authentication;
 
 /**
  * Class ConfigProvider
@@ -23,6 +27,7 @@ use Magento\Payment\Helper\Data;
 class ConfigProvider implements ConfigProviderInterface
 {
     const CODE  = 'sdm_altapay';
+
     /**
      * @var Data
      */
@@ -38,17 +43,25 @@ class ConfigProvider implements ConfigProviderInterface
      */
     private $urlInterface;
 
+     /**
+     * @var SystemConfig
+     */
+    private $systemConfig;
+
     /**
      * ConfigProvider constructor.
      * @param Data $data
      * @param Escaper $escaper
      * @param UrlInterface $urlInterface
+     * @param ScopeConfigInterface $scopeConfig
      */
-    public function __construct(Data $data, Escaper $escaper, UrlInterface $urlInterface)
+    public function __construct(Data $data, Escaper $escaper, UrlInterface $urlInterface,         SystemConfig $systemConfig
+)
     {
         $this->data = $data;
         $this->escaper = $escaper;
         $this->urlInterface = $urlInterface;
+        $this->systemConfig = $systemConfig;
     }
 
     /**
@@ -58,13 +71,47 @@ class ConfigProvider implements ConfigProviderInterface
      */
     public function getConfig()
     {
+    	$store = null;
         return [
             'payment' => [
                 self::CODE => [
-                    'url' => $this->urlInterface->getDirectUrl($this->getData()->getConfigData('place_order_url'))
+                    'url' => $this->urlInterface->getDirectUrl($this->getData()->getConfigData('place_order_url')),
+                    'auth' => $this->checkAuth(),
+                    'connection' => $this->checkConn()
                 ]
             ]
         ];
+    }
+
+    public function checkAuth()
+    {
+    	$auth = 0;
+    	$response = new TestAuthentication($this->systemConfig->getAuth());
+    	 if (!$response) {
+           $result = false;
+        } else {
+           $result = $response->call();
+        }
+        if($result){
+          $auth = 1;
+        }
+
+        return $auth;
+    }
+
+    public function checkConn()
+    {
+    	$conn = 0;
+    	$response = new TestConnection($this->systemConfig->getApiConfig('productionurl'));
+        if (!$response) {
+           $result = false;
+        } else {
+           $result = $response->call();
+        }
+        if($result){
+          $conn = 1;
+        }
+        return $conn;
     }
 
     /**

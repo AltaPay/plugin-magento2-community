@@ -59,6 +59,7 @@ define(
 
             return storage.post(serviceUrl, JSON.stringify(payload))
                 .done(function (data) {
+                    $('#altapay-error-message').text('');
                     $.ajax({
                         method: "POST",
                         url: window.checkoutConfig.payment['sdm_altapay'].url,
@@ -71,13 +72,14 @@ define(
                     })
                         .done(function (jsonResponse) {
                             console.log(jsonResponse);
-                            $('#altapay-error-message').html('');
                             if (jsonResponse.result == 'success') {
                                 window.location.href = jsonResponse.formurl;
                             } else {
+                                console.log(jsonResponse.message);
                                 fullScreenLoader.stopLoader();
-                                $('#altapay-error-message').css('display','block');
-                                $('#altapay-error-message').html(jsonResponse.message);
+                                $(".payment-method._active").find('#altapay-error-message').css('display','block');
+                                $(".payment-method._active").find('#altapay-error-message').text(jsonResponse.message);
+                                return false;
                             }
                         });
                 })
