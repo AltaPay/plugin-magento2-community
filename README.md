@@ -8,7 +8,7 @@ web shop.
 
 ** Version 1.1.3
 
-    * auth before place order
+    * auth before place order + update version
     * restore quote check
 
 ** Version 1.1.2
