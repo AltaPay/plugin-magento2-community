@@ -6,6 +6,11 @@ web shop.
 
 == Change log ==
 
+** Version 1.1.3
+
+    * auth before place order
+    * restore quote check
+
 ** Version 1.1.2
 
     * update dependency version in composer.json
