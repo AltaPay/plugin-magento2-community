@@ -10,7 +10,7 @@ web shop.
 
     * Fixed the authorization from the checkout section
     * Added a check before a quote is restored
-    * symfony dependency
+    * symfony dependency ~2.6 || ~3.0 || ^4.0
 
 ** Version 1.1.2
 
