@@ -8,16 +8,16 @@ web shop.
 
 ** Version 1.1.3
 
-    * auth before place order + update version
-    * restore quote check
+    * Fixed the authorization from the checkout section
+    * Added a check before a quote is restored
 
 ** Version 1.1.2
 
-    * update dependency version in composer.json
+    * Internal reference updates
 
 ** Version 1.1.1
 
-    * alert popups into div
+    * Replaced the pop up messages with regular ones
 
 ** Version 1.1.0
 
