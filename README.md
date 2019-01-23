@@ -5,12 +5,14 @@ web shop.
 
 
 == Change log ==
+** Version 1.1.4
+    
+    * symfony dependency ~2.6 || ~3.0 || ^4.0
 
 ** Version 1.1.3
 
     * Fixed the authorization from the checkout section
     * Added a check before a quote is restored
-    * symfony dependency ~2.6 || ~3.0 || ^4.0
 
 ** Version 1.1.2
 
