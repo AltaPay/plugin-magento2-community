@@ -21,7 +21,7 @@
         "guzzlehttp/guzzle": "^6.0",
         "psr/http-message": "^1.0.1",
         "ralouphie/getallheaders": "^2.0",
-        "symfony/options-resolver": "^v3.4.12"
+        "symfony/options-resolver": "*"
   },
   "type": "magento2-module",
   "version": "1.1.3",
