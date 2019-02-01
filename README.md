@@ -5,9 +5,10 @@ web shop.
 
 
 == Change log ==
+
 ** Version 1.1.4
     
-    * symfony dependency ~2.6 || ~3.0 || ^4.0
+    * Fixed the symfony dependency: either one from the next list will be used, according to the Magento version: 2.6, 3.0 or 4.0+
 
 ** Version 1.1.3
 
