@@ -1,23 +1,23 @@
 <?php
 /**
- * Altapay Module for Magento 2.x.
+ * Valitor Module for Magento 2.x.
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  *
- * @copyright 2018 Altapay
+ * @copyright 2018 Valitor
  * @category  payment
- * @package   altapay
+ * @package   valitor
  */
-namespace SDM\Altapay\Block\Callback;
+namespace SDM\Valitor\Block\Callback;
 
 use Magento\Customer\Model\Context;
 use Magento\Sales\Model\Order;
-use SDM\Altapay\Api\OrderLoaderInterface;
+use SDM\Valitor\Api\OrderLoaderInterface;
 
 /**
  * Class Ordersummary
- * @package SDM\Altapay\Block\Callback
+ * @package SDM\Valitor\Block\Callback
  */
 class Ordersummary extends \Magento\Framework\View\Element\Template
 {

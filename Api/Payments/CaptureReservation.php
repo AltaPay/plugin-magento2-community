@@ -21,14 +21,14 @@
  * THE SOFTWARE.
  */
 
-namespace SDM\Altapay\Api\Payments;
+namespace SDM\Valitor\Api\Payments;
 
-use SDM\Altapay\AbstractApi;
-use SDM\Altapay\Response\CaptureReservationResponse;
-use SDM\Altapay\Serializer\ResponseSerializer;
-use SDM\Altapay\Traits\AmountTrait;
-use SDM\Altapay\Traits\OrderlinesTrait;
-use SDM\Altapay\Traits\TransactionsTrait;
+use SDM\Valitor\AbstractApi;
+use SDM\Valitor\Response\CaptureReservationResponse;
+use SDM\Valitor\Serializer\ResponseSerializer;
+use SDM\Valitor\Traits\AmountTrait;
+use SDM\Valitor\Traits\OrderlinesTrait;
+use SDM\Valitor\Traits\TransactionsTrait;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
 use Symfony\Component\OptionsResolver\OptionsResolver;

@@ -21,9 +21,9 @@
  * THE SOFTWARE.
  */
 
-namespace SDM\Altapay\Response;
+namespace SDM\Valitor\Response;
 
-use SDM\Altapay\Response\Embeds\GiftCardAccount;
+use SDM\Valitor\Response\Embeds\GiftCardAccount;
 
 class GiftcardResponse extends AbstractResponse
 {

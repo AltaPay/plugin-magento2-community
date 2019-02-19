@@ -1,22 +1,22 @@
 <?php
 /**
- * Altapay Module for Magento 2.x.
+ * Valitor Module for Magento 2.x.
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  *
- * @copyright 2018 Altapay
+ * @copyright 2018 Valitor
  * @category  payment
- * @package   altapay
+ * @package   valitor
  */
 
-namespace SDM\Altapay\Api;
+namespace SDM\Valitor\Api;
 
 use Magento\Sales\Model\Order;
 
 /**
  * Interface OrderLoaderInterface
- * @package SDM\Altapay\Api
+ * @package SDM\Valitor\Api
  */
 interface OrderLoaderInterface
 {

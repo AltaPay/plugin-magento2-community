@@ -1,30 +1,30 @@
 <?php
 /**
- * Altapay Module for Magento 2.x.
+ * Valitor Module for Magento 2.x.
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  *
- * @copyright 2018 Altapay
+ * @copyright 2018 Valitor
  * @category  payment
- * @package   altapay
+ * @package   valitor
  */
 
-namespace SDM\Altapay\Test\Unit\Block\Callback;
+namespace SDM\Valitor\Test\Unit\Block\Callback;
 
 use Magento\Sales\Model\OrderFactory;
 use Magento\Sales\Model\Order\Address\Renderer;
 use Magento\Catalog\Model\ProductRepository;
 use Magento\Framework\Pricing\Helper\Data;
 use Magento\Framework\App\Request\Http;
-use SDM\Altapay\Block\Callback\Ordersummary;
+use SDM\Valitor\Block\Callback\Ordersummary;
 use Magento\Framework\TestFramework\Unit\Helper\ObjectManager;
-use SDM\Altapay\Test\Unit\MainTestCase;
-use SDM\Altapay\Test\Unit\ConstantTestConfig;
+use SDM\Valitor\Test\Unit\MainTestCase;
+use SDM\Valitor\Test\Unit\ConstantTestConfig;
 
 /**
  * Class OrdersummaryTest
- * @package SDM\Altapay\Test\Unit\Block
+ * @package SDM\Valitor\Test\Unit\Block
  */
 class OrdersummaryTest extends MainTestCase
 {

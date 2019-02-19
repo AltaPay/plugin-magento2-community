@@ -1,28 +1,28 @@
 <?php
 /**
- * Altapay Module for Magento 2.x.
+ * Valitor Module for Magento 2.x.
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  *
- * @copyright 2018 Altapay
+ * @copyright 2018 Valitor
  * @category  payment
- * @package   altapay
+ * @package   valitor
  */
-namespace SDM\Altapay\Observer;
+namespace SDM\Valitor\Observer;
 
-use SDM\Altapay\Api\Payments\CaptureReservation;
-use SDM\Altapay\Exceptions\ResponseHeaderException;
-use SDM\Altapay\Request\OrderLine;
-use SDM\Altapay\Response\CaptureReservationResponse;
+use SDM\Valitor\Api\Payments\CaptureReservation;
+use SDM\Valitor\Exceptions\ResponseHeaderException;
+use SDM\Valitor\Request\OrderLine;
+use SDM\Valitor\Response\CaptureReservationResponse;
 use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
-use SDM\Altapay\Logger\Logger;
-use SDM\Altapay\Model\SystemConfig;
+use SDM\Valitor\Logger\Logger;
+use SDM\Valitor\Model\SystemConfig;
 
 /**
  * Class CaptureObserver
- * @package SDM\Altapay\Observer
+ * @package SDM\Valitor\Observer
  */
 class CaptureObserver implements ObserverInterface
 {
@@ -34,17 +34,17 @@ class CaptureObserver implements ObserverInterface
     /**
      * @var Logger
      */
-    private $altapayLogger;
+    private $valitorLogger;
 
     /**
      * CaptureObserver constructor.
      * @param SystemConfig $systemConfig
-     * @param Logger $altapayLogger
+     * @param Logger $valitorLogger
      */
-    public function __construct(SystemConfig $systemConfig, Logger $altapayLogger)
+    public function __construct(SystemConfig $systemConfig, Logger $valitorLogger)
     {
         $this->systemConfig = $systemConfig;
-        $this->altapayLogger = $altapayLogger;
+        $this->valitorLogger = $valitorLogger;
     }
 
     /**
@@ -107,23 +107,23 @@ class CaptureObserver implements ObserverInterface
             try {
                 $response = $api->call();
             } catch (ResponseHeaderException $e) {
-                $this->altapayLogger->addInfoLog('Info', $e->getHeader());
-                $this->altapayLogger->addCriticalLog('Response header exception', $e->getMessage());
+                $this->valitorLogger->addInfoLog('Info', $e->getHeader());
+                $this->valitorLogger->addCriticalLog('Response header exception', $e->getMessage());
                 throw $e;
             } catch (\Exception $e) {
-                $this->altapayLogger->addCriticalLog('Exception', $e->getMessage());
+                $this->valitorLogger->addCriticalLog('Exception', $e->getMessage());
                 throw $e;
             }
 
             $rawresponse = $api->getRawResponse();
             $body = $rawresponse->getBody();
-            $this->altapayLogger->addInfoLog('Response body', $body);
+            $this->valitorLogger->addInfoLog('Response body', $body);
 
             $headdata = [];
             foreach ($rawresponse->getHeaders() as $k => $v) {
                 $headdata[] = $k . ': ' . json_encode($v);
             }
-            $this->altapayLogger->addInfoLog('Response headers', implode(", ", $headdata));
+            $this->valitorLogger->addInfoLog('Response headers', implode(", ", $headdata));
 
             if ($response->Result != 'Success') {
                 throw new \InvalidArgumentException('Could not capture reservation');
@@ -136,7 +136,7 @@ class CaptureObserver implements ObserverInterface
      */
     private function logItem($item)
     {
-        $this->altapayLogger->addInfoLog(
+        $this->valitorLogger->addInfoLog(
             'Log Item',
             sprintf(
                 implode(' - ', [
@@ -179,7 +179,7 @@ class CaptureObserver implements ObserverInterface
             'getAmountRefunded: %s',
         ];
 
-        $this->altapayLogger->addInfoLog(
+        $this->valitorLogger->addInfoLog(
             'Log Transaction',
             sprintf(
                 implode(' - ', $logs),

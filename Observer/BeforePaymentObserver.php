@@ -1,24 +1,24 @@
 <?php
 /**
- * Altapay Module for Magento 2.x.
+ * Valitor Module for Magento 2.x.
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  *
- * @copyright 2018 Altapay
+ * @copyright 2018 Valitor
  * @category  payment
- * @package   altapay
+ * @package   valitor
  */
-namespace SDM\Altapay\Observer;
+namespace SDM\Valitor\Observer;
 
 use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
 use Magento\Sales\Model\Order;
-use SDM\Altapay\Model\SystemConfig;
+use SDM\Valitor\Model\SystemConfig;
 
 /**
  * Class BeforePaymentObserver
- * @package SDM\Altapay\Observer
+ * @package SDM\Valitor\Observer
  */
 class BeforePaymentObserver implements ObserverInterface
 {

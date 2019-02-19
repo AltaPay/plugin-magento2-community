@@ -21,9 +21,9 @@
  * THE SOFTWARE.
  */
 
-namespace SDM\Altapay\Response\Embeds;
+namespace SDM\Valitor\Response\Embeds;
 
-use SDM\Altapay\Response\AbstractResponse;
+use SDM\Valitor\Response\AbstractResponse;
 
 class Shop extends AbstractResponse
 {

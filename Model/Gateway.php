@@ -1,36 +1,36 @@
 <?php
 /**
- * Altapay Module for Magento 2.x.
+ * Valitor Module for Magento 2.x.
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  *
- * @copyright 2018 Altapay
+ * @copyright 2018 Valitor
  * @category  payment
- * @package   altapay
+ * @package   valitor
  */
-namespace SDM\Altapay\Model;
+namespace SDM\Valitor\Model;
 
-use SDM\Altapay\Api\GatewayInterface;
-use SDM\Altapay\Api\OrderLoaderInterface;
-use SDM\Altapay\Model\ConstantConfig;
+use SDM\Valitor\Api\GatewayInterface;
+use SDM\Valitor\Api\OrderLoaderInterface;
+use SDM\Valitor\Model\ConstantConfig;
 use Magento\Sales\Model\Order;
 use Magento\Checkout\Model\Session;
 use Magento\Quote\Model\Quote;
 use Magento\Framework\UrlInterface;
-use SDM\Altapay\Request\Address;
-use SDM\Altapay\Request\Customer;
-use SDM\Altapay\Request\Config;
-use SDM\Altapay\Api\Ecommerce\PaymentRequest;
-use SDM\Altapay\Api\Test\TestAuthentication;
-use SDM\Altapay\Request\OrderLine;
-use SDM\Altapay\Exceptions\ClientException;
-use SDM\Altapay\Exceptions\ResponseHeaderException;
-use SDM\Altapay\Exceptions\ResponseMessageException;
+use SDM\Valitor\Request\Address;
+use SDM\Valitor\Request\Customer;
+use SDM\Valitor\Request\Config;
+use SDM\Valitor\Api\Ecommerce\PaymentRequest;
+use SDM\Valitor\Api\Test\TestAuthentication;
+use SDM\Valitor\Request\OrderLine;
+use SDM\Valitor\Exceptions\ClientException;
+use SDM\Valitor\Exceptions\ResponseHeaderException;
+use SDM\Valitor\Exceptions\ResponseMessageException;
 
 /**
  * Class Gateway
- * @package SDM\Altapay\Model
+ * @package SDM\Valitor\Model
  */
 class Gateway implements GatewayInterface
 {
@@ -90,7 +90,7 @@ class Gateway implements GatewayInterface
     }
 
    /**
-     * Createrequest to altapay
+     * Createrequest to valitor
      * @param int $terminalId
      * @param string $orderId
      * @return array
@@ -176,7 +176,7 @@ class Gateway implements GatewayInterface
             ))->setGoodsType('shipment');
             $request->setOrderLines($orderlines);
             try {
-                /** @var \Altapay\Response\PaymentRequestResponse $response */
+                /** @var \Valitor\Response\PaymentRequestResponse $response */
                 $response = $request->call();
                 $requestParams['result'] = __(ConstantConfig::SUCCESS);
                 $requestParams['formurl'] = $response->Url;
@@ -185,12 +185,12 @@ class Gateway implements GatewayInterface
                 // set notification
                 $order->addStatusHistoryComment(__(ConstantConfig::REDIRECT_TO_ALTAPAY) . $response->PaymentRequestId);
 
-                $order->setAltapayPaymentFormUrl($response->Url);
+                $order->setValitorPaymentFormUrl($response->Url);
 
                 $order->getResource()->save($order);
 
-                //set flag if customer redirect to Altapay
-                $this->checkoutSession->setAltapayCustomerRedirect(true);
+                //set flag if customer redirect to Valitor
+                $this->checkoutSession->setValitorCustomerRedirect(true);
 
                 return $requestParams;
             } catch (ClientException $e) {

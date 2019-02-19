@@ -1,9 +1,9 @@
 <?php
-namespace SDM\Altapay\Observer;
+namespace SDM\Valitor\Observer;
 
 use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
-use SDM\Altapay\Model\Handler\RestoreQuote;
+use SDM\Valitor\Model\Handler\RestoreQuote;
 
 class CheckoutCartIndex implements ObserverInterface
 {

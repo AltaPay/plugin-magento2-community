@@ -21,10 +21,10 @@
  * THE SOFTWARE.
  */
 
-namespace SDM\Altapay;
+namespace SDM\Valitor;
 
-use SDM\Altapay\Exceptions;
-use SDM\Altapay\Response\AbstractResponse;
+use SDM\Valitor\Exceptions;
+use SDM\Valitor\Response\AbstractResponse;
 use GuzzleHttp\Client;
 use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Exception\ClientException as GuzzleHttpClientException;

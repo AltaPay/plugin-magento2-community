@@ -1,14 +1,14 @@
 <?xml version="1.0"?>
 <!--
 /**
- * Altapay Module for Magento 2.x.
+ * Valitor Module for Magento 2.x.
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  *
- * @copyright 2018 Altapay
+ * @copyright 2018 Valitor
  * @category  payment
- * @package   altapay
+ * @package   valitor
  */
 -->
 
@@ -30,8 +30,8 @@
                                                         <item name="renders" xsi:type="array">
                                                             <!-- merge payment method renders here -->
                                                             <item name="children" xsi:type="array">
-                                                                <item name="sdm_altapay" xsi:type="array">
-                                                                    <item name="component" xsi:type="string">SDM_Altapay/js/view/payment/terminal</item>
+                                                                <item name="sdm_valitor" xsi:type="array">
+                                                                    <item name="component" xsi:type="string">SDM_Valitor/js/view/payment/terminal</item>
                                                                     <item name="methods" xsi:type="array">
                                                                         <item name="terminal1" xsi:type="array">
                                                                             <item name="isBillingAddressRequired" xsi:type="boolean">true</item>

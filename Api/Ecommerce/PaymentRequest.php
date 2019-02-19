@@ -21,14 +21,14 @@
  * THE SOFTWARE.
  */
 
-namespace SDM\Altapay\Api\Ecommerce;
+namespace SDM\Valitor\Api\Ecommerce;
 
-use SDM\Altapay\AbstractApi;
-use SDM\Altapay\Request\Config;
-use SDM\Altapay\Response\PaymentRequestResponse;
-use SDM\Altapay\Serializer\ResponseSerializer;
-use SDM\Altapay\Traits;
-use SDM\Altapay\Types;
+use SDM\Valitor\AbstractApi;
+use SDM\Valitor\Request\Config;
+use SDM\Valitor\Response\PaymentRequestResponse;
+use SDM\Valitor\Serializer\ResponseSerializer;
+use SDM\Valitor\Traits;
+use SDM\Valitor\Types;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
 use Symfony\Component\OptionsResolver\Options;

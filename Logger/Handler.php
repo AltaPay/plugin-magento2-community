@@ -1,22 +1,22 @@
 <?php
 /**
- * Altapay Module for Magento 2.x.
+ * Valitor Module for Magento 2.x.
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  *
- * @copyright 2018 Altapay
+ * @copyright 2018 Valitor
  * @category  payment
- * @package   altapay
+ * @package   valitor
  */
-namespace SDM\Altapay\Logger;
+namespace SDM\Valitor\Logger;
 
 use Monolog\Logger;
 use Magento\Framework\Logger\Handler\Base;
 
 /**
  * Class Handler
- * @package SDM\Altapay\Logger
+ * @package SDM\Valitor\Logger
  */
 class Handler extends Base
 {
@@ -28,5 +28,5 @@ class Handler extends Base
     /**
      * @var string
      */
-    protected $fileName = '/var/log/altapay.log';
+    protected $fileName = '/var/log/valitor.log';
 }

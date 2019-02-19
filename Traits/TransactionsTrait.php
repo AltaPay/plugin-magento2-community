@@ -21,9 +21,9 @@
  * THE SOFTWARE.
  */
 
-namespace SDM\Altapay\Traits;
+namespace SDM\Valitor\Traits;
 
-use SDM\Altapay\Response\Embeds\Transaction;
+use SDM\Valitor\Response\Embeds\Transaction;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 

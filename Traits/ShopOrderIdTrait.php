@@ -21,7 +21,7 @@
  * THE SOFTWARE.
  */
 
-namespace SDM\Altapay\Traits;
+namespace SDM\Valitor\Traits;
 
 use Symfony\Component\OptionsResolver\OptionsResolver;
 

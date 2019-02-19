@@ -21,9 +21,9 @@
  * THE SOFTWARE.
  */
 
-namespace SDM\Altapay\Exceptions;
+namespace SDM\Valitor\Exceptions;
 
-use SDM\Altapay\Response\Embeds\Header;
+use SDM\Valitor\Response\Embeds\Header;
 
 class ResponseHeaderException extends Exception
 {

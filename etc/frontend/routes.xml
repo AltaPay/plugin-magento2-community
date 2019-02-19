@@ -1,21 +1,21 @@
 <?xml version="1.0"?>
 <!--
 /**
- * Altapay Module for Magento 2.x.
+ * Valitor Module for Magento 2.x.
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  *
- * @copyright 2018 Altapay
+ * @copyright 2018 Valitor
  * @category  payment
- * @package   altapay
+ * @package   valitor
  */
 -->
 
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:App/etc/routes.xsd">
     <router id="standard">
-        <route id="sdmaltapay" frontName="sdmaltapay">
-            <module name="SDM_Altapay"/>
+        <route id="sdmvalitor" frontName="sdmvalitor">
+            <module name="SDM_Valitor"/>
         </route>
     </router>
 </config>

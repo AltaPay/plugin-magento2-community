@@ -1,24 +1,24 @@
 <?php
 /**
- * Altapay Module for Magento 2.x.
+ * Valitor Module for Magento 2.x.
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  *
- * @copyright 2018 Altapay
+ * @copyright 2018 Valitor
  * @category  payment
- * @package   altapay
+ * @package   valitor
  */
 
-namespace SDM\Altapay\Model;
+namespace SDM\Valitor\Model;
 
 use Magento\Framework\DataObject\IdentityInterface;
 use Magento\Framework\Model\AbstractModel;
-use SDM\Altapay\Api\Data\TransactionInterface;
+use SDM\Valitor\Api\Data\TransactionInterface;
 
 /**
  * Class Transaction
- * @package SDM\Altapay\Model
+ * @package SDM\Valitor\Model
  */
 class Transaction extends AbstractModel implements TransactionInterface, IdentityInterface
 {
@@ -30,7 +30,7 @@ class Transaction extends AbstractModel implements TransactionInterface, Identit
      */
     protected function _construct()
     {
-        $this->_init(\SDM\Altapay\Model\ResourceModel\Transaction::class);
+        $this->_init(\SDM\Valitor\Model\ResourceModel\Transaction::class);
     }
 
     /**

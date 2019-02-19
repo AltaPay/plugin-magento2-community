@@ -1,29 +1,29 @@
 <?php
 /**
- * Altapay Module for Magento 2.x.
+ * Valitor Module for Magento 2.x.
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  *
- * @copyright 2018 Altapay
+ * @copyright 2018 Valitor
  * @category  payment
- * @package   altapay
+ * @package   valitor
  */
 
-namespace SDM\Altapay\Test\Unit\Model;
+namespace SDM\Valitor\Test\Unit\Model;
 
 use Magento\Sales\Model\Order;
-use SDM\Altapay\Model\Generator as ClassToTest;
+use SDM\Valitor\Model\Generator as ClassToTest;
 use Magento\Framework\TestFramework\Unit\Helper\ObjectManager;
-use PSDM\Altapay\Test\Unit\MainTestCase;
+use PSDM\Valitor\Test\Unit\MainTestCase;
 use Magento\Store\Model\Store;
-use SDM\Altapay\Model\SystemConfig;
-use Altapay\Api\Test\TestAuthentication;
-use Altapay\Api\Ecommerce\PaymentRequest;
-use Altapay\Request\Address;
-use Altapay\Request\Customer;
-use Altapay\Request\OrderLine;
-use SDM\Altapay\Test\Unit\ConstantTestConfig;
+use SDM\Valitor\Model\SystemConfig;
+use Valitor\Api\Test\TestAuthentication;
+use Valitor\Api\Ecommerce\PaymentRequest;
+use Valitor\Request\Address;
+use Valitor\Request\Customer;
+use Valitor\Request\OrderLine;
+use SDM\Valitor\Test\Unit\ConstantTestConfig;
 
 class GeneratorTest extends MainTestCase
 {

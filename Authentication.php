@@ -21,7 +21,7 @@
  * THE SOFTWARE.
  */
 
-namespace SDM\Altapay;
+namespace SDM\Valitor;
 
 /**
  * Authenticator

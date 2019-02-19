@@ -21,9 +21,9 @@
  * THE SOFTWARE.
  */
 
-namespace SDM\Altapay\Traits;
+namespace SDM\Valitor\Traits;
 
-use SDM\Altapay\Request\OrderLine;
+use SDM\Valitor\Request\OrderLine;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 

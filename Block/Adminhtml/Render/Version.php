@@ -1,16 +1,16 @@
 <?php
 /**
- * Altapay Module for Magento 2.x.
+ * Valitor Module for Magento 2.x.
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  *
- * @copyright 2018 Altapay
+ * @copyright 2018 Valitor
  * @category  payment
- * @package   altapay
+ * @package   valitor
  */
 
-namespace SDM\Altapay\Block\Adminhtml\Render;
+namespace SDM\Valitor\Block\Adminhtml\Render;
 
 use Magento\Config\Block\System\Config\Form\Field;
 use Magento\Backend\Block\Template\Context;
@@ -19,11 +19,11 @@ use Magento\Framework\Module\ModuleListInterface;
 
 /**
  * Class Version
- * @package SDM\Altapay\Block\Adminhtml\Render
+ * @package SDM\Valitor\Block\Adminhtml\Render
  */
 class Version extends Field
 {
-    const MODULE_CODE = 'SDM_Altapay';
+    const MODULE_CODE = 'SDM_Valitor';
     /**
      * @var ModuleListInterface
      */

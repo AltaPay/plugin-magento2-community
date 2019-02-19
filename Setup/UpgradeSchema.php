@@ -1,15 +1,15 @@
 <?php
 /**
- * Altapay Module for Magento 2.x.
+ * Valitor Module for Magento 2.x.
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  *
- * @copyright 2018 Altapay
+ * @copyright 2018 Valitor
  * @category  payment
- * @package   altapay
+ * @package   valitor
  */
-namespace SDM\Altapay\Setup;
+namespace SDM\Valitor\Setup;
 
 use Magento\Framework\Setup\UpgradeSchemaInterface;
 use Magento\Framework\Setup\SchemaSetupInterface;
@@ -17,7 +17,7 @@ use Magento\Framework\Setup\ModuleContextInterface;
 
 /**
  * Class UpgradeSchema
- * @package SDM\Altapay\Setup
+ * @package SDM\Valitor\Setup
  */
 class UpgradeSchema implements UpgradeSchemaInterface
 {
@@ -37,13 +37,13 @@ class UpgradeSchema implements UpgradeSchemaInterface
         $setup->getConnection()
             ->addColumn(
                 $setup->getTable($orderTable),
-                'altapay_payment_form_url',
+                'valitor_payment_form_url',
                 [
                     'type' => \Magento\Framework\DB\Ddl\Table::TYPE_TEXT,
                     'length' => 65536,
                     'nullable' => true,
                     'visible' => false,
-                    'comment' =>'Altapay Payment Form Url'
+                    'comment' =>'Valitor Payment Form Url'
                 ]
             );
 

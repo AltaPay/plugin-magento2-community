@@ -21,12 +21,12 @@
  * THE SOFTWARE.
  */
 
-namespace SDM\Altapay\Api\Others;
+namespace SDM\Valitor\Api\Others;
 
-use SDM\Altapay\AbstractApi;
-use SDM\Altapay\Response\Embeds\Transaction;
-use SDM\Altapay\Serializer\ResponseSerializer;
-use SDM\Altapay\Traits;
+use SDM\Valitor\AbstractApi;
+use SDM\Valitor\Response\Embeds\Transaction;
+use SDM\Valitor\Serializer\ResponseSerializer;
+use SDM\Valitor\Traits;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
 use Symfony\Component\OptionsResolver\OptionsResolver;

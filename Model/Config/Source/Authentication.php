@@ -1,23 +1,23 @@
 <?php
 /**
- * Altapay Module for Magento 2.x.
+ * Valitor Module for Magento 2.x.
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  *
- * @copyright 2018 Altapay
+ * @copyright 2018 Valitor
  * @category  payment
- * @package   altapay
+ * @package   valitor
  */
-namespace SDM\Altapay\Model\Config\Source;
+namespace SDM\Valitor\Model\Config\Source;
 
-use SDM\Altapay\Api\Test\TestAuthentication;
+use SDM\Valitor\Api\Test\TestAuthentication;
 use Magento\Framework\Option\ArrayInterface;
-use SDM\Altapay\Model\SystemConfig;
+use SDM\Valitor\Model\SystemConfig;
 
 /**
  * Class Authentication
- * @package SDM\Altapay\Model\Config\Source
+ * @package SDM\Valitor\Model\Config\Source
  */
 class Authentication implements ArrayInterface
 {

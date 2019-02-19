@@ -21,10 +21,10 @@
  * THE SOFTWARE.
  */
 
-namespace SDM\Altapay\Api\Test;
+namespace SDM\Valitor\Api\Test;
 
-use SDM\Altapay\AbstractApi;
-use SDM\Altapay\Exceptions\ClientException;
+use SDM\Valitor\AbstractApi;
+use SDM\Valitor\Exceptions\ClientException;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
 use Symfony\Component\OptionsResolver\OptionsResolver;

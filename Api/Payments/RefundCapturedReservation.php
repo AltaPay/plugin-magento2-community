@@ -21,12 +21,12 @@
  * THE SOFTWARE.
  */
 
-namespace Altapay\Api\Payments;
+namespace Valitor\Api\Payments;
 
-use SDM\Altapay\AbstractApi;
-use SDM\Altapay\Response\RefundResponse;
-use SDM\Altapay\Serializer\ResponseSerializer;
-use SDM\Altapay\Traits;
+use SDM\Valitor\AbstractApi;
+use SDM\Valitor\Response\RefundResponse;
+use SDM\Valitor\Serializer\ResponseSerializer;
+use SDM\Valitor\Traits;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -109,7 +109,7 @@ class RefundCapturedReservation extends AbstractApi
      *
      * @param Request $request
      * @param Response $response
-     * @return \Altapay\Response\AbstractResponse|array
+     * @return \Valitor\Response\AbstractResponse|array
      * @throws \Exception
      */
     protected function handleResponse(Request $request, Response $response)

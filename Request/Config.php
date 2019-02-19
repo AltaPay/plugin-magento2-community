@@ -21,7 +21,7 @@
  * THE SOFTWARE.
  */
 
-namespace SDM\Altapay\Request;
+namespace SDM\Valitor\Request;
 
 class Config extends AbstractSerializer
 {

@@ -1,12 +1,12 @@
 /**
- * Altapay Module for Magento 2.x.
+ * Valitor Module for Magento 2.x.
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  *
- * @copyright 2018 Altapay
+ * @copyright 2018 Valitor
  * @category  payment
- * @package   altapay
+ * @package   valitor
  */
 
 /*browser:true*/
@@ -17,26 +17,26 @@ define(
         'jquery',
         'Magento_Checkout/js/view/payment/default',
         'Magento_Customer/js/customer-data',
-        'SDM_Altapay/js/action/set-payment'
+        'SDM_Valitor/js/action/set-payment'
     ],
     function ($, Component, storage, Action) {
         'use strict';
 
         return Component.extend({
             defaults: {
-                template: 'SDM_Altapay/payment/terminal',
+                template: 'SDM_Valitor/payment/terminal',
                 terminal: '1'
             },
 
             redirectAfterPlaceOrder: false,
 
             placeOrder: function () {
-                $('#altapay-error-message').text('');
+                $('#valitor-error-message').text('');
                 var auth = window.checkoutConfig.payment[this.getDefaultCode()].auth;
                 var connection = window.checkoutConfig.payment[this.getDefaultCode()].connection;
                 if (!auth || !connection) {
-                    $(".payment-method._active").find('#altapay-error-message').css('display','block');
-                    $(".payment-method._active").find('#altapay-error-message').text('Could not authenticate with API');
+                    $(".payment-method._active").find('#valitor-error-message').css('display','block');
+                    $(".payment-method._active").find('#valitor-error-message').text('Could not authenticate with API');
                     return false;
                 }
 
@@ -51,7 +51,7 @@ define(
             },
 
             getDefaultCode: function () {
-                return 'sdm_altapay';
+                return 'sdm_valitor';
             }
         });
     }

@@ -21,9 +21,9 @@
  * THE SOFTWARE.
  */
 
-namespace SDM\Altapay\Response;
+namespace SDM\Valitor\Response;
 
-use SDM\Altapay\Response\Embeds\Terminal;
+use SDM\Valitor\Response\Embeds\Terminal;
 
 class TerminalsResponse extends AbstractResponse
 {

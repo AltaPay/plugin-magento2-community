@@ -1,15 +1,15 @@
 <?php
 /**
- * Altapay Module for Magento 2.x.
+ * Valitor Module for Magento 2.x.
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  *
- * @copyright 2018 Altapay
+ * @copyright 2018 Valitor
  * @category  payment
- * @package   altapay
+ * @package   valitor
  */
-namespace SDM\Altapay\Controller;
+namespace SDM\Valitor\Controller;
 
 use Magento\Checkout\Model\Session;
 use Magento\Framework\App\Action\Action;
@@ -17,13 +17,13 @@ use Magento\Framework\App\Action\Context;
 use Magento\Framework\View\Result\PageFactory;
 use Magento\Quote\Model\Quote;
 use Magento\Sales\Model\Order;
-use SDM\Altapay\Logger\Logger;
-use SDM\Altapay\Model\Generator;
-use SDM\Altapay\Model\Gateway;
+use SDM\Valitor\Logger\Logger;
+use SDM\Valitor\Model\Generator;
+use SDM\Valitor\Model\Gateway;
 
 /**
  * Class Index
- * @package SDM\Altapay\Controller
+ * @package SDM\Valitor\Controller
  */
 abstract class Index extends Action
 {
@@ -56,7 +56,7 @@ abstract class Index extends Action
     /**
      * @var Logger
      */
-    protected $altapayLogger;
+    protected $valitorLogger;
 
     /**
      * @var PageFactory
@@ -72,7 +72,7 @@ abstract class Index extends Action
      * @param Session $checkoutSession
      * @param Generator $generator
      * @param Gateway $gateway
-     * @param Logger $altapayLogger
+     * @param Logger $valitorLogger
      */
     public function __construct(
         Context $context,
@@ -82,7 +82,7 @@ abstract class Index extends Action
         Session $checkoutSession,
         Generator $generator,
         Gateway $gateway,
-        Logger $altapayLogger
+        Logger $valitorLogger
     ) {
         parent::__construct($context);
         $this->order = $order;
@@ -90,7 +90,7 @@ abstract class Index extends Action
         $this->checkoutSession = $checkoutSession;
         $this->generator = $generator;
         $this->gateway = $gateway;
-        $this->altapayLogger = $altapayLogger;
+        $this->valitorLogger = $valitorLogger;
         $this->pageFactory = $pageFactory;
     }
 
@@ -109,11 +109,11 @@ abstract class Index extends Action
     protected function writeLog()
     {
         $calledClass = get_called_class();
-        $this->altapayLogger->addDebugLog('- BEGIN', $calledClass);
+        $this->valitorLogger->addDebugLog('- BEGIN', $calledClass);
         if (method_exists($this->getRequest(), 'getPostValue')) {
-            $this->altapayLogger->addDebugLog('-- PostValue --', $this->getRequest()->getPostValue());
+            $this->valitorLogger->addDebugLog('-- PostValue --', $this->getRequest()->getPostValue());
         }
-        $this->altapayLogger->addDebugLog('-- Params --', $this->getRequest()->getParams());
-        $this->altapayLogger->addDebugLog('- END', $calledClass);
+        $this->valitorLogger->addDebugLog('-- Params --', $this->getRequest()->getParams());
+        $this->valitorLogger->addDebugLog('- END', $calledClass);
     }
 }

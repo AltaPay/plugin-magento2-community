@@ -21,9 +21,9 @@
  * THE SOFTWARE.
  */
 
-namespace SDM\Altapay\Request;
+namespace SDM\Valitor\Request;
 
-use SDM\Altapay\Exceptions\Exception;
+use SDM\Valitor\Exceptions\Exception;
 
 class Customer extends AbstractSerializer
 {

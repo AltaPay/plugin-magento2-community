@@ -1,5 +1,5 @@
 {
-  "name": "altapay/magento2-community",
+  "name": "valitor/magento2-community",
   "license": "MIT",
   "authors": [
     {
@@ -13,7 +13,7 @@
       "role": "Developer"
     }
   ],
-  "description": "Altapay payment",
+  "description": "Valitor payment",
    "require": {
         "php": ">=5.5",
         "guzzlehttp/promises": "^1.0",
@@ -28,7 +28,7 @@
   "autoload": {
     "files": [ "registration.php" ],
     "psr-4": {
-      "SDM\\Altapay\\": ""
+      "SDM\\Valitor\\": ""
     }
   }
 }

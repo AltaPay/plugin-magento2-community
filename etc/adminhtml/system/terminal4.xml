@@ -1,14 +1,14 @@
 <?xml version="1.0"?>
 <!--
 /**
- * Altapay Module for Magento 2.x.
+ * Valitor Module for Magento 2.x.
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  *
- * @copyright 2018 Altapay
+ * @copyright 2018 Valitor
  * @category  payment
- * @package   altapay
+ * @package   valitor
  */
 -->
 
@@ -31,13 +31,13 @@
             <label>Terminal name</label>
             <comment>Select terminal - Remember to save configuration after you have added your API login and password, to get your terminals</comment>
             <config_path>payment/terminal4/terminalname</config_path>
-            <source_model>SDM\Altapay\Model\Config\Source\Terminals</source_model>
+            <source_model>SDM\Valitor\Model\Config\Source\Terminals</source_model>
         </field>
 
         <field id="language" translate="label comment" type="select" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
             <label>Force language</label>
             <comment>Force the language of the payment page</comment>
-            <source_model>SDM\Altapay\Model\Config\Source\Languages</source_model>
+            <source_model>SDM\Valitor\Model\Config\Source\Languages</source_model>
             <config_path>payment/terminal4/language</config_path>
         </field>
 

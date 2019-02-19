@@ -1,12 +1,12 @@
 /**
- * Altapay Module for Magento 2.x.
+ * Valitor Module for Magento 2.x.
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  *
- * @copyright 2018 Altapay
+ * @copyright 2018 Valitor
  * @category  payment
- * @package   altapay
+ * @package   valitor
  */
 
 /*browser:true*/
@@ -14,7 +14,7 @@
 
 define(
     [
-        'SDM_Altapay/js/view/payment/method-renderer/terminal-abstract'
+        'SDM_Valitor/js/view/payment/method-renderer/terminal-abstract'
     ],
     function (Component) {
         'use strict';

@@ -1,26 +1,26 @@
 <?php
 /**
- * Altapay Module for Magento 2.x.
+ * Valitor Module for Magento 2.x.
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  *
- * @copyright 2018 Altapay
+ * @copyright 2018 Valitor
  * @category  payment
- * @package   altapay
+ * @package   valitor
  */
-namespace SDM\Altapay\Observer;
+namespace SDM\Valitor\Observer;
 
-use SDM\Altapay\Api\Payments\ReleaseReservation;
-use SDM\Altapay\Exceptions\ResponseHeaderException;
-use SDM\Altapay\Response\ReleaseReservationResponse;
+use SDM\Valitor\Api\Payments\ReleaseReservation;
+use SDM\Valitor\Exceptions\ResponseHeaderException;
+use SDM\Valitor\Response\ReleaseReservationResponse;
 use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
-use SDM\Altapay\Model\SystemConfig;
+use SDM\Valitor\Model\SystemConfig;
 
 /**
  * Class OrderCancelObserver
- * @package SDM\Altapay\Observer
+ * @package SDM\Valitor\Observer
  */
 class OrderCancelObserver implements ObserverInterface
 {

@@ -1,17 +1,17 @@
 <?php
 /**
- * Altapay Module for Magento 2.x.
+ * Valitor Module for Magento 2.x.
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  *
- * @copyright 2018 Altapay
+ * @copyright 2018 Valitor
  * @category  payment
- * @package   altapay
+ * @package   valitor
  */
-namespace SDM\Altapay\Model;
+namespace SDM\Valitor\Model;
 
-use SDM\Altapay\Authentication;
+use SDM\Valitor\Authentication;
 use Magento\Config\Model\Config\Backend\Encrypted;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Store\Model\StoreManagerInterface;
@@ -21,7 +21,7 @@ use Magento\Store\Model\StoreResolver;
 
 /**
  * Class SystemConfig
- * @package SDM\Altapay\Model
+ * @package SDM\Valitor\Model
  */
 class SystemConfig
 {
@@ -91,11 +91,11 @@ class SystemConfig
     public static function getTerminalCodes()
     {
         return [
-            \SDM\Altapay\Model\Method\Terminal1::METHOD_CODE,
-            \SDM\Altapay\Model\Method\Terminal2::METHOD_CODE,
-            \SDM\Altapay\Model\Method\Terminal3::METHOD_CODE,
-            \SDM\Altapay\Model\Method\Terminal4::METHOD_CODE,
-            \SDM\Altapay\Model\Method\Terminal5::METHOD_CODE
+            \SDM\Valitor\Model\Method\Terminal1::METHOD_CODE,
+            \SDM\Valitor\Model\Method\Terminal2::METHOD_CODE,
+            \SDM\Valitor\Model\Method\Terminal3::METHOD_CODE,
+            \SDM\Valitor\Model\Method\Terminal4::METHOD_CODE,
+            \SDM\Valitor\Model\Method\Terminal5::METHOD_CODE
         ];
     }
 
@@ -133,7 +133,7 @@ class SystemConfig
         }
         return $this->scopeConfig->getValue(
             sprintf(
-                'payment/altapay_status/%s',
+                'payment/valitor_status/%s',
                 $configKey
             ),
             $storeScope,
@@ -194,7 +194,7 @@ class SystemConfig
         }
         return $this->scopeConfig->getValue(
             sprintf(
-                'payment/altapay_config/%s',
+                'payment/valitor_config/%s',
                 $configKey
             ),
             $storeScope,

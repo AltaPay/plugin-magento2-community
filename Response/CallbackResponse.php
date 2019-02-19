@@ -21,9 +21,9 @@
  * THE SOFTWARE.
  */
 
-namespace SDM\Altapay\Response;
+namespace SDM\Valitor\Response;
 
-use SDM\Altapay\Response\Embeds\Transaction;
+use SDM\Valitor\Response\Embeds\Transaction;
 
 class CallbackResponse extends AbstractResponse
 {

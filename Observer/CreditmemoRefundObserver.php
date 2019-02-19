@@ -1,28 +1,28 @@
 <?php
 /**
- * Altapay Module for Magento 2.x.
+ * Valitor Module for Magento 2.x.
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  *
- * @copyright 2018 Altapay
+ * @copyright 2018 Valitor
  * @category  payment
- * @package   altapay
+ * @package   valitor
  */
-namespace SDM\Altapay\Observer;
+namespace SDM\Valitor\Observer;
 
-use SDM\Altapay\Api\Payments\RefundCapturedReservation;
-use SDM\Altapay\Exceptions\ResponseHeaderException;
-use SDM\Altapay\Response\RefundResponse;
-use SDM\Altapay\Request\OrderLine;
+use SDM\Valitor\Api\Payments\RefundCapturedReservation;
+use SDM\Valitor\Exceptions\ResponseHeaderException;
+use SDM\Valitor\Response\RefundResponse;
+use SDM\Valitor\Request\OrderLine;
 use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
-use SDM\Altapay\Logger\Logger;
-use SDM\Altapay\Model\SystemConfig;
+use SDM\Valitor\Logger\Logger;
+use SDM\Valitor\Model\SystemConfig;
 
 /**
  * Class CreditmemoRefundObserver
- * @package SDM\Altapay\Observer
+ * @package SDM\Valitor\Observer
  */
 class CreditmemoRefundObserver implements ObserverInterface
 {
@@ -35,17 +35,17 @@ class CreditmemoRefundObserver implements ObserverInterface
     /**
      * @var Logger
      */
-    private $altapayLogger;
+    private $valitorLogger;
 
     /**
      * CaptureObserver constructor.
      * @param SystemConfig $systemConfig
-     * @param Logger $altapayLogger
+     * @param Logger $valitorLogger
      */
-    public function __construct(SystemConfig $systemConfig, Logger $altapayLogger)
+    public function __construct(SystemConfig $systemConfig, Logger $valitorLogger)
     {
         $this->systemConfig = $systemConfig;
-        $this->altapayLogger = $altapayLogger;
+        $this->valitorLogger = $valitorLogger;
     }
 
     /**

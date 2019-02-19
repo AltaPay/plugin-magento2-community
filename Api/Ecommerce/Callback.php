@@ -21,10 +21,10 @@
  * THE SOFTWARE.
  */
 
-namespace SDM\Altapay\Api\Ecommerce;
+namespace SDM\Valitor\Api\Ecommerce;
 
-use SDM\Altapay\Response\CallbackResponse;
-use SDM\Altapay\Serializer\ResponseSerializer;
+use SDM\Valitor\Response\CallbackResponse;
+use SDM\Valitor\Serializer\ResponseSerializer;
 
 class Callback
 {

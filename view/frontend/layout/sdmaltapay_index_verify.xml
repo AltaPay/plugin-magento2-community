@@ -1,14 +1,14 @@
 <?xml version="1.0"?>
 <!--
 /**
- * Altapay Module for Magento 2.x.
+ * Valitor Module for Magento 2.x.
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  *
- * @copyright 2018 Altapay
+ * @copyright 2018 Valitor
  * @category  payment
- * @package   altapay
+ * @package   valitor
  */
 -->
 
@@ -16,8 +16,8 @@
     <referenceBlock name="content">
         <block
             template="callback_verify.phtml"
-            class="SDM\Altapay\Block\Callback\Verify"
-            name="sdm_altapay_callback_verify"
+            class="SDM\Valitor\Block\Callback\Verify"
+            name="sdm_valitor_callback_verify"
         />
     </referenceBlock>
 </page>

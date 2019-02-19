@@ -2,7 +2,7 @@
 
 <listing xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
     <columns name="sales_order_invoice_columns">
-        <column name="payment_method_title" class="SDM\Altapay\Ui\Component\Listing\Column\PaymentMethod">
+        <column name="payment_method_title" class="SDM\Valitor\Ui\Component\Listing\Column\PaymentMethod">
             <settings>
                 <filter>false</filter>
                 <label translate="true">Store Specific Payment Title</label>

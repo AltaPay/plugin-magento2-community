@@ -21,7 +21,7 @@
  * THE SOFTWARE.
  */
 
-namespace SDM\Altapay\Types;
+namespace SDM\Valitor\Types;
 
 class ShippingMethods implements TypeInterface
 {

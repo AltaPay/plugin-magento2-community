@@ -1,22 +1,22 @@
 <?php
 /**
- * Altapay Module for Magento 2.x.
+ * Valitor Module for Magento 2.x.
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  *
- * @copyright 2018 Altapay
+ * @copyright 2018 Valitor
  * @category  payment
- * @package   altapay
+ * @package   valitor
  */
-namespace SDM\Altapay\Model\Config\Source;
+namespace SDM\Valitor\Model\Config\Source;
 
 use Magento\Config\Model\Config\Source\Locale;
 use Magento\Framework\Option\ArrayInterface;
 
 /**
  * Class Languages
- * @package SDM\Altapay\Model\Config\Source
+ * @package SDM\Valitor\Model\Config\Source
  */
 class Languages extends Locale implements ArrayInterface
 {

@@ -1,23 +1,23 @@
 <?php
 /**
- * Altapay Module for Magento 2.x.
+ * Valitor Module for Magento 2.x.
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  *
- * @copyright 2018 Altapay
+ * @copyright 2018 Valitor
  * @category  payment
- * @package   altapay
+ * @package   valitor
  */
 
-namespace SDM\Altapay\Test\Unit;
+namespace SDM\Valitor\Test\Unit;
 
 use Magento\Framework\TestFramework\Unit\Helper\ObjectManager;
 use PHPUnit\Framework\TestCase;
 
 /**
  * Class MainTestCase
- * @package SDM\Altapay\Test\Unit
+ * @package SDM\Valitor\Test\Unit
  */
 class MainTestCase extends TestCase
 {

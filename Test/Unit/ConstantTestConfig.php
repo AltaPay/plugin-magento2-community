@@ -1,20 +1,20 @@
 <?php
 /**
- * Altapay Module for Magento 2.x.
+ * Valitor Module for Magento 2.x.
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  *
- * @copyright 2018 Altapay
+ * @copyright 2018 Valitor
  * @category  payment
- * @package   altapay
+ * @package   valitor
  */
 
-namespace SDM\Altapay\Test\Unit;
+namespace SDM\Valitor\Test\Unit;
 
 /**
  * Class ConstantTestConfig
- * @package SDM\Altapay\Test\Unit
+ * @package SDM\Valitor\Test\Unit
  */
 abstract class ConstantTestConfig
 {
@@ -31,7 +31,7 @@ abstract class ConstantTestConfig
     const COMPANY       = 'Testcompany Ltd.';
     const ORDER_TOTAL   = '100';
     const CURRECNY      = 'USD';
-    const CALL_BACK     = 'sdmaltapay/index/callbackform';
+    const CALL_BACK     = 'sdmvalitor/index/callbackform';
     const TAX           = '10';
     const ITEM_NAME     = 'Test';
     const ITEM_SKU      = '001';

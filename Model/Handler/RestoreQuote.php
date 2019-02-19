@@ -1,31 +1,31 @@
 <?php
 /**
- * Altapay Module for Magento 2.x.
+ * Valitor Module for Magento 2.x.
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  *
  */
 
-namespace SDM\Altapay\Model\Handler;
+namespace SDM\Valitor\Model\Handler;
 
 use Magento\Checkout\Model\Session;
 use Magento\Sales\Model\Order;
 use Magento\Sales\Model\OrderFactory;
 use Magento\Framework\Message\ManagerInterface;
 use Magento\Quote\Model\QuoteFactory;
-use SDM\Altapay\Model\ConstantConfig;
+use SDM\Valitor\Model\ConstantConfig;
 use Magento\SalesRule\Model\Coupon;
 use Magento\SalesRule\Model\ResourceModel\Coupon\Usage as CouponUsage;
-use SDM\Altapay\Api\OrderLoaderInterface;
+use SDM\Valitor\Api\OrderLoaderInterface;
 use Magento\CatalogInventory\Api\StockManagementInterface;
-use SDM\Altapay\Model\SystemConfig;
+use SDM\Valitor\Model\SystemConfig;
 use Magento\Framework\App\ResourceConnection;
 
 /**
  * Class RestoreQuote
  *
- * @package SDM\Altapay\Model\Handler
+ * @package SDM\Valitor\Model\Handler
  */
 class RestoreQuote
 {
@@ -116,8 +116,8 @@ class RestoreQuote
      */
     public function handleQuote()
     {
-        //check if customer redirect from altapay
-        if ($this->checkoutSession->getAltapayCustomerRedirect()) {
+        //check if customer redirect from valitor
+        if ($this->checkoutSession->getValitorCustomerRedirect()) {
             //get last order Id from inteface
              $orderId = $this->orderLoader->getLastOrderIncrementIdFromSession();
              $order = $this->checkoutSession->getLastRealOrder();
@@ -175,7 +175,7 @@ class RestoreQuote
                 //show fail message
                 $this->messageManager->addErrorMessage($message);
             }
-            $this->checkoutSession->unsAltapayCustomerRedirect();
+            $this->checkoutSession->unsValitorCustomerRedirect();
         }
     }
 
@@ -201,7 +201,7 @@ class RestoreQuote
     {
 
         $connection = $this->modelResource->getConnection();
-        $sql = "SELECT parametersdata FROM sdm_altapay WHERE orderid = '$orderid'";
+        $sql = "SELECT parametersdata FROM sdm_valitor WHERE orderid = '$orderid'";
         return $result = $connection->fetchOne($sql);
     }
 }

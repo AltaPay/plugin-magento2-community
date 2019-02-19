@@ -1,16 +1,16 @@
 <?php
 /**
- * Altapay Module for Magento 2.x.
+ * Valitor Module for Magento 2.x.
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  *
- * @copyright 2018 Altapay
+ * @copyright 2018 Valitor
  * @category  payment
- * @package   altapay
+ * @package   valitor
  */
 
-namespace SDM\Altapay\Api\Data;
+namespace SDM\Valitor\Api\Data;
 
 /**
  * Transaction interface.
@@ -21,7 +21,7 @@ interface TransactionInterface
     /**
      * Constants defined for keys of the data array.
      */
-    const TABLE_NAME           = 'sdm_altapay';
+    const TABLE_NAME           = 'sdm_valitor';
     const ENTITY_ID            = 'id';
     const PAYMENT_ID           = 'paymentid';
     const TRANSACTION_ID       = 'transactionid';

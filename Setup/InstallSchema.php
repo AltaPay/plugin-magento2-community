@@ -1,25 +1,25 @@
 <?php
 /**
- * Altapay Module for Magento 2.x.
+ * Valitor Module for Magento 2.x.
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  *
- * @copyright 2018 Altapay
+ * @copyright 2018 Valitor
  * @category  payment
- * @package   altapay
+ * @package   valitor
  */
-namespace SDM\Altapay\Setup;
+namespace SDM\Valitor\Setup;
 
 use Magento\Framework\DB\Ddl\Table;
 use Magento\Framework\Setup\InstallSchemaInterface;
 use Magento\Framework\Setup\ModuleContextInterface;
 use Magento\Framework\Setup\SchemaSetupInterface;
-use SDM\Altapay\Api\Data\TransactionInterface;
+use SDM\Valitor\Api\Data\TransactionInterface;
 
 /**
  * Class InstallSchema
- * @package SDM\Altapay\Setup
+ * @package SDM\Valitor\Setup
  */
 class InstallSchema implements InstallSchemaInterface
 {
@@ -117,7 +117,7 @@ class InstallSchema implements InstallSchemaInterface
             [TransactionInterface::TRANSACTION_ID]
         );
 
-        $table->setComment('Altapay transaction data');
+        $table->setComment('Valitor transaction data');
 
         $installer->getConnection()->createTable($table);
 

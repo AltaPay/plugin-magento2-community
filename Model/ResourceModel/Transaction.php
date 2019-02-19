@@ -1,22 +1,22 @@
 <?php
 /**
- * Altapay Module for Magento 2.x.
+ * Valitor Module for Magento 2.x.
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  *
- * @copyright 2018 Altapay
+ * @copyright 2018 Valitor
  * @category  payment
- * @package   altapay
+ * @package   valitor
  */
-namespace SDM\Altapay\Model\ResourceModel;
+namespace SDM\Valitor\Model\ResourceModel;
 
 use Magento\Framework\Model\ResourceModel\Db\AbstractDb;
-use SDM\Altapay\Api\Data\TransactionInterface;
+use SDM\Valitor\Api\Data\TransactionInterface;
 
 /**
  * Class Transaction
- * @package SDM\Altapay\Model\ResourceModel
+ * @package SDM\Valitor\Model\ResourceModel
  */
 class Transaction extends AbstractDb
 {

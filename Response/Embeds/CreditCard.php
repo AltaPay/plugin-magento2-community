@@ -21,7 +21,7 @@
  * THE SOFTWARE.
  */
 
-namespace SDM\Altapay\Response\Embeds;
+namespace SDM\Valitor\Response\Embeds;
 
 class CreditCard
 {

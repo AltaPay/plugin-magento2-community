@@ -1,22 +1,22 @@
 <?php
 /**
- * Altapay Module for Magento 2.x.
+ * Valitor Module for Magento 2.x.
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  *
- * @copyright 2018 Altapay
+ * @copyright 2018 Valitor
  * @category  payment
- * @package   altapay
+ * @package   valitor
  */
-namespace SDM\Altapay\Controller\Index;
+namespace SDM\Valitor\Controller\Index;
 
 use Magento\Framework\App\ResponseInterface;
-use SDM\Altapay\Controller\Index;
+use SDM\Valitor\Controller\Index;
 
 /**
  * Class Notification
- * @package SDM\Altapay\Controller\Index
+ * @package SDM\Valitor\Controller\Index
  */
 class Notification extends Index
 {

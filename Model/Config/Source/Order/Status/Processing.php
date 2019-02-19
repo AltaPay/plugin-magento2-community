@@ -1,22 +1,22 @@
 <?php
 /**
- * Altapay Module for Magento 2.x.
+ * Valitor Module for Magento 2.x.
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  *
- * @copyright 2018 Altapay
+ * @copyright 2018 Valitor
  * @category  payment
- * @package   altapay
+ * @package   valitor
  */
-namespace SDM\Altapay\Model\Config\Source\Order\Status;
+namespace SDM\Valitor\Model\Config\Source\Order\Status;
 
 use Magento\Sales\Model\Config\Source\Order\Status;
 use Magento\Sales\Model\Order;
 
 /**
  * Class Processing
- * @package SDM\Altapay\Model\Config\Source\Order\Status
+ * @package SDM\Valitor\Model\Config\Source\Order\Status
  */
 class Processing extends Status
 {

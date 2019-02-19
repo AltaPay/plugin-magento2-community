@@ -21,9 +21,9 @@
  * THE SOFTWARE.
  */
 
-namespace SDM\Altapay\Response;
+namespace SDM\Valitor\Response;
 
-use SDM\Altapay\Response\Embeds\Funding;
+use SDM\Valitor\Response\Embeds\Funding;
 
 class FundingsResponse extends AbstractResponse
 {

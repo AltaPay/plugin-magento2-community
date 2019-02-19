@@ -21,10 +21,10 @@
  * THE SOFTWARE.
  */
 
-namespace SDM\Altapay\Response;
+namespace SDM\Valitor\Response;
 
-use SDM\Altapay\Response\Embeds\Header;
-use SDM\Altapay\Serializer\ResponseSerializer;
+use SDM\Valitor\Response\Embeds\Header;
+use SDM\Valitor\Serializer\ResponseSerializer;
 
 /**
  * Class AbstractResponse

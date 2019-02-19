@@ -1,6 +1,6 @@
 <?php
 
-namespace SDM\Altapay\Ui\Component\Listing\Column;
+namespace SDM\Valitor\Ui\Component\Listing\Column;
 
 use \Magento\Sales\Api\OrderRepositoryInterface;
 use \Magento\Framework\View\Element\UiComponent\ContextInterface;

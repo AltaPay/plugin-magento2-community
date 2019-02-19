@@ -1,21 +1,21 @@
 <?php
 /**
- * Altapay Module for Magento 2.x.
+ * Valitor Module for Magento 2.x.
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  *
- * @copyright 2018 Altapay
+ * @copyright 2018 Valitor
  * @category  payment
- * @package   altapay
+ * @package   valitor
  */
  
-namespace SDM\Altapay\Api;
+namespace SDM\Valitor\Api;
 
 interface GatewayInterface
 {
    /**
-     * Createrequest to altapay in order to generate for url
+     * Createrequest to valitor in order to generate for url
      * @param int $terminalId
      * @param string $orderId
      * @return array

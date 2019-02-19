@@ -21,7 +21,7 @@
  * THE SOFTWARE.
  */
 
-namespace SDM\Altapay\Exceptions;
+namespace SDM\Valitor\Exceptions;
 
 class Exception extends \Exception
 {

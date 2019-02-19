@@ -21,10 +21,10 @@
  * THE SOFTWARE.
  */
 
-namespace SDM\Altapay\Api\Others;
+namespace SDM\Valitor\Api\Others;
 
-use SDM\Altapay\AbstractApi;
-use SDM\Altapay\Traits\CsvToArrayTrait;
+use SDM\Valitor\AbstractApi;
+use SDM\Valitor\Traits\CsvToArrayTrait;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
 use Symfony\Component\OptionsResolver\OptionsResolver;

@@ -1,34 +1,34 @@
 <?php
 /**
- * Altapay Module for Magento 2.x.
+ * Valitor Module for Magento 2.x.
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  *
- * @copyright 2018 Altapay
+ * @copyright 2018 Valitor
  * @category  payment
- * @package   altapay
+ * @package   valitor
  */
-namespace SDM\Altapay\Model;
+namespace SDM\Valitor\Model;
 
-use SDM\Altapay\Api\Ecommerce\Callback;
-use SDM\Altapay\Request\Config;
-use SDM\Altapay\Response\CallbackResponse;
-use SDM\Altapay\Model\ConstantConfig;
+use SDM\Valitor\Api\Ecommerce\Callback;
+use SDM\Valitor\Request\Config;
+use SDM\Valitor\Response\CallbackResponse;
+use SDM\Valitor\Model\ConstantConfig;
 use Magento\Checkout\Model\Session;
 use Magento\Framework\App\Request\Http;
 use Magento\Framework\App\RequestInterface;
-use SDM\Altapay\Logger\Logger;
+use SDM\Valitor\Logger\Logger;
 use Magento\Payment\Helper\Data as PaymentData;
 use Magento\Quote\Model\Quote;
 use Magento\Sales\Model\Order;
 use Magento\Sales\Model\Order\Email\Sender\OrderSender;
-use SDM\Altapay\Api\TransactionRepositoryInterface;
-use SDM\Altapay\Api\OrderLoaderInterface;
+use SDM\Valitor\Api\TransactionRepositoryInterface;
+use SDM\Valitor\Api\OrderLoaderInterface;
 
 /**
  * Class Generator
- * @package SDM\Altapay\Model
+ * @package SDM\Valitor\Model
  */
 class Generator
 {
@@ -70,7 +70,7 @@ class Generator
     /**
      * @var Logger
      */
-    private $altapayLogger;
+    private $valitorLogger;
 
     /**
      * @var TransactionRepositoryInterface
@@ -91,7 +91,7 @@ class Generator
      * @param Order $order
      * @param OrderSender $orderSender
      * @param SystemConfig $systemConfig
-     * @param Logger $altapayLogger
+     * @param Logger $valitorLogger
      * @param TransactionRepositoryInterface $transactionRepository
      * @param OrderLoaderInterface $orderLoader
      */
@@ -103,7 +103,7 @@ class Generator
         Order $order,
         OrderSender $orderSender,
         SystemConfig $systemConfig,
-        Logger $altapayLogger,
+        Logger $valitorLogger,
         TransactionRepositoryInterface $transactionRepository,
         OrderLoaderInterface $orderLoader
     ) {
@@ -114,7 +114,7 @@ class Generator
         $this->order = $order;
         $this->orderSender = $orderSender;
         $this->systemConfig = $systemConfig;
-        $this->altapayLogger = $altapayLogger;
+        $this->valitorLogger = $valitorLogger;
         $this->transactionRepository = $transactionRepository;
         $this->orderLoader = $orderLoader;
     }
@@ -129,12 +129,12 @@ class Generator
         $callback = new Callback($request->getPostValue());
         $response = $callback->call();
         if ($response) {
-            $this->altapayLogger->addDebugLog('[restoreOrderFromRequest] Response correct', $response);
+            $this->valitorLogger->addDebugLog('[restoreOrderFromRequest] Response correct', $response);
             $order = $this->orderLoader->getOrderByOrderIncrementId($response->shopOrderId);
             if ($order->getQuoteId()) {
-                $this->altapayLogger->addDebugLog('[restoreOrderFromRequest] Order quote id', $order->getQuoteId());
+                $this->valitorLogger->addDebugLog('[restoreOrderFromRequest] Order quote id', $order->getQuoteId());
                 if ($quote = $this->quote->loadByIdWithoutStore($order->getQuoteId())) {
-                    $this->altapayLogger->addDebugLog('[restoreOrderFromRequest] Quote found', $order->getQuoteId());
+                    $this->valitorLogger->addDebugLog('[restoreOrderFromRequest] Quote found', $order->getQuoteId());
                     $quote
                         ->setIsActive(1)
                         ->setReservedOrderId(null)
@@ -178,7 +178,7 @@ class Generator
         $response = $callback->call();
         if ($response) {
             $order = $this->orderLoader->getOrderByOrderIncrementId($response->shopOrderId);
-            $formUrl = $order->getAltapayPaymentFormUrl();
+            $formUrl = $order->getValitorPaymentFormUrl();
             if ($formUrl) {
                 $order->addStatusHistoryComment(__(ConstantConfig::DECLINED_PAYMENT_FORM));
             } else {
