@@ -27,6 +27,12 @@ use SDM\Valitor\Request\OrderLine;
 use SDM\Valitor\Exceptions\ClientException;
 use SDM\Valitor\Exceptions\ResponseHeaderException;
 use SDM\Valitor\Exceptions\ResponseMessageException;
+use Magento\Framework\Module\ModuleListInterface;
+use Magento\Framework\App\ProductMetadataInterface;
+use Magento\Catalog\Helper\Data as Taxhelper;
+use Magento\Catalog\Api\ProductRepositoryInterface;
+use Magento\Framework\App\Config\ScopeConfigInterface;
+use SDM\Valitor\Helper\Data;
 
 /**
  * Class Gateway
@@ -34,6 +40,31 @@ use SDM\Valitor\Exceptions\ResponseMessageException;
  */
 class Gateway implements GatewayInterface
 {
+    const MODULE_CODE = 'SDM_Altapay';
+    /**
+     * @var ModuleListInterface
+     */
+    private $moduleList;
+    /**
+     * @var Helper Data
+     */
+    private $helper;
+    /**
+     * @var productRepository
+     */
+    protected $productRepository; 
+    /**
+     * @var ScopeConfigInterface
+     */
+    private $scopeConfig;
+    /**
+     * @var Taxhelper
+     */
+    private $taxHelper;
+    /**
+     * @var ProductMetadataInterface
+     */
+    private $productMetadata;
     /**
      * @var Order
      */
@@ -43,25 +74,21 @@ class Gateway implements GatewayInterface
      * @var SystemConfig
      */
     private $systemConfig;
-
     /**
      * @var OrderLoaderInterface
      */
     private $orderLoader;
-
     /**
      * @var Session
      */
     private $checkoutSession;
-
     /**
      * @var UrlInterface
      */
     private $urlInterface;
-
-     /**
-     * @var Quote
-     */
+    /**
+    * @var Quote
+    */
     private $quote;
 
     /**
@@ -79,7 +106,13 @@ class Gateway implements GatewayInterface
         Order $order,
         SystemConfig $systemConfig,
         OrderLoaderInterface $orderLoader,
-        Quote $quote
+        Quote $quote,
+        ModuleListInterface $moduleList,
+        ProductMetadataInterface $productMetadata,
+        ProductRepositoryInterface $productRepository,
+        Taxhelper $taxHelper,
+        ScopeConfigInterface $scopeConfig,
+        Data $helper
     ) {
         $this->checkoutSession = $checkoutSession;
         $this->urlInterface = $urlInterface;
@@ -87,20 +120,29 @@ class Gateway implements GatewayInterface
         $this->systemConfig = $systemConfig;
         $this->orderLoader = $orderLoader;
         $this->quote = $quote;
+        $this->moduleList = $moduleList;
+        $this->productMetadata = $productMetadata;
+        $this->productRepository = $productRepository;
+        $this->taxHelper = $taxHelper;
+        $this->scopeConfig = $scopeConfig;
+        $this->helper = $helper;
     }
 
-   /**
-     * Createrequest to valitor
-     * @param int $terminalId
-     * @param string $orderId
-     * @return array
-     */
+    /**
+      * Createrequest to valitor
+      * @param int $terminalId
+      * @param string $orderId
+      * @return array
+      */
     public function createRequest($terminalId, $orderId)
     {
         $order = $this->order->load($orderId);
         if ($order->getId()) {
             $storeScope = \Magento\Store\Model\ScopeInterface::SCOPE_STORE;
             $storeCode = $order->getStore()->getCode();
+            $couponCode = $order->getDiscountDescription();
+            $appliedRule = $order->getAppliedRuleIds();
+            $couponCodeAmount = number_format($order->getDiscountAmount(), 2, '.', ''); 
             //Test the conn with the Payment Gateway
             $auth = $this->systemConfig->getAuth($storeCode);
             $api = new TestAuthentication($auth);
@@ -113,7 +155,9 @@ class Gateway implements GatewayInterface
                 $requestParams['message'] = __(ConstantConfig::AUTH_MESSAGE);
                 return $requestParams;
             }
-
+            //Transaction Info
+            $transactionDetail = $this->helper->transactionDetail($orderId);
+            
             $request = new PaymentRequest($auth);
             $request
                 ->setTerminal($terminalName)
@@ -121,7 +165,8 @@ class Gateway implements GatewayInterface
                 ->setAmount((float) $order->getGrandTotal())
                 ->setCurrency($order->getOrderCurrencyCode())
                 ->setCustomerInfo($this->setCustomer($order))
-                ->setConfig($this->setConfig());
+                ->setConfig($this->setConfig())
+                ->setTransactionInfo($transactionDetail);
 
             if ($fraud = $this->systemConfig->getTerminalConfig($terminalId, 'fraud', $storeScope, $storeCode)) {
                 $request->setFraudService($fraud);
@@ -134,46 +179,80 @@ class Gateway implements GatewayInterface
                     $request->setLanguage($language);
                 }
             }
-
-            if ($this->systemConfig->getTerminalConfig($terminalId, 'capture', $storeScope, $storeCode)) {
+            
+            $autoCaptureEnable =  $this->systemConfig->getTerminalConfig($terminalId, 'capture', $storeScope, $storeCode);
+            if ($autoCaptureEnable) {
                 $request->setType('paymentAndCapture');
             }
 
             $orderlines = [];
+            $sendShipment = false;
             /** @var \Magento\Sales\Model\Order\Item $item */
             foreach ($order->getAllVisibleItems() as $item) {
-                $taxAmount = ($item->getQtyOrdered() * $item->getPriceInclTax()) - ($item->getQtyOrdered() * $item->getPrice());
+                $product_type = $item->getProductType();
+                $productOriginalPrice = number_format($item->getBaseOriginalPrice(), 2, '.', '');
+                $taxPercent = $item->getTaxPercent();
+				$taxRate = (1 + $taxPercent/100);
+                $priceIncTax = false;
+                $quantity = $item->getQtyOrdered(); 
+
+                if ((int) $this->scopeConfig->getValue('tax/calculation/price_includes_tax', $storeScope) === 1) {
+                    $unitPriceWithoutTax = $productOriginalPrice/$taxRate;
+                    $unitPrice = number_format($unitPriceWithoutTax, 2, '.', '');
+                    $priceIncTax = true;
+                }else{
+                    $unitPrice = $productOriginalPrice;
+                }
                 $orderline = new OrderLine(
                     $item->getName(),
                     $item->getSku(),
                     $item->getQtyOrdered(),
-                    $item->getPrice()
+                    $unitPrice
                 );
+                if ($product_type != 'virtual' && $product_type != 'downloadable') {
+                    $sendShipment = true;
+                }
                 $orderline->setGoodsType('item');
-                $orderline->taxAmount = $taxAmount;
-                //$orderline->taxPercent = $item->getTaxPercent();
+                //in case of cart rule discount, send tax after discount
+                if ($priceIncTax) {
+                    $dataForPriceIncTax = $this->returnDataForPriceIncTax($productOriginalPrice, $item, $unitPrice, $couponCode, $taxPercent, $quantity);
+                    $orderline->discount = $dataForPriceIncTax["discount"];
+                    $taxAmount = number_format($dataForPriceIncTax["rawTaxAmount"], 2, '.', '');
+                }else {
+                    $dataForPriceExcTax = $this->returnDataForPriceExcTax($item , $unitPrice, $couponCode, $quantity);
+                    $orderline->discount = $dataForPriceExcTax["discount"];
+                    $taxAmount = number_format($dataForPriceExcTax["rawTaxAmount"], 2, '.', '');
+                }
+                $orderline->taxAmount = $taxAmount + $item->getWeeeTaxAppliedRowAmount();
                 $orderlines[] = $orderline;
             }
-            if ($order->getDiscountAmount() > 0) {
+            if ((abs($couponCodeAmount) > 0) || !(empty($appliedRules))) {
+                if(empty($couponCode)){
+                    $couponCode = 'Cart Price Rule';
+                }
                 // Handling price reductions
                 $orderline = new OrderLine(
-                    $order->getDiscountDescription(),
+                    $couponCode,
                     'discount',
                     1,
-                    $order->getDiscountAmount()
+                    $couponCodeAmount
                 );
                 $orderline->setGoodsType('handling');
                 $orderlines[] = $orderline;
             }
-
-            // Handling orderline
-            $data = $order->getShippingMethod(true);
-            $orderlines[] = (new OrderLine(
-                $data['method'],
-                $data['carrier_code'],
-                1,
-                $order->getShippingInclTax()
-            ))->setGoodsType('shipment');
+            if ($sendShipment) {
+                $shippingaddress = $order->getShippingMethod(true);
+                $method = isset($shippingaddress['method']) ? $shippingaddress['method'] : '';
+                $carrier_code = isset($shippingaddress['carrier_code']) ? $shippingaddress['carrier_code'] : '';
+                if (!empty($shippingaddress)) {
+                    $orderlines[] = (new OrderLine(
+                        $method,
+                        $carrier_code,
+                        1,
+                        $order->getShippingInclTax()
+                    ))->setGoodsType('shipment');
+                }
+            }
             $request->setOrderLines($orderlines);
             try {
                 /** @var \Valitor\Response\PaymentRequestResponse $response */
@@ -181,9 +260,16 @@ class Gateway implements GatewayInterface
                 $requestParams['result'] = __(ConstantConfig::SUCCESS);
                 $requestParams['formurl'] = $response->Url;
                 // set before payment status
-                $this->setCustomOrderStatus($order, Order::STATE_NEW, 'before');
+                $orderStatusBefore = $this->systemConfig->getStatusConfig('before', $storeScope, $storeCode);
+                if ($orderStatusBefore) {
+                    $this->setCustomOrderStatus($order, Order::STATE_NEW, 'before');
+                }
                 // set notification
-                $order->addStatusHistoryComment(__(ConstantConfig::REDIRECT_TO_ALTAPAY) . $response->PaymentRequestId);
+                $order->addStatusHistoryComment(__(ConstantConfig::REDIRECT_TO_VALITOR) . $response->PaymentRequestId);
+                $extensionAttribute = $order->getExtensionAttributes();
+                if ($extensionAttribute && $extensionAttribute->getValitorPaymentFormUrl()) {
+                    $extensionAttribute->setValitorPaymentFormUrl($response->Url);
+                }
 
                 $order->setValitorPaymentFormUrl($response->Url);
 
@@ -216,13 +302,52 @@ class Gateway implements GatewayInterface
         $requestParams['message'] = __(ConstantConfig::ERROR_MESSAGE);
         return $requestParams;
     }
-
-
-   /**
-     * @param $orderId
-     * @throws \Exception
-     * @throws \Magento\Framework\Exception\AlreadyExistsException
-     */
+	/**
+	 * @returns returnDataForPriceIncTax[]
+	 */
+    private function returnDataForPriceIncTax($productOriginalPrice, $item , $unitPrice, $couponCode, $taxPercent, $quantity)
+	{
+        $data["discount"] =	0;
+        $data["rawTaxAmount"] = 0;
+        $productID = $item->getProductId();
+        $_product = $this->productRepository->getById($productID);
+        $priceAfterDiscount = $_product->getPriceInfo()->getPrice('final_price')->getAmount()->getBaseAmount();
+        $priceAfterDiscount = number_format($priceAfterDiscount, 2, '.', '');
+        if(empty($couponCode)){
+            $data["rawTaxAmount"] = (($taxPercent/100) * $unitPrice) *  $quantity;
+        } else {
+            $data["rawTaxAmount"] = ($productOriginalPrice - $unitPrice) *  $quantity;
+        }
+        if ($priceAfterDiscount != null && $unitPrice > $priceAfterDiscount && empty($couponCode)) {
+            $data["discount"] = (($unitPrice-$priceAfterDiscount)/$unitPrice)*100;
+            $taxBeforeDiscount = ($unitPrice * $taxPercent)/100;
+            //In case of catalog rule discount, send tax before discount
+            $data["rawTaxAmount"] = $taxBeforeDiscount * $quantity;
+        }
+			return $data;
+    }
+    	/**
+	 * @returns returnDataForPriceExcTax[]
+	 */
+	private function returnDataForPriceExcTax($item , $unitPrice, $couponCode, $quantity)
+	{
+        $data["discount"] =	0;
+        $data["rawTaxAmount"] = $item->getTaxAmount();
+		$productSpecialPrice = number_format($item->getPrice(), 2, '.', '');
+			if($productSpecialPrice != null && $unitPrice > $productSpecialPrice && empty($couponCode)){
+				$discount = (($unitPrice-$productSpecialPrice)/$unitPrice)*100;
+				//In case of catalog rule discount, send tax before discount
+				$taxBeforeDiscount = ($unitPrice * $item->getTaxPercent())/100;
+				$data["discount"] = $discount;
+				$data["rawTaxAmount"] = $taxBeforeDiscount * $quantity;
+			}
+			return $data;
+    }
+    /**
+      * @param $orderId
+      * @throws \Exception
+      * @throws \Magento\Framework\Exception\AlreadyExistsException
+      */
     public function restoreOrderFromOrderId($orderId)
     {
         $order = $this->orderLoader->getOrderByOrderIncrementId($orderId);
@@ -236,10 +361,10 @@ class Gateway implements GatewayInterface
         }
     }
 
-   /**
-     * @param Order $order
-     * @return Customer
-     */
+    /**
+      * @param Order $order
+      * @return Customer
+      */
     private function setCustomer(Order $order)
     {
         $billingAddress = new Address();
@@ -268,6 +393,8 @@ class Gateway implements GatewayInterface
             $shippingAddress->Region = $address['region'] ?: '0';
             $shippingAddress->Country = $address['country_id'];
             $customer->setShipping($shippingAddress);
+        } else {
+            $customer->setShipping($billingAddress);
         }
 
         if ($order->getBillingAddress()) {
@@ -276,24 +403,26 @@ class Gateway implements GatewayInterface
         } elseif ($order->getShippingAddress()) {
             $customer->setEmail($order->getShippingAddress()->getEmail());
             $customer->setPhone($order->getShippingAddress()->getTelephone());
+        } else {
+            $customer->setEmail($order->getBillingAddress()->getEmail());
+            $customer->setPhone($order->getBillingAddress()->getTelephone());
         }
-
         return $customer;
     }
 
-  /**
-    * @return Config
-    */
+    /**
+      * @return Config
+      */
     private function setConfig()
     {
         $config = new Config();
-        $config->setCallbackOk($this->urlInterface->getDirectUrl(ConstantConfig::ALTAPAY_OK));
-        $config->setCallbackFail($this->urlInterface->getDirectUrl(ConstantConfig::ALTAPAY_FAIL));
-        $config->setCallbackRedirect($this->urlInterface->getDirectUrl(ConstantConfig::ALTAPAY_REDIRECT));
-        $config->setCallbackOpen($this->urlInterface->getDirectUrl(ConstantConfig::ALTAPAY_OPEN));
-        $config->setCallbackNotification($this->urlInterface->getDirectUrl(ConstantConfig::ALTAPAY_NOTIFICATION));
+        $config->setCallbackOk($this->urlInterface->getDirectUrl(ConstantConfig::VALITOR_OK));
+        $config->setCallbackFail($this->urlInterface->getDirectUrl(ConstantConfig::VALITOR_FAIL));
+        $config->setCallbackRedirect($this->urlInterface->getDirectUrl(ConstantConfig::VALITOR_REDIRECT));
+        $config->setCallbackOpen($this->urlInterface->getDirectUrl(ConstantConfig::VALITOR_OPEN));
+        $config->setCallbackNotification($this->urlInterface->getDirectUrl(ConstantConfig::VALITOR_NOTIFICATION));
         //$config->setCallbackVerifyOrder($this->urlInterface->getDirectUrl(ConstantConfig::VERIFY_ORDER));
-        $config->setCallbackForm($this->urlInterface->getDirectUrl(ConstantConfig::ALTAPAY_CALLBACK));
+        $config->setCallbackForm($this->urlInterface->getDirectUrl(ConstantConfig::VALITOR_CALLBACK));
         return $config;
     }
 

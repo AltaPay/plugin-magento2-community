@@ -43,9 +43,9 @@ class ConfigProvider implements ConfigProviderInterface
      */
     private $urlInterface;
 
-     /**
-     * @var SystemConfig
-     */
+    /**
+    * @var SystemConfig
+    */
     private $systemConfig;
 
     /**
@@ -55,9 +55,12 @@ class ConfigProvider implements ConfigProviderInterface
      * @param UrlInterface $urlInterface
      * @param ScopeConfigInterface $scopeConfig
      */
-    public function __construct(Data $data, Escaper $escaper, UrlInterface $urlInterface,         SystemConfig $systemConfig
-    )
-    {
+    public function __construct(
+        Data $data,
+        Escaper $escaper,
+        UrlInterface $urlInterface,
+        SystemConfig $systemConfig
+    ) {
         $this->data = $data;
         $this->escaper = $escaper;
         $this->urlInterface = $urlInterface;
@@ -117,7 +120,7 @@ class ConfigProvider implements ConfigProviderInterface
     /**
      * @return \Magento\Payment\Model\MethodInterface
      */
-    private function getData()
+    protected function getData()
     {
         return $this->data->getMethodInstance('terminal1');
     }

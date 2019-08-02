@@ -25,7 +25,7 @@
                     <attribute type="expanded">0</attribute>
 
                     <label>API login</label>
-                     <comment><![CDATA[For enabling capture/cancel in backend, you need to provide your API username and password.<br>You can find your Api Keys in your <a href="https://testgateway.valitorsecure.com/merchant.php" title="Mollie Profiles">Valitor Merchnat Account</a>]]></comment>
+                     <comment><![CDATA[For enabling capture/cancel in backend, you need to provide your API username and password.<br>You can find your Api Keys in your <a href="https://testgateway.altapaysecure.com/merchant.php" title="Mollie Profiles">Valitor Merchnat Account</a>]]></comment>
                     <field id="version" translate="label" type="text" sortOrder="1" showInDefault="1" showInWebsite="1"
                            showInStore="1">
                         <label>Version</label>
@@ -45,7 +45,7 @@
 
                     <field id="productionurl" translate="label comment" type="text" sortOrder="25" showInDefault="1" showInWebsite="1" showInStore="1">
                         <label>Production URL</label>
-                        <comment><![CDATA[Your production url fx (https://YourShopName.valitorsecure.com)]]></comment>
+                        <comment><![CDATA[Your production url fx (https://YourShopName.altapaysecure.com)]]></comment>
                         <config_path>payment/valitor_config/productionurl</config_path>
                     </field>
 
@@ -95,6 +95,12 @@
                         <comment>The status on the order if a user cancel the order in the payment window</comment>
                         <source_model>SDM\Valitor\Model\Config\Source\Order\Status\Cancel</source_model>
                         <config_path>payment/valitor_status/cancel</config_path>
+                    </field>
+                    <field id="orderstatus_autocapture" translate="label comment" type="select" sortOrder="5" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Order status - autocapture</label>
+                        <comment>The status on the order if autocapture is enabled</comment>
+                        <source_model>SDM\Valitor\Model\Config\Source\Order\Status\Autocapture</source_model>
+                        <config_path>payment/valitor_status/autocapture</config_path>
                     </field>
                 </group>
 

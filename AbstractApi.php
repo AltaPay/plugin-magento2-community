@@ -82,14 +82,14 @@ abstract class AbstractApi
      *
      * @var Request
      */
-    private $request;
+    protected $request;
 
     /**
      * Response of the call
      *
      * @var Response
      */
-    private $response;
+    protected $response;
 
     /**
      * Base url
@@ -103,14 +103,14 @@ abstract class AbstractApi
      *
      * @var Authentication
      */
-    private $authentication;
+    protected $authentication;
 
     /**
      * HTTP client to use
      *
      * @var ClientInterface
      */
-    private $httpClient;
+    protected $httpClient;
 
     /**
      * Configure options
@@ -354,7 +354,7 @@ abstract class AbstractApi
      *
      * @return Client
      */
-    private function getClient()
+    protected function getClient()
     {
         return $this->httpClient;
     }

@@ -48,9 +48,9 @@ class RestoreQuote
      */
     protected $quoteFactory;
 
-     /**
-      * @var ManagerInterface
-      */
+    /**
+     * @var ManagerInterface
+     */
     protected $messageManager;
 
     /**
@@ -77,9 +77,9 @@ class RestoreQuote
      */
     protected $systemConfig;
 
-   /**
-     * @var ResourceConnection
-     */
+    /**
+      * @var ResourceConnection
+      */
     protected $modelResource;
 
 
@@ -119,19 +119,21 @@ class RestoreQuote
         //check if customer redirect from valitor
         if ($this->checkoutSession->getValitorCustomerRedirect()) {
             //get last order Id from inteface
-             $orderId = $this->orderLoader->getLastOrderIncrementIdFromSession();
-             $order = $this->checkoutSession->getLastRealOrder();
-             $quote = $this->quoteFactory->create()->loadByIdWithoutStore($order->getQuoteId());
+            $orderId = $this->orderLoader->getLastOrderIncrementIdFromSession();
+            $order = $this->checkoutSession->getLastRealOrder();
+            $quote = $this->quoteFactory->create()->loadByIdWithoutStore($order->getQuoteId());
+            $storeScope = \Magento\Store\Model\ScopeInterface::SCOPE_STORE;
+            $storeCode = $order->getStore()->getCode();
 
             //Default history and message
-             $history = __(ConstantConfig::BROWSER_BK_BUTTON_COMMENT);
-             $message = __(ConstantConfig::BROWSER_BK_BUTTON_MSG);
+            $history = __(ConstantConfig::BROWSER_BK_BUTTON_COMMENT);
+            $message = __(ConstantConfig::BROWSER_BK_BUTTON_MSG);
 
 
-             //get transaction details if faliure and redirect to cart
-             $getTransactionData = $this->getTransactionData($orderId);
-             
-              //if fail set message and history
+            //get transaction details if faliure and redirect to cart
+            $getTransactionData = $this->getTransactionData($orderId);
+
+            //if fail set message and history
             if (!empty($getTransactionData)) {
                 $getTransactionDataDecode = json_decode($getTransactionData);
 
@@ -142,30 +144,36 @@ class RestoreQuote
             }
  
             //set before state set in admin configuration
-            $storeScope = \Magento\Store\Model\ScopeInterface::SCOPE_STORE;
-            $storeCode = $order->getStore()->getCode();
-            $orderStatus = $this->systemConfig->getStatusConfig('before', $storeScope, $storeCode);
+            $orderStatusBefore = $this->systemConfig->getStatusConfig('before', $storeScope, $storeCode);
+            $orderStatusCancel = $this->systemConfig->getStatusConfig('cancel', $storeScope, $storeCode);
+            $orderStatusCancelUpdate = Order::STATE_CANCELED;
+            $orderStateCancelUpdate = Order::STATE_CANCELED;
 
-            //if quote id and order exist
-            if ($quote->getId() && $order) {
+            //if quote id exist and order status is from config
+            if ($quote->getId() && $this->verifyIfOrderStatus($orderStatusBefore, $order->getStatus(), $orderStatusCancel)) {
                 //get quote Id from order and set as active
                 $quote->setIsActive(1)->setReservedOrderId(null)->save();
                 $this->checkoutSession->replaceQuote($quote)->unsLastRealOrderId();
+                
+                if ($orderStatusCancel) {
+                    $orderStatusCancelUpdate = $orderStatusCancel;
+                }
+                
                 //set order status and comments
-                $order->setState(Order::STATE_CANCELED);
+                $order->setState($orderStateCancelUpdate);
                 $order->setIsNotified(false);
-                $order->addStatusHistoryComment($history, Order::STATE_CANCELED);
+                $order->addStatusHistoryComment($history, $orderStatusCancelUpdate);
 
                 //if coupon applied revert it
                 if ($order->getCouponCode()) {
-                     $this->resetCouponAfterCancellation($order);
+                    $this->resetCouponAfterCancellation($order);
                 }
 
                 //revert quantity when cancel order
                 $orderItems = $order->getAllItems();
                 foreach ($orderItems as $item) {
-                     $children = $item->getChildrenItems();
-                     $qty = $item->getQtyOrdered() - max($item->getQtyShipped(), $item->getQtyInvoiced()) - $item->getQtyCanceled();
+                    $children = $item->getChildrenItems();
+                    $qty = $item->getQtyOrdered() - max($item->getQtyShipped(), $item->getQtyInvoiced()) - $item->getQtyCanceled();
                     if ($item->getId() && $item->getProductId() && empty($children) && $qty) {
                         $this->stockManagement->backItemQty($item->getProductId(), $qty, $item->getStore()->getWebsiteId());
                     }
@@ -199,9 +207,29 @@ class RestoreQuote
 
     public function getTransactionData($orderid)
     {
-
         $connection = $this->modelResource->getConnection();
         $sql = "SELECT parametersdata FROM sdm_valitor WHERE orderid = '$orderid'";
         return $result = $connection->fetchOne($sql);
+    }
+    
+    /**
+    * @param orderStatusConfig
+    * @param currentOrderStatus
+    */
+    public function verifyIfOrderStatus($orderStatusConfigBefore, $currentOrderStatus, $orderStatusConfigCancel)
+    {
+        if (!is_null($orderStatusConfigBefore)) {
+            if ($orderStatusConfigBefore == $currentOrderStatus) {
+                return true;
+            }
+        }
+        
+        if (!is_null($orderStatusConfigCancel)) {
+            if ($orderStatusConfigCancel == $currentOrderStatus) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

@@ -25,9 +25,9 @@ use SDM\Valitor\Test\Unit\MainTestCase;
  */
 class FailTest extends MainTestCase
 {
-   /**
-    * @var ClassToTest
-    */
+    /**
+     * @var ClassToTest
+     */
     private $classToTest;
 
     /**

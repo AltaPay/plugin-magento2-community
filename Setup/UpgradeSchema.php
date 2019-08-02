@@ -11,9 +11,9 @@
  */
 namespace SDM\Valitor\Setup;
 
-use Magento\Framework\Setup\UpgradeSchemaInterface;
-use Magento\Framework\Setup\SchemaSetupInterface;
 use Magento\Framework\Setup\ModuleContextInterface;
+use Magento\Framework\Setup\SchemaSetupInterface;
+use Magento\Framework\Setup\UpgradeSchemaInterface;
 
 /**
  * Class UpgradeSchema
@@ -30,23 +30,46 @@ class UpgradeSchema implements UpgradeSchemaInterface
      */
     public function upgrade(SchemaSetupInterface $setup, ModuleContextInterface $context)
     {
-        $setup->startSetup();
-
-        $orderTable = 'sales_order';
         //Add a new attribute for the redirect to the payment form
-        $setup->getConnection()
-            ->addColumn(
-                $setup->getTable($orderTable),
-                'valitor_payment_form_url',
-                [
-                    'type' => \Magento\Framework\DB\Ddl\Table::TYPE_TEXT,
-                    'length' => 65536,
-                    'nullable' => true,
-                    'visible' => false,
-                    'comment' =>'Valitor Payment Form Url'
-                ]
-            );
-
+        $setup->startSetup();
+        $orderTable = 'sales_order';
+        $columnName = 'valitor_payment_form_url';
+        $oldColumnName = 'altapay_payment_form_url';
+        if (!$setup->getConnection()->tableColumnExists($setup->getTable($orderTable), $columnName)) {
+            if ($setup->getConnection()->tableColumnExists($setup->getTable($orderTable), $oldColumnName)) {
+                $setup->getConnection()->changeColumn(
+                    $setup->getTable('sales_order'),
+                    'altapay_payment_form_url',
+                    'valitor_payment_form_url',
+                    [
+                        'type' => \Magento\Framework\DB\Ddl\Table::TYPE_TEXT,
+                        'length' => 655366,
+                        'nullable' => true,
+                        'visible' => false,
+                        'comment' => 'Valitor Payment Form Url',
+                    ]
+                );
+            } else {
+                $setup->getConnection()
+                    ->addColumn(
+                        $setup->getTable($orderTable),
+                        $columnName,
+                        [
+                            'type' => \Magento\Framework\DB\Ddl\Table::TYPE_TEXT,
+                            'length' => 65536,
+                            'nullable' => true,
+                            'visible' => false,
+                            'comment' => 'Valitor Payment Form Url',
+                        ]
+                    );
+            }
+        } elseif ($setup->getConnection()->tableColumnExists($setup->getTable($orderTable), $oldColumnName)) {
+            $setup->getConnection()
+                    ->dropColumn(
+                        $setup->getTable($orderTable),
+                        $oldColumnName
+                    );
+        }
         $setup->endSetup();
     }
 }

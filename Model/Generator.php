@@ -25,6 +25,8 @@ use Magento\Sales\Model\Order;
 use Magento\Sales\Model\Order\Email\Sender\OrderSender;
 use SDM\Valitor\Api\TransactionRepositoryInterface;
 use SDM\Valitor\Api\OrderLoaderInterface;
+use Magento\Framework\DB\TransactionFactory;
+use Magento\Sales\Model\Service\InvoiceService;
 
 /**
  * Class Generator
@@ -56,7 +58,10 @@ class Generator
      * @var Order
      */
     private $order;
-
+    /**
+    * @var \Magento\Sales\Model\Service\InvoiceService
+    */
+    private $_invoiceService;
     /**
      * @var OrderSender
      */
@@ -83,6 +88,10 @@ class Generator
     private $orderLoader;
 
     /**
+     * @var \Magento\Framework\DB\TransactionFactory
+     */
+    private $transactionFactory;
+    /**
      * Generator constructor.
      * @param Quote $quote
      * @param PaymentData $paymentData
@@ -105,7 +114,9 @@ class Generator
         SystemConfig $systemConfig,
         Logger $valitorLogger,
         TransactionRepositoryInterface $transactionRepository,
-        OrderLoaderInterface $orderLoader
+        OrderLoaderInterface $orderLoader,
+        TransactionFactory $transactionFactory,
+        InvoiceService $invoiceService
     ) {
         $this->quote = $quote;
         $this->paymentData = $paymentData;
@@ -113,9 +124,11 @@ class Generator
         $this->request = $request;
         $this->order = $order;
         $this->orderSender = $orderSender;
+        $this->_invoiceService = $invoiceService;
         $this->systemConfig = $systemConfig;
         $this->valitorLogger = $valitorLogger;
         $this->transactionRepository = $transactionRepository;
+        $this->transactionFactory = $transactionFactory;
         $this->orderLoader = $orderLoader;
     }
 
@@ -148,6 +161,18 @@ class Generator
         return false;
     }
 
+    public function createInvoice($order)
+    {
+        if (!$order->getInvoiceCollection()->count()) {
+            $invoice = $this->_invoiceService->prepareInvoice($order);
+            $invoice->setRequestedCaptureCase(\Magento\Sales\Model\Order\Invoice::CAPTURE_OFFLINE);
+            $invoice->register();
+            $invoice->getOrder()->setCustomerNoteNotify(false);
+            $invoice->getOrder()->setIsInProcess(true);
+            $transactionSave = $this->transactionFactory->create()->addObject($invoice)->addObject($invoice->getOrder());
+            $transactionSave->save();
+        }
+    }
     /**
      * @param RequestInterface $request
      */
@@ -159,11 +184,30 @@ class Generator
     /**
      * @param RequestInterface $request
      */
-    public function handleCancelStatusAction(RequestInterface $request)
+    public function handleCancelStatusAction(RequestInterface $request, $responseStatus)
     {
-        $historyComment = __(ConstantConfig::CONSUMER_CANCEL_PAYMENT);
+        $stateWhenRedirectCancel = Order::STATE_CANCELED;
+        $statusWhenRedirectCancel = Order::STATE_CANCELED;
+        $responseComment = __(ConstantConfig::CONSUMER_CANCEL_PAYMENT);
+        if ($responseStatus != 'cancelled') {
+            $responseComment = __(ConstantConfig::UNKNOWN_PAYMENT_STATUS_MERCHANT);
+        }
+        $historyComment = __(ConstantConfig::CANCELLED).'|'.$responseComment;
         //TODO: fetch the MerchantErrorMessage and use it as historyComment
-        $this->handleOrderStateAction($request, Order::STATE_CANCELED, Order::STATE_CANCELED, $historyComment);
+        $callback = new Callback($request->getPostValue());
+        $response = $callback->call();
+        if ($response) {
+            $order = $this->loadOrderFromCallback($response);
+        }
+
+        $storeCode = $order->getStore()->getCode();
+        $storeScope = \Magento\Store\Model\ScopeInterface::SCOPE_STORE;
+        $orderStatusCancel = $this->systemConfig->getStatusConfig('cancel', $storeScope, $storeCode);
+
+        if ($orderStatusCancel) {
+            $statusWhenRedirectCancel = $orderStatusCancel;
+        }
+        $this->handleOrderStateAction($request, $stateWhenRedirectCancel, $statusWhenRedirectCancel, $historyComment);
     }
 
     /**
@@ -195,37 +239,64 @@ class Generator
     /**
      * @param RequestInterface $request
      */
-    public function handleFailedStatusAction(RequestInterface $request)
+    public function handleFailedStatusAction(RequestInterface $request, $msg, $merchantErrorMsg, $responseStatus)
     {
-        $historyComment = __(ConstantConfig::CONSUMER_PAYMENT_FAILED);
+        $historyComment = $responseStatus.'|'.$msg;
+        if (!is_null($merchantErrorMsg)) {
+            $historyComment = $responseStatus.'|'.$msg.'|'.$merchantErrorMsg;
+        }
         $transInfo = null;
         $callback = new Callback($request->getPostValue());
         $response = $callback->call();
         if ($response) {
-            $order = $this->orderLoader->getOrderByOrderIncrementId($response->shopOrderId);
+            $order = $this->loadOrderFromCallback($response);
             $transInfo = sprintf(
                 "Transaction ID: %s - Payment ID: %s - Credit card token: %s",
                 $response->transactionId,
                 $response->paymentId,
                 $response->creditCardToken
             );
-            
-            //save transaction data for failure
-            $parametersData = json_encode($request->getPostValue());
-            $transactionData = json_encode($response);
-            $this->transactionRepository->addTransactionData($response->shopOrderId, $response->transactionId, $response->paymentId, $transactionData, $parametersData);
+        }
+        
+        //check if order status set oin configuaration
+        $stateWhenRedirectFail = Order::STATE_CANCELED;
+        $statusWhenRedirectFail = Order::STATE_CANCELED;
+        $storeCode = $order->getStore()->getCode();
+        $storeScope = \Magento\Store\Model\ScopeInterface::SCOPE_STORE;
+        $orderStatusCancel = $this->systemConfig->getStatusConfig('cancel', $storeScope, $storeCode);
+
+        if ($orderStatusCancel) {
+            $statusWhenRedirectFail = $orderStatusCancel;
         }
 
-        $customFirstOrderStatus = $this->systemConfig->getStatusConfig('before', $storeScope, $storeCode);
-        if ($customFirstOrderStatus) {
-            $orderStatus = $customFirstOrderStatus;
-        } else {
-            $orderStatus = Order::STATE_PENDING_PAYMENT;
-        }
-
-        $this->handleOrderStateAction($request, Order::STATE_PENDING_PAYMENT, $orderStatus, $historyComment, $transInfo);
+        $this->handleOrderStateAction(
+            $request,
+            $stateWhenRedirectFail,
+            $statusWhenRedirectFail,
+            $historyComment,
+            $transInfo
+        );
     }
 
+    /**
+     * @param CallbackResponse $response
+     * @return Order
+     */
+    private function loadOrderFromCallback(CallbackResponse $response)
+    {
+        return $this->loadOrderFromOrderId($response->shopOrderId);
+    }
+    
+    /**
+     * @param string $orderId
+     * @return Order
+     */
+    private function loadOrderFromOrderId($orderId)
+    {
+        $order = $this->order->loadByIncrementId($orderId);
+        return $order;
+    }
+    
     /**
      * @param RequestInterface $request
      * @param string $orderState
@@ -237,15 +308,15 @@ class Generator
      */
     public function handleOrderStateAction(
         RequestInterface $request,
-        $orderState = Order::STATE_PENDING_PAYMENT,
-        $orderStatus = Order::STATE_PENDING_PAYMENT,
+        $orderState = Order::STATE_NEW,
+        $orderStatus = Order::STATE_NEW,
         $historyComment = "Order state changed",
         $transactionInfo = null
     ) {
         $callback = new Callback($request->getPostValue());
         $response = $callback->call();
         if ($response) {
-            $order = $this->orderLoader->getOrderByOrderIncrementId($response->shopOrderId);
+            $order = $this->loadOrderFromCallback($response);
             $order->setState($orderState);
             $order->setIsNotified(false);
             if (!is_null($transactionInfo)) {
@@ -290,21 +361,19 @@ class Generator
                 $payment->setCcTransId($response->creditCardToken);
                 $payment->save();
             }
-
+            //If the product is shipping product then check
+            $shippedProduct = false;
             if (!$order->getEmailSent()) {
                 $this->orderSender->send($order);
             }
-
-            $order->addStatusHistoryComment($comment);
-            $order->addStatusHistoryComment(
-                sprintf(
-                    "Transaction ID: %s - Payment ID: %s - Credit card token: %s",
-                    $response->transactionId,
-                    $response->paymentId,
-                    $response->creditCardToken
-                )
-            );
-
+            foreach ($order->getAllVisibleItems() as $item) {
+                $product_type = $item->getProductType();
+            }
+            if ($product_type != 'virtual' && $product_type != 'downloadable') {
+                $shippedProduct = true;
+            }
+            //unset redirect if success
+            $this->checkoutSession->unsValitorCustomerRedirect();
             //save transaction data
             $parametersData = json_encode($request->getPostValue());
             $transactionData = json_encode($response);
@@ -323,16 +392,41 @@ class Generator
                     break;
                 }
             }
+            $orderStatusAfterPayment = $this->systemConfig->getStatusConfig('process', $storeScope, $storeCode);
+            $orderStatus_capture = $this->systemConfig->getStatusConfig('autocapture', $storeScope, $storeCode);
 
             if ($isCaptured) {
-                $this->setCustomOrderStatus($order, Order::STATE_COMPLETE, 'complete');
-                $order->addStatusHistoryComment(__(ConstantConfig::PAYMENT_COMPLETE));
+                if ($orderStatus_capture == "complete") {
+                    if ($shippedProduct) {
+                        $this->setCustomOrderStatus($order, Order::STATE_COMPLETE, 'autocapture');
+                        $order->addStatusHistoryComment(__(ConstantConfig::PAYMENT_COMPLETE));
+                    } else {
+                        $order->addStatusToHistory($orderStatus_capture, ConstantConfig::PAYMENT_COMPLETE, false);
+                    }
+                } else {
+                    $this->setCustomOrderStatus($order, Order::STATE_PROCESSING, 'process');
+                }
             } else {
-                $this->setCustomOrderStatus($order, Order::STATE_PROCESSING, 'process');
+                if ($orderStatusAfterPayment) {
+                    $this->setCustomOrderStatus($order, $orderStatusAfterPayment, 'process');
+                } else {
+                    $this->setCustomOrderStatus($order, Order::STATE_PROCESSING, 'process');
+                }
             }
-
+            $order->addStatusHistoryComment($comment);
+            $order->addStatusHistoryComment(
+                sprintf(
+                    "Transaction ID: %s - Payment ID: %s - Credit card token: %s",
+                    $response->transactionId,
+                    $response->paymentId,
+                    $response->creditCardToken
+                )
+            );
             $order->setIsNotified(false);
             $order->getResource()->save($order);
+            if ($response->type == "paymentAndCapture") {
+                $this->createInvoice($order);
+            }
         }
     }
 

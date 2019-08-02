@@ -21,7 +21,7 @@
  * THE SOFTWARE.
  */
 
-namespace Valitor\Api\Payments;
+namespace SDM\Valitor\Api\Payments;
 
 use SDM\Valitor\AbstractApi;
 use SDM\Valitor\Response\RefundResponse;

@@ -36,6 +36,15 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class PaymentRequest extends AbstractApi
 {
+
+    const REQUIRED_QUERY_PARAMS = [
+        'language',
+        'amount',
+        'shop_orderid',
+        'terminal',
+        'currency',
+    ];
+
     use Traits\TerminalTrait;
     use Traits\AmountTrait;
     use Traits\CurrencyTrait;
@@ -261,6 +270,47 @@ class PaymentRequest extends AbstractApi
     }
 
     /**
+     * @return array
+     */
+    protected function getBasicHeaders()
+    {
+        $headers = parent::getBasicHeaders();
+
+        if(strtolower($this->getHttpMethod()) == 'post'){
+            $headers['Content-Type'] = 'application/x-www-form-urlencoded';
+        }
+
+        return $headers;
+    }
+
+    /**
+     * Build url
+     *
+     * @param array $options
+     * @return bool|string
+     */
+    protected function buildUrl(array $options)
+    {
+
+        if (! $options) {
+            return false;
+        }
+
+        $tmpOptions = $options;
+        if (strtolower($this->getHttpMethod()) == 'post') {
+            foreach ($tmpOptions as $key => $option) {
+
+                if(!in_array(strtolower($key),self::REQUIRED_QUERY_PARAMS)){
+                    unset($tmpOptions[$key]);
+                }
+
+            }
+        }
+
+        return http_build_query($tmpOptions);
+    }
+
+    /**
      * Url to api call
      *
      * @param array $options Resolved options
@@ -271,4 +321,66 @@ class PaymentRequest extends AbstractApi
         $query = $this->buildUrl($options);
         return sprintf('createPaymentRequest/?%s', $query);
     }
+
+    /**
+     * @return string
+     */
+    protected function getHttpMethod()
+    {
+        return 'POST';
+    }
+
+    /**
+     * @return \Altapay\Response\AbstractResponse|PaymentRequestResponse|bool|void
+     * @throws \Altapay\Exceptions\ResponseHeaderException
+     * @throws \Altapay\Exceptions\ResponseMessageException
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     */
+    protected function doResponse()
+    {
+
+        $this->doConfigureOptions();
+        $headers = $this->getBasicHeaders();
+
+        $requestParameters = [
+            $this->getHttpMethod(),
+            $this->parseUrl(),
+            $headers,
+        ];
+
+        if(strtolower($this->getHttpMethod()) == 'post'){
+            $requestParameters[] = $this->getPostOptions();
+        }
+
+        $request = new Request(...$requestParameters);
+
+        $this->request = $request;
+
+        try {
+            $response = $this->getClient()->send($request);
+            $this->response = $response;
+
+            $output = $this->handleResponse($request, $response);
+            $this->validateResponse($output);
+
+            return $output;
+        } catch (GuzzleHttpClientException $e) {
+            $exception = new Exceptions\ClientException($e->getMessage(), $e->getRequest(), $e->getResponse());
+            return $this->handleExceptionResponse($exception);
+        }
+
+    }
+
+    protected function getPostOptions(){
+
+        $options = $this->options;
+        foreach(self::REQUIRED_QUERY_PARAMS as $QUERY_PARAM){
+            if(array_key_exists($QUERY_PARAM,$options)){
+                unset($options[$QUERY_PARAM]);
+            }
+        }
+        return http_build_query($options,null,'&');
+
+    }
+
 }

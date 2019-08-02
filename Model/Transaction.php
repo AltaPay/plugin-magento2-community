@@ -43,12 +43,12 @@ class Transaction extends AbstractModel implements TransactionInterface, Identit
         return [TransactionInterface::TABLE_NAME . '_' . $this->getId()];
     }
 
-     /**
-      * @param string $transactionid
-      *
-      * @return void
-      * @see TransactionInterface
-      */
+    /**
+     * @param string $transactionid
+     *
+     * @return void
+     * @see TransactionInterface
+     */
     public function setTransactionid($transactionid)
     {
         $this->setData(TransactionInterface::TRANSACTION_ID, $transactionid);

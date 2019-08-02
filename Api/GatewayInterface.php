@@ -14,11 +14,11 @@ namespace SDM\Valitor\Api;
 
 interface GatewayInterface
 {
-   /**
-     * Createrequest to valitor in order to generate for url
-     * @param int $terminalId
-     * @param string $orderId
-     * @return array
-     */
+    /**
+      * Createrequest to valitor in order to generate for url
+      * @param int $terminalId
+      * @param string $orderId
+      * @return array
+      */
     public function createRequest($terminalId, $orderId);
 }

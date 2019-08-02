@@ -27,9 +27,9 @@ use SDM\Valitor\Test\Unit\ConstantTestConfig;
 
 class GeneratorTest extends MainTestCase
 {
-   /**
-    * @var ClassToTest
-    */
+    /**
+     * @var ClassToTest
+     */
     private $classToTest;
 
     /**
@@ -84,20 +84,20 @@ class GeneratorTest extends MainTestCase
 
         $orderlines = [];
         /** @var \Magento\Sales\Model\Order\Item $item */
-            $taxAmount = ConstantTestConfig::TAX;
-            $orderline = new OrderLine(
+        $taxAmount = ConstantTestConfig::TAX;
+        $orderline = new OrderLine(
                 ConstantTestConfig::ITEM_NAME,
                 ConstantTestConfig::ITEM_SKU,
                 ConstantTestConfig::ITEM_QTY,
                 ConstantTestConfig::ITEM_PRICE
             );
-            $orderline->setGoodsType('item');
-            $orderline->taxAmount = $taxAmount;
-            //$orderline->taxPercent = $item->getTaxPercent();
-            $orderlines[] = $orderline;
+        $orderline->setGoodsType('item');
+        $orderline->taxAmount = $taxAmount;
+        //$orderline->taxPercent = $item->getTaxPercent();
+        $orderlines[] = $orderline;
         
 
-            // Handling orderline
+        // Handling orderline
         $orderlines[] = (new OrderLine(
             'free_shipping',
             'free_free',

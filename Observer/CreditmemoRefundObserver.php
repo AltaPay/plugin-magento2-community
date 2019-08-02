@@ -99,12 +99,26 @@ class CreditmemoRefundObserver implements ObserverInterface
                 /** @var RefundResponse $response */
                 try {
                     $response = $refund->call();
-                    if ($response->Result != 'Success') {
-                        throw new \InvalidArgumentException('Could not refund captured reservation');
-                    }
                 } catch (ResponseHeaderException $e) {
-                    $this->monolog->addCritical('Response header exception: ' . $e->getMessage());
+                    $this->valitorLogger->addCritical('Response header exception: ' . $e->getMessage());
                     throw $e;
+                } catch (\Exception $e) {
+                    $this->valitorLogger->addCritical('Exception: ' . $e->getMessage());
+                }
+                
+                $rawresponse = $refund->getRawResponse();
+                $body = $rawresponse->getBody();
+                $this->valitorLogger->addInfo('Response body: ' . $body);
+                
+                //Update comments if refund fail
+                $xml = simplexml_load_string($body);
+                if ($xml->Body->Result == 'Error' || $xml->Body->Result == 'Failed') {
+                    $orderObject->addStatusHistoryComment('Refund failed: '. $xml->Body->MerchantErrorMessage)->setIsCustomerNotified(false);
+                    $orderObject->getResource()->save($orderObject);
+                }
+          
+                if ($xml->Body->Result != 'Success') {
+                    throw new \InvalidArgumentException('Could not refund captured reservation');
                 }
             }
         }

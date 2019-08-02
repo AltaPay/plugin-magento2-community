@@ -19,7 +19,9 @@ use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
 use SDM\Valitor\Logger\Logger;
 use SDM\Valitor\Model\SystemConfig;
-
+use Magento\Sales\Model\Order;
+use Magento\Catalog\Model\ProductFactory;
+use Magento\Framework\App\Config\ScopeConfigInterface;
 /**
  * Class CaptureObserver
  * @package SDM\Valitor\Observer
@@ -30,23 +32,42 @@ class CaptureObserver implements ObserverInterface
      * @var SystemConfig
      */
     private $systemConfig;
-
+    /**
+     * @var ScopeConfigInterface
+     */
+    private $scopeConfig;
     /**
      * @var Logger
      */
     private $valitorLogger;
-
+    /**
+     * @var Order
+    */
+    private $order;
+    /**
+     * @var productFactory
+    */
+    private $productFactory;
     /**
      * CaptureObserver constructor.
      * @param SystemConfig $systemConfig
      * @param Logger $valitorLogger
      */
-    public function __construct(SystemConfig $systemConfig, Logger $valitorLogger)
+    public function __construct(SystemConfig $systemConfig, Logger $valitorLogger, Order $order, ProductFactory $productFactory
+    ,ScopeConfigInterface $scopeConfig)
     {
         $this->systemConfig = $systemConfig;
         $this->valitorLogger = $valitorLogger;
+        $this->order = $order;
+        $this->productFactory = $productFactory;
+        $this->scopeConfig = $scopeConfig;
     }
-
+    public function getProductPrice($id)
+    {
+    $product = $this->productFactory->create();
+    $productPriceById = $product->load($id)->getPrice();
+    return $productPriceById;
+    }
     /**
      * @param Observer $observer
      *
@@ -60,27 +81,64 @@ class CaptureObserver implements ObserverInterface
 
         /** @var \Magento\Sales\Model\Order\Invoice $invoice */
         $invoice = $observer['invoice'];
-
+        $orderIncrementId = $invoice->getOrder()->getIncrementId();
+        $orderObject = $this->order->loadByIncrementId($orderIncrementId);
+        $storeScope = \Magento\Store\Model\ScopeInterface::SCOPE_STORE;
         $storeCode = $invoice->getStore()->getCode();
         if (in_array($payment->getMethod(), SystemConfig::getTerminalCodes())) {
             $this->logPayment($payment, $invoice);
 
             $orderlines = [];
+            $appliedRule = $invoice->getAppliedRuleIds();
+            $couponCode = $invoice->getDiscountDescription();
+            $couponCodeAmount = $invoice->getDiscountAmount();
             /** @var \Magento\Sales\Model\Order\Invoice\Item $item */
             foreach ($invoice->getItems() as $item) {
+                $id = $item->getProductId();
+                $productOriginalPrice = $this->getProductPrice($id);
+                $priceExcTax = $item->getPrice();
+                $quantity = $item->getQty();
+                if ((int) $this->scopeConfig->getValue('tax/calculation/price_includes_tax', $storeScope) === 1) {
+                    //Handle only if we have coupon Code
+                    if(empty($couponCode)){
+                        $taxPercent = $item->getOrderItem()->getTaxPercent();
+                        $taxCalculatedAmount = $priceExcTax *  ($taxPercent/100);
+                        $taxAmount = (number_format($taxCalculatedAmount, 2, '.', '') * $quantity);
+                    } else{
+                        $taxAmount = ($productOriginalPrice - $priceExcTax) * $quantity;
+                    }
+                }else{
+                    $taxAmount = $item->getTaxAmount();
+                }
                 if ($item->getPriceInclTax()) {
+                    $taxPercent = $item->getTaxPercent();
                     $this->logItem($item);
 
                     $orderline = new OrderLine(
                         $item->getName(),
                         $item->getSku(),
-                        $item->getQty(),
-                        $item->getPriceInclTax()
+                        $quantity,
+                        $item->getPrice()
                     );
                     $orderline->setGoodsType('item');
-                    $orderline->taxAmount = $item->getTaxAmount();
+                    $orderline->taxAmount = $taxAmount;
                     $orderlines[] = $orderline;
                 }
+            }
+            
+            if ((abs($couponCodeAmount) > 0) || !(empty($appliedRules))) {
+                if(empty($couponCode)){
+                    $couponCode = 'Cart Price Rule';
+                }
+                // Handling price reductions
+                $orderline = new OrderLine(
+                    $couponCode,
+                    'discount',
+                    1,
+                    $couponCodeAmount
+                );
+                $orderline->setGoodsType('handling');
+                $orderlines[] = $orderline;
             }
 
             if ($invoice->getShippingInclTax()) {
@@ -112,12 +170,21 @@ class CaptureObserver implements ObserverInterface
                 throw $e;
             } catch (\Exception $e) {
                 $this->valitorLogger->addCriticalLog('Exception', $e->getMessage());
-                throw $e;
             }
 
             $rawresponse = $api->getRawResponse();
-            $body = $rawresponse->getBody();
-            $this->valitorLogger->addInfoLog('Response body', $body);
+            if (!empty($rawresponse)) {
+                $body = $rawresponse->getBody();
+                $this->valitorLogger->addInfo('Response body: ' . $body);
+            }
+
+          
+            //Update comments if capture fail
+            $xml = simplexml_load_string($body);    
+            if ($xml->Body->Result == 'Error' || $xml->Body->Result == 'Failed') {
+                $orderObject->addStatusHistoryComment('Refund failed: '. $xml->Body->MerchantErrorMessage)->setIsCustomerNotified(false);
+                $orderObject->getResource()->save($orderObject);
+            }
 
             $headdata = [];
             foreach ($rawresponse->getHeaders() as $k => $v) {
@@ -134,7 +201,7 @@ class CaptureObserver implements ObserverInterface
     /**
      * @param \Magento\Sales\Model\Order\Invoice\Item $item
      */
-    private function logItem($item)
+    protected function logItem($item)
     {
         $this->valitorLogger->addInfoLog(
             'Log Item',
@@ -165,7 +232,7 @@ class CaptureObserver implements ObserverInterface
      * @param \Magento\Sales\Model\Order\Payment $payment
      * @param \Magento\Sales\Model\Order\Invoice $invoice
      */
-    private function logPayment($payment, $invoice)
+    protected function logPayment($payment, $invoice)
     {
         $logs = [
             'invoice.getTransactionId: %s',

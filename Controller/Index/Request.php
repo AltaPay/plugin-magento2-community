@@ -13,6 +13,9 @@ namespace SDM\Valitor\Controller\Index;
 
 use Magento\Framework\App\ResponseInterface;
 use SDM\Valitor\Controller\Index;
+use Magento\Framework\App\CsrfAwareActionInterface;
+use Magento\Framework\App\RequestInterface;
+use Magento\Framework\App\Request\InvalidRequestException;
 
 /**
  * Class Request
@@ -20,6 +23,22 @@ use SDM\Valitor\Controller\Index;
  */
 class Request extends Index
 {
+    /**
+     * @inheritDoc
+    */
+    public function createCsrfValidationException(
+        RequestInterface $request
+    ): ?InvalidRequestException {
+        return null;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function validateForCsrf(RequestInterface $request): ?bool
+    {
+        return true;
+    }
 
     /**
      * Dispatch request

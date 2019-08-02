@@ -26,6 +26,5 @@ class Pending extends Status
      */
     protected $_stateStatuses = [
         Order::STATE_NEW,
-        Order::STATE_PENDING_PAYMENT,
     ];
 }

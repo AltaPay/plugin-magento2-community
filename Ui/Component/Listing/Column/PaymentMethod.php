@@ -36,7 +36,11 @@ class PaymentMethod extends Column
     {
         if (isset($dataSource['data']['items'])) {
             foreach ($dataSource['data']['items'] as $key => &$items) {
-                $order  = $this->_orderRepository->get($items["entity_id"]);
+                $order_id = $items["entity_id"];
+                if (isset($items["order_id"])) {
+                    $order_id = $items["order_id"];
+                }
+                $order  = $this->_orderRepository->get($order_id);
                 $dataSource['data']['items'][$key]['payment_method_title'] = $order->getPayment()->getMethodInstance()->getConfigData('title', $order->getStoreId());
             }
         }

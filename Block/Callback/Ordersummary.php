@@ -94,7 +94,6 @@ class Ordersummary extends \Magento\Framework\View\Element\Template
         \Magento\Framework\Pricing\Helper\Data $priceHelper,
         array $data = []
     ) {
-        
         parent::__construct($context, $data);
         $this->orderLoader = $orderLoader;
         $this->request = $request;
@@ -136,12 +135,15 @@ class Ordersummary extends \Magento\Framework\View\Element\Template
      * @param string $address
      * @return mixed
      */
-    public function getFormatedShippingAddress()
+    public function getFormattedAddress()
     {
         $order = $this->getOrder();
-        return $this->renderer->format($order->getShippingAddress(), 'html');
+        if ($order->getShippingAddress()) {
+            return $this->renderer->format($order->getShippingAddress(), 'html');
+        } else {
+            return $this->renderer->format($order->getBillingAddress(), 'html');
+        }
     }
-
     
     /**
      * Get order payment title
