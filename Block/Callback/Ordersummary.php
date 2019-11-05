@@ -14,6 +14,7 @@ namespace SDM\Valitor\Block\Callback;
 use Magento\Customer\Model\Context;
 use Magento\Sales\Model\Order;
 use SDM\Valitor\Api\OrderLoaderInterface;
+use \Magento\Framework\App\Config\ScopeConfigInterface;
 
 /**
  * Class Ordersummary
@@ -65,7 +66,10 @@ class Ordersummary extends \Magento\Framework\View\Element\Template
      * @var \Magento\Checkout\Model\Session;
      */
     private $checkoutSession;
-
+    /**
+     * @var ScopeConfigInterface
+     */
+    protected $_appConfigScopeConfigInterface;
 
     /**
      * Ordersummary constructor.
@@ -92,6 +96,7 @@ class Ordersummary extends \Magento\Framework\View\Element\Template
         \Magento\Sales\Model\Order\Address\Renderer $renderer,
         \Magento\Catalog\Model\ProductRepository $productRepository,
         \Magento\Framework\Pricing\Helper\Data $priceHelper,
+        ScopeConfigInterface $appConfigScopeConfigInterface,
         array $data = []
     ) {
         parent::__construct($context, $data);
@@ -104,6 +109,7 @@ class Ordersummary extends \Magento\Framework\View\Element\Template
         $this->renderer = $renderer;
         $this->productRepository = $productRepository;
         $this->priceHelper=$priceHelper;
+        $this->_appConfigScopeConfigInterface = $appConfigScopeConfigInterface;
     }
 
 
@@ -151,10 +157,23 @@ class Ordersummary extends \Magento\Framework\View\Element\Template
      */
     public function getPaymentMethodtitle()
     {
+        $storeScope = \Magento\Store\Model\ScopeInterface::SCOPE_STORE;
         $order = $this->getOrder();
         $payment = $order->getPayment();
         $method = $payment->getMethodInstance();
-        return $method->getTitle();
+        $storeCode = $order->getStore()->getCode();
+                $storeId = $order->getStore()->getId();
+                $payment = $order->getPayment();
+                $method = $payment->getMethodInstance();
+                $title = $method->getConfigData('title', $storeId);;
+                $terminalID = $payment->getMethod();
+                    if($title == null){
+                        $terminalTitle = $this->_appConfigScopeConfigInterface
+                        ->getValue('payment/'.$terminalID.'/terminalname',$storeScope); 
+                    } else{
+                        $terminalTitle = $title; 
+                    }
+        return $terminalTitle;
     }
 
     /**

@@ -13,6 +13,7 @@ namespace SDM\Valitor\Model\Config\Source;
 
 use Magento\Config\Model\Config\Source\Locale;
 use Magento\Framework\Option\ArrayInterface;
+use SDM\Valitor\Types\LanguageTypes;
 
 /**
  * Class Languages
@@ -20,16 +21,6 @@ use Magento\Framework\Option\ArrayInterface;
  */
 class Languages extends Locale implements ArrayInterface
 {
-    // nb, nn will be converted to no.
-    //ee will be converted to et
-    /**
-     * @var array
-     */
-    private static $allowedLanguages = [
-        'cs', 'da', 'de', 'en', 'es', 'fi', 'fr', 'ja',
-        'lt', 'nl', 'no', 'nb', 'nn', 'pl', 'sv','th', 'tr', 'zh',
-        'et', 'ee', 'it', 'pt', 'eu'
-    ];
 
     /**
      * Return array of options as value-label pairs
@@ -40,9 +31,10 @@ class Languages extends Locale implements ArrayInterface
     {
         $languages = [];
         $mainlanguages = parent::toOptionArray();
+        $response = new LanguageTypes();
         foreach ($mainlanguages as $keylang => $language) {
             list($key, $tmp) = explode('_', $language['value']);
-            if (in_array($key, self::$allowedLanguages)) {
+            if (in_array($key, $response->getAllowed())) {
                 $languages[$key] = $language;
             }
         }

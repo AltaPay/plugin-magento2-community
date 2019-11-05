@@ -10,7 +10,7 @@
 <form id="edit_form" method="post" action="<?= /* @escapeNotVerified */ $block->getSaveUrl() ?>">
     <?= $block->getBlockHtml('formkey') ?>
     <?php  $_order = $block->getCreditmemo()->getOrder() ?>
-
+    <?php $helper = $this->helper('SDM\Valitor\Helper\Data'); ?>
     <?= $block->getChildHtml('order_info') ?>
 
     <section class="admin__page-section">
@@ -29,7 +29,7 @@
                 <span class="title"><?= /* @escapeNotVerified */ __('Payment Information') ?></span>
             </div>
             <div class="admin__page-section-item-content">
-                <div class="order-payment-method-title"><?= $_order->getPayment()->getMethodInstance()->getConfigData('title', $_order->getStoreId()); ?></div>
+                <div class="order-payment-method-title"><?php echo $helper->getPaymentTitleTerminal($_order->getId());?></div>
                 <div class="order-payment-currency">
                     <?= /* @escapeNotVerified */ __('The order was placed using %1.', $_order->getOrderCurrencyCode()) ?>
                 </div>

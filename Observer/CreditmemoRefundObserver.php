@@ -19,7 +19,9 @@ use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
 use SDM\Valitor\Logger\Logger;
 use SDM\Valitor\Model\SystemConfig;
-
+use Magento\Sales\Model\Order;
+use Magento\Catalog\Model\ProductFactory;
+use Magento\Framework\App\Config\ScopeConfigInterface;
 /**
  * Class CreditmemoRefundObserver
  * @package SDM\Valitor\Observer
@@ -31,23 +33,42 @@ class CreditmemoRefundObserver implements ObserverInterface
      * @var SystemConfig
      */
     private $systemConfig;
-
+    /**
+     * @var ScopeConfigInterface
+     */
+    private $scopeConfig;
     /**
      * @var Logger
      */
     private $valitorLogger;
-
+    /**
+     * @var Order
+    */
+    private $order;
+    /**
+     * @var productFactory
+    */
+    private $productFactory;
     /**
      * CaptureObserver constructor.
      * @param SystemConfig $systemConfig
      * @param Logger $valitorLogger
      */
-    public function __construct(SystemConfig $systemConfig, Logger $valitorLogger)
+    public function __construct(SystemConfig $systemConfig, Logger $valitorLogger, Order $order, ProductFactory $productFactory
+    ,ScopeConfigInterface $scopeConfig)
     {
         $this->systemConfig = $systemConfig;
         $this->valitorLogger = $valitorLogger;
+        $this->order = $order;
+        $this->productFactory = $productFactory;
+        $this->scopeConfig = $scopeConfig;
     }
-
+    public function getProductPrice($id)
+    {
+    $product = $this->productFactory->create();
+    $productPriceById = $product->load($id)->getPrice();
+    return $productPriceById;
+    }
     /**
      * @param Observer $observer
      *
@@ -58,43 +79,81 @@ class CreditmemoRefundObserver implements ObserverInterface
     {
         /** @var \Magento\Sales\Api\Data\CreditmemoInterface $memo */
         $memo = $observer['creditmemo'];
-        $orderlines = [];
         $creditOnline = $memo->getDoTransaction();
         if ($creditOnline) {
             /** @var \Magento\Sales\Model\Order $order */
-            $order = $memo->getOrder();
-
+            $orderIncrementId = $memo->getOrder()->getIncrementId();
+            $orderObject = $this->order->loadByIncrementId($orderIncrementId);
+            $storeScope = \Magento\Store\Model\ScopeInterface::SCOPE_STORE;
+            $storeCode = $memo->getStore()->getCode();
             /** @var \Magento\Sales\Model\Order\Payment $payment */
-            $payment = $order->getPayment();
+            $payment = $memo->getOrder()->getPayment();
+            $storeScope = \Magento\Store\Model\ScopeInterface::SCOPE_STORE;
             if (in_array($payment->getMethod(), SystemConfig::getTerminalCodes())) {
+                $orderlines = [];
+                $appliedRule = $memo->getAppliedRuleIds();
+                $couponCode = $memo->getDiscountDescription();
+                $couponCodeAmount = $memo->getDiscountAmount();
+                $compAmount = $memo->getOrder()->getShippingDiscountTaxCompensationAmount();
                 foreach ($memo->getItems() as $item) {
-                    if ($item->getPriceInclTax()) {
-                        $orderline = new OrderLine(
-                            $item->getName(),
-                            $item->getSku(),
-                            $item->getQty(),
-                            $item->getPriceInclTax()
-                        );
-                        $orderline->setGoodsType('item');
-                        $orderline->taxAmount = $item->getTaxAmount();
-                        $orderlines[] = $orderline;
+                    $quantity = $item->getQty();
+                    if($quantity > 0){
+                        $id = $item->getProductId();                
+                        $priceExcTax = $item->getPrice();
+                        if ((int) $this->scopeConfig->getValue('tax/calculation/price_includes_tax', $storeScope) === 1) {
+                            //Handle only if we have coupon Code
+                            $taxPercent = $item->getOrderItem()->getTaxPercent();
+                            $taxCalculatedAmount = $priceExcTax *  ($taxPercent/100);
+                            $taxAmount = (number_format($taxCalculatedAmount, 2, '.', '') * $quantity);
+                        }else{
+                            $taxAmount = $item->getTaxAmount();
+                        }
+                        if ($item->getPriceInclTax()) {
+                            $orderline = new OrderLine(
+                                $item->getName(),
+                                $item->getSku(),
+                                $quantity,
+                                $item->getPrice()
+                                );
+                            $orderline->setGoodsType('item');
+                            $orderline->taxAmount = $taxAmount;
+                            $orderlines[] = $orderline;
+                        }
                     }
                 }
+
+                if (abs($couponCodeAmount) > 0) {
+                    if(empty($couponCode)){
+                        $couponCode = 'Cart Price Rule';
+                    }
+                    // Handling price reductions
+                    $orderline = new OrderLine(
+                        $couponCode,
+                        'discount',
+                        1,
+                        $couponCodeAmount
+                    );
+                    $orderline->setGoodsType('handling');
+                    $orderlines[] = $orderline;
+                }
+
 
                 if ($memo->getShippingInclTax()) {
                     $orderline = new OrderLine(
                         'Shipping',
                         'shipping',
                         1,
-                        $memo->getShippingInclTax()
+                        $memo->getShippingAmount() + $compAmount
                     );
                     $orderline->setGoodsType('shipment');
                     $orderline->taxAmount = $memo->getShippingTaxAmount();
                     $orderlines[] = $orderline;
                 }
-                $refund = new RefundCapturedReservation($this->systemConfig->getAuth($order->getStore()->getCode()));
+                $refund = new RefundCapturedReservation($this->systemConfig->getAuth($storeCode));
+            if ($memo->getTransactionId()) {
                 $refund->setTransaction($payment->getLastTransId());
-                $refund->setAmount((float) $memo->getGrandTotal());
+            }
+                $refund->setAmount((float) number_format($memo->getGrandTotal(), 2, '.', ''));
                 $refund->setOrderLines($orderlines);
                 /** @var RefundResponse $response */
                 try {
@@ -122,5 +181,69 @@ class CreditmemoRefundObserver implements ObserverInterface
                 }
             }
         }
+    }
+    /**
+     * @param \Magento\Sales\Model\Order\Invoice\Item $item
+     */
+    protected function logItem($item)
+    {
+        $this->valitorLogger->addInfoLog(
+            'Log Item',
+            sprintf(
+                implode(' - ', [
+                    'getSku: %s',
+                    'getQty: %s',
+                    'getDescription: %s',
+                    'getPrice(): %s',
+                    'getDiscountAmount(): %s',
+                    'getPrice() - getDiscountAmount(): %s',
+                    'getRowTotalInclTax: %s',
+                    'getRowTotal: %s'
+                ]),
+                $item->getSku(),
+                $item->getQty(),
+                $item->getDescription(),
+                $item->getPrice(),
+                $item->getDiscountAmount(),
+                $item->getPrice() - $item->getDiscountAmount(),
+                $item->getRowTotalInclTax(),
+                $item->getRowTotal()
+            )
+        );
+    }
+
+    /**
+     * @param \Magento\Sales\Model\Order\Payment $payment
+     * @param \Magento\Sales\Model\Order\Invoice $invoice
+     */
+    protected function logPayment($payment, $invoice)
+    {
+        $logs = [
+            'invoice.getTransactionId: %s',
+            'invoice->getOrder()->getIncrementId: %s',
+            '$invoice->getGrandTotal(): %s',
+            'getLastTransId: %s',
+            'getAmountAuthorized: %s',
+            'getAmountCanceled: %s',
+            'getAmountOrdered: %s',
+            'getAmountPaid: %s',
+            'getAmountRefunded: %s',
+        ];
+
+        $this->valitorLogger->addInfoLog(
+            'Log Transaction',
+            sprintf(
+                implode(' - ', $logs),
+                $invoice->getTransactionId(),
+                $invoice->getOrder()->getIncrementId(),
+                $invoice->getGrandTotal(),
+                $payment->getLastTransId(),
+                $payment->getAmountAuthorized(),
+                $payment->getAmountCanceled(),
+                $payment->getAmountOrdered(),
+                $payment->getAmountPaid(),
+                $payment->getAmountRefunded()
+            )
+        );
     }
 }

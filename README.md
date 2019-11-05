@@ -1,13 +1,17 @@
-# Valitor Magento2 extension
+# ValitorOmni Magento2 extension
 
 Valitor has made it much easier for you as merchant/developer to receive secure payments in your Magento2.3.x web shop.
 
 
 == Change log ==
 
+** Version 2.1.0
+
+    * A new batch of improvements and bug fixes
+
 ** Version 2.0.0
 
-    * Major improvements and bug fixtures
+    * Major improvements and bug fixes
 
 ** Version 1.1.4
     

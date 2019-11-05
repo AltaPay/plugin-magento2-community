@@ -75,6 +75,7 @@ class Fail extends Index implements CsrfAwareActionInterface
                     $this->generator->handleCancelStatusAction($this->getRequest(), $responseStatus);
                     break;
                 case 'failed':
+                    $this->generator->handleFailedStatusAction($this->getRequest(), $msg, $merchantErrorMsg, $responseStatus);
                 case 'error':
                     $this->generator->handleFailedStatusAction($this->getRequest(), $msg, $merchantErrorMsg, $responseStatus);
                     break;

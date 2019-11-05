@@ -62,11 +62,16 @@ class CaptureObserver implements ObserverInterface
         $this->productFactory = $productFactory;
         $this->scopeConfig = $scopeConfig;
     }
+
+    /**
+      * @param $id
+      * @return productPrice
+      */
     public function getProductPrice($id)
     {
-    $product = $this->productFactory->create();
-    $productPriceById = $product->load($id)->getPrice();
-    return $productPriceById;
+        $product = $this->productFactory->create();
+        $productPrice = $product->load($id)->getPrice();
+        return $productPrice;
     }
     /**
      * @param Observer $observer
@@ -86,47 +91,39 @@ class CaptureObserver implements ObserverInterface
         $storeScope = \Magento\Store\Model\ScopeInterface::SCOPE_STORE;
         $storeCode = $invoice->getStore()->getCode();
         if (in_array($payment->getMethod(), SystemConfig::getTerminalCodes())) {
-            $this->logPayment($payment, $invoice);
-
             $orderlines = [];
-            $appliedRule = $invoice->getAppliedRuleIds();
             $couponCode = $invoice->getDiscountDescription();
             $couponCodeAmount = $invoice->getDiscountAmount();
+            $compAmount = $invoice->getShippingDiscountTaxCompensationAmount();
             /** @var \Magento\Sales\Model\Order\Invoice\Item $item */
             foreach ($invoice->getItems() as $item) {
                 $id = $item->getProductId();
-                $productOriginalPrice = $this->getProductPrice($id);
-                $priceExcTax = $item->getPrice();
                 $quantity = $item->getQty();
-                if ((int) $this->scopeConfig->getValue('tax/calculation/price_includes_tax', $storeScope) === 1) {
-                    //Handle only if we have coupon Code
-                    if(empty($couponCode)){
+                if($quantity > 0){
+                    $priceExcTax = $item->getPrice();
+                    if ((int) $this->scopeConfig->getValue('tax/calculation/price_includes_tax', $storeScope) === 1) {
+                        //Handle only if we have coupon Code
                         $taxPercent = $item->getOrderItem()->getTaxPercent();
                         $taxCalculatedAmount = $priceExcTax *  ($taxPercent/100);
                         $taxAmount = (number_format($taxCalculatedAmount, 2, '.', '') * $quantity);
-                    } else{
-                        $taxAmount = ($productOriginalPrice - $priceExcTax) * $quantity;
+                    }else{
+                        $taxAmount = $item->getTaxAmount();
                     }
-                }else{
-                    $taxAmount = $item->getTaxAmount();
-                }
-                if ($item->getPriceInclTax()) {
-                    $taxPercent = $item->getTaxPercent();
-                    $this->logItem($item);
-
-                    $orderline = new OrderLine(
-                        $item->getName(),
-                        $item->getSku(),
-                        $quantity,
-                        $item->getPrice()
-                    );
-                    $orderline->setGoodsType('item');
-                    $orderline->taxAmount = $taxAmount;
-                    $orderlines[] = $orderline;
+                    if ($item->getPriceInclTax()) {
+                        $orderline = new OrderLine(
+                            $item->getName(),
+                            $item->getSku(),
+                            $quantity,
+                            $item->getPrice()
+                        );
+                        $orderline->setGoodsType('item');
+                        $orderline->taxAmount = $taxAmount;
+                        $orderlines[] = $orderline;
+                    }
                 }
             }
             
-            if ((abs($couponCodeAmount) > 0) || !(empty($appliedRules))) {
+            if (abs($couponCodeAmount) > 0) {
                 if(empty($couponCode)){
                     $couponCode = 'Cart Price Rule';
                 }
@@ -141,12 +138,12 @@ class CaptureObserver implements ObserverInterface
                 $orderlines[] = $orderline;
             }
 
-            if ($invoice->getShippingInclTax()) {
+            if ($invoice->getShippingInclTax() > 0) {
                 $orderline = new OrderLine(
                     'Shipping',
                     'shipping',
                     1,
-                    $invoice->getShippingInclTax()
+                    $invoice->getShippingAmount() + $compAmount
                 );
                 $orderline->setGoodsType('shipment');
                 $orderline->taxAmount = $invoice->getShippingTaxAmount();
@@ -158,7 +155,7 @@ class CaptureObserver implements ObserverInterface
                 $api->setInvoiceNumber($invoice->getTransactionId());
             }
 
-            $api->setAmount((float) $invoice->getGrandTotal());
+            $api->setAmount((float) number_format($invoice->getGrandTotal(), 2, '.', ''));
             $api->setOrderLines($orderlines);
             $api->setTransaction($payment->getLastTransId());
             /** @var CaptureReservationResponse $response */
@@ -192,7 +189,7 @@ class CaptureObserver implements ObserverInterface
             }
             $this->valitorLogger->addInfoLog('Response headers', implode(", ", $headdata));
 
-            if ($response->Result != 'Success') {
+            if (!isset($response->Result) || $response->Result != 'Success') {
                 throw new \InvalidArgumentException('Could not capture reservation');
             }
         }

@@ -48,6 +48,7 @@ class Terminals implements ArrayInterface
             $call = new \SDM\Valitor\Api\Others\Terminals($this->systemConfig->getAuth());
             /** @var TerminalsResponse $response */
             $response = $call->call();
+            $terminals[] = ['value' => ' ', 'label' => '-- Please Select --'];
             foreach ($response->Terminals as $terminal) {
                 $terminals[] = ['value' => $terminal->Title, 'label' => $terminal->Title];
             }

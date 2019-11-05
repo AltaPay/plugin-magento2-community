@@ -208,6 +208,11 @@ class Generator
             $statusWhenRedirectCancel = $orderStatusCancel;
         }
         $this->handleOrderStateAction($request, $stateWhenRedirectCancel, $statusWhenRedirectCancel, $historyComment);
+        
+        //save faild transaction data
+        $parametersData = json_encode($request->getPostValue());
+        $transactionData = json_encode($response);
+        $this->transactionRepository->addTransactionData($order->getIncrementId(), $response->transactionId, $response->paymentId, $transactionData, $parametersData);
     }
 
     /**
@@ -276,6 +281,11 @@ class Generator
             $historyComment,
             $transInfo
         );
+        
+        //save faild transaction data
+        $parametersData = json_encode($request->getPostValue());
+        $transactionData = json_encode($response);
+        $this->transactionRepository->addTransactionData($order->getIncrementId(), $response->transactionId, $response->paymentId, $transactionData, $parametersData);
     }
 
     /**

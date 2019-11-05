@@ -49,7 +49,37 @@ define(
                     );
                 }
             },
+            terminalName: function () {
+                var self = this;
+                var terminalname;
+                var paymentMethod = window.checkoutConfig.payment[this.getDefaultCode()].terminaldata;
+                for(var obj in paymentMethod) {
+                    if(obj === self.getCode()) {
+                        if(paymentMethod[obj].terminalname != " "){
+                            if(paymentMethod[obj].label != null){
+                                terminalname = paymentMethod[obj].label
+                            }else {
+                                terminalname = paymentMethod[obj].terminalname;
+                            }
+                        }                        
+                    }
+                }
+                return terminalname;
+            },
+            terminalStatus: function () {
+                var self = this;
+                var paymentMethod = window.checkoutConfig.payment[this.getDefaultCode()].terminaldata;
+                for(var obj in paymentMethod) {
+                    if(obj === self.getCode()) {
+                        if(paymentMethod[obj].terminalname == " "){
+                            return false;
+                        } else {
+                            return true;
+                        }                   
+                    }
+                }
 
+            },
             getDefaultCode: function () {
                 return 'sdm_valitor';
             }

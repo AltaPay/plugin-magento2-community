@@ -8,6 +8,7 @@
 
 ?>
 <?php  $_order = $block->getCreditmemo()->getOrder() ?>
+<?php $helper = $this->helper('SDM\Valitor\Helper\Data'); ?>
 <?= $block->getChildHtml('order_info') ?>
 <section class="admin__page-section">
     <div class="admin__page-section-title">
@@ -25,7 +26,7 @@
                 <span class="title"><?= /* @escapeNotVerified */ __('Payment Information') ?></span>
             </div>
             <div class="admin__page-section-item-content">
-                <div class="order-payment-method-title"><?= $_order->getPayment()->getMethodInstance()->getConfigData('title', $_order->getStoreId()); ?></div>
+                <div class="order-payment-method-title"><?php echo $helper->getPaymentTitleTerminal($_order->getId());?></div>
                 <div class="order-payment-currency"><?= /* @escapeNotVerified */ __('The order was placed using %1.', $_order->getOrderCurrencyCode()) ?></div>
                 <div class="order-payment-additional"><?= $block->getChildHtml('order_payment_additional') ?></div>
             </div>

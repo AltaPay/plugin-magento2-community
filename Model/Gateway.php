@@ -33,6 +33,9 @@ use Magento\Catalog\Helper\Data as Taxhelper;
 use Magento\Catalog\Api\ProductRepositoryInterface;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use SDM\Valitor\Helper\Data;
+use SDM\Valitor\Logger\Logger;
+use Magento\SalesRule\Model\RuleFactory;
+use \Magento\Sales\Model\ResourceModel\Order\Tax\Item;
 
 /**
  * Class Gateway
@@ -90,6 +93,18 @@ class Gateway implements GatewayInterface
     * @var Quote
     */
     private $quote;
+    /**
+     * @var Logger
+     */
+    protected $valitorLogger;
+    /**
+     * @var rule
+     */
+    protected $rule;
+    /**
+     * @var taxItem
+     */
+    protected $taxItem;
 
     /**
      * Gateway constructor.
@@ -112,7 +127,10 @@ class Gateway implements GatewayInterface
         ProductRepositoryInterface $productRepository,
         Taxhelper $taxHelper,
         ScopeConfigInterface $scopeConfig,
-        Data $helper
+        Data $helper,
+        Logger $valitorLogger,
+        RuleFactory $rule,
+        Item $taxItem
     ) {
         $this->checkoutSession = $checkoutSession;
         $this->urlInterface = $urlInterface;
@@ -126,12 +144,15 @@ class Gateway implements GatewayInterface
         $this->taxHelper = $taxHelper;
         $this->scopeConfig = $scopeConfig;
         $this->helper = $helper;
+        $this->valitorLogger = $valitorLogger;
+        $this->rule = $rule;
+        $this->taxItem = $taxItem;
     }
 
     /**
       * Createrequest to valitor
       * @param int $terminalId
-      * @param string $orderId
+      * @param string $orderId 
       * @return array
       */
     public function createRequest($terminalId, $orderId)
@@ -162,7 +183,8 @@ class Gateway implements GatewayInterface
             $request
                 ->setTerminal($terminalName)
                 ->setShopOrderId($order->getIncrementId())
-                ->setAmount((float) $order->getGrandTotal())
+                //Grand total formated to avoid the 3 digits error in total
+                ->setAmount((float) number_format($order->getGrandTotal(), 2, '.', '')) 
                 ->setCurrency($order->getOrderCurrencyCode())
                 ->setCustomerInfo($this->setCustomer($order))
                 ->setConfig($this->setConfig())
@@ -187,6 +209,17 @@ class Gateway implements GatewayInterface
 
             $orderlines = [];
             $sendShipment = false;
+            //get shipping information
+            $compAmount = $order->getShippingDiscountTaxCompensationAmount();
+            $shippingTax = $order->getShippingTaxAmount();
+            $shippingAmount = $order->getShippingAmount();
+            $shippingTaxPercent = $this->getOrderShippingTax($order->getId());
+
+            $shippingDiscounts = array();
+            $itemDiscount = 0;
+            $discountOnAllItems = $this->allItemsHaveDiscount($order->getAllVisibleItems());
+
+
             /** @var \Magento\Sales\Model\Order\Item $item */
             foreach ($order->getAllVisibleItems() as $item) {
                 $product_type = $item->getProductType();
@@ -194,7 +227,36 @@ class Gateway implements GatewayInterface
                 $taxPercent = $item->getTaxPercent();
 				$taxRate = (1 + $taxPercent/100);
                 $priceIncTax = false;
-                $quantity = $item->getQtyOrdered(); 
+                $quantity = $item->getQtyOrdered();
+                $appliedRule = $item->getAppliedRuleIds();
+
+                if(!empty($appliedRule)){
+                    $appliedRuleArr = explode(",",$appliedRule);
+                    $discountPercentage = array();
+                    foreach($appliedRuleArr as $ruleId){
+                        $couponCodeData = $this->rule->create()->load($ruleId); 
+                        $simpleAction  = $couponCodeData->getData('simple_action');
+                        $discountAmount  = $couponCodeData->getData('discount_amount');
+                        $applyToShipping  = $couponCodeData->getData('apply_to_shipping');
+                        if($applyToShipping){
+                            if(!in_array($ruleId,$shippingDiscounts)){
+                                $shippingDiscounts[] = $ruleId;
+                            }
+                        }
+                        if($simpleAction == 'by_percent'){
+                            $discountPercentage[] = ($discountAmount/100);
+                        }
+                    }
+
+                    if(count($discountPercentage) == 1){
+                        $itemDiscount = array_shift($discountPercentage);
+                        $itemDiscount = $itemDiscount*100;
+                    }else if(count($discountPercentage) > 1){
+                        $discountSum = array_sum($discountPercentage);
+                        $discountProduct = array_product($discountPercentage);
+                        $itemDiscount = ($discountSum - $discountProduct)*100;
+                    }                    
+                }
 
                 if ((int) $this->scopeConfig->getValue('tax/calculation/price_includes_tax', $storeScope) === 1) {
                     $unitPriceWithoutTax = $productOriginalPrice/$taxRate;
@@ -215,18 +277,96 @@ class Gateway implements GatewayInterface
                 $orderline->setGoodsType('item');
                 //in case of cart rule discount, send tax after discount
                 if ($priceIncTax) {
-                    $dataForPriceIncTax = $this->returnDataForPriceIncTax($productOriginalPrice, $item, $unitPrice, $couponCode, $taxPercent, $quantity);
-                    $orderline->discount = $dataForPriceIncTax["discount"];
-                    $taxAmount = number_format($dataForPriceIncTax["rawTaxAmount"], 2, '.', '');
+                    $dataForPrice = $this->returnDataForPriceIncTax($item, $unitPrice, $couponCode, $taxPercent, $quantity, $itemDiscount);
                 }else {
-                    $dataForPriceExcTax = $this->returnDataForPriceExcTax($item , $unitPrice, $couponCode, $quantity);
-                    $orderline->discount = $dataForPriceExcTax["discount"];
-                    $taxAmount = number_format($dataForPriceExcTax["rawTaxAmount"], 2, '.', '');
+                    $dataForPrice = $this->returnDataForPriceExcTax($item, $unitPrice, $couponCode, $taxPercent, $quantity, $itemDiscount, $discountOnAllItems);
+                }
+                
+                $taxAmount = number_format($dataForPrice["rawTaxAmount"], 2, '.', '');
+
+                if($discountOnAllItems){
+                    $orderline->discount = 0;
+                }else{
+                    $orderline->discount = $dataForPrice["discount"];
                 }
                 $orderline->taxAmount = $taxAmount + $item->getWeeeTaxAppliedRowAmount();
                 $orderlines[] = $orderline;
             }
-            if ((abs($couponCodeAmount) > 0) || !(empty($appliedRules))) {
+            /* Code for shipment */
+            if ($sendShipment) {
+                $shippingaddress = $order->getShippingMethod(true);
+                $method = isset($shippingaddress['method']) ? $shippingaddress['method'] : '';
+                $carrier_code = isset($shippingaddress['carrier_code']) ? $shippingaddress['carrier_code'] : '';
+
+                //add shipping tax amount in separate column of request
+                $discountPercentage = array();
+                $itemDiscount = 0;
+
+                if(!empty($shippingDiscounts)){
+                    foreach($shippingDiscounts as $ruleId){
+                        $couponCodeData = $this->rule->create()->load($ruleId); 
+                        $simpleAction  = $couponCodeData->getData('simple_action');
+                        $discountAmount  = $couponCodeData->getData('discount_amount');
+                        if($simpleAction == 'by_percent'){
+                            $discountPercentage[] = ($discountAmount/100);
+                        }
+                    }   
+                    if(count($discountPercentage) == 1){
+                        $itemDiscount = array_shift($discountPercentage);
+                        $itemDiscount = $itemDiscount*100;
+                    }else if(count($discountPercentage) > 1){
+                        $discountSum = array_sum($discountPercentage);
+                        $discountProduct = array_product($discountPercentage);
+                        $itemDiscount = ($discountSum - $discountProduct)*100;
+                    }
+                }
+
+                $compAmountDiscount = 0;
+                if($compAmount > 0){
+                    /* add discount rate*/
+                    $compAmountDiscount = $compAmount + ($compAmount*($itemDiscount/100));
+                    /*Add tax percentage in compensation amount*/
+                    $compAmountDiscount = $compAmountDiscount + ($compAmountDiscount*($shippingTaxPercent/100));
+                    $compAmountDiscount = number_format($compAmountDiscount, 2, '.', '');
+                }
+
+              if($discountOnAllItems){
+                $totalShipAmount = $shippingAmount + $compAmount;
+              }else{
+                $totalShipAmount = $shippingAmount + $compAmountDiscount;
+              }
+              
+              $totalShipAmount = number_format($totalShipAmount, 2, '.', '');
+                
+                //after discount tax case
+                if (!empty($shippingaddress)) {
+                    $orderline = new OrderLine(
+                        $method,
+                        $carrier_code,
+                        1,
+                        $totalShipAmount
+                );
+                
+                if($discountOnAllItems){
+                    $orderline->discount = 0;
+                    $orderline->taxAmount = $shippingTax;
+                }else{
+                    $orderline->discount = $itemDiscount;
+                    if($shippingTaxPercent > 0){
+                        $shippingAmount = $shippingAmount*($shippingTaxPercent/100);
+                        $orderline->taxAmount = number_format($shippingAmount, 2, '.', '');
+                    }else{
+                        $orderline->taxAmount = 0;
+                    }
+                }
+
+                $orderline->setGoodsType('shipment');
+                $orderlines[] = $orderline;
+
+                }
+            }
+
+            if ($discountOnAllItems == true && ((abs($couponCodeAmount) > 0) || !(empty($appliedRules)))) {
                 if(empty($couponCode)){
                     $couponCode = 'Cart Price Rule';
                 }
@@ -240,20 +380,9 @@ class Gateway implements GatewayInterface
                 $orderline->setGoodsType('handling');
                 $orderlines[] = $orderline;
             }
-            if ($sendShipment) {
-                $shippingaddress = $order->getShippingMethod(true);
-                $method = isset($shippingaddress['method']) ? $shippingaddress['method'] : '';
-                $carrier_code = isset($shippingaddress['carrier_code']) ? $shippingaddress['carrier_code'] : '';
-                if (!empty($shippingaddress)) {
-                    $orderlines[] = (new OrderLine(
-                        $method,
-                        $carrier_code,
-                        1,
-                        $order->getShippingInclTax()
-                    ))->setGoodsType('shipment');
-                }
-            }
+          
             $request->setOrderLines($orderlines);
+
             try {
                 /** @var \Valitor\Response\PaymentRequestResponse $response */
                 $response = $request->call();
@@ -305,34 +434,45 @@ class Gateway implements GatewayInterface
 	/**
 	 * @returns returnDataForPriceIncTax[]
 	 */
-    private function returnDataForPriceIncTax($productOriginalPrice, $item , $unitPrice, $couponCode, $taxPercent, $quantity)
-	{
+     private function returnDataForPriceIncTax($item, $unitPrice, $couponCode, $taxPercent, $quantity, $itemDiscount)
+     {
         $data["discount"] =	0;
         $data["rawTaxAmount"] = 0;
+        $priceAfterDiscount = 0;
         $productID = $item->getProductId();
+        $product_type = $item->getProductType();
         $_product = $this->productRepository->getById($productID);
-        $priceAfterDiscount = $_product->getPriceInfo()->getPrice('final_price')->getAmount()->getBaseAmount();
+        //If product type is configurable get price after discount
+        if($product_type == "configurable") {
+            $priceAfterDiscount = $item->getRowTotal()/$quantity;
+        }else {
+            $priceAfterDiscount = $_product->getPriceInfo()->getPrice('final_price')->getAmount()->getBaseAmount();
+        }    
         $priceAfterDiscount = number_format($priceAfterDiscount, 2, '.', '');
-        if(empty($couponCode)){
-            $data["rawTaxAmount"] = (($taxPercent/100) * $unitPrice) *  $quantity;
-        } else {
-            $data["rawTaxAmount"] = ($productOriginalPrice - $unitPrice) *  $quantity;
-        }
+        $data["rawTaxAmount"] = (($taxPercent/100) * $unitPrice) *  $quantity;
         if ($priceAfterDiscount != null && $unitPrice > $priceAfterDiscount && empty($couponCode)) {
-            $data["discount"] = (($unitPrice-$priceAfterDiscount)/$unitPrice)*100;
+            $discountAmount = (($unitPrice-$priceAfterDiscount)/$unitPrice)*100;
+            $data["discount"] = number_format($discountAmount, 2, '.', '');
             $taxBeforeDiscount = ($unitPrice * $taxPercent)/100;
             //In case of catalog rule discount, send tax before discount
             $data["rawTaxAmount"] = $taxBeforeDiscount * $quantity;
+        }else{
+            $data["discount"] = $itemDiscount;
         }
-			return $data;
+        return $data;
     }
-    	/**
-	 * @returns returnDataForPriceExcTax[]
-	 */
-	private function returnDataForPriceExcTax($item , $unitPrice, $couponCode, $quantity)
+    /**
+     * @returns returnDataForPriceExcTax[]
+     */
+	private function returnDataForPriceExcTax($item, $unitPrice, $couponCode, $taxPercent, $quantity, $itemDiscount, $discountOnAllItems)
 	{
         $data["discount"] =	0;
-        $data["rawTaxAmount"] = $item->getTaxAmount();
+
+        if ($discountOnAllItems) {
+			$data["rawTaxAmount"] = $item->getTaxAmount();
+		} else {
+			$data["rawTaxAmount"] = ($unitPrice * ($taxPercent / 100)) * $quantity;
+		}
 		$productSpecialPrice = number_format($item->getPrice(), 2, '.', '');
 			if($productSpecialPrice != null && $unitPrice > $productSpecialPrice && empty($couponCode)){
 				$discount = (($unitPrice-$productSpecialPrice)/$unitPrice)*100;
@@ -340,8 +480,10 @@ class Gateway implements GatewayInterface
 				$taxBeforeDiscount = ($unitPrice * $item->getTaxPercent())/100;
 				$data["discount"] = $discount;
 				$data["rawTaxAmount"] = $taxBeforeDiscount * $quantity;
-			}
-			return $data;
+        }else{
+            $data["discount"] = $itemDiscount;
+        }
+        return $data;
     }
     /**
       * @param $orderId
@@ -442,5 +584,46 @@ class Gateway implements GatewayInterface
             $order->setStatus($status);
         }
         $order->getResource()->save($order);
+    }
+    /**
+     * @param $orderItems
+     */
+    private function allItemsHaveDiscount($orderItems)
+    {
+        $discountOnAllItems = true;
+        foreach ($orderItems as $item) {
+            $appliedRule = $item->getAppliedRuleIds();
+            $product_type = $item->getProductType();
+            if(!empty($appliedRule)){
+                $appliedRuleArr = explode(",",$appliedRule);
+                foreach($appliedRuleArr as $ruleId){
+                    $couponCodeData = $this->rule->create()->load($ruleId); 
+                    $applyToShipping  = $couponCodeData->getData('apply_to_shipping');
+                    if(!$applyToShipping && $product_type != 'virtual' && $product_type != 'downloadable'){
+                        $discountOnAllItems = false;
+                    }
+                }
+            }else{
+                $discountOnAllItems = false;
+            }
+        }
+        return $discountOnAllItems;
+    }
+    
+    /**
+     * @param $orderID
+     */
+    private function getOrderShippingTax($orderID)
+    {
+        $shippingTaxPercent = 0;
+        $tax_items = $this->taxItem->getTaxItemsByOrderId($orderID); 
+        if(!empty($tax_items) && is_array($tax_items)){
+            foreach($tax_items as $item){
+                if ($item['taxable_item_type'] === 'shipping') {
+                    $shippingTaxPercent = $item['tax_percent'];
+                }
+            }
+        }
+        return $shippingTaxPercent;
     }
 }

@@ -21,6 +21,7 @@ use SDM\Valitor\Api\OrderLoaderInterface;
 use Magento\CatalogInventory\Api\StockManagementInterface;
 use SDM\Valitor\Model\SystemConfig;
 use Magento\Framework\App\ResourceConnection;
+use SDM\Valitor\Logger\Logger;
 
 /**
  * Class RestoreQuote
@@ -82,6 +83,10 @@ class RestoreQuote
       */
     protected $modelResource;
 
+   /**
+     * @var Logger
+     */
+    protected $valitorLogger;
 
     /**
      * RestoreQuote Constructor
@@ -97,7 +102,7 @@ class RestoreQuote
      * @param SystemConfig             $systemConfig
      * @param ResourceConnection       $modelResource
      */
-    public function __construct(Session $checkoutSession, OrderFactory $orderFactory, QuoteFactory $quoteFactory, ManagerInterface $messageManager, Coupon $coupon, CouponUsage $couponUsage, OrderLoaderInterface $orderLoader, StockManagementInterface $stockManagement, SystemConfig $systemConfig, ResourceConnection $modelResource)
+    public function __construct(Session $checkoutSession, OrderFactory $orderFactory, QuoteFactory $quoteFactory, ManagerInterface $messageManager, Coupon $coupon, CouponUsage $couponUsage, OrderLoaderInterface $orderLoader, StockManagementInterface $stockManagement, SystemConfig $systemConfig, ResourceConnection $modelResource,Logger $valitorLogger)
     {
         $this->checkoutSession = $checkoutSession;
         $this->orderFactory    = $orderFactory;
@@ -109,6 +114,7 @@ class RestoreQuote
         $this->stockManagement = $stockManagement;
         $this->systemConfig    = $systemConfig;
         $this->modelResource   = $modelResource;
+        $this->valitorLogger = $valitorLogger;
     }
 
     /**
@@ -137,7 +143,7 @@ class RestoreQuote
             if (!empty($getTransactionData)) {
                 $getTransactionDataDecode = json_decode($getTransactionData);
 
-                if ($getTransactionDataDecode->error_message) {
+                if (isset($getTransactionDataDecode->error_message)) {
                     $history = $getTransactionDataDecode->error_message;
                     $message = $getTransactionDataDecode->error_message;
                 }

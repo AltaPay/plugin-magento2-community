@@ -71,7 +71,6 @@ define(
                         dataType: 'json'
                     })
                         .done(function (jsonResponse) {
-                            console.log(jsonResponse);
                             if (jsonResponse.result == 'success') {
                                 window.location.href = jsonResponse.formurl;
                             } else {
