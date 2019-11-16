@@ -11,11 +11,8 @@
   "description": "Valitor-Omni: we make buying and selling easy",
    "require": {
         "php": ">=5.5",
-        "guzzlehttp/promises": "^1.0",
         "guzzlehttp/psr7": "^1.4",
         "guzzlehttp/guzzle": "^6.0",
-        "psr/http-message": "^1.0.1",
-        "ralouphie/getallheaders": "^3.0",
         "symfony/options-resolver": "~2.6 || ~3.0 || ^4.0"
   },
   "type": "magento2-module",
