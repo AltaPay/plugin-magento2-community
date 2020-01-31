@@ -331,9 +331,9 @@ class PaymentRequest extends AbstractApi
     }
 
     /**
-     * @return \Altapay\Response\AbstractResponse|PaymentRequestResponse|bool|void
-     * @throws \Altapay\Exceptions\ResponseHeaderException
-     * @throws \Altapay\Exceptions\ResponseMessageException
+     * @return \Valitor\Response\AbstractResponse|PaymentRequestResponse|bool|void
+     * @throws \Valitor\Exceptions\ResponseHeaderException
+     * @throws \Valitor\Exceptions\ResponseMessageException
      * @throws \GuzzleHttp\Exception\GuzzleException
      */
     protected function doResponse()

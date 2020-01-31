@@ -9,6 +9,7 @@
  * @category  payment
  * @package   valitor
  */
+
 namespace SDM\Valitor\Controller\Index;
 
 use Magento\Framework\App\ResponseInterface;
@@ -19,6 +20,7 @@ use Magento\Framework\App\Request\InvalidRequestException;
 
 /**
  * Class Verifyorder
+ *
  * @package SDM\Valitor\Controller\Index
  */
 class Verifyorder extends Index implements CsrfAwareActionInterface
@@ -46,6 +48,7 @@ class Verifyorder extends Index implements CsrfAwareActionInterface
     {
         return true;
     }
+
     public function execute()
     {
         $this->writeLog();

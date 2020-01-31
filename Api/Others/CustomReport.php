@@ -34,7 +34,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  * Find the id and see the optional parameters that can be passed to each custom report on the
  * custom report details page in the merchant interface (this is only visible if you have api credentials).
  *
- * Custom reports can be enabled by AltaPay support.
+ * Custom reports can be enabled by Valitor support.
  */
 class CustomReport extends AbstractApi
 {

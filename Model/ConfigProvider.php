@@ -135,7 +135,6 @@ class ConfigProvider implements ConfigProviderInterface
                 }
             
         }
-        //exit;
         return $methods;
     }
     public function checkAuth()
