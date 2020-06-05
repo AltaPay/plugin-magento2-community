@@ -2,13 +2,11 @@
 /**
  * Valitor Module for Magento 2.x.
  *
+ * Copyright © 2018 Valitor. All rights reserved.
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
- *
- * @copyright 2018 Valitor
- * @category  payment
- * @package   valitor
  */
+
 namespace SDM\Valitor\Observer;
 
 use SDM\Valitor\Api\Payments\ReleaseReservation;
@@ -18,10 +16,6 @@ use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
 use SDM\Valitor\Model\SystemConfig;
 
-/**
- * Class OrderCancelObserver
- * @package SDM\Valitor\Observer
- */
 class OrderCancelObserver implements ObserverInterface
 {
 
@@ -32,6 +26,7 @@ class OrderCancelObserver implements ObserverInterface
 
     /**
      * OrderCancelObserver constructor.
+     *
      * @param SystemConfig $systemConfig
      */
     public function __construct(SystemConfig $systemConfig)
@@ -49,7 +44,6 @@ class OrderCancelObserver implements ObserverInterface
     {
         /** @var \Magento\Sales\Model\Order $order */
         $order = $observer['order'];
-
         /** @var \Magento\Sales\Model\Order\Payment $payment */
         $payment = $order->getPayment();
 

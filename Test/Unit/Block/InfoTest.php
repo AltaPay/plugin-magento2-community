@@ -2,12 +2,9 @@
 /**
  * Valitor Module for Magento 2.x.
  *
+ * Copyright © 2018 Valitor. All rights reserved.
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
- *
- * @copyright 2018 Valitor
- * @category  payment
- * @package   valitor
  */
 
 namespace SDM\Valitor\Test\Unit\Block;
@@ -19,10 +16,6 @@ use Magento\Payment\Model\Info;
 use SDM\Valitor\Test\Unit\MainTestCase;
 use SDM\Valitor\Test\Unit\ConstantTestConfig;
 
-/**
- * Class InfoTest
- * @package SDM\Valitor\Test\Unit\Block
- */
 class InfoTest extends MainTestCase
 {
     /**
@@ -40,35 +33,25 @@ class InfoTest extends MainTestCase
      */
     private $info;
 
-    /**
-     *
-     */
     protected function setUp()
     {
         $this->objectManager = $this->getObjectManager();
-
-        $order = $this->getMockBuilder(Order::class)
-            ->disableOriginalConstructor()
-            ->setMethods([
-                'getCcTransId',
-                'getPaymentId'
-            ])
-            ->getMock();
+        $order               = $this->getMockBuilder(Order::class)
+                                    ->disableOriginalConstructor()
+                                    ->setMethods(['getCcTransId', 'getPaymentId'])
+                                    ->getMock();
         $order->method('getCcTransId')->willReturn(ConstantTestConfig::CC_TRANSACTION_ID);
         $order->method('getPaymentId')->willReturn(ConstantTestConfig::CC_PAYMENT_ID);
 
         $this->info = $this->getMockBuilder(Info::class)
-            ->disableOriginalConstructor()
-            ->setMethods(['getLastTransId', 'getOrder'])
-            ->getMock();
+                           ->disableOriginalConstructor()
+                           ->setMethods(['getLastTransId', 'getOrder'])
+                           ->getMock();
         $this->info->method('getOrder')->willReturn($order);
 
         $this->classToTest->setInfo($this->info);
     }
 
-    /**
-     *
-     */
     public function testPrepareSpecificInformation()
     {
         $this->info->method('getLastTransId')->willReturn(ConstantTestConfig::CC_TRANSACTION_ID);
@@ -76,9 +59,6 @@ class InfoTest extends MainTestCase
         $this->assertNotEmpty($result);
     }
 
-    /**
-     *
-     */
     public function testPrepareSpecificInformationNoLastTransId()
     {
         $this->info->method('getLastTransId')->willReturn('');

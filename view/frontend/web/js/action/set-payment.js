@@ -1,12 +1,9 @@
 /**
  * Valitor Module for Magento 2.x.
  *
+ * Copyright © 2018 Valitor. All rights reserved.
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
- *
- * @copyright 2018 Valitor
- * @category  payment
- * @package   valitor
  */
 
 define(
@@ -61,35 +58,37 @@ define(
 
             fullScreenLoader.startLoader();
 
-            return storage.post(serviceUrl, JSON.stringify(payload))
-                .done(function (data) {
-                    $('#valitor-error-message').text('');
-                    $.ajax({
-                        method: "POST",
-                        url: window.checkoutConfig.payment['sdm_valitor'].url,
-                        data: {
-                            paytype: method,
-                            cartid: quote.getQuoteId(),
-                            orderid: data
-                        },
-                        dataType: 'json'
-                    })
-                        .done(function (jsonResponse) {
-                            if (jsonResponse.result == 'success') {
-                                window.location.href = jsonResponse.formurl;
-                            } else {
-                                fullScreenLoader.stopLoader();
-                                $(".payment-method._active").find('#valitor-error-message').css('display', 'block');
-                                $(".payment-method._active").find('#valitor-error-message').text(jsonResponse.message);
-                                return false;
-                            }
-                        });
-                })
-                .fail(function (response) {
-                    errorProcessor.process(response, messageContainer);
-                    fullScreenLoader.stopLoader();
-                });
+            return storage.post(serviceUrl, JSON.stringify(payload)).done(function (data) {
+                $('#valitor-error-message').text('');
+                var tokenId = '';
+                if ($(".payment-method._active select[name='ccToken']").length == 1) {
+                    tokenId = $(".payment-method._active select[name='ccToken']").val();
+                }
 
+                $.ajax({
+                    method: "POST",
+                    url: window.checkoutConfig.payment['sdm_valitor'].url,
+                    data: {
+                        paytype: method,
+                        cartid: quote.getQuoteId(),
+                        orderid: data,
+                        tokenid: tokenId
+                    },
+                    dataType: 'json'
+                }).done(function (jsonResponse) {
+                    if (jsonResponse.result == 'success') {
+                        window.location.href = jsonResponse.formurl;
+                    } else {
+                        fullScreenLoader.stopLoader();
+                        $(".payment-method._active").find('#valitor-error-message').css('display', 'block');
+                        $(".payment-method._active").find('#valitor-error-message').text(jsonResponse.message);
+                        return false;
+                    }
+                });
+            }).fail(function (response) {
+                errorProcessor.process(response, messageContainer);
+                fullScreenLoader.stopLoader();
+            });
         };
     }
 );

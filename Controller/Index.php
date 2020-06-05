@@ -2,13 +2,11 @@
 /**
  * Valitor Module for Magento 2.x.
  *
+ * Copyright © 2018 Valitor. All rights reserved.
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
- *
- * @copyright 2018 Valitor
- * @category  payment
- * @package   valitor
  */
+
 namespace SDM\Valitor\Controller;
 
 use Magento\Checkout\Model\Session;
@@ -23,7 +21,6 @@ use SDM\Valitor\Model\Gateway;
 
 /**
  * Class Index
- * @package SDM\Valitor\Controller
  */
 abstract class Index extends Action
 {
@@ -65,14 +62,15 @@ abstract class Index extends Action
 
     /**
      * Index constructor.
-     * @param Context $context
+     *
+     * @param Context     $context
      * @param PageFactory $pageFactory
-     * @param Order $order
-     * @param Quote $quote
-     * @param Session $checkoutSession
-     * @param Generator $generator
-     * @param Gateway $gateway
-     * @param Logger $valitorLogger
+     * @param Order       $order
+     * @param Quote       $quote
+     * @param Session     $checkoutSession
+     * @param Generator   $generator
+     * @param Gateway     $gateway
+     * @param Logger      $valitorLogger
      */
     public function __construct(
         Context $context,
@@ -85,15 +83,14 @@ abstract class Index extends Action
         Logger $valitorLogger
     ) {
         parent::__construct($context);
-        $this->order = $order;
-        $this->quote = $quote;
+        $this->order           = $order;
+        $this->quote           = $quote;
         $this->checkoutSession = $checkoutSession;
-        $this->generator = $generator;
-        $this->gateway = $gateway;
-        $this->valitorLogger = $valitorLogger;
-        $this->pageFactory = $pageFactory;
+        $this->generator       = $generator;
+        $this->gateway         = $gateway;
+        $this->valitorLogger   = $valitorLogger;
+        $this->pageFactory     = $pageFactory;
     }
-
 
     /**
      * @return mixed
@@ -104,7 +101,7 @@ abstract class Index extends Action
     }
 
     /**
-     *
+     * Write the logs to the valitoe logger.
      */
     protected function writeLog()
     {

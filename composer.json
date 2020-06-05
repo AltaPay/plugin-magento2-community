@@ -19,7 +19,7 @@
         "symfony/options-resolver": "~2.6 || ~3.0 || ^4.0"
   },
   "type": "magento2-module",
-  "version": "2.2.0",
+  "version": "3.0.0",
   "autoload": {
     "files": [ "registration.php" ],
     "psr-4": {

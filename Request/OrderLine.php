@@ -25,9 +25,7 @@ namespace SDM\Valitor\Request;
 
 class OrderLine extends AbstractSerializer
 {
-    private static $goodsTypes = [
-        'shipment', 'handling', 'item'
-    ];
+    private static $goodsTypes = ['shipment', 'handling', 'item'];
 
     /**
      * Description of item
@@ -100,29 +98,38 @@ class OrderLine extends AbstractSerializer
     public $imageUrl;
 
     /**
+     * Product URL
+     *
+     * @var string
+     */
+    public $productUrl;
+
+    /**
      * OrderLine constructor.
+     *
      * @param string $description
      * @param string $itemId
-     * @param float $quantity
-     * @param float $unitPrice
+     * @param float  $quantity
+     * @param float  $unitPrice
      */
     public function __construct($description = null, $itemId = null, $quantity = null, $unitPrice = null)
     {
         $this->description = $description;
-        $this->itemId = $itemId;
-        $this->quantity = $quantity;
-        $this->unitPrice = $unitPrice;
+        $this->itemId      = $itemId;
+        $this->quantity    = $quantity;
+        $this->unitPrice   = $unitPrice;
     }
 
     /**
      * Set goods type
      *
      * @param string $goodsType
+     *
      * @return OrderLine
      */
     public function setGoodsType($goodsType)
     {
-        if (! in_array($goodsType, self::$goodsTypes)) {
+        if (!in_array($goodsType, self::$goodsTypes)) {
             throw new \InvalidArgumentException(
                 sprintf(
                     'goodsType should be one of "%s" you have selected "%s"',
@@ -133,6 +140,7 @@ class OrderLine extends AbstractSerializer
         }
 
         $this->goodsType = $goodsType;
+
         return $this;
     }
 
@@ -155,16 +163,12 @@ class OrderLine extends AbstractSerializer
     {
         $output = [
             'description' => $this->get($this, 'description'),
-            'itemId' => $this->get($this, 'itemId'),
-            'quantity' => $this->get($this, 'quantity'),
-            'unitPrice' => $this->get($this, 'unitPrice')
+            'itemId'      => $this->get($this, 'itemId'),
+            'quantity'    => $this->get($this, 'quantity'),
+            'unitPrice'   => $this->get($this, 'unitPrice')
         ];
 
-        if ($this->get($this, 'taxPercent') && $this->get($this, 'taxAmount')) {
-            throw new \InvalidArgumentException('Only one of "taxPercent" and "taxAmount" should be used');
-        }
-
-        $fields = ['taxPercent', 'taxAmount', 'unitCode', 'discount', 'goodsType', 'imageUrl'];
+        $fields = ['taxPercent', 'taxAmount', 'unitCode', 'discount', 'goodsType', 'imageUrl', 'productUrl'];
         foreach ($fields as $field) {
             if (($value = $this->get($this, $field)) !== null) {
                 $output[$field] = $value;

@@ -2,12 +2,9 @@
 /**
  * Valitor Module for Magento 2.x.
  *
+ * Copyright © 2018 Valitor. All rights reserved.
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
- *
- * @copyright 2018 Valitor
- * @category  payment
- * @package   valitor
  */
 
 namespace SDM\Valitor\Test\Unit\Block\Callback;
@@ -22,10 +19,6 @@ use Magento\Framework\TestFramework\Unit\Helper\ObjectManager;
 use SDM\Valitor\Test\Unit\MainTestCase;
 use SDM\Valitor\Test\Unit\ConstantTestConfig;
 
-/**
- * Class OrdersummaryTest
- * @package SDM\Valitor\Test\Unit\Block
- */
 class OrdersummaryTest extends MainTestCase
 {
     /**
@@ -43,9 +36,6 @@ class OrdersummaryTest extends MainTestCase
      */
     private $orderCore;
 
-    /**
-     *
-     */
     protected function setUp()
     {
         $this->objectManager = $this->getObjectManager();
@@ -53,13 +43,13 @@ class OrdersummaryTest extends MainTestCase
         $this->orderCore = $this->getMockBuilder(OrderCore::class)->disableOriginalConstructor()->getMock();
         $this->orderCore->method('loadByIncrementId')->willReturn($this->orderCore);
         $orderFactory = $this->getMockBuilder(OrderFactory::class)
-           ->disableOriginalConstructor()
-           ->setMethods(['create'])
-           ->getMock();
+                             ->disableOriginalConstructor()
+                             ->setMethods(['create'])
+                             ->getMock();
         $orderFactory->method('create')->willReturn($this->orderCore);
 
         $this->order = $this->objectManager->getObject(Ordersummary::class, [
-           'orderFactory' => $orderFactory
+            'orderFactory' => $orderFactory
         ]);
     }
 
@@ -91,7 +81,7 @@ class OrdersummaryTest extends MainTestCase
     public function testGetFormatedShippingAddress()
     {
         $address = '';
-        $result = $this->order->FormatedShippingAddress();
+        $result  = $this->order->FormatedShippingAddress();
         $this->assertEquals($address, $result);
     }
 

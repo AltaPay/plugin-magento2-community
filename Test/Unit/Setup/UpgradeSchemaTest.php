@@ -2,12 +2,9 @@
 /**
  * Valitor Module for Magento 2.x.
  *
+ * Copyright © 2018 Valitor. All rights reserved.
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
- *
- * @copyright 2018 Valitor
- * @category  payment
- * @package   valitor
  */
 
 namespace SDM\Valitor\Test\Unit\Setup;
@@ -20,10 +17,6 @@ use Magento\Framework\DB\Adapter\AdapterInterface;
 use Magento\Framework\DB\Ddl\Table;
 use SDM\Valitor\Test\Unit\MainTestCase;
 
-/**
- * Class UpgradeSchemaTest
- * @package SDM\Valitor\Test\Unit\Setup
- */
 class UpgradeSchemaTest extends MainTestCase
 {
     /**
@@ -36,19 +29,12 @@ class UpgradeSchemaTest extends MainTestCase
      */
     private $objectManager;
 
-    /**
-     *
-     */
     protected function setUp()
     {
         $this->objectManager = $this->getObjectManager();
-
-        $this->classToTest = $this->objectManager->getObject(ClassToTest::class);
+        $this->classToTest   = $this->objectManager->getObject(ClassToTest::class);
     }
 
-    /**
-     *
-     */
     public function testUpgrade()
     {
         $table = $this->getMockBuilder(Table::class)->disableOriginalConstructor()->getMock();

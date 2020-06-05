@@ -36,15 +36,6 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class PaymentRequest extends AbstractApi
 {
-
-    const REQUIRED_QUERY_PARAMS = [
-        'language',
-        'amount',
-        'shop_orderid',
-        'terminal',
-        'currency',
-    ];
-
     use Traits\TerminalTrait;
     use Traits\AmountTrait;
     use Traits\CurrencyTrait;
@@ -57,11 +48,13 @@ class PaymentRequest extends AbstractApi
      * The language of the payment form
      *
      * @param string $language
+     *
      * @return $this
      */
     public function setLanguage($language)
     {
         $this->unresolvedOptions['language'] = $language;
+
         return $this;
     }
 
@@ -69,11 +62,13 @@ class PaymentRequest extends AbstractApi
      * The type of the authorization
      *
      * @param string $type
+     *
      * @return $this
      */
     public function setType($type)
     {
         $this->unresolvedOptions['type'] = $type;
+
         return $this;
     }
 
@@ -81,11 +76,13 @@ class PaymentRequest extends AbstractApi
      * Use the credit_card_token from a previous payment to allow your customer to buy with the same credit card again
      *
      * @param string $token
+     *
      * @return $this
      */
     public function setCcToken($token)
     {
         $this->unresolvedOptions['ccToken'] = $token;
+
         return $this;
     }
 
@@ -93,11 +90,13 @@ class PaymentRequest extends AbstractApi
      * If you wish to define the reconciliation identifier used in the reconciliation csv files
      *
      * @param string $identifier
+     *
      * @return $this
      */
     public function setSaleReconciliationIdentifier($identifier)
     {
         $this->unresolvedOptions['sale_reconciliation_identifier'] = $identifier;
+
         return $this;
     }
 
@@ -105,11 +104,13 @@ class PaymentRequest extends AbstractApi
      * This sets the invoice number to be used on capture
      *
      * @param string $number
+     *
      * @return $this
      */
     public function setSaleInvoiceNumber($number)
     {
         $this->unresolvedOptions['sale_invoice_number'] = $number;
+
         return $this;
     }
 
@@ -117,11 +118,13 @@ class PaymentRequest extends AbstractApi
      * This sets the sales tax amount that will be used on capture
      *
      * @param float $tax
+     *
      * @return $this
      */
     public function setSalesTax($tax)
     {
         $this->unresolvedOptions['sales_tax'] = $tax;
+
         return $this;
     }
 
@@ -129,11 +132,13 @@ class PaymentRequest extends AbstractApi
      * The cookie to be sent to your callback urls
      *
      * @param string $cookie
+     *
      * @return $this
      */
     public function setCookie($cookie)
     {
         $this->unresolvedOptions['cookie'] = $cookie;
+
         return $this;
     }
 
@@ -141,11 +146,13 @@ class PaymentRequest extends AbstractApi
      * The source of the payment
      *
      * @param string $source
+     *
      * @return $this
      */
     public function setPaymentSource($source)
     {
         $this->unresolvedOptions['payment_source'] = $source;
+
         return $this;
     }
 
@@ -153,11 +160,13 @@ class PaymentRequest extends AbstractApi
      * Set config
      *
      * @param Config $config
+     *
      * @return $this
      */
     public function setConfig(Config $config)
     {
         $this->unresolvedOptions['config'] = $config;
+
         return $this;
     }
 
@@ -165,11 +174,13 @@ class PaymentRequest extends AbstractApi
      * If you wish to decide pr. Payment wich fraud detection service to use
      *
      * @param string $service
+     *
      * @return $this
      */
     public function setFraudService($service)
     {
         $this->unresolvedOptions['fraud_service'] = $service;
+
         return $this;
     }
 
@@ -177,11 +188,13 @@ class PaymentRequest extends AbstractApi
      * Fraud detection services can use this parameter in the fraud detection calculations
      *
      * @param string $shippingMethod
+     *
      * @return $this
      */
     public function setShippingMethod($shippingMethod)
     {
         $this->unresolvedOptions['shipping_method'] = $shippingMethod;
+
         return $this;
     }
 
@@ -189,11 +202,13 @@ class PaymentRequest extends AbstractApi
      * If the this is given the organisation number field in the invoice payment form is prepopulated
      *
      * @param string $number
+     *
      * @return $this
      */
     public function setOrganisationNumber($number)
     {
         $this->unresolvedOptions['organisation_number'] = $number;
+
         return $this;
     }
 
@@ -202,11 +217,27 @@ class PaymentRequest extends AbstractApi
      * To disable account for this specific customer, set to false
      *
      * @param bool $offer
+     *
      * @return $this
      */
     public function setAccountOffer($offer)
     {
         $this->unresolvedOptions['account_offer'] = $offer;
+
+        return $this;
+    }
+
+    /**
+     * This is the date when the customer account was first created in system.
+     *
+     * @param string $customerCreatedDate
+     *
+     * @return $this
+     */
+    public function setCustomerCreatedDate($customerCreatedDate)
+    {
+        $this->unresolvedOptions['customer_created_date'] = $customerCreatedDate;
+
         return $this;
     }
 
@@ -214,23 +245,35 @@ class PaymentRequest extends AbstractApi
      * Configure options
      *
      * @param OptionsResolver $resolver
+     *
      * @return void
      */
     protected function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setRequired(['terminal', 'shop_orderid', 'amount', 'currency']);
         $resolver->setDefined([
-            'language', 'transaction_info', 'type', 'ccToken', 'sale_reconciliation_identifier',
-            'sale_invoice_number', 'sales_tax', 'cookie', 'payment_source', 'customer_info', 'customer_created_date',
-            'config', 'fraud_service', 'shipping_method', 'organisation_number', 'account_offer', 'orderLines'
+            'language',
+            'transaction_info',
+            'type',
+            'ccToken',
+            'sale_reconciliation_identifier',
+            'sale_invoice_number',
+            'sales_tax',
+            'cookie',
+            'payment_source',
+            'customer_info',
+            'customer_created_date',
+            'config',
+            'fraud_service',
+            'shipping_method',
+            'organisation_number',
+            'account_offer',
+            'orderLines'
         ]);
 
         $resolver->setAllowedValues('language', Types\LanguageTypes::getAllowed());
         $resolver->setDefault('type', 'payment');
         $resolver->setAllowedValues('type', Types\PaymentTypes::getAllowed());
-        $resolver->setAllowedValues('ccToken', function ($value) {
-            return preg_match('/^[0-9a-f]{41}$/', $value);
-        });
         $resolver->setAllowedValues('sale_reconciliation_identifier', function ($value) {
             return strlen($value) <= 100;
         });
@@ -258,14 +301,16 @@ class PaymentRequest extends AbstractApi
     /**
      * Handle response
      *
-     * @param Request $request
+     * @param Request  $request
      * @param Response $response
+     *
      * @return PaymentRequestResponse
      */
     protected function handleResponse(Request $request, Response $response)
     {
-        $body = (string) $response->getBody();
-        $xml = simplexml_load_string($body);
+        $body = (string)$response->getBody();
+        $xml  = simplexml_load_string($body);
+
         return ResponseSerializer::serialize(PaymentRequestResponse::class, $xml->Body, false, $xml->Header);
     }
 
@@ -275,8 +320,7 @@ class PaymentRequest extends AbstractApi
     protected function getBasicHeaders()
     {
         $headers = parent::getBasicHeaders();
-
-        if(strtolower($this->getHttpMethod()) == 'post'){
+        if (strtolower($this->getHttpMethod()) == 'post') {
             $headers['Content-Type'] = 'application/x-www-form-urlencoded';
         }
 
@@ -284,42 +328,21 @@ class PaymentRequest extends AbstractApi
     }
 
     /**
-     * Build url
-     *
-     * @param array $options
-     * @return bool|string
-     */
-    protected function buildUrl(array $options)
-    {
-
-        if (! $options) {
-            return false;
-        }
-
-        $tmpOptions = $options;
-        if (strtolower($this->getHttpMethod()) == 'post') {
-            foreach ($tmpOptions as $key => $option) {
-
-                if(!in_array(strtolower($key),self::REQUIRED_QUERY_PARAMS)){
-                    unset($tmpOptions[$key]);
-                }
-
-            }
-        }
-
-        return http_build_query($tmpOptions);
-    }
-
-    /**
      * Url to api call
      *
      * @param array $options Resolved options
+     *
      * @return string
      */
     protected function getUrl(array $options)
     {
-        $query = $this->buildUrl($options);
-        return sprintf('createPaymentRequest/?%s', $query);
+        $url = 'createPaymentRequest';
+        if (strtolower($this->getHttpMethod()) == 'get') {
+            $query = $this->buildUrl($options);
+            $url   = sprintf('%s/?%s', $url, $query);
+        }
+
+        return $url;
     }
 
     /**
@@ -338,26 +361,16 @@ class PaymentRequest extends AbstractApi
      */
     protected function doResponse()
     {
-
         $this->doConfigureOptions();
-        $headers = $this->getBasicHeaders();
-
-        $requestParameters = [
-            $this->getHttpMethod(),
-            $this->parseUrl(),
-            $headers,
-        ];
-
-        if(strtolower($this->getHttpMethod()) == 'post'){
+        $headers           = $this->getBasicHeaders();
+        $requestParameters = [$this->getHttpMethod(), $this->parseUrl(), $headers];
+        if (strtolower($this->getHttpMethod()) == 'post') {
             $requestParameters[] = $this->getPostOptions();
         }
-
-        $request = new Request(...$requestParameters);
-
+        $request       = new Request(...$requestParameters);
         $this->request = $request;
-
         try {
-            $response = $this->getClient()->send($request);
+            $response       = $this->getClient()->send($request);
             $this->response = $response;
 
             $output = $this->handleResponse($request, $response);
@@ -366,21 +379,18 @@ class PaymentRequest extends AbstractApi
             return $output;
         } catch (GuzzleHttpClientException $e) {
             $exception = new Exceptions\ClientException($e->getMessage(), $e->getRequest(), $e->getResponse());
+
             return $this->handleExceptionResponse($exception);
         }
-
     }
 
-    protected function getPostOptions(){
-
+    /**
+     * @return string
+     */
+    protected function getPostOptions()
+    {
         $options = $this->options;
-        foreach(self::REQUIRED_QUERY_PARAMS as $QUERY_PARAM){
-            if(array_key_exists($QUERY_PARAM,$options)){
-                unset($options[$QUERY_PARAM]);
-            }
-        }
-        return http_build_query($options,null,'&');
 
+        return http_build_query($options, null, '&');
     }
-
 }

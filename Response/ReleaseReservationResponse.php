@@ -64,4 +64,9 @@ class ReleaseReservationResponse extends AbstractResponse
      * @var Transaction[]
      */
     public $Transactions;
+
+    /**
+     * @var string
+     */
+    public $MerchantErrorMessage;
 }

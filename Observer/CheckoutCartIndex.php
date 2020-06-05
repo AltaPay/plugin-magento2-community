@@ -1,4 +1,12 @@
 <?php
+/**
+ * Valitor Module for Magento 2.x.
+ *
+ * Copyright © 2018 Valitor. All rights reserved.
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace SDM\Valitor\Observer;
 
 use Magento\Framework\Event\Observer;
@@ -13,6 +21,7 @@ class CheckoutCartIndex implements ObserverInterface
 
     /**
      * CheckoutCartIndex Constructor
+     *
      * @param RestoreQuote $restoreQuote
      */
     public function __construct(RestoreQuote $restoreQuote)
@@ -21,8 +30,9 @@ class CheckoutCartIndex implements ObserverInterface
     }
 
     /**
-     * @param Observer $observer
+     * @param Observer                          $observer
      * @param \Magento\Framework\Event\Observer $observer
+     *
      * @return void
      */
     public function execute(Observer $observer)

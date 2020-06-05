@@ -2,13 +2,11 @@
 /**
  * Valitor Module for Magento 2.x.
  *
+ * Copyright © 2018 Valitor. All rights reserved.
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
- *
- * @copyright 2018 Valitor
- * @category  payment
- * @package   valitor
  */
+
 namespace SDM\Valitor\Controller;
 
 use Magento\Framework\App\Action\Action;
@@ -19,10 +17,6 @@ use Magento\Framework\View\Result\PageFactory;
 use Magento\Framework\TestFramework\Unit\Helper\ObjectManager;
 use SDM\Valitor\Test\Unit\MainTestCase;
 
-/**
- * Class IndexTest
- * @package SDM\Valitor\Controller\Index
- */
 class IndexTest extends MainTestCase
 {
     /**

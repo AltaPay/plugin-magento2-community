@@ -1,4 +1,11 @@
 <?php
+/**
+ * Valitor Module for Magento 2.x.
+ *
+ * Copyright © 2018 Valitor. All rights reserved.
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
 
 namespace SDM\Valitor\Ui\Component\Listing\Column;
 
@@ -27,16 +34,17 @@ class PaymentMethod extends Column
         array $components = [],
         array $data = []
     ) {
-        $this->_orderRepository = $orderRepository;
-        $this->_searchCriteria  = $criteria;
+        $this->_orderRepository               = $orderRepository;
+        $this->_searchCriteria                = $criteria;
         $this->_appConfigScopeConfigInterface = $appConfigScopeConfigInterface;
         parent::__construct($context, $uiComponentFactory, $components, $data);
     }
-    
+
     /**
      * {@inheritdoc}
      *
-     * @param  array $dataSource
+     * @param array $dataSource
+     *
      * @return array
      */
     public function prepareDataSource(array $dataSource)
@@ -48,22 +56,23 @@ class PaymentMethod extends Column
                 if (isset($items["order_id"])) {
                     $order_id = $items["order_id"];
                 }
-                $order  = $this->_orderRepository->get($order_id);
-                $storeCode = $order->getStore()->getCode();
-                $storeId = $order->getStore()->getId();
-                $payment = $order->getPayment();
-                $method = $payment->getMethodInstance();
-                $title = $method->getConfigData('title', $storeId);;
+                $order      = $this->_orderRepository->get($order_id);
+                $storeCode  = $order->getStore()->getCode();
+                $storeId    = $order->getStore()->getId();
+                $payment    = $order->getPayment();
+                $method     = $payment->getMethodInstance();
+                $title      = $method->getConfigData('title', $storeId);
                 $terminalID = $payment->getMethod();
-                    if($title == null){
-                        $terminalTitle = $this->_appConfigScopeConfigInterface
-                        ->getValue('payment/'.$terminalID.'/terminalname',$storeScope,$storeCode); 
-                    } else{
-                        $terminalTitle = $title; 
-                    }
-                $dataSource['data']['items'][$key]['payment_method_title'] = $terminalTitle;  
+                if ($title == null) {
+                    $terminalTitle = $this->_appConfigScopeConfigInterface
+                        ->getValue('payment/' . $terminalID . '/terminalname', $storeScope, $storeCode);
+                } else {
+                    $terminalTitle = $title;
+                }
+                $dataSource['data']['items'][$key]['payment_method_title'] = $terminalTitle;
             }
         }
+
         return $dataSource;
     }
 }

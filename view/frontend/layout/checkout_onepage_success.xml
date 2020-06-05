@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Valitor Module for Magento 2.x.
+ *
+ * Copyright © 2018 Valitor. All rights reserved.
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+-->
+
+<body>
+    <referenceContainer name="order.success.additional.info">
+        <block class="SDM\Valitor\Block\Success" name="sdm.valitor.success"
+               template="SDM_Valitor::order/success.phtml" after="-">
+        </block>
+    </referenceContainer>
+</body>

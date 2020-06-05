@@ -2,19 +2,15 @@
 /**
  * Valitor Module for Magento 2.x.
  *
+ * Copyright © 2018 Valitor. All rights reserved.
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
- *
- * @copyright 2018 Valitor
- * @category  payment
- * @package   valitor
  */
 
 namespace SDM\Valitor\Test\Unit;
 
 /**
  * Class ConstantTestConfig
- * @package SDM\Valitor\Test\Unit
  */
 abstract class ConstantTestConfig
 {
@@ -33,6 +29,7 @@ abstract class ConstantTestConfig
     const CURRECNY      = 'USD';
     const CALL_BACK     = 'sdmvalitor/index/callbackform';
     const TAX           = '10';
+    const TAX_PERCENT   = '10';
     const ITEM_NAME     = 'Test';
     const ITEM_SKU      = '001';
     const ITEM_QTY      = '1';
@@ -45,6 +42,9 @@ abstract class ConstantTestConfig
     const COUNTRY       = 'US';
     const STATE         = 'CA';
     const REGION_ID     = '5';
+    const PRODUCT_URL   = '';
+    const IMAGE_URL     = '';
+    const UNIT_CODE     = 'unit';
 
     /* model handler restorequotetest  */
     const ID             = '123';

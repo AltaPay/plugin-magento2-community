@@ -2,22 +2,15 @@
 /**
  * Valitor Module for Magento 2.x.
  *
+ * Copyright © 2018 Valitor. All rights reserved.
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
- *
- * @copyright 2018 Valitor
- * @category  payment
- * @package   valitor
  */
 
 namespace SDM\Valitor\Api;
 
 use Magento\Sales\Model\Order;
 
-/**
- * Interface OrderLoaderInterface
- * @package SDM\Valitor\Api
- */
 interface OrderLoaderInterface
 {
     /**
@@ -30,7 +23,7 @@ interface OrderLoaderInterface
     /**
      * getOrderByOrderIncrementId
      *
-     * @param string $orderIncrementId
+     * @param $orderId
      *
      * @return Order
      */

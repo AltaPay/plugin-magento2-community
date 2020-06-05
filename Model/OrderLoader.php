@@ -2,12 +2,9 @@
 /**
  * Valitor Module for Magento 2.x.
  *
+ * Copyright © 2018 Valitor. All rights reserved.
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
- *
- * @copyright 2018 Valitor
- * @category  payment
- * @package   valitor
  */
 
 namespace SDM\Valitor\Model;
@@ -17,10 +14,6 @@ use Magento\Sales\Model\OrderFactory;
 use Magento\Sales\Model\Order;
 use SDM\Valitor\Api\OrderLoaderInterface;
 
-/**
- * Class OrderLoader
- * @package SDM\Valitor\Model
- */
 class OrderLoader implements OrderLoaderInterface
 {
     /**
@@ -31,8 +24,10 @@ class OrderLoader implements OrderLoaderInterface
      * @var OrderFactory
      */
     private $orderFactory;
+
     /**
      * OrderLoader constructor.
+     *
      * @param Session      $checkoutSession
      * @param OrderFactory $orderFactory
      */
@@ -41,25 +36,28 @@ class OrderLoader implements OrderLoaderInterface
         OrderFactory $orderFactory
     ) {
         $this->checkoutSession = $checkoutSession;
-        $this->orderFactory = $orderFactory;
+        $this->orderFactory    = $orderFactory;
     }
+
     /**
-     * getLastOrderIncrementIdFromSession
+     * Get Last Order Increment Id From Session.
+     *
      * @return string
      */
     public function getLastOrderIncrementIdFromSession()
     {
         return (string)$this->checkoutSession->getLastRealOrder()->getIncrementId();
     }
+
     /**
      * getOrderByOrderIncrementId
+     *
      * @param string $orderId
+     *
      * @return Order
      */
     public function getOrderByOrderIncrementId($orderId)
     {
-        return $this->orderFactory
-            ->create()
-            ->loadByIncrementId($orderId);
+        return $this->orderFactory->create()->loadByIncrementId($orderId);
     }
 }

@@ -116,6 +116,7 @@ abstract class AbstractApi
      * Configure options
      *
      * @param OptionsResolver $resolver
+     *
      * @return void
      */
     abstract protected function configureOptions(OptionsResolver $resolver);
@@ -123,8 +124,9 @@ abstract class AbstractApi
     /**
      * Handle response
      *
-     * @param Request $request
+     * @param Request  $request
      * @param Response $response
+     *
      * @return AbstractResponse
      */
     abstract protected function handleResponse(Request $request, Response $response);
@@ -133,6 +135,7 @@ abstract class AbstractApi
      * Url to api call
      *
      * @param array $options Resolved options
+     *
      * @return string
      */
     abstract protected function getUrl(array $options);
@@ -145,11 +148,10 @@ abstract class AbstractApi
     public function __construct(Authentication $authentication)
     {
         $this->unresolvedOptions = [];
-        $this->dispatcher = new EventDispatcher();
-        $this->httpClient = new Client();
-
-        $this->authentication = $authentication;
-        $this->baseUrl = $authentication->getBaseurl();
+        $this->dispatcher        = new EventDispatcher();
+        $this->httpClient        = new Client();
+        $this->authentication    = $authentication;
+        $this->baseUrl           = $authentication->getBaseurl();
     }
 
     /**
@@ -166,11 +168,13 @@ abstract class AbstractApi
      * Set HTTP client
      *
      * @param ClientInterface $client
+     *
      * @return $this
      */
     public function setClient(ClientInterface $client)
     {
         $this->httpClient = $client;
+
         return $this;
     }
 
@@ -210,8 +214,9 @@ abstract class AbstractApi
      * Handle exception response
      *
      * @param Exceptions\ClientException $exception
-     * @throws Exceptions\ClientException
+     *
      * @return bool|void
+     * @throws Exceptions\ClientException
      */
     protected function handleExceptionResponse(Exceptions\ClientException $exception)
     {
@@ -224,9 +229,7 @@ abstract class AbstractApi
     protected function doConfigureOptions()
     {
         $resolver = new OptionsResolver();
-
         $this->configureOptions($resolver);
-
         $this->setTransactionResolver($resolver);
         $this->setOrderLinesResolver($resolver);
         $this->setAmountResolver($resolver);
@@ -235,7 +238,6 @@ abstract class AbstractApi
         $this->setShopOrderIdResolver($resolver);
         $this->setTransactionInfoResolver($resolver);
         $this->setCustomerInfoResolver($resolver);
-
         $this->options = $resolver->resolve($this->unresolvedOptions);
     }
 
@@ -243,6 +245,7 @@ abstract class AbstractApi
      * Validate response
      *
      * @param mixed $response
+     *
      * @throws Exceptions\ResponseHeaderException
      * @throws Exceptions\ResponseMessageException
      */
@@ -256,6 +259,12 @@ abstract class AbstractApi
             if (property_exists($response, 'MerchantErrorMessage')) {
                 if ($response->MerchantErrorMessage) {
                     throw new Exceptions\ResponseMessageException($response->MerchantErrorMessage);
+                }
+            }
+
+            if (property_exists($response, 'CardHolderMessageMustBeShown')) {
+                if ($response->CardHolderMessageMustBeShown) {
+                    throw new Exceptions\ResponseMessageException($response->CardHolderErrorMessage);
                 }
             }
         }
@@ -277,15 +286,15 @@ abstract class AbstractApi
         $this->request = $request;
 
         try {
-            $response = $this->getClient()->send($request);
+            $response       = $this->getClient()->send($request);
             $this->response = $response;
-
-            $output = $this->handleResponse($request, $response);
+            $output         = $this->handleResponse($request, $response);
             $this->validateResponse($output);
 
             return $output;
         } catch (GuzzleHttpClientException $e) {
             $exception = new Exceptions\ClientException($e->getMessage(), $e->getRequest(), $e->getResponse());
+
             return $this->handleExceptionResponse($exception);
         }
     }
@@ -309,11 +318,12 @@ abstract class AbstractApi
      * Build url
      *
      * @param array $options
+     *
      * @return bool|string
      */
     protected function buildUrl(array $options)
     {
-        if (! $options) {
+        if (!$options) {
             return false;
         }
 

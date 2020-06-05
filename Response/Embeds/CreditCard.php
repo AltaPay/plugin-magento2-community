@@ -23,6 +23,17 @@
 
 namespace SDM\Valitor\Response\Embeds;
 
-class CreditCard
+use SDM\Valitor\Response\AbstractResponse;
+
+class CreditCard extends AbstractResponse
 {
+    /**
+     * @var Year
+     */
+    public $Year;
+
+    /**
+     * @var Month
+     */
+    public $Month;
 }

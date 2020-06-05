@@ -5,6 +5,22 @@ Valitor has made it much easier for you as merchant/developer to receive secure 
 
 == Change log ==
 
+** Version 3.0.0
+
+    * Improvements:
+        - Added plugin disclaimer
+        - Code refactored according to latest coding standards
+        - Added support for Klarna Payments (Klarna reintegration) and credit card token
+        - Added the option of choosing a logo for each payment method
+        - Added new parameters, according to the payment gateway Klarna Payments updates, for the following:
+            - Create payment request
+            - Capture and refund
+        - Added support for AVS
+        - Added support for fixed amount and Buy X get Y free discount type
+    * Bug fixes:
+        - Discount applied to shipping not sent to the payment gateway accordingly
+        - Order details dependent on the current tax configuration rather than the one at the time when order was placed
+
 ** Version 2.2.0
 
     * Improvements:

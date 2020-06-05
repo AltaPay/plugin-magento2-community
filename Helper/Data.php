@@ -1,4 +1,11 @@
 <?php
+/**
+ * Valitor Module for Magento 2.x.
+ *
+ * Copyright © 2018 Valitor. All rights reserved.
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
 
 namespace SDM\Valitor\Helper;
 
@@ -6,8 +13,12 @@ use Magento\Framework\App\ProductMetadataInterface;
 use Magento\Framework\Module\ModuleListInterface;
 use Magento\Framework\App\Helper\AbstractHelper;
 use Magento\Sales\Model\Order;
-use \Magento\Framework\App\Config\ScopeConfigInterface;
+use Magento\Framework\App\Config\ScopeConfigInterface;
+use Magento\Sales\Model\ResourceModel\Order\Tax\Item;
 
+/**
+ * Class Data for helper functions
+ */
 class Data extends AbstractHelper
 {
     const MODULE_CODE = 'SDM_Valitor';
@@ -26,34 +37,52 @@ class Data extends AbstractHelper
     /**
      * @var ScopeConfigInterface
      */
-    protected $_appConfigScopeConfigInterface;
+    protected $scopeConfig;
+    /**
+     * @var taxItem
+     */
+    protected $taxItem;
 
+    /**
+     * Data constructor.
+     *
+     * @param ModuleListInterface      $moduleList
+     * @param ProductMetadataInterface $productMetadata
+     * @param ScopeConfigInterface     $scopeConfig
+     * @param Order                    $order
+     * @param Item                     $taxItem
+     */
     public function __construct(
         ModuleListInterface $moduleList,
         ProductMetadataInterface $productMetadata,
-        ScopeConfigInterface $appConfigScopeConfigInterface,
-        Order $order
+        ScopeConfigInterface $scopeConfig,
+        Order $order,
+        Item $taxItem
     ) {
-        $this->moduleList                     = $moduleList;
-        $this->productMetadata                = $productMetadata;
-        $this->_appConfigScopeConfigInterface = $appConfigScopeConfigInterface;
-        $this->order                          = $order;
+        $this->moduleList      = $moduleList;
+        $this->productMetadata = $productMetadata;
+        $this->scopeConfig     = $scopeConfig;
+        $this->order           = $order;
+        $this->taxItem         = $taxItem;
     }
 
     //Method for adding transaction info
+
+    /**
+     * @param $orderId
+     *
+     * @return array
+     */
     public function transactionDetail($orderId)
     {
         $order = $this->order->load($orderId);
         if ($order->getId()) {
-            $storeScope                             = \Magento\Store\Model\ScopeInterface::SCOPE_STORE;
-            $storeCode                              = $order->getStore()->getCode();
             $storeName                              = $order->getStore()->getName();
             $websiteName                            = $order->getStore()->getWebsite()->getName();
-            $versionDetails                         = array();
-            $magentoVersion                         = $this->productMetadata->getVersion();
             $moduleInfo                             = $this->moduleList->getOne(self::MODULE_CODE);
+            $versionDetails                         = [];
             $versionDetails['ecomPlatform']         = 'Magento';
-            $versionDetails['ecomVersion']          = $magentoVersion;
+            $versionDetails['ecomVersion']          = $this->productMetadata->getVersion();
             $versionDetails['valitorPluginName']    = $moduleInfo['name'];
             $versionDetails['valitorPluginVersion'] = $moduleInfo['setup_version'];
             $versionDetails['otherInfo']            = 'websiteName - ' . $websiteName . ', storeName - ' . $storeName;
@@ -62,6 +91,11 @@ class Data extends AbstractHelper
         }
     }
 
+    /**
+     * @param $orderId
+     *
+     * @return mixed
+     */
     public function getPaymentTitleTerminal($orderId)
     {
         $storeScope = \Magento\Store\Model\ScopeInterface::SCOPE_STORE;
@@ -70,15 +104,38 @@ class Data extends AbstractHelper
         $storeId    = $order->getStore()->getId();
         $payment    = $order->getPayment();
         $method     = $payment->getMethodInstance();
-        $title      = $method->getConfigData('title', $storeId);;
+        $title      = $method->getConfigData('title', $storeId);
         $terminalID = $payment->getMethod();
         if ($title == null) {
-            $terminalTitle = $this->_appConfigScopeConfigInterface
-                ->getValue('payment/' . $terminalID . '/terminalname', $storeScope, $storeCode);
+            $terminalTitle = $this->scopeConfig->getValue(
+                'payment/' . $terminalID . '/terminalname',
+                $storeScope,
+                $storeCode
+            );
         } else {
             $terminalTitle = $title;
         }
 
         return $terminalTitle;
+    }
+
+    /**
+     * @param $orderID
+     *
+     * @return int
+     */
+    public function getOrderShippingTax($orderID)
+    {
+        $shippingTaxPercent = 0;
+        $tax_items          = $this->taxItem->getTaxItemsByOrderId($orderID);
+        if (!empty($tax_items) && is_array($tax_items)) {
+            foreach ($tax_items as $item) {
+                if ($item['taxable_item_type'] === 'shipping') {
+                    $shippingTaxPercent += $item['tax_percent'];
+                }
+            }
+        }
+
+        return $shippingTaxPercent;
     }
 }

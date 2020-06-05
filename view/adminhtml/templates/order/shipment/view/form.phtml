@@ -1,7 +1,10 @@
 <?php
 /**
- * Copyright © Magento, Inc. All rights reserved.
- * See COPYING.txt for license details.
+ * Valitor Module for Magento 2.x.
+ *
+ * Copyright © 2018 Valitor. All rights reserved.
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
  */
 
 // @codingStandardsIgnoreFile
@@ -9,7 +12,7 @@
  * @var \Magento\Shipping\Block\Adminhtml\View\Form $block
  */
 $order = $block->getShipment()->getOrder();
-$helper = $this->helper('SDM\Valitor\Helper\Data'); 
+$helper = $this->helper('SDM\Valitor\Helper\Data');
 ?>
 <?= $block->getChildHtml('order_info'); ?>
 <section class="admin__page-section order-shipment-billing-shipping">

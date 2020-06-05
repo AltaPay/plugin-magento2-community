@@ -3,12 +3,9 @@
 /**
  * Valitor Module for Magento 2.x.
  *
+ * Copyright © 2018 Valitor. All rights reserved.
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
- *
- * @copyright 2018 Valitor
- * @category  payment
- * @package   valitor
  */
 -->
 
@@ -26,8 +23,7 @@
 
                     <label>API login</label>
                      <comment><![CDATA[For enabling capture/cancel in backend, you need to provide your API username and password.<br>You can find your Api Keys in your <a href="https://testgateway.altapaysecure.com/merchant.php" title="Mollie Profiles">Valitor Merchnat Account</a>]]></comment>
-                    <field id="version" translate="label" type="text" sortOrder="1" showInDefault="1" showInWebsite="1"
-                           showInStore="1">
+                    <field id="version" translate="label" type="text" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
                         <label>Version</label>
                         <frontend_model>SDM\Valitor\Block\Adminhtml\Render\Version</frontend_model>
                     </field>

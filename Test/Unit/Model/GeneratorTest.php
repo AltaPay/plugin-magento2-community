@@ -2,12 +2,9 @@
 /**
  * Valitor Module for Magento 2.x.
  *
+ * Copyright © 2018 Valitor. All rights reserved.
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
- *
- * @copyright 2018 Valitor
- * @category  payment
- * @package   valitor
  */
 
 namespace SDM\Valitor\Test\Unit\Model;
@@ -27,6 +24,10 @@ use SDM\Valitor\Test\Unit\ConstantTestConfig;
 use Valitor\Api\Ecommerce\Callback;
 use Valitor\Response\CallbackResponse;
 
+/**
+ * Class GeneratorTest
+ * Handle the create payment related functionality.
+ */
 class GeneratorTest extends MainTestCase
 {
     /**
@@ -55,31 +56,31 @@ class GeneratorTest extends MainTestCase
         $this->classToTest = $objectManager->getObject(ClassToTest::class, [
             'systemConfig' => $this->systemConfig
         ]);
-        $this->order = [
-            'shop_orderid' => '000000289',
-            'currency' => '208',
-            'transaction_info' => [
-                'ecomPlatform' => 'Magento',
-                'ecomVersion' => '2.3.2',
-                'valitorPluginName' => 'SDM_Valitor',
+        $this->order       = [
+            'shop_orderid'       => '000000289',
+            'currency'           => '208',
+            'transaction_info'   => [
+                'ecomPlatform'         => 'Magento',
+                'ecomVersion'          => '2.3.2',
+                'valitorPluginName'    => 'SDM_Valitor',
                 'valitorPluginVersion' => '1.3.4',
-                'otherInfo' => 'websiteName - Main Website, storeName - Danish Store View',
+                'otherInfo'            => 'websiteName - Main Website, storeName - Danish Store View',
             ],
-            'type' => 'payment',
-            'embedded_window' => '0',
-            'amount' => '23.18',
-            'transaction_id' => '33329721',
-            'payment_id' => 'fe68da2c-a7ca-493a-b01c-ebafd80cd93b',
-            'nature' => 'CreditCard',
-            'require_capture' => 'true',
-            'payment_status' => 'preauth',
+            'type'               => 'payment',
+            'embedded_window'    => '0',
+            'amount'             => '23.18',
+            'transaction_id'     => '33329721',
+            'payment_id'         => 'fe68da2c-a7ca-493a-b01c-ebafd80cd93b',
+            'nature'             => 'CreditCard',
+            'require_capture'    => 'true',
+            'payment_status'     => 'preauth',
             'masked_credit_card' => '411111******1111',
-            'blacklist_token' => '57c4f859a6b4e005bb1e7a42bd4cc7e8e4b58f1b',
-            'credit_card_token' => 'AQ+DuN1BmWe8g9PnsfU2jNC4ZsG7r5TuSAxFvt3uO/A5UPuGq1FarLiphj2WJA+AYBu/fbP6zdPezEJA3Q49ZA==+1',
-            'status' => 'succeeded',
-            'avs_code' => 'S',
-            'avs_text' => 'AVS not supported',
-            'xml' => <<<XML
+            'blacklist_token'    => '57c4f859a6b4e005bb1e7a42bd4cc7e8e4b58f1b',
+            'credit_card_token'  => 'AQ+DuN1BmWe8g9PnsfU2jNC4ZsG7r5TuSAxFvt3uO/A5UPuGq1FarLiphj2WJA+AYBu/fbP6zdPezEJA3Q49ZA==+1',
+            'status'             => 'succeeded',
+            'avs_code'           => 'S',
+            'avs_text'           => 'AVS not supported',
+            'xml'                => <<<XML
 <?xml version="1.0"?>
 <APIResponse version="20170228">
     <Header>
@@ -187,16 +188,20 @@ XML
      */
     public function testCreateRequest()
     {
-        $terminalId = ConstantTestConfig::TERMINAL_ID;
-        $orderId = ConstantTestConfig::ORDER_ID;
+        $terminalId    = ConstantTestConfig::TERMINAL_ID;
+        $orderId       = ConstantTestConfig::ORDER_ID;
         $requestParams = [];
-        $result = $this->classToTest->createRequest($terminalId, $orderId);
-        $storeCode = ConstantTestConfig::STORE_CODE;
-        $auth = $this->systemConfig->getAuth($storeCode);
-        $api = new TestAuthentication($auth);
-        $response = $api->call();
-        $terminalName = $this->systemConfig->getTerminalConfig($terminalId, 'terminalname',
-            \Magento\Store\Model\ScopeInterface::SCOPE_STORE, $storeCode);
+        $result        = $this->classToTest->createRequest($terminalId, $orderId);
+        $storeCode     = ConstantTestConfig::STORE_CODE;
+        $auth          = $this->systemConfig->getAuth($storeCode);
+        $api           = new TestAuthentication($auth);
+        $response      = $api->call();
+        $terminalName  = $this->systemConfig->getTerminalConfig(
+            $terminalId,
+            'terminalname',
+            \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
+            $storeCode
+        );
         if (!$response) {
             $this->assertArrayHasKey('status', $response);
         }
@@ -210,19 +215,24 @@ XML
             ->setConfig(ConstantTestConfig::CALL_BACK);
         $orderlines = [];
         /** @var \Magento\Sales\Model\Order\Item $item */
-        $taxAmount = ConstantTestConfig::TAX;
-        $orderline = new OrderLine(
+        $taxAmount  = ConstantTestConfig::TAX;
+        $taxPercent = ConstantTestConfig::TAX_PERCENT;
+        $productUrl = ConstantTestConfig::PRODUCT_URL;
+        $imageUrl   = ConstantTestConfig::IMAGE_URL;
+        $unitCode   = ConstantTestConfig::UNIT_CODE;
+        $orderline  = new OrderLine(
             ConstantTestConfig::ITEM_NAME,
             ConstantTestConfig::ITEM_SKU,
             ConstantTestConfig::ITEM_QTY,
             ConstantTestConfig::ITEM_PRICE
         );
         $orderline->setGoodsType('item');
-        $orderline->taxAmount = $taxAmount;
-        //$orderline->taxPercent = $item->getTaxPercent();
-        $orderlines[] = $orderline;
-
-
+        $orderline->taxAmount  = $taxAmount;
+        $orderline->taxPercent = $taxPercent;
+        $orderline->productUrl = $productUrl;
+        $orderline->imageUrl   = $imageUrl;
+        $orderline->unitCode   = $unitCode;
+        $orderlines[]          = $orderline;
         // Handling orderline
         $orderlines[] = (new OrderLine(
             'free_shipping',
@@ -231,8 +241,8 @@ XML
             5
         ))->setGoodsType('shipment');
         $request->setOrderLines($orderlines);
-        $response = $request->call();
-        $requestParams['result'] = __('success');
+        $response                 = $request->call();
+        $requestParams['result']  = __('success');
         $requestParams['formurl'] = $response->Url;
 
         $this->assertEquals($requestParams, $result);
@@ -240,7 +250,7 @@ XML
 
     public function testRequestCallback()
     {
-        $call = new Callback($this->order);
+        $call     = new Callback($this->order);
         $response = $call->call();
         $this->assertInstanceOf(CallbackResponse::class, $response);
         $this->assertEquals('fe68da2c-a7ca-493a-b01c-ebafd80cd93b', $response->paymentId);
@@ -253,40 +263,40 @@ XML
 
     public function testBillingDetails()
     {
-        $billingInfo = array(
-            'email' => 'johnandleson@gmail.com',
-            'firstname' => 'John',
-            'lastname' => 'Andleson',
-            'city' => 'Varde',
+        $billingInfo                = [
+            'email'      => 'johnandleson@gmail.com',
+            'firstname'  => 'John',
+            'lastname'   => 'Andleson',
+            'city'       => 'Varde',
             'postalcode' => '6800',
-            'region' => 'Esbjerg',
-            'country' => 'AUS',
-        );
-        $expectedResult = array(
-            'Firstname' => 'John',
-            'Lastname' => 'Andleson',
-            'Address' => null,
-            'City' => 'Varde',
+            'region'     => 'Esbjerg',
+            'country'    => 'AUS',
+        ];
+        $expectedResult             = [
+            'Firstname'  => 'John',
+            'Lastname'   => 'Andleson',
+            'Address'    => null,
+            'City'       => 'Varde',
             'PostalCode' => '6800',
-            'Region' => 'Esbjerg',
-            'Country' => 'AUS',
-            'Header' => null,
-            'Email' => 'johnandleson@gmail.com',
-        );
-        $billingAddress = new Address();
-        $billingAddress->Email = $billingInfo['email'];
-        $billingAddress->Firstname = $billingInfo['firstname'];
-        $billingAddress->Lastname = $billingInfo['lastname'];
-        $billingAddress->City = $billingInfo['city'];
+            'Region'     => 'Esbjerg',
+            'Country'    => 'AUS',
+            'Header'     => null,
+            'Email'      => 'johnandleson@gmail.com',
+        ];
+        $billingAddress             = new Address();
+        $billingAddress->Email      = $billingInfo['email'];
+        $billingAddress->Firstname  = $billingInfo['firstname'];
+        $billingAddress->Lastname   = $billingInfo['lastname'];
+        $billingAddress->City       = $billingInfo['city'];
         $billingAddress->PostalCode = $billingInfo['postalcode'];
-        $billingAddress->Region = $billingInfo['region'] ?: '0';
-        $billingAddress->Country = $billingInfo['country'];
-        $customer = new Customer($billingAddress);
+        $billingAddress->Region     = $billingInfo['region'] ?: '0';
+        $billingAddress->Country    = $billingInfo['country'];
+        $customer                   = new Customer($billingAddress);
         $customer->setShipping($billingAddress);
         $reflectionProperty = new \ReflectionProperty(Customer::class, 'billing');
         $reflectionProperty->setAccessible(true);
         $setbillinginfo = (array)$reflectionProperty->getValue($customer);
-        $keys = array_keys($setbillinginfo);
+        $keys           = array_keys($setbillinginfo);
         end($keys);
         $removechildarray = prev($keys);
         unset($setbillinginfo[$removechildarray]);
@@ -296,40 +306,40 @@ XML
 
     public function testShippingDetails()
     {
-        $shippingInfo = array(
-            'email' => 'johnandleson@gmail.com',
-            'firstname' => 'John',
-            'lastname' => 'Andleson',
-            'city' => 'Varde',
+        $shippingInfo                = [
+            'email'      => 'johnandleson@gmail.com',
+            'firstname'  => 'John',
+            'lastname'   => 'Andleson',
+            'city'       => 'Varde',
             'postalcode' => '6800',
-            'region' => 'Esbjerg',
-            'country' => 'AUS',
-        );
-        $expectedResult = array(
-            'Firstname' => 'John',
-            'Lastname' => 'Andleson',
-            'Address' => null,
-            'City' => 'Varde',
+            'region'     => 'Esbjerg',
+            'country'    => 'AUS',
+        ];
+        $expectedResult              = [
+            'Firstname'  => 'John',
+            'Lastname'   => 'Andleson',
+            'Address'    => null,
+            'City'       => 'Varde',
             'PostalCode' => '6800',
-            'Region' => 'Esbjerg',
-            'Country' => 'AUS',
-            'Header' => null,
-            'Email' => 'johnandleson@gmail.com',
-        );
-        $shippingAddress = new Address();
-        $shippingAddress->Email = $shippingInfo['email'];
-        $shippingAddress->Firstname = $shippingInfo['firstname'];
-        $shippingAddress->Lastname = $shippingInfo['lastname'];
-        $shippingAddress->City = $shippingInfo['city'];
+            'Region'     => 'Esbjerg',
+            'Country'    => 'AUS',
+            'Header'     => null,
+            'Email'      => 'johnandleson@gmail.com',
+        ];
+        $shippingAddress             = new Address();
+        $shippingAddress->Email      = $shippingInfo['email'];
+        $shippingAddress->Firstname  = $shippingInfo['firstname'];
+        $shippingAddress->Lastname   = $shippingInfo['lastname'];
+        $shippingAddress->City       = $shippingInfo['city'];
         $shippingAddress->PostalCode = $shippingInfo['postalcode'];
-        $shippingAddress->Region = $shippingInfo['region'] ?: '0';
-        $shippingAddress->Country = $shippingInfo['country'];
-        $customer = new Customer($shippingAddress);
+        $shippingAddress->Region     = $shippingInfo['region'] ?: '0';
+        $shippingAddress->Country    = $shippingInfo['country'];
+        $customer                    = new Customer($shippingAddress);
         $customer->setShipping($shippingAddress);
         $reflectionProperty = new \ReflectionProperty(Customer::class, 'shipping');
         $reflectionProperty->setAccessible(true);
         $setshippinginfo = (array)$reflectionProperty->getValue($customer);
-        $keys = array_keys($setshippinginfo);
+        $keys            = array_keys($setshippinginfo);
         end($keys);
         $removechildarray = prev($keys);
         unset($setshippinginfo[$removechildarray]);
@@ -339,42 +349,42 @@ XML
 
     public function testNoShipping()
     {
-        $shippingInfo = array();
-        $billingInfo = array(
-            'email' => 'johnandleson@gmail.com',
-            'firstname' => 'John',
-            'lastname' => 'Andleson',
-            'city' => 'Varde',
+        $shippingInfo               = [];
+        $billingInfo                = [
+            'email'      => 'johnandleson@gmail.com',
+            'firstname'  => 'John',
+            'lastname'   => 'Andleson',
+            'city'       => 'Varde',
             'postalcode' => '6800',
-            'region' => 'Esbjerg',
-            'country' => 'AUS',
-        );
-        $expectedResult = array(
-            'Firstname' => 'John',
-            'Lastname' => 'Andleson',
-            'Address' => null,
-            'City' => 'Varde',
+            'region'     => 'Esbjerg',
+            'country'    => 'AUS',
+        ];
+        $expectedResult             = [
+            'Firstname'  => 'John',
+            'Lastname'   => 'Andleson',
+            'Address'    => null,
+            'City'       => 'Varde',
             'PostalCode' => '6800',
-            'Region' => 'Esbjerg',
-            'Country' => 'AUS',
-            'Header' => null,
-            'Email' => 'johnandleson@gmail.com',
-        );
-        $billingAddress = new Address();
-        $billingAddress->Email = $billingInfo['email'];
-        $billingAddress->Firstname = $billingInfo['firstname'];
-        $billingAddress->Lastname = $billingInfo['lastname'];
-        $billingAddress->City = $billingInfo['city'];
+            'Region'     => 'Esbjerg',
+            'Country'    => 'AUS',
+            'Header'     => null,
+            'Email'      => 'johnandleson@gmail.com',
+        ];
+        $billingAddress             = new Address();
+        $billingAddress->Email      = $billingInfo['email'];
+        $billingAddress->Firstname  = $billingInfo['firstname'];
+        $billingAddress->Lastname   = $billingInfo['lastname'];
+        $billingAddress->City       = $billingInfo['city'];
         $billingAddress->PostalCode = $billingInfo['postalcode'];
-        $billingAddress->Region = $billingInfo['region'] ?: '0';
-        $billingAddress->Country = $billingInfo['country'];
+        $billingAddress->Region     = $billingInfo['region'] ?: '0';
+        $billingAddress->Country    = $billingInfo['country'];
         if (empty($shippingInfo)) {
             $customer = new Customer($billingAddress);
             $customer->setShipping($billingAddress);
             $reflectionProperty = new \ReflectionProperty(Customer::class, 'billing');
             $reflectionProperty->setAccessible(true);
             $setBillingAsShippingInfo = (array)$reflectionProperty->getValue($customer);
-            $keys = array_keys($setBillingAsShippingInfo);
+            $keys                     = array_keys($setBillingAsShippingInfo);
             end($keys);
             $removeChildArray = prev($keys);
             unset($setBillingAsShippingInfo[$removeChildArray]);
@@ -385,13 +395,13 @@ XML
 
     public function testForPriceInclTax()
     {
-        $orderline = array(
+        $orderline = [
             "productOriginalPrice" => 220,
-            "unitPrice" => 200,
-            "couponCode" => "abcdef",
-            "taxPercent" => 10,
-            "quantity" => 1,
-        );
+            "unitPrice"            => 200,
+            "couponCode"           => "abcdef",
+            "taxPercent"           => 10,
+            "quantity"             => 1,
+        ];
         if (empty($orderline['couponCode'])) {
             $taxAmount = (($orderline['taxPercent'] / 100) * $orderline['unitPrice']) * $orderline['quantity'];
             $this->assertEquals(20, $taxAmount);
@@ -403,17 +413,17 @@ XML
 
     public function testgetItemDiscountByPercentage()
     {
-        $itemDiscount = 0;
-        $discountPercentage = array(0.1, 0.2);
+        $itemDiscount       = 0;
+        $discountPercentage = [0.1, 0.2];
         if (count($discountPercentage) == 1) {
             $itemDiscount = array_shift($discountPercentage);
             $itemDiscount = $itemDiscount * 100;
             $this->assertEquals(10, $itemDiscount);
         } else {
             if (count($discountPercentage) > 1) {
-                $discountSum = array_sum($discountPercentage);
+                $discountSum     = array_sum($discountPercentage);
                 $discountProduct = array_product($discountPercentage);
-                $itemDiscount = ($discountSum - $discountProduct) * 100;
+                $itemDiscount    = ($discountSum - $discountProduct) * 100;
                 $this->assertEquals(28, $itemDiscount);
             }
         }
