@@ -531,7 +531,7 @@ class Customer extends AbstractSerializer
         }
 
         if (session_id()) {
-            $output['client_session_id'] = md5(session_id());
+            $output['client_session_id'] = crypt(session_id(),'$5$rounds=5000$customersessionid$');
         }
 
         if (isset($_SERVER['HTTP_ACCEPT_LANGUAGE'])) {
