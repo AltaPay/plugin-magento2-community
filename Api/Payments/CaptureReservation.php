@@ -21,14 +21,14 @@
  * THE SOFTWARE.
  */
 
-namespace SDM\Valitor\Api\Payments;
+namespace SDM\Altapay\Api\Payments;
 
-use SDM\Valitor\AbstractApi;
-use SDM\Valitor\Response\CaptureReservationResponse;
-use SDM\Valitor\Serializer\ResponseSerializer;
-use SDM\Valitor\Traits\AmountTrait;
-use SDM\Valitor\Traits\OrderlinesTrait;
-use SDM\Valitor\Traits\TransactionsTrait;
+use SDM\Altapay\AbstractApi;
+use SDM\Altapay\Response\CaptureReservationResponse;
+use SDM\Altapay\Serializer\ResponseSerializer;
+use SDM\Altapay\Traits\AmountTrait;
+use SDM\Altapay\Traits\OrderlinesTrait;
+use SDM\Altapay\Traits\TransactionsTrait;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -41,7 +41,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  * which means if the capture fails the system will automatically try to reauth the payment and then capture again.
  * Reauthed payments, however, do not have cvv or 3d-secure protection, which means the
  * protection against chargebacks is not as good.
- * If you wish to disable auto reauth for one or more of your terminals please contact Valitor.
+ * If you wish to disable auto reauth for one or more of your terminals please contact Altapay.
  */
 class CaptureReservation extends AbstractApi
 {
@@ -147,9 +147,7 @@ class CaptureReservation extends AbstractApi
         }
 
         try {
-            $data = ResponseSerializer::serialize(CaptureReservationResponse::class, $xml->Body, false, $xml->Header);
-
-            return $data;
+            return ResponseSerializer::serialize(CaptureReservationResponse::class, $xml->Body, false, $xml->Header);
         } catch (\Exception $e) {
             throw $e;
         }
@@ -216,9 +214,7 @@ class CaptureReservation extends AbstractApi
 
             return $output;
         } catch (GuzzleHttpClientException $e) {
-            $exception = new Exceptions\ClientException($e->getMessage(), $e->getRequest(), $e->getResponse());
-
-            return $this->handleExceptionResponse($exception);
+            throw new Exceptions\ClientException($e->getMessage(), $e->getRequest(), $e->getResponse());
         }
     }
 

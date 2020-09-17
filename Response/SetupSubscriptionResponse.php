@@ -21,7 +21,7 @@
  * THE SOFTWARE.
  */
 
-namespace SDM\Valitor\Response;
+namespace SDM\Altapay\Response;
 
 class SetupSubscriptionResponse extends ReservationOfFixedAmountResponse
 {

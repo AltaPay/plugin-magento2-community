@@ -1,7 +1,7 @@
 /**
- * Valitor Module for Magento 2.x.
+ * Altapay Module for Magento 2.x.
  *
- * Copyright © 2018 Valitor. All rights reserved.
+ * Copyright © 2018 Altapay. All rights reserved.
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -59,7 +59,7 @@ define(
             fullScreenLoader.startLoader();
 
             return storage.post(serviceUrl, JSON.stringify(payload)).done(function (data) {
-                $('#valitor-error-message').text('');
+                $('#altapay-error-message').text('');
                 var tokenId = '';
                 if ($(".payment-method._active select[name='ccToken']").length == 1) {
                     tokenId = $(".payment-method._active select[name='ccToken']").val();
@@ -67,7 +67,7 @@ define(
 
                 $.ajax({
                     method: "POST",
-                    url: window.checkoutConfig.payment['sdm_valitor'].url,
+                    url: window.checkoutConfig.payment['sdm_altapay'].url,
                     data: {
                         paytype: method,
                         cartid: quote.getQuoteId(),
@@ -80,8 +80,8 @@ define(
                         window.location.href = jsonResponse.formurl;
                     } else {
                         fullScreenLoader.stopLoader();
-                        $(".payment-method._active").find('#valitor-error-message').css('display', 'block');
-                        $(".payment-method._active").find('#valitor-error-message').text(jsonResponse.message);
+                        $(".payment-method._active").find('#altapay-error-message').css('display', 'block');
+                        $(".payment-method._active").find('#altapay-error-message').text(jsonResponse.message);
                         return false;
                     }
                 });

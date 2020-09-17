@@ -1,15 +1,15 @@
 <?xml version="1.0"?>
 <!--
 /**
- * Valitor Module for Magento 2.x.
+ * Altapay Module for Magento 2.x.
  *
- * Copyright © 2018 Valitor. All rights reserved.
+ * Copyright © 2018 Altapay. All rights reserved.
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
 -->
 
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Module/etc/module.xsd">
-  <module name="SDM_Valitor" setup_version="3.0.0">
+  <module name="SDM_Altapay" setup_version="3.1.0">
   </module>
 </config>

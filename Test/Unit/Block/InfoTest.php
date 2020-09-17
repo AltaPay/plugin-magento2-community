@@ -1,20 +1,20 @@
 <?php
 /**
- * Valitor Module for Magento 2.x.
+ * Altapay Module for Magento 2.x.
  *
- * Copyright © 2018 Valitor. All rights reserved.
+ * Copyright © 2018 Altapay. All rights reserved.
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
 
-namespace SDM\Valitor\Test\Unit\Block;
+namespace SDM\Altapay\Test\Unit\Block;
 
 use Magento\Sales\Model\Order;
-use SDM\Valitor\Block\Info as ClassToTest;
+use SDM\Altapay\Block\Info as ClassToTest;
 use Magento\Framework\TestFramework\Unit\Helper\ObjectManager;
 use Magento\Payment\Model\Info;
-use SDM\Valitor\Test\Unit\MainTestCase;
-use SDM\Valitor\Test\Unit\ConstantTestConfig;
+use SDM\Altapay\Test\Unit\MainTestCase;
+use SDM\Altapay\Test\Unit\ConstantTestConfig;
 
 class InfoTest extends MainTestCase
 {

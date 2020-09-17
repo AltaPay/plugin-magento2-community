@@ -1,9 +1,9 @@
 <?xml version="1.0"?>
 <!--
 /**
- * Valitor Module for Magento 2.x.
+ * Altapay Module for Magento 2.x.
  *
- * Copyright © 2018 Valitor. All rights reserved.
+ * Copyright © 2018 Altapay. All rights reserved.
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -13,7 +13,7 @@
     <type name="Magento\Checkout\Model\CompositeConfigProvider">
         <arguments>
             <argument name="configProviders" xsi:type="array">
-                <item name="sdm_valitor_config_provider" xsi:type="object">SDM\Valitor\Model\ConfigProvider</item>
+                <item name="sdm_altapay_config_provider" xsi:type="object">SDM\Altapay\Model\ConfigProvider</item>
             </argument>
         </arguments>
     </type>

@@ -1,18 +1,18 @@
 <?php
 /**
- * Valitor Module for Magento 2.x.
+ * Altapay Module for Magento 2.x.
  *
- * Copyright © 2018 Valitor. All rights reserved.
+ * Copyright © 2018 Altapay. All rights reserved.
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
 
-namespace SDM\Valitor\Controller\Index;
+namespace SDM\Altapay\Controller\Index;
 
 use Magento\Framework\App\Action\Action;
 use Magento\Framework\App\Action\Context;
 use Magento\Framework\Controller\ResultFactory;
-use SDM\Valitor\Model\TokenFactory;
+use SDM\Altapay\Model\TokenFactory;
 use Magento\Sales\Model\OrderFactory;
 use Magento\Customer\Model\Session;
 use Magento\Framework\App\CsrfAwareActionInterface;
@@ -78,7 +78,7 @@ class Savetoken extends Action implements CsrfAwareActionInterface
         $resultRedirect->setUrl($url);
         $post = (array)$this->getRequest()->getPost();
         if (!empty($post)) {
-            $orderId           = $post['valitor_order_id'];
+            $orderId           = $post['altapay_order_id'];
             $order             = $this->orderFactory->create()->load($orderId);
             $orderCustomerId   = $order->getCustomerId();
             $currentCustomerId = $this->customerSession->getCustomer()->getId();

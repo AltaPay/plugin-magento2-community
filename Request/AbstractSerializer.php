@@ -21,7 +21,7 @@
  * THE SOFTWARE.
  */
 
-namespace SDM\Valitor\Request;
+namespace SDM\Altapay\Request;
 
 /**
  * Serialize object

@@ -21,14 +21,14 @@
  * THE SOFTWARE.
  */
 
-namespace SDM\Valitor;
+namespace SDM\Altapay;
 
-use SDM\Valitor\Exceptions\ClassDoesNotExistsException;
-use SDM\Valitor\Api\Ecommerce;
-use SDM\Valitor\Api\Others;
-use SDM\Valitor\Api\Payments;
-use SDM\Valitor\Api\Subscription;
-use SDM\Valitor\Api\Test;
+use SDM\Altapay\Exceptions\ClassDoesNotExistsException;
+use SDM\Altapay\Api\Ecommerce;
+use SDM\Altapay\Api\Others;
+use SDM\Altapay\Api\Payments;
+use SDM\Altapay\Api\Subscription;
+use SDM\Altapay\Api\Test;
 
 class Factory
 {

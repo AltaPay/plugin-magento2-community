@@ -1,24 +1,24 @@
 <?php
 /**
- * Valitor Module for Magento 2.x.
+ * Altapay Module for Magento 2.x.
  *
- * Copyright © 2018 Valitor. All rights reserved.
+ * Copyright © 2018 Altapay. All rights reserved.
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
 
-namespace SDM\Valitor\Test\Unit\Model\Handler;
+namespace SDM\Altapay\Test\Unit\Model\Handler;
 
 use Magento\Quote\Model\Quote;
 use Magento\Sales\Model\Order;
-use SDM\Valitor\Model\Handler\RestoreQuote as ClassToTest;
+use SDM\Altapay\Model\Handler\RestoreQuote as ClassToTest;
 use Magento\Framework\TestFramework\Unit\Helper\ObjectManager;
-use SDM\Valitor\Test\Unit\MainTestCase;
+use SDM\Altapay\Test\Unit\MainTestCase;
 use Magento\Checkout\Model\Session;
 use Magento\Sales\Model\OrderFactory;
 use Magento\Quote\Model\QuoteFactory;
 use Magento\Framework\Exception\LocalizedException;
-use SDM\Valitor\Test\Unit\ConstantTestConfig;
+use SDM\Altapay\Test\Unit\ConstantTestConfig;
 
 class RestoreQuoteTest extends MainTestCase
 {

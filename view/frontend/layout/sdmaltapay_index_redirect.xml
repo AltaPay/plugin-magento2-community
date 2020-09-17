@@ -1,9 +1,9 @@
 <?xml version="1.0"?>
 <!--
 /**
- * Valitor Module for Magento 2.x.
+ * Altapay Module for Magento 2.x.
  *
- * Copyright © 2018 Valitor. All rights reserved.
+ * Copyright © 2018 Altapay. All rights reserved.
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -13,8 +13,8 @@
     <referenceBlock name="content">
         <block
             template="callback_redirect.phtml"
-            class="SDM\Valitor\Block\Callback\Redirect"
-            name="sdm_valitor_callback_redirect"
+            class="SDM\Altapay\Block\Callback\Redirect"
+            name="sdm_altapay_callback_redirect"
         />
     </referenceBlock>
 </page>

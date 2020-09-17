@@ -1,14 +1,14 @@
 <?php
 /**
- * Valitor Module for Magento 2.x.
+ * Altapay Module for Magento 2.x.
  *
- * Copyright © 2018 Valitor. All rights reserved.
+ * Copyright © 2018 Altapay. All rights reserved.
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
 ?>
 <link rel="stylesheet" type="text/css" href="<?= /* @noEscape */
-$block->getViewFileUrl('SDM_Valitor::css/ordersummary.css') ?>">
+$block->getViewFileUrl('SDM_Altapay::css/ordersummary.css') ?>">
 <?php $order = $block->getOrder(); ?>
 <!-- Order Shipping Details -->
 <aside style="float:left" class="modal-custom opc-sidebar opc-summary-wrapper">
@@ -115,7 +115,7 @@ $block->getViewFileUrl('SDM_Valitor::css/ordersummary.css') ?>">
                         $product      = $block->getProductById($item->getProductId());
                         $options      = $item->getProductOptions();
                         $imageBlock   = $block->getLayout()
-                                              ->createBlock('Magento\Catalog\Block\Product\ListProduct');
+                                              ->createBlock(\Magento\Catalog\Block\Product\ListProduct::class);
                         $productImage = $imageBlock->getImage($product, 'category_page_list');
                         ?>
                         <li class="product-item">

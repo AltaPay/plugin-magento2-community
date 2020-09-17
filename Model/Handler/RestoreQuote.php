@@ -1,27 +1,27 @@
 <?php
 /**
- * Valitor Module for Magento 2.x.
+ * Altapay Module for Magento 2.x.
  *
- * Copyright © 2018 Valitor. All rights reserved.
+ * Copyright © 2018 Altapay. All rights reserved.
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
 
-namespace SDM\Valitor\Model\Handler;
+namespace SDM\Altapay\Model\Handler;
 
 use Magento\Checkout\Model\Session;
 use Magento\Sales\Model\Order;
 use Magento\Sales\Model\OrderFactory;
 use Magento\Framework\Message\ManagerInterface;
 use Magento\Quote\Model\QuoteFactory;
-use SDM\Valitor\Model\ConstantConfig;
+use SDM\Altapay\Model\ConstantConfig;
 use Magento\SalesRule\Model\Coupon;
 use Magento\SalesRule\Model\ResourceModel\Coupon\Usage as CouponUsage;
-use SDM\Valitor\Api\OrderLoaderInterface;
+use SDM\Altapay\Api\OrderLoaderInterface;
 use Magento\CatalogInventory\Api\StockManagementInterface;
-use SDM\Valitor\Model\SystemConfig;
+use SDM\Altapay\Model\SystemConfig;
 use Magento\Framework\App\ResourceConnection;
-use SDM\Valitor\Logger\Logger;
+use SDM\Altapay\Logger\Logger;
 
 class RestoreQuote
 {
@@ -81,7 +81,7 @@ class RestoreQuote
     /**
      * @var Logger
      */
-    protected $valitorLogger;
+    protected $altapayLogger;
 
     /**
      * RestoreQuote Constructor
@@ -96,7 +96,7 @@ class RestoreQuote
      * @param StockManagementInterface $stockManagement
      * @param SystemConfig             $systemConfig
      * @param ResourceConnection       $modelResource
-     * @param Logger                   $valitorLogger
+     * @param Logger                   $altapayLogger
      */
     public function __construct(
         Session $checkoutSession,
@@ -109,7 +109,7 @@ class RestoreQuote
         StockManagementInterface $stockManagement,
         SystemConfig $systemConfig,
         ResourceConnection $modelResource,
-        Logger $valitorLogger
+        Logger $altapayLogger
     ) {
         $this->checkoutSession = $checkoutSession;
         $this->orderFactory    = $orderFactory;
@@ -121,7 +121,7 @@ class RestoreQuote
         $this->stockManagement = $stockManagement;
         $this->systemConfig    = $systemConfig;
         $this->modelResource   = $modelResource;
-        $this->valitorLogger   = $valitorLogger;
+        $this->altapayLogger   = $altapayLogger;
     }
 
     /**
@@ -129,8 +129,8 @@ class RestoreQuote
      */
     public function handleQuote()
     {
-        //check if customer redirect from valitor
-        if ($this->checkoutSession->getValitorCustomerRedirect()) {
+        //check if customer redirect from altapay
+        if ($this->checkoutSession->getAltapayCustomerRedirect()) {
             //get last order Id from interface
             $orderId    = $this->orderLoader->getLastOrderIncrementIdFromSession();
             $order      = $this->checkoutSession->getLastRealOrder();
@@ -184,7 +184,7 @@ class RestoreQuote
                 //show fail message
                 $this->messageManager->addErrorMessage($message);
             }
-            $this->checkoutSession->unsValitorCustomerRedirect();
+            $this->checkoutSession->unsAltapayCustomerRedirect();
         }
     }
 
@@ -216,7 +216,7 @@ class RestoreQuote
     public function getTransactionData($orderId)
     {
         $connection = $this->modelResource->getConnection();
-        $table      = $this->modelResource->getTableName('sdm_valitor');
+        $table      = $this->modelResource->getTableName('sdm_altapay');
         $sql        = $connection->select()
                                  ->from($table, ['parametersdata'])
                                  ->where('orderid = ?', $orderId);

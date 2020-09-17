@@ -21,9 +21,9 @@
  * THE SOFTWARE.
  */
 
-namespace SDM\Valitor\Request;
+namespace SDM\Altapay\Request;
 
-use SDM\Valitor\Exceptions\Exception;
+use SDM\Altapay\Exceptions\Exception;
 
 class Customer extends AbstractSerializer
 {
@@ -170,6 +170,41 @@ class Customer extends AbstractSerializer
      * @var string
      */
     private $shippingRef;
+
+    /**
+     * Client IP Address.
+     *
+     * @var string
+     */
+    private $clientIP;
+
+    /**
+     * Client accept language.
+     *
+     * @var string
+     */
+    private $clientAcceptLanguage;
+
+    /**
+     * HTTP User Agent.
+     *
+     * @var string
+     */
+    private $httpUserAgent;
+
+    /**
+     * Header that is used by the trusted proxy to refer to.
+     *
+     * @var string
+     */
+    private $httpXForwardedFor;
+
+    /**
+     * Client Session ID.
+     *
+     * @var string
+     */
+    private $clientSessionID;
 
     /**
      * Customer constructor.
@@ -458,6 +493,76 @@ class Customer extends AbstractSerializer
     }
 
     /**
+     * Set Client IP
+     *
+     * @param string $clientIP
+     *
+     * @return Customer
+     */
+    public function setClientIP($clientIP)
+    {
+        $this->clientIP = $clientIP;
+
+        return $this;
+    }
+
+    /**
+     * Set Client Accept Language
+     *
+     * @param $clientAcceptLanguage
+     *
+     * @return Customer
+     */
+    public function setClientAcceptLanguage($clientAcceptLanguage)
+    {
+        $this->clientAcceptLanguage = $clientAcceptLanguage;
+
+        return $this;
+    }
+
+    /**
+     * Set Client Accept Language
+     *
+     * @param $httpUserAgent
+     *
+     * @return Customer
+     */
+    public function setHttpUserAgent($httpUserAgent)
+    {
+        $this->httpUserAgent = $httpUserAgent;
+
+        return $this;
+    }
+
+    /**
+     * Set Client Accept Language
+     *
+     * @param $httpXForwardedFor
+     *
+     * @return Customer
+     */
+    public function setHttpXForwardedFor($httpXForwardedFor)
+    {
+        $this->httpXForwardedFor = $httpXForwardedFor;
+
+        return $this;
+    }
+
+    /**
+     * Set Client Session ID
+     *
+     * @param $clientSessionID
+     *
+     * @return Customer
+     */
+    public function setClientSessionID($clientSessionID)
+    {
+        $this->clientSessionID = $clientSessionID;
+
+        return $this;
+    }
+
+    /**
      * Serialize a object
      *
      * @return array
@@ -526,24 +631,24 @@ class Customer extends AbstractSerializer
             $output['gender'] = $this->gender;
         }
 
-        if (isset($_SERVER['REMOTE_ADDR'])) {
-            $output['client_ip'] = $_SERVER['REMOTE_ADDR'];
+        if ($this->clientIP) {
+            $output['client_ip'] = $this->clientIP;
         }
 
-        if (session_id()) {
-            $output['client_session_id'] = crypt(session_id(),'$5$rounds=5000$customersessionid$');
+        if ($this->clientSessionID) {
+            $output['client_session_id'] = $this->clientSessionID;
         }
 
-        if (isset($_SERVER['HTTP_ACCEPT_LANGUAGE'])) {
-            $output['client_accept_language'] = substr($_SERVER['HTTP_ACCEPT_LANGUAGE'], 0, 2);
+        if ($this->clientAcceptLanguage) {
+            $output['client_accept_language'] = $this->clientAcceptLanguage;
         }
 
-        if (isset($_SERVER['HTTP_USER_AGENT'])) {
-            $output['client_user_agent'] = $_SERVER['HTTP_USER_AGENT'];
+        if ($this->httpUserAgent) {
+            $output['client_user_agent'] = $this->httpUserAgent;
         }
 
-        if (isset($_SERVER['HTTP_X_FORWARDED_FOR'])) {
-            $output['client_forwarded_ip'] = $_SERVER['HTTP_X_FORWARDED_FOR'];
+        if ($this->httpXForwardedFor) {
+            $output['client_forwarded_ip'] = $this->httpXForwardedFor;
         }
 
         if ($this->billingRef) {

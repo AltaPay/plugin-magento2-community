@@ -21,9 +21,9 @@
  * THE SOFTWARE.
  */
 
-namespace SDM\Valitor\Serializer;
+namespace SDM\Altapay\Serializer;
 
-use SDM\Valitor\Response\AbstractResponse;
+use SDM\Altapay\Response\AbstractResponse;
 
 /**
  * Response serializer

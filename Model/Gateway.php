@@ -1,36 +1,37 @@
 <?php
 /**
- * Valitor Module for Magento 2.x.
+ * Altapay Module for Magento 2.x.
  *
- * Copyright © 2018 Valitor. All rights reserved.
+ * Copyright © 2018 Altapay. All rights reserved.
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
 
-namespace SDM\Valitor\Model;
+namespace SDM\Altapay\Model;
 
-use SDM\Valitor\Api\GatewayInterface;
-use SDM\Valitor\Api\OrderLoaderInterface;
+use SDM\Altapay\Api\GatewayInterface;
+use SDM\Altapay\Api\OrderLoaderInterface;
 use Magento\Sales\Model\Order;
 use Magento\Checkout\Model\Session;
 use Magento\Quote\Model\Quote;
 use Magento\Framework\UrlInterface;
 use Magento\Framework\App\Request\Http;
-use SDM\Valitor\Request\Config;
-use SDM\Valitor\Api\Ecommerce\PaymentRequest;
-use SDM\Valitor\Api\Test\TestAuthentication;
-use SDM\Valitor\Exceptions\ClientException;
-use SDM\Valitor\Exceptions\ResponseHeaderException;
-use SDM\Valitor\Exceptions\ResponseMessageException;
-use SDM\Valitor\Helper\Data;
-use SDM\Valitor\Helper\Config as storeConfig;
-use SDM\Valitor\Logger\Logger;
-use SDM\Valitor\Model\Handler\CustomerHandler;
-use SDM\Valitor\Model\Handler\OrderLinesHandler;
-use SDM\Valitor\Model\Handler\PriceHandler;
-use SDM\Valitor\Model\Handler\DiscountHandler;
-use SDM\Valitor\Model\Handler\CreatePaymentHandler;
-use SDM\Valitor\Model\TokenFactory;
+use Magento\Framework\App\RequestInterface;
+use SDM\Altapay\Request\Config;
+use SDM\Altapay\Api\Ecommerce\PaymentRequest;
+use SDM\Altapay\Api\Test\TestAuthentication;
+use SDM\Altapay\Exceptions\ClientException;
+use SDM\Altapay\Exceptions\ResponseHeaderException;
+use SDM\Altapay\Exceptions\ResponseMessageException;
+use SDM\Altapay\Helper\Data;
+use SDM\Altapay\Helper\Config as storeConfig;
+use SDM\Altapay\Logger\Logger;
+use SDM\Altapay\Model\Handler\CustomerHandler;
+use SDM\Altapay\Model\Handler\OrderLinesHandler;
+use SDM\Altapay\Model\Handler\PriceHandler;
+use SDM\Altapay\Model\Handler\DiscountHandler;
+use SDM\Altapay\Model\Handler\CreatePaymentHandler;
+use SDM\Altapay\Model\TokenFactory;
 
 /**
  * Class Gateway
@@ -77,7 +78,7 @@ class Gateway implements GatewayInterface
     /**
      * @var Logger
      */
-    protected $valitorLogger;
+    protected $altapayLogger;
     /**
      * @var CustomerHandler
      */
@@ -115,7 +116,7 @@ class Gateway implements GatewayInterface
      * @param Quote                $quote
      * @param Data                 $helper
      * @param storeConfig          $storeConfig
-     * @param Logger               $valitorLogger
+     * @param Logger               $altapayLogger
      * @param CustomerHandler      $customerHandler
      * @param OrderLinesHandler    $orderLines
      * @param PriceHandler         $priceHandler
@@ -133,7 +134,7 @@ class Gateway implements GatewayInterface
         Quote $quote,
         Data $helper,
         storeConfig $storeConfig,
-        Logger $valitorLogger,
+        Logger $altapayLogger,
         CustomerHandler $customerHandler,
         OrderLinesHandler $orderLines,
         PriceHandler $priceHandler,
@@ -150,7 +151,7 @@ class Gateway implements GatewayInterface
         $this->quote           = $quote;
         $this->helper          = $helper;
         $this->storeConfig     = $storeConfig;
-        $this->valitorLogger   = $valitorLogger;
+        $this->altapayLogger   = $altapayLogger;
         $this->customerHandler = $customerHandler;
         $this->orderLines      = $orderLines;
         $this->priceHandler    = $priceHandler;
@@ -160,7 +161,7 @@ class Gateway implements GatewayInterface
     }
 
     /**
-     * createRequest to valitor
+     * createRequest to altapay
      *
      * @param int    $terminalId
      * @param string $orderId
@@ -170,14 +171,13 @@ class Gateway implements GatewayInterface
     public function createRequest($terminalId, $orderId)
     {
         $order = $this->order->load($orderId);
-        $storePriceIncTax = $this->storeConfig->storePriceIncTax();
         if ($order->getId()) {
             $couponCode       = $order->getDiscountDescription();
             $couponCodeAmount = $order->getDiscountAmount();
             $discountAllItems = $this->discountHandler->allItemsHaveDiscount($order->getAllVisibleItems());
             $orderLines       = $this->itemOrderLines($couponCodeAmount, $order, $discountAllItems);
             if ($this->orderLines->sendShipment($order) && !empty($order->getShippingMethod(true))) {
-                $orderLines[] = $this->orderLines->handleShipping($storePriceIncTax, $order, $discountAllItems, true);
+                $orderLines[] = $this->orderLines->handleShipping($order, $discountAllItems, true);
                 //Shipping Discount Tax Compensation Amount
                 $compAmount = $this->discountHandler->hiddenTaxDiscountCompensation($order, $discountAllItems, true);
                 if ($compAmount > 0 && $discountAllItems == false) {
@@ -190,6 +190,9 @@ class Gateway implements GatewayInterface
             }
             if ($discountAllItems && abs($couponCodeAmount) > 0) {
                 $orderLines[] = $this->orderLines->discountOrderLine($couponCodeAmount, $couponCode);
+            }
+            if(!empty($this->fixedProductTax($order))){
+                $orderLines[] = $this->orderLines->fixedProductTaxOrderLine($this->fixedProductTax($order));
             }
             $request = $this->preparePaymentRequest($order, $orderLines, $orderId, $terminalId);
             if ($request) {
@@ -222,12 +225,12 @@ class Gateway implements GatewayInterface
     private function setConfig()
     {
         $config = new Config();
-        $config->setCallbackOk($this->urlInterface->getDirectUrl(ConstantConfig::VALITOR_OK));
-        $config->setCallbackFail($this->urlInterface->getDirectUrl(ConstantConfig::VALITOR_FAIL));
-        $config->setCallbackRedirect($this->urlInterface->getDirectUrl(ConstantConfig::VALITOR_REDIRECT));
-        $config->setCallbackOpen($this->urlInterface->getDirectUrl(ConstantConfig::VALITOR_OPEN));
-        $config->setCallbackNotification($this->urlInterface->getDirectUrl(ConstantConfig::VALITOR_NOTIFICATION));
-        $config->setCallbackForm($this->urlInterface->getDirectUrl(ConstantConfig::VALITOR_CALLBACK));
+        $config->setCallbackOk($this->urlInterface->getDirectUrl(ConstantConfig::ALTAPAY_OK));
+        $config->setCallbackFail($this->urlInterface->getDirectUrl(ConstantConfig::ALTAPAY_FAIL));
+        $config->setCallbackRedirect($this->urlInterface->getDirectUrl(ConstantConfig::ALTAPAY_REDIRECT));
+        $config->setCallbackOpen($this->urlInterface->getDirectUrl(ConstantConfig::ALTAPAY_OPEN));
+        $config->setCallbackNotification($this->urlInterface->getDirectUrl(ConstantConfig::ALTAPAY_NOTIFICATION));
+        $config->setCallbackForm($this->urlInterface->getDirectUrl(ConstantConfig::ALTAPAY_CALLBACK));
 
         return $config;
     }
@@ -246,33 +249,32 @@ class Gateway implements GatewayInterface
         $storePriceIncTax = $this->storeConfig->storePriceIncTax();
 
         foreach ($order->getAllItems() as $item) {
-            $productType          = $item->getProductType();
-            $productOriginalPrice = $item->getBaseOriginalPrice();
-            $taxPercent           = $item->getTaxPercent();
-            $appliedRule          = $this->discountHandler->getAppliedDiscounts($item);
-            $discountAmount       = $item->getBaseDiscountAmount();
-            $parentItemType       = "";
+            $productType    = $item->getProductType();
+            $originalPrice  = $item->getBaseOriginalPrice();
+            $taxPercent     = $item->getTaxPercent();
+            $discountAmount = $item->getBaseDiscountAmount();
+            $parentItemType = "";
             if ($item->getParentItem()) {
                 $parentItemType = $item->getParentItem()->getProductType();
             }
             if ($productType != "bundle" && $parentItemType != "configurable") {
 
-                if ($productOriginalPrice == 0) {
-                    $productOriginalPrice = $item->getPriceInclTax();
+                if ($originalPrice == 0) {
+                    $originalPrice = $item->getPriceInclTax();
                 }
 
                 if ($storePriceIncTax) {
-                    $unitPriceWithoutTax = $this->priceHandler->getPriceWithoutTax($productOriginalPrice, $taxPercent);
+                    $unitPriceWithoutTax = $this->priceHandler->getPriceWithoutTax($originalPrice, $taxPercent);
                     $unitPrice           = bcdiv($unitPriceWithoutTax, 1, 2);
                 } else {
-                    $unitPrice           = $productOriginalPrice;
-                    $unitPriceWithoutTax = $productOriginalPrice;
+                    $unitPrice           = $originalPrice;
+                    $unitPriceWithoutTax = $originalPrice;
                 }
                 $dataForPrice         = $this->priceHandler->dataForPrice(
                     $item,
                     $unitPrice,
                     $couponCode,
-                    $this->discountHandler->getItemDiscount($discountAmount, $productOriginalPrice, $item->getQtyOrdered())
+                    $this->discountHandler->getItemDiscount($discountAmount, $originalPrice, $item->getQtyOrdered())
                 );
                 $taxAmount            = $dataForPrice["taxAmount"];
                 $discount             = $this->discountHandler->orderLineDiscount(
@@ -280,7 +282,7 @@ class Gateway implements GatewayInterface
                     $dataForPrice["discount"]
                 );
                 $catalogDiscount      = $dataForPrice["catalogDiscount"];
-                $itemTaxAmount        = $taxAmount + $item->getWeeeTaxAppliedRowAmount();
+                $itemTaxAmount        = $taxAmount;
                 $orderLines[]         = $this->orderLines->itemOrderLine(
                     $item,
                     $unitPrice,
@@ -322,14 +324,14 @@ class Gateway implements GatewayInterface
     private function restoreOrderAndReturnError($order)
     {
         $this->restoreOrderFromOrderId($order->getIncrementId());
-        $requestParams['result']  = __(ConstantConfig::ERROR);
+        $requestParams['result']  = ConstantConfig::ERROR;
         $requestParams['message'] = __(ConstantConfig::ERROR_MESSAGE);
 
         return $requestParams;
     }
 
     /**
-     * Prepare request to the valitor, sets the necessary parameters.
+     * Prepare request to the altapay, sets the necessary parameters.
      *
      * @param $order
      * @param $orderLines
@@ -361,7 +363,7 @@ class Gateway implements GatewayInterface
                 ->setConfig($this->setConfig())
                 ->setTransactionInfo($transactionDetail)
                 ->setSalesTax((float)number_format($order->getTaxAmount(), 2, '.', ''))
-                ->setCookie($_SERVER['HTTP_COOKIE']);
+                ->setCookie($this->request->getServer('HTTP_COOKIE'));
 
         $post = $this->request->getPostValue();
 
@@ -396,7 +398,7 @@ class Gateway implements GatewayInterface
     }
 
     /**
-     * Send payment request to the valitor.
+     * Send payment request to the altapay.
      *
      * @param $order
      * @param $request
@@ -409,43 +411,56 @@ class Gateway implements GatewayInterface
         $storeCode  = $order->getStore()->getCode();
 
         try {
-            /** @var \Valitor\Response\PaymentRequestResponse $response */
+            /** @var \Altapay\Response\PaymentRequestResponse $response */
             $response                 = $request->call();
-            $requestParams['result']  = __(ConstantConfig::SUCCESS);
+            $requestParams['result']  = ConstantConfig::SUCCESS;
             $requestParams['formurl'] = $response->Url;
             // set before payment status
             if ($this->systemConfig->getStatusConfig('before', $storeScope, $storeCode)) {
                 $this->paymentHandler->setCustomOrderStatus($order, Order::STATE_NEW, 'before');
             }
             // set notification
-            $order->addStatusHistoryComment(__(ConstantConfig::REDIRECT_TO_VALITOR) . $response->PaymentRequestId);
+            $order->addStatusHistoryComment(__(ConstantConfig::REDIRECT_TO_ALTAPAY) . $response->PaymentRequestId);
             $extensionAttribute = $order->getExtensionAttributes();
-            if ($extensionAttribute && $extensionAttribute->getValitorPaymentFormUrl()) {
-                $extensionAttribute->setValitorPaymentFormUrl($response->Url);
+            if ($extensionAttribute && $extensionAttribute->getAltapayPaymentFormUrl()) {
+                $extensionAttribute->setAltapayPaymentFormUrl($response->Url);
             }
-            $order->setValitorPaymentFormUrl($response->Url);
-            $order->setValitorPriceIncludesTax($this->storeConfig->storePriceIncTax());
+            $order->setAltapayPaymentFormUrl($response->Url);
+            $order->setAltapayPriceIncludesTax($this->storeConfig->storePriceIncTax());
             $order->getResource()->save($order);
-            //set flag if customer redirect to Valitor
-            $this->checkoutSession->setValitorCustomerRedirect(true);
+            //set flag if customer redirect to Altapay
+            $this->checkoutSession->setAltapayCustomerRedirect(true);
 
             return $requestParams;
         } catch (ClientException $e) {
-            $requestParams['result']  = __(ConstantConfig::ERROR);
+            $requestParams['result']  = ConstantConfig::ERROR;
             $requestParams['message'] = $e->getResponse()->getBody();
         } catch (ResponseHeaderException $e) {
-            $requestParams['result']  = __(ConstantConfig::ERROR);
+            $requestParams['result']  = ConstantConfig::ERROR;
             $requestParams['message'] = $e->getHeader()->ErrorMessage;
         } catch (ResponseMessageException $e) {
-            $requestParams['result']  = __(ConstantConfig::ERROR);
+            $requestParams['result']  = ConstantConfig::ERROR;
             $requestParams['message'] = $e->getMessage();
         } catch (\Exception $e) {
-            $requestParams['result']  = __(ConstantConfig::ERROR);
+            $requestParams['result']  = ConstantConfig::ERROR;
             $requestParams['message'] = $e->getMessage();
         }
 
         $this->restoreOrderFromOrderId($order->getIncrementId());
 
         return $requestParams;
+    }
+     /**
+     * @param $order
+     *
+     * @return float|int
+     */
+    public function fixedProductTax($order){
+        $weeTaxAmount = 0;
+        foreach ($order->getAllItems() as $item) {
+           $weeTaxAmount +=  $item->getWeeeTaxAppliedRowAmount();
+        }
+
+       return $weeTaxAmount;
     }
 }

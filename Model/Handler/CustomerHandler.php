@@ -1,23 +1,25 @@
 <?php
 /**
- * Valitor Module for Magento 2.x.
+ * Altapay Module for Magento 2.x.
  *
- * Copyright © 2018 Valitor. All rights reserved.
+ * Copyright © 2018 Altapay. All rights reserved.
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
 
-namespace SDM\Valitor\Model\Handler;
+namespace SDM\Altapay\Model\Handler;
 
-use SDM\Valitor\Request\Address;
-use SDM\Valitor\Request\Customer;
+use SDM\Altapay\Request\Address;
+use SDM\Altapay\Request\Customer;
 use Magento\Sales\Model\Order;
 use Magento\Customer\Api\CustomerRepositoryInterface;
+use Magento\Framework\App\Request\Http;
+use Magento\Framework\Session\SessionManagerInterface;
 
 /**
  * Class CustomerHandler
  * To handle the customer information for
- * create payment request at valitor.
+ * create payment request at altapay.
  */
 class CustomerHandler
 {
@@ -29,19 +31,34 @@ class CustomerHandler
      * @var CustomerRepositoryInterface
      */
     private $customerRepositoryInterface;
+    /**
+     * @var Http
+     */
+    private $request;
+
+    /**
+     * @var SessionManagerInterface
+     */
+    protected $session;
 
     /**
      * Gateway constructor.
      *
      * @param Order                       $order
      * @param CustomerRepositoryInterface $customerRepositoryInterface
+     * @param Http                        $request
+     * @param SessionManagerInterface     $session
      */
     public function __construct(
         Order $order,
-        CustomerRepositoryInterface $customerRepositoryInterface
+        CustomerRepositoryInterface $customerRepositoryInterface,
+        Http $request,
+        SessionManagerInterface $session
     ) {
         $this->order                       = $order;
         $this->customerRepositoryInterface = $customerRepositoryInterface;
+        $this->request                     = $request;
+        $this->session                     = $session;
     }
 
     /**
@@ -78,6 +95,10 @@ class CustomerHandler
 
         $customer->setEmail($customerEmail);
         $customer->setPhone(str_replace(' ', '', $customerPhone));
+        $customer->setClientIP($this->request->getServer('REMOTE_ADDR'));
+        $customer->setClientAcceptLanguage(substr($this->request->getServer('HTTP_ACCEPT_LANGUAGE'), 0, 2));
+        $customer->setHttpUserAgent($this->request->getServer('HTTP_USER_AGENT'));
+        $customer->setClientSessionID(crypt($this->session->getSessionId(),'$5$rounds=5000$customersessionid$'));
 
         if (!$order->getCustomerIsGuest()) {
             $customer->setUsername($order->getCustomerId());

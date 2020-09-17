@@ -1,9 +1,9 @@
 <?xml version="1.0"?>
 <!--
 /**
- * Valitor Module for Magento 2.x.
+ * Altapay Module for Magento 2.x.
  *
- * Copyright © 2018 Valitor. All rights reserved.
+ * Copyright © 2018 Altapay. All rights reserved.
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -15,7 +15,7 @@
         <referenceBlock name="customer_account_navigation">
             <block class="Magento\Framework\View\Element\Html\Link\Current" name="customer-account-navigation-custom">
                 <arguments>
-                    <argument name="path" xsi:type="string">sdmvalitor/customer/index</argument>
+                    <argument name="path" xsi:type="string">sdmaltapay/customer/index</argument>
                     <argument name="label" xsi:type="string">Saved Credit Cards</argument>
                 </arguments>
             </block>

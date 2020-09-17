@@ -21,12 +21,12 @@
  * THE SOFTWARE.
  */
 
-namespace SDM\Valitor\Api\Payments;
+namespace SDM\Altapay\Api\Payments;
 
-use SDM\Valitor\AbstractApi;
-use SDM\Valitor\Response\ReleaseReservationResponse;
-use SDM\Valitor\Serializer\ResponseSerializer;
-use SDM\Valitor\Traits\TransactionsTrait;
+use SDM\Altapay\AbstractApi;
+use SDM\Altapay\Response\ReleaseReservationResponse;
+use SDM\Altapay\Serializer\ResponseSerializer;
+use SDM\Altapay\Traits\TransactionsTrait;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -111,9 +111,9 @@ class ReleaseReservation extends AbstractApi
     }
 
     /**
-     * @return \Valitor\Response\AbstractResponse|PaymentRequestResponse|bool|void
-     * @throws \Valitor\Exceptions\ResponseHeaderException
-     * @throws \Valitor\Exceptions\ResponseMessageException
+     * @return \Altapay\Response\AbstractResponse|PaymentRequestResponse|bool|void
+     * @throws \Altapay\Exceptions\ResponseHeaderException
+     * @throws \Altapay\Exceptions\ResponseMessageException
      * @throws \GuzzleHttp\Exception\GuzzleException
      */
     protected function doResponse()
@@ -135,9 +135,7 @@ class ReleaseReservation extends AbstractApi
 
             return $output;
         } catch (GuzzleHttpClientException $e) {
-            $exception = new Exceptions\ClientException($e->getMessage(), $e->getRequest(), $e->getResponse());
-
-            return $this->handleExceptionResponse($exception);
+            throw new Exceptions\ClientException($e->getMessage(), $e->getRequest(), $e->getResponse());
         }
     }
 

@@ -1,13 +1,13 @@
 <?php
 /**
- * Valitor Module for Magento 2.x.
+ * Altapay Module for Magento 2.x.
  *
- * Copyright © 2018 Valitor. All rights reserved.
+ * Copyright © 2018 Altapay. All rights reserved.
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
 
-namespace SDM\Valitor\Helper;
+namespace SDM\Altapay\Helper;
 
 use Magento\Framework\App\Helper\AbstractHelper;
 use Magento\Framework\App\Config\ScopeConfigInterface;
@@ -51,8 +51,8 @@ class Config extends AbstractHelper
     public function storePriceIncTax($order = null)
     {
         if ($order !== null) {
-            if ($order->getValitorPriceIncludesTax() !== null) {
-                return $order->getValitorPriceIncludesTax();
+            if ($order->getAltapayPriceIncludesTax() !== null) {
+                return $order->getAltapayPriceIncludesTax();
             }
         }
 

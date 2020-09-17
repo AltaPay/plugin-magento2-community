@@ -1,27 +1,27 @@
 <?php
 /**
- * Valitor Module for Magento 2.x.
+ * Altapay Module for Magento 2.x.
  *
- * Copyright © 2018 Valitor. All rights reserved.
+ * Copyright © 2018 Altapay. All rights reserved.
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
 
-namespace SDM\Valitor\Observer;
+namespace SDM\Altapay\Observer;
 
 use Magento\Sales\Model\Order\Payment;
-use SDM\Valitor\Api\Payments\RefundCapturedReservation;
-use SDM\Valitor\Exceptions\ResponseHeaderException;
+use SDM\Altapay\Api\Payments\RefundCapturedReservation;
+use SDM\Altapay\Exceptions\ResponseHeaderException;
 use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
-use SDM\Valitor\Logger\Logger;
-use SDM\Valitor\Model\SystemConfig;
+use SDM\Altapay\Logger\Logger;
+use SDM\Altapay\Model\SystemConfig;
 use Magento\Sales\Model\Order;
-use SDM\Valitor\Helper\Data;
-use SDM\Valitor\Helper\Config as storeConfig;
-use SDM\Valitor\Model\Handler\OrderLinesHandler;
-use SDM\Valitor\Model\Handler\PriceHandler;
-use SDM\Valitor\Model\Handler\DiscountHandler;
+use SDM\Altapay\Helper\Data;
+use SDM\Altapay\Helper\Config as storeConfig;
+use SDM\Altapay\Model\Handler\OrderLinesHandler;
+use SDM\Altapay\Model\Handler\PriceHandler;
+use SDM\Altapay\Model\Handler\DiscountHandler;
 
 /**
  * Class CreditmemoRefundObserver
@@ -36,7 +36,7 @@ class CreditmemoRefundObserver implements ObserverInterface
     /**
      * @var Logger
      */
-    private $valitorLogger;
+    private $altapayLogger;
     /**
      * @var Order
      */
@@ -67,7 +67,7 @@ class CreditmemoRefundObserver implements ObserverInterface
      * CreditmemoRefundObserver constructor.
      *
      * @param SystemConfig      $systemConfig
-     * @param Logger            $valitorLogger
+     * @param Logger            $altapayLogger
      * @param Order             $order
      * @param Data              $helper
      * @param storeConfig       $storeConfig
@@ -77,7 +77,7 @@ class CreditmemoRefundObserver implements ObserverInterface
      */
     public function __construct(
         SystemConfig $systemConfig,
-        Logger $valitorLogger,
+        Logger $altapayLogger,
         Order $order,
         Data $helper,
         storeConfig $storeConfig,
@@ -86,7 +86,7 @@ class CreditmemoRefundObserver implements ObserverInterface
         DiscountHandler $discountHandler
     ) {
         $this->systemConfig    = $systemConfig;
-        $this->valitorLogger   = $valitorLogger;
+        $this->altapayLogger   = $altapayLogger;
         $this->order           = $order;
         $this->helper          = $helper;
         $this->storeConfig     = $storeConfig;
@@ -103,7 +103,6 @@ class CreditmemoRefundObserver implements ObserverInterface
     public function execute(\Magento\Framework\Event\Observer $observer)
     {
         $memo = $observer['creditmemo'];
-        $storePriceIncTax = $this->storeConfig->storePriceIncTax($memo->getOrder());
         //proceed if online refund
         if ($memo->getDoTransaction()) {
             $orderIncrementId = $memo->getOrder()->getIncrementId();
@@ -113,7 +112,7 @@ class CreditmemoRefundObserver implements ObserverInterface
             //If payment method belongs to terminal codes
             if (in_array($payment->getMethod(), SystemConfig::getTerminalCodes())) {
                 //Create orderlines from order items
-                $orderLines = $this->processRefundOrderItems($storePriceIncTax, $memo);
+                $orderLines = $this->processRefundOrderItems($memo);
                 //Send request for payment refund
                 $this->sendRefundRequest($memo, $orderLines, $orderObject, $payment, $storeCode);
             }
@@ -121,12 +120,12 @@ class CreditmemoRefundObserver implements ObserverInterface
     }
 
     /**
-     * @param $storePriceIncTax
      * @param $memo
+     *
      * @return array
      */
 
-    private function processRefundOrderItems($storePriceIncTax, $memo)
+    private function processRefundOrderItems($memo)
     {
         $couponCode       = $memo->getDiscountDescription();
         $couponCodeAmount = $memo->getDiscountAmount();
@@ -141,7 +140,7 @@ class CreditmemoRefundObserver implements ObserverInterface
         }
         if ($memo->getShippingInclTax() > 0) {
             //order lines for shipping
-            $orderLines[] = $this->orderLines->handleShipping($storePriceIncTax, $memo, $discountAllItems, false);
+            $orderLines[] = $this->orderLines->handleShipping($memo, $discountAllItems, false);
             //Shipping Discount Tax Compensation Amount
             $compAmount = $this->discountHandler->hiddenTaxDiscountCompensation($memo, $discountAllItems, false);
             if ($compAmount > 0 && $discountAllItems == false) {
@@ -151,6 +150,10 @@ class CreditmemoRefundObserver implements ObserverInterface
                     $compAmount
                 );
             }
+        }
+        if(!empty($this->fixedProductTax($memo))){
+            //order lines for FPT
+            $orderLines[] = $this->orderLines->fixedProductTaxOrderLine($this->fixedProductTax($memo));
         }
 
         return $orderLines;
@@ -255,16 +258,16 @@ class CreditmemoRefundObserver implements ObserverInterface
         try {
             $refund->call();
         } catch (ResponseHeaderException $e) {
-            $this->valitorLogger->addCritical('Response header exception: ' . $e->getMessage());
+            $this->altapayLogger->addCritical('Response header exception: ' . $e->getMessage());
             throw $e;
         } catch (\Exception $e) {
-            $this->valitorLogger->addCritical('Exception: ' . $e->getMessage());
+            $this->altapayLogger->addCritical('Exception: ' . $e->getMessage());
         }
 
         $rawResponse = $refund->getRawResponse();
         $body        = $rawResponse->getBody();
-        //add information to the valitor log
-        $this->valitorLogger->addInfo('Response body: ' . $body);
+        //add information to the altapay log
+        $this->altapayLogger->addInfo('Response body: ' . $body);
 
         //Update comments if refund fail
         $xml = simplexml_load_string($body);
@@ -277,5 +280,20 @@ class CreditmemoRefundObserver implements ObserverInterface
         if ($xml->Body->Result != 'Success') {
             throw new \InvalidArgumentException('Could not refund captured reservation');
         }
+    }
+        
+    /**
+     * @param $order
+     *
+     * @return float|int
+     */
+    public function fixedProductTax($memo){
+
+        $weeTaxAmount = 0;
+        foreach ($memo->getAllItems() as $item) {
+           $weeTaxAmount +=  $item->getWeeeTaxAppliedRowAmount();
+        }
+
+       return $weeTaxAmount;
     }
 }

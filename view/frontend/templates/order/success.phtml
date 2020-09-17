@@ -1,13 +1,13 @@
-<?php /* @var $block \SDM\Valitor\Block\Success */ ?>
+<?php /* @var $block \SDM\Altapay\Block\Success */ ?>
 <?php if ($block->getTokenData()) { ?>
     <form
             class="form"
-            action="<?= $block->escapeUrl($block->getUrl('sdmvalitor/Index/Savetoken')) ?>"
+            action="<?= $block->escapeUrl($block->getUrl('sdmaltapay/Index/Savetoken')) ?>"
             method="post">
         <?= $block->getBlockHtml('formkey') ?>
-        <input name="valitor_order_id" value="<?= /* @noEscape */
+        <input name="altapay_order_id" value="<?= /* @noEscape */
         (int)$block->getTokenData()->getEntityId() ?>" type="hidden"/>
-        <button type="submit" class="action primary valitor-savetoken" style="margin: 5px 0 15px;padding: 9px 15px;">
+        <button type="submit" class="action primary altapay-savetoken" style="margin: 5px 0 15px;padding: 9px 15px;">
             <span><?= $block->escapeHtml(__('Save your credit card for later use')) ?></span>
         </button>
     </form>

@@ -21,10 +21,10 @@
  * THE SOFTWARE.
  */
 
-namespace SDM\Valitor\Response;
+namespace SDM\Altapay\Response;
 
-use SDM\Valitor\Response\Embeds\Address;
-use SDM\Valitor\Response\Embeds\TextInfo;
+use SDM\Altapay\Response\Embeds\Address;
+use SDM\Altapay\Response\Embeds\TextInfo;
 
 class InvoiceTextResponse extends AbstractResponse
 {

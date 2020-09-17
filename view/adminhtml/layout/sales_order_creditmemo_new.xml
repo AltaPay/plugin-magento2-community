@@ -1,9 +1,9 @@
 <?xml version="1.0"?>
 <!--
 /**
- * Valitor Module for Magento 2.x.
+ * Altapay Module for Magento 2.x.
  *
- * Copyright © 2018 Valitor. All rights reserved.
+ * Copyright © 2018 Altapay. All rights reserved.
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -13,7 +13,7 @@
     <body>
         <referenceBlock name="form">
             <action method="setTemplate">
-                <argument name="template" xsi:type="string">SDM_Valitor::order/creditmemo/create/form.phtml</argument>
+                <argument name="template" xsi:type="string">SDM_Altapay::order/creditmemo/create/form.phtml</argument>
             </action>
         </referenceBlock>
     </body>

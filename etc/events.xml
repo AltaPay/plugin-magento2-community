@@ -1,9 +1,9 @@
 <?xml version="1.0"?>
 <!--
 /**
- * Valitor Module for Magento 2.x.
+ * Altapay Module for Magento 2.x.
  *
- * Copyright © 2018 Valitor. All rights reserved.
+ * Copyright © 2018 Altapay. All rights reserved.
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -11,23 +11,23 @@
 
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Event/etc/events.xsd">
     <event name="sales_order_payment_place_start">
-        <observer name="SDM_Valitor_Order_Before_Payment" instance="SDM\Valitor\Observer\BeforePaymentObserver" />
+        <observer name="SDM_Altapay_Order_Before_Payment" instance="SDM\Altapay\Observer\BeforePaymentObserver" />
     </event>
 
     <event name="order_cancel_after">
-        <observer name="SDM_Valitor_OrderCancel" instance="SDM\Valitor\Observer\OrderCancelObserver" />
+        <observer name="SDM_Altapay_OrderCancel" instance="SDM\Altapay\Observer\OrderCancelObserver" />
     </event>
 
     <event name="sales_order_payment_capture">
-        <observer name="SDM_Valitor_Capture" instance="SDM\Valitor\Observer\CaptureObserver" />
+        <observer name="SDM_Altapay_Capture" instance="SDM\Altapay\Observer\CaptureObserver" />
     </event>
 
     <event name="sales_order_creditmemo_refund">
-        <observer name="SDM_Valitor_Creditmemo_Refund" instance="SDM\Valitor\Observer\CreditmemoRefundObserver" />
+        <observer name="SDM_Altapay_Creditmemo_Refund" instance="SDM\Altapay\Observer\CreditmemoRefundObserver" />
     </event>
 
     <event name="controller_action_predispatch_checkout_cart_index">
-        <observer name="SDM_Valitor_Checkout_Cart_Index" instance="SDM\Valitor\Observer\CheckoutCartIndex" />
+        <observer name="SDM_Altapay_Checkout_Cart_Index" instance="SDM\Altapay\Observer\CheckoutCartIndex" />
     </event>
 
 </config>

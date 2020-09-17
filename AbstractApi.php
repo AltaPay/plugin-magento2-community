@@ -21,10 +21,10 @@
  * THE SOFTWARE.
  */
 
-namespace SDM\Valitor;
+namespace SDM\Altapay;
 
-use SDM\Valitor\Exceptions;
-use SDM\Valitor\Response\AbstractResponse;
+use SDM\Altapay\Exceptions;
+use SDM\Altapay\Response\AbstractResponse;
 use GuzzleHttp\Client;
 use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Exception\ClientException as GuzzleHttpClientException;
@@ -211,19 +211,6 @@ abstract class AbstractApi
     }
 
     /**
-     * Handle exception response
-     *
-     * @param Exceptions\ClientException $exception
-     *
-     * @return bool|void
-     * @throws Exceptions\ClientException
-     */
-    protected function handleExceptionResponse(Exceptions\ClientException $exception)
-    {
-        throw $exception;
-    }
-
-    /**
      * Resolve options
      */
     protected function doConfigureOptions()
@@ -293,9 +280,7 @@ abstract class AbstractApi
 
             return $output;
         } catch (GuzzleHttpClientException $e) {
-            $exception = new Exceptions\ClientException($e->getMessage(), $e->getRequest(), $e->getResponse());
-
-            return $this->handleExceptionResponse($exception);
+            throw new Exceptions\ClientException($e->getMessage(), $e->getRequest(), $e->getResponse());
         }
     }
 

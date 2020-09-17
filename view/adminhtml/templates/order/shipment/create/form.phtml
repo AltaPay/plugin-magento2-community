@@ -1,8 +1,8 @@
 <?php
 /**
- * Valitor Module for Magento 2.x.
+ * Altapay Module for Magento 2.x.
  *
- * Copyright © 2018 Valitor. All rights reserved.
+ * Copyright © 2018 Altapay. All rights reserved.
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -13,7 +13,7 @@
 <form id="edit_form" method="post" action="<?= /* @escapeNotVerified */ $block->getSaveUrl() ?>">
     <?= $block->getBlockHtml('formkey') ?>
     <?php  $_order = $block->getShipment()->getOrder() ?>
-    <?php $helper = $this->helper('SDM\Valitor\Helper\Data'); ?>
+    <?php $helper = $this->helper('SDM\Altapay\Helper\Data'); ?>
     <?= $block->getChildHtml('order_info') ?>
     <div class="admin__page-section">
         <div class="admin__page-section-title">

@@ -21,13 +21,13 @@
  * THE SOFTWARE.
  */
 
-namespace SDM\Valitor\Api\Others;
+namespace SDM\Altapay\Api\Others;
 
-use SDM\Valitor\AbstractApi;
+use SDM\Altapay\AbstractApi;
 use SDM\Request\Giftcard;
-use SDM\Valitor\Response\GiftcardResponse;
-use SDM\Valitor\Serializer\ResponseSerializer;
-use SDM\Valitor\Traits\TerminalTrait;
+use SDM\Altapay\Response\GiftcardResponse;
+use SDM\Altapay\Serializer\ResponseSerializer;
+use SDM\Altapay\Traits\TerminalTrait;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
 use Symfony\Component\OptionsResolver\OptionsResolver;

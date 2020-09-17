@@ -1,28 +1,28 @@
 <?php
 /**
- * Valitor Module for Magento 2.x.
+ * Altapay Module for Magento 2.x.
  *
- * Copyright © 2018 Valitor. All rights reserved.
+ * Copyright © 2018 Altapay. All rights reserved.
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
 
-namespace SDM\Valitor\Test\Unit\Model;
+namespace SDM\Altapay\Test\Unit\Model;
 
 use Magento\Sales\Model\Order;
-use SDM\Valitor\Model\Generator as ClassToTest;
+use SDM\Altapay\Model\Generator as ClassToTest;
 use Magento\Framework\TestFramework\Unit\Helper\ObjectManager;
-use SDM\Valitor\Test\Unit\MainTestCase;
+use SDM\Altapay\Test\Unit\MainTestCase;
 use Magento\Store\Model\Store;
-use SDM\Valitor\Model\SystemConfig;
-use Valitor\Api\Test\TestAuthentication;
-use Valitor\Api\Ecommerce\PaymentRequest;
-use Valitor\Request\Address;
-use Valitor\Request\Customer;
-use Valitor\Request\OrderLine;
-use SDM\Valitor\Test\Unit\ConstantTestConfig;
-use Valitor\Api\Ecommerce\Callback;
-use Valitor\Response\CallbackResponse;
+use SDM\Altapay\Model\SystemConfig;
+use Altapay\Api\Test\TestAuthentication;
+use Altapay\Api\Ecommerce\PaymentRequest;
+use Altapay\Request\Address;
+use Altapay\Request\Customer;
+use Altapay\Request\OrderLine;
+use SDM\Altapay\Test\Unit\ConstantTestConfig;
+use Altapay\Api\Ecommerce\Callback;
+use Altapay\Response\CallbackResponse;
 
 /**
  * Class GeneratorTest
@@ -60,11 +60,11 @@ class GeneratorTest extends MainTestCase
             'shop_orderid'       => '000000289',
             'currency'           => '208',
             'transaction_info'   => [
-                'ecomPlatform'         => 'Magento',
-                'ecomVersion'          => '2.3.2',
-                'valitorPluginName'    => 'SDM_Valitor',
-                'valitorPluginVersion' => '1.3.4',
-                'otherInfo'            => 'websiteName - Main Website, storeName - Danish Store View',
+                'ecomPlatform'      => 'Magento',
+                'ecomVersion'       => '2.3.2',
+                'ecomPluginName'    => 'SDM_Altapay',
+                'ecomPluginVersion' => '1.3.4',
+                'otherInfo'         => 'websiteName - Main Website, storeName - Danish Store View',
             ],
             'type'               => 'payment',
             'embedded_window'    => '0',
@@ -140,8 +140,8 @@ class GeneratorTest extends MainTestCase
                 <PaymentInfos>
                     <PaymentInfo name="ecomPlatform"><![CDATA[Magento]]></PaymentInfo>
                     <PaymentInfo name="ecomVersion"><![CDATA[2.3.2]]></PaymentInfo>
-                    <PaymentInfo name="valitorPluginName"><![CDATA[SDM_Valitor]]></PaymentInfo>
-                    <PaymentInfo name="valitorPluginVersion"><![CDATA[1.3.5]]></PaymentInfo>
+                    <PaymentInfo name="ecomPluginName"><![CDATA[SDM_Altapay]]></PaymentInfo>
+                    <PaymentInfo name="ecomPluginVersion"><![CDATA[1.3.5]]></PaymentInfo>
                     <PaymentInfo name="otherInfo"><![CDATA[websiteName - Main Website, storeName - Danish Store View]]></PaymentInfo>
                 </PaymentInfos>
                 <CustomerInfo>
@@ -242,7 +242,7 @@ XML
         ))->setGoodsType('shipment');
         $request->setOrderLines($orderlines);
         $response                 = $request->call();
-        $requestParams['result']  = __('success');
+        $requestParams['result']  = 'success';
         $requestParams['formurl'] = $response->Url;
 
         $this->assertEquals($requestParams, $result);

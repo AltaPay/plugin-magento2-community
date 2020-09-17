@@ -1,17 +1,17 @@
 <?php
 /**
- * Valitor Module for Magento 2.x.
+ * Altapay Module for Magento 2.x.
  *
- * Copyright © 2018 Valitor. All rights reserved.
+ * Copyright © 2018 Altapay. All rights reserved.
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
 
-namespace SDM\Valitor\Observer;
+namespace SDM\Altapay\Observer;
 
 use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
-use SDM\Valitor\Model\Handler\RestoreQuote;
+use SDM\Altapay\Model\Handler\RestoreQuote;
 
 class CheckoutCartIndex implements ObserverInterface
 {

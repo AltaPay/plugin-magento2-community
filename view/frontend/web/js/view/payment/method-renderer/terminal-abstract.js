@@ -1,7 +1,7 @@
 /**
- * Valitor Module for Magento 2.x.
+ * Altapay Module for Magento 2.x.
  *
- * Copyright © 2018 Valitor. All rights reserved.
+ * Copyright © 2018 Altapay. All rights reserved.
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -14,26 +14,26 @@ define(
         'jquery',
         'Magento_Checkout/js/view/payment/default',
         'Magento_Customer/js/customer-data',
-        'SDM_Valitor/js/action/set-payment'
+        'SDM_Altapay/js/action/set-payment'
     ],
     function ($, Component, storage, Action) {
         'use strict';
 
         return Component.extend({
             defaults: {
-                template: 'SDM_Valitor/payment/terminal',
+                template: 'SDM_Altapay/payment/terminal',
                 terminal: '1'
             },
 
             redirectAfterPlaceOrder: false,
 
             placeOrder: function () {
-                $('#valitor-error-message').text('');
+                $('#altapay-error-message').text('');
                 var auth = window.checkoutConfig.payment[this.getDefaultCode()].auth;
                 var connection = window.checkoutConfig.payment[this.getDefaultCode()].connection;
                 if (!auth || !connection) {
-                    $(".payment-method._active").find('#valitor-error-message').css('display', 'block');
-                    $(".payment-method._active").find('#valitor-error-message').text('Could not authenticate with API');
+                    $(".payment-method._active").find('#altapay-error-message').css('display', 'block');
+                    $(".payment-method._active").find('#altapay-error-message').text('Could not authenticate with API');
                     return false;
                 }
 
@@ -82,7 +82,7 @@ define(
 
             },
             getDefaultCode: function () {
-                return 'sdm_valitor';
+                return 'sdm_altapay';
             },
             terminalLogo: function () {
                 var self = this;
