@@ -13,6 +13,7 @@ use Magento\Framework\Setup\ModuleContextInterface;
 use Magento\Framework\Setup\SchemaSetupInterface;
 use Magento\Framework\Setup\UpgradeSchemaInterface;
 use Magento\Framework\DB\Ddl\Table;
+use SDM\Altapay\Api\Data\TransactionInterface;
 
 class UpgradeSchema implements UpgradeSchemaInterface
 {
@@ -104,9 +105,9 @@ class UpgradeSchema implements UpgradeSchemaInterface
          * Replace database table from sdm_valitor to sdm_altapay
          */
         if ($setup->getConnection()->isTableExists($setup->getTable('sdm_valitor')) == true
-            && $setup->getConnection()->isTableExists($setup->getTable('sdm_altapay')) == false
+            && $setup->getConnection()->isTableExists($setup->getTable(TransactionInterface::TABLE_NAME)) == false
         ) {
-            $setup->getConnection()->renameTable($setup->getTable('sdm_valitor'), $setup->getTable('sdm_altapay'));
+            $setup->getConnection()->renameTable($setup->getTable('sdm_valitor'), $setup->getTable(TransactionInterface::TABLE_NAME));
         }
         /**
          * Replace database table from valitor_token to altapay_token

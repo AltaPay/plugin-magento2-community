@@ -32,7 +32,7 @@ class InstallSchema implements InstallSchemaInterface
         $installer->startSetup();
 
         if ($setup->getConnection()->isTableExists($setup->getTable('sdm_valitor')) == true) {
-            $setup->getConnection()->renameTable($setup->getTable('sdm_valitor'), $setup->getTable('sdm_altapay'));
+            $setup->getConnection()->renameTable($setup->getTable('sdm_valitor'), $setup->getTable(TransactionInterface::TABLE_NAME));
         } else {
             // Create transaction data schema
             $table = $installer->getConnection()->newTable($installer->getTable(TransactionInterface::TABLE_NAME));
