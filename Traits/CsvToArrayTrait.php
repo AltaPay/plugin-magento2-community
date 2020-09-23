@@ -21,7 +21,7 @@
  * THE SOFTWARE.
  */
 
-namespace SDM\Valitor\Traits;
+namespace SDM\Altapay\Traits;
 
 use GuzzleHttp\Psr7\Response;
 

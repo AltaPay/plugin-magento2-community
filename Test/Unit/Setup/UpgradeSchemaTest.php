@@ -1,21 +1,21 @@
 <?php
 /**
- * Valitor Module for Magento 2.x.
+ * Altapay Module for Magento 2.x.
  *
- * Copyright © 2018 Valitor. All rights reserved.
+ * Copyright © 2018 Altapay. All rights reserved.
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
 
-namespace SDM\Valitor\Test\Unit\Setup;
+namespace SDM\Altapay\Test\Unit\Setup;
 
-use SDM\Valitor\Setup\UpgradeSchema as ClassToTest;
+use SDM\Altapay\Setup\UpgradeSchema as ClassToTest;
 use Magento\Framework\TestFramework\Unit\Helper\ObjectManager;
 use Magento\Framework\Setup\SchemaSetupInterface;
 use Magento\Framework\Setup\ModuleContextInterface;
 use Magento\Framework\DB\Adapter\AdapterInterface;
 use Magento\Framework\DB\Ddl\Table;
-use SDM\Valitor\Test\Unit\MainTestCase;
+use SDM\Altapay\Test\Unit\MainTestCase;
 
 class UpgradeSchemaTest extends MainTestCase
 {

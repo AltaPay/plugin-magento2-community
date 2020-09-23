@@ -1,29 +1,29 @@
 <?php
 /**
- * Valitor Module for Magento 2.x.
+ * Altapay Module for Magento 2.x.
  *
- * Copyright © 2018 Valitor. All rights reserved.
+ * Copyright © 2018 Altapay. All rights reserved.
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
 
-namespace SDM\Valitor\Observer;
+namespace SDM\Altapay\Observer;
 
 use Magento\Sales\Model\Order\Invoice;
 use Magento\Sales\Model\Order\Payment;
-use SDM\Valitor\Api\Payments\CaptureReservation;
-use SDM\Valitor\Exceptions\ResponseHeaderException;
-use SDM\Valitor\Response\CaptureReservationResponse;
+use SDM\Altapay\Api\Payments\CaptureReservation;
+use SDM\Altapay\Exceptions\ResponseHeaderException;
+use SDM\Altapay\Response\CaptureReservationResponse;
 use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
-use SDM\Valitor\Logger\Logger;
-use SDM\Valitor\Model\SystemConfig;
+use SDM\Altapay\Logger\Logger;
+use SDM\Altapay\Model\SystemConfig;
 use Magento\Sales\Model\Order;
-use SDM\Valitor\Helper\Data;
-use SDM\Valitor\Helper\Config as storeConfig;
-use SDM\Valitor\Model\Handler\OrderLinesHandler;
-use SDM\Valitor\Model\Handler\PriceHandler;
-use SDM\Valitor\Model\Handler\DiscountHandler;
+use SDM\Altapay\Helper\Data;
+use SDM\Altapay\Helper\Config as storeConfig;
+use SDM\Altapay\Model\Handler\OrderLinesHandler;
+use SDM\Altapay\Model\Handler\PriceHandler;
+use SDM\Altapay\Model\Handler\DiscountHandler;
 
 /**
  * Class CaptureObserver
@@ -38,7 +38,7 @@ class CaptureObserver implements ObserverInterface
     /**
      * @var Logger
      */
-    private $valitorLogger;
+    private $altapayLogger;
     /**
      * @var Order
      */
@@ -69,7 +69,7 @@ class CaptureObserver implements ObserverInterface
      * CaptureObserver constructor.
      *
      * @param SystemConfig      $systemConfig
-     * @param Logger            $valitorLogger
+     * @param Logger            $altapayLogger
      * @param Order             $order
      * @param Data              $helper
      * @param storeConfig       $storeConfig
@@ -79,7 +79,7 @@ class CaptureObserver implements ObserverInterface
      */
     public function __construct(
         SystemConfig $systemConfig,
-        Logger $valitorLogger,
+        Logger $altapayLogger,
         Order $order,
         Data $helper,
         storeConfig $storeConfig,
@@ -88,7 +88,7 @@ class CaptureObserver implements ObserverInterface
         DiscountHandler $discountHandler
     ) {
         $this->systemConfig    = $systemConfig;
-        $this->valitorLogger   = $valitorLogger;
+        $this->altapayLogger   = $altapayLogger;
         $this->order           = $order;
         $this->helper          = $helper;
         $this->storeConfig     = $storeConfig;
@@ -110,25 +110,24 @@ class CaptureObserver implements ObserverInterface
         $orderIncrementId = $invoice->getOrder()->getIncrementId();
         $orderObject      = $this->order->loadByIncrementId($orderIncrementId);
         $storeCode        = $invoice->getStore()->getCode();
-        $storePriceIncTax = $this->storeConfig->storePriceIncTax($invoice->getOrder());
         if (in_array($payment->getMethod(), SystemConfig::getTerminalCodes())) {
             //Create orderlines from order items
-            $orderLines = $this->processInvoiceOrderLines($storePriceIncTax, $invoice);
+            $orderLines = $this->processInvoiceOrderLines($invoice);
             //Send request for payment refund
             $this->sendInvoiceRequest($invoice, $orderLines, $orderObject, $payment, $storeCode);
         }
     }
 
     /**
-     * @param $storePriceIncTax
      * @param $invoice
+     *
      * @return array
      */
-    private function processInvoiceOrderLines($storePriceIncTax, $invoice)
+    private function processInvoiceOrderLines($invoice)
     {
         $couponCode       = $invoice->getDiscountDescription();
         $couponCodeAmount = $invoice->getDiscountAmount();
-        //Return true if disocunt enabled on all items
+        //Return true if discount enabled on all items
         $discountAllItems = $this->discountHandler->allItemsHaveDiscount($invoice->getOrder()->getAllVisibleItems());
         //order lines for items
         $orderLines = $this->itemOrderLines($couponCodeAmount, $invoice, $discountAllItems);
@@ -139,7 +138,7 @@ class CaptureObserver implements ObserverInterface
         }
         if ($invoice->getShippingInclTax() > 0) {
             //order lines for shipping
-            $orderLines[] = $this->orderLines->handleShipping($storePriceIncTax, $invoice, $discountAllItems, false);
+            $orderLines[] = $this->orderLines->handleShipping($invoice, $discountAllItems, false);
             //Shipping Discount Tax Compensation Amount
             $compAmount = $this->discountHandler->hiddenTaxDiscountCompensation($invoice, $discountAllItems, false);
             if ($compAmount > 0 && $discountAllItems == false) {
@@ -149,6 +148,10 @@ class CaptureObserver implements ObserverInterface
                     $compAmount
                 );
             }
+        }
+        if(!empty($this->fixedProductTax($invoice))){
+            //order lines for FPT
+            $orderLines[] = $this->orderLines->fixedProductTaxOrderLine($this->fixedProductTax($invoice));
         }
 
         return $orderLines;
@@ -281,17 +284,17 @@ class CaptureObserver implements ObserverInterface
         try {
             $response = $api->call();
         } catch (ResponseHeaderException $e) {
-            $this->valitorLogger->addInfoLog('Info', $e->getHeader());
-            $this->valitorLogger->addCriticalLog('Response header exception', $e->getMessage());
+            $this->altapayLogger->addInfoLog('Info', $e->getHeader());
+            $this->altapayLogger->addCriticalLog('Response header exception', $e->getMessage());
             throw $e;
         } catch (\Exception $e) {
-            $this->valitorLogger->addCriticalLog('Exception', $e->getMessage());
+            $this->altapayLogger->addCriticalLog('Exception', $e->getMessage());
         }
 
         $rawResponse = $api->getRawResponse();
         if (!empty($rawResponse)) {
             $body = $rawResponse->getBody();
-            $this->valitorLogger->addInfo('Response body: ' . $body);
+            $this->altapayLogger->addInfo('Response body: ' . $body);
             //Update comments if capture fail
             $xml = simplexml_load_string($body);
             if ($xml->Body->Result == 'Error' || $xml->Body->Result == 'Failed') {
@@ -304,10 +307,25 @@ class CaptureObserver implements ObserverInterface
             foreach ($rawResponse->getHeaders() as $k => $v) {
                 $headData[] = $k . ': ' . json_encode($v);
             }
-            $this->valitorLogger->addInfoLog('Response headers', implode(", ", $headData));
+            $this->altapayLogger->addInfoLog('Response headers', implode(", ", $headData));
         }
         if (!isset($response->Result) || $response->Result != 'Success') {
             throw new \InvalidArgumentException('Could not capture reservation');
         }
+    }
+
+    /**
+     * @param $order
+     *
+     * @return float|int
+     */
+    public function fixedProductTax($invoice){
+
+        $weeTaxAmount = 0;
+        foreach ($invoice->getAllItems() as $item) {
+           $weeTaxAmount +=  $item->getWeeeTaxAppliedRowAmount();
+        }
+
+       return $weeTaxAmount;
     }
 }

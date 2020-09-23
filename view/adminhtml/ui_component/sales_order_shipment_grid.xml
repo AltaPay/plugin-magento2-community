@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
 /**
- * Valitor Module for Magento 2.x.
+ * Altapay Module for Magento 2.x.
  *
- * Copyright © 2018 Valitor. All rights reserved.
+ * Copyright © 2018 Altapay. All rights reserved.
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -11,7 +11,7 @@
 
 <listing xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
     <columns name="sales_order_shipment_columns">
-        <column name="payment_method_title1" class="SDM\Valitor\Ui\Component\Listing\Column\PaymentMethod">
+        <column name="payment_method_title1" class="SDM\Altapay\Ui\Component\Listing\Column\PaymentMethod">
             <settings>
                 <filter>false</filter>
                 <label translate="true">Store Specific Payment Title1</label>

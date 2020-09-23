@@ -1,30 +1,30 @@
 <?php
 /**
- * Valitor Module for Magento 2.x.
+ * Altapay Module for Magento 2.x.
  *
- * Copyright © 2018 Valitor. All rights reserved.
+ * Copyright © 2018 Altapay. All rights reserved.
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
 
-namespace SDM\Valitor\Model;
+namespace SDM\Altapay\Model;
 
 use Magento\Framework\Exception\AlreadyExistsException;
-use SDM\Valitor\Api\Ecommerce\Callback;
-use SDM\Valitor\Response\CallbackResponse;
+use SDM\Altapay\Api\Ecommerce\Callback;
+use SDM\Altapay\Response\CallbackResponse;
 use Magento\Checkout\Model\Session;
 use Magento\Framework\App\Request\Http;
 use Magento\Framework\App\RequestInterface;
-use SDM\Valitor\Logger\Logger;
+use SDM\Altapay\Logger\Logger;
 use Magento\Quote\Model\Quote;
 use Magento\Sales\Model\Order;
 use Magento\Sales\Model\Order\Email\Sender\OrderSender;
-use SDM\Valitor\Api\TransactionRepositoryInterface;
-use SDM\Valitor\Api\OrderLoaderInterface;
+use SDM\Altapay\Api\TransactionRepositoryInterface;
+use SDM\Altapay\Api\OrderLoaderInterface;
 use Magento\Framework\DB\TransactionFactory;
 use Magento\Sales\Model\Service\InvoiceService;
-use SDM\Valitor\Model\Handler\OrderLinesHandler;
-use SDM\Valitor\Model\Handler\CreatePaymentHandler;
+use SDM\Altapay\Model\Handler\OrderLinesHandler;
+use SDM\Altapay\Model\Handler\CreatePaymentHandler;
 
 /**
  * Class Generator
@@ -68,7 +68,7 @@ class Generator
     /**
      * @var Logger
      */
-    private $valitorLogger;
+    private $altapayLogger;
 
     /**
      * @var TransactionRepositoryInterface
@@ -102,7 +102,7 @@ class Generator
      * @param Order                          $order
      * @param OrderSender                    $orderSender
      * @param SystemConfig                   $systemConfig
-     * @param Logger                         $valitorLogger
+     * @param Logger                         $altapayLogger
      * @param TransactionRepositoryInterface $transactionRepository
      * @param OrderLoaderInterface           $orderLoader
      * @param TransactionFactory             $transactionFactory
@@ -117,7 +117,7 @@ class Generator
         Order $order,
         OrderSender $orderSender,
         SystemConfig $systemConfig,
-        Logger $valitorLogger,
+        Logger $altapayLogger,
         TransactionRepositoryInterface $transactionRepository,
         OrderLoaderInterface $orderLoader,
         TransactionFactory $transactionFactory,
@@ -132,7 +132,7 @@ class Generator
         $this->orderSender           = $orderSender;
         $this->invoiceService        = $invoiceService;
         $this->systemConfig          = $systemConfig;
-        $this->valitorLogger         = $valitorLogger;
+        $this->altapayLogger         = $altapayLogger;
         $this->transactionRepository = $transactionRepository;
         $this->transactionFactory    = $transactionFactory;
         $this->orderLoader           = $orderLoader;
@@ -151,12 +151,12 @@ class Generator
         $callback = new Callback($request->getPostValue());
         $response = $callback->call();
         if ($response) {
-            $this->valitorLogger->addDebugLog('[restoreOrderFromRequest] Response correct', $response);
+            $this->altapayLogger->addDebugLog('[restoreOrderFromRequest] Response correct', $response);
             $order = $this->orderLoader->getOrderByOrderIncrementId($response->shopOrderId);
             if ($order->getQuoteId()) {
-                $this->valitorLogger->addDebugLog('[restoreOrderFromRequest] Order quote id', $order->getQuoteId());
+                $this->altapayLogger->addDebugLog('[restoreOrderFromRequest] Order quote id', $order->getQuoteId());
                 if ($quote = $this->quote->loadByIdWithoutStore($order->getQuoteId())) {
-                    $this->valitorLogger->addDebugLog('[restoreOrderFromRequest] Quote found', $order->getQuoteId());
+                    $this->altapayLogger->addDebugLog('[restoreOrderFromRequest] Quote found', $order->getQuoteId());
                     $quote->setIsActive(1)->setReservedOrderId(null)->save();
                     $this->checkoutSession->replaceQuote($quote);
 
@@ -261,7 +261,7 @@ class Generator
         $response = $callback->call();
         if ($response) {
             $order   = $this->orderLoader->getOrderByOrderIncrementId($response->shopOrderId);
-            $formUrl = $order->getValitorPaymentFormUrl();
+            $formUrl = $order->getAltapayPaymentFormUrl();
             if ($formUrl) {
                 $order->addStatusHistoryComment(__(ConstantConfig::DECLINED_PAYMENT_FORM));
             } else {
@@ -402,7 +402,7 @@ class Generator
                 //send order confirmation email
                 $this->sendOrderConfirmationEmail($comment, $order);
                 //unset redirect if success
-                $this->checkoutSession->unsValitorCustomerRedirect();
+                $this->checkoutSession->unsAltapayCustomerRedirect();
                 //save transaction data
                 $parametersData  = json_encode($request->getPostValue());
                 $transactionData = json_encode($response);

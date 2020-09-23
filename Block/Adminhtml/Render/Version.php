@@ -1,24 +1,25 @@
 <?php
 /**
- * Valitor Module for Magento 2.x.
+ * Altapay Module for Magento 2.x.
  *
- * Copyright © 2018 Valitor. All rights reserved.
+ * Copyright © 2018 Altapay. All rights reserved.
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
 
-namespace SDM\Valitor\Block\Adminhtml\Render;
+namespace SDM\Altapay\Block\Adminhtml\Render;
 
 use Magento\Config\Block\System\Config\Form\Field;
 use Magento\Backend\Block\Template\Context;
 use Magento\Framework\Data\Form\Element\AbstractElement;
 use Magento\Framework\Module\ModuleListInterface;
-use SDM\Valitor\Response\TerminalsResponse;
-use SDM\Valitor\Model\SystemConfig;
+use SDM\Altapay\Response\TerminalsResponse;
+use SDM\Altapay\Model\SystemConfig;
+use SDM\Altapay\Logger\Logger;
 
 class Version extends Field
 {
-    const MODULE_CODE = 'SDM_Valitor';
+    const MODULE_CODE = 'SDM_Altapay';
     /**
      * @var ModuleListInterface
      */
@@ -28,6 +29,10 @@ class Version extends Field
      * @var SystemConfig
      */
     private $systemConfig;
+    /**
+     * @var Logger
+     */
+    private $altapayLogger;
 
     /**
      * Version constructor.
@@ -35,17 +40,19 @@ class Version extends Field
      * @param Context             $context
      * @param ModuleListInterface $moduleList
      * @param SystemConfig        $systemConfig
+     * @param Logger              $altapayLogger
      */
     public function __construct(
         Context $context,
         ModuleListInterface $moduleList,
-        SystemConfig $systemConfig
+        SystemConfig $systemConfig,
+        Logger $altapayLogger
     ) {
         $this->moduleList = $moduleList;
         parent::__construct($context);
-        $this->systemConfig = $systemConfig;
+        $this->systemConfig  = $systemConfig;
+        $this->altapayLogger = $altapayLogger;
     }
-
 
     /**
      * Render module version
@@ -59,7 +66,7 @@ class Version extends Field
         $html       = '';
         $moduleInfo = $this->moduleList->getOne(self::MODULE_CODE);
         try {
-            $call = new \SDM\Valitor\Api\Others\Terminals($this->systemConfig->getAuth());
+            $call = new \SDM\Altapay\Api\Others\Terminals($this->systemConfig->getAuth());
             /** @var TerminalsResponse $response */
             $response  = $call->call();
             $terminals = [];
@@ -85,6 +92,7 @@ class Version extends Field
             $html .= "</tr>";
 
         } catch (\Exception $e) {
+            $this->altapayLogger->addCriticalLog('Exception', $e->getMessage());
         }
 
         $html .= '<tr id="row_' . $element->getHtmlId() . '">';

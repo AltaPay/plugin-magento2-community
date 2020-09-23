@@ -1,18 +1,19 @@
 <?php
 /**
- * Valitor Module for Magento 2.x.
+ * Altapay Module for Magento 2.x.
  *
- * Copyright © 2018 Valitor. All rights reserved.
+ * Copyright © 2018 Altapay. All rights reserved.
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
 
-namespace SDM\Valitor\Setup;
+namespace SDM\Altapay\Setup;
 
 use Magento\Framework\Setup\ModuleContextInterface;
 use Magento\Framework\Setup\SchemaSetupInterface;
 use Magento\Framework\Setup\UpgradeSchemaInterface;
 use Magento\Framework\DB\Ddl\Table;
+use SDM\Altapay\Api\Data\TransactionInterface;
 
 class UpgradeSchema implements UpgradeSchemaInterface
 {
@@ -29,8 +30,8 @@ class UpgradeSchema implements UpgradeSchemaInterface
         //Add a new attribute for the redirect to the payment form
         $setup->startSetup();
         $orderTable    = 'sales_order';
-        $columnName    = 'valitor_payment_form_url';
-        $oldColumnName = 'altapay_payment_form_url';
+        $columnName    = 'altapay_payment_form_url';
+        $oldColumnName = 'valitor_payment_form_url';
         if (!$setup->getConnection()->tableColumnExists($setup->getTable($orderTable), $columnName)) {
             if ($setup->getConnection()->tableColumnExists($setup->getTable($orderTable), $oldColumnName)) {
                 $setup->getConnection()->changeColumn(
@@ -42,7 +43,7 @@ class UpgradeSchema implements UpgradeSchemaInterface
                         'length'   => 655366,
                         'nullable' => true,
                         'visible'  => false,
-                        'comment'  => 'Valitor Payment Form Url',
+                        'comment'  => 'Altapay Payment Form Url',
                     ]
                 );
             } else {
@@ -54,7 +55,7 @@ class UpgradeSchema implements UpgradeSchemaInterface
                         'length'   => 65536,
                         'nullable' => true,
                         'visible'  => false,
-                        'comment'  => 'Valitor Payment Form Url',
+                        'comment'  => 'Altapay Payment Form Url',
                     ]
                 );
             }
@@ -64,24 +65,59 @@ class UpgradeSchema implements UpgradeSchemaInterface
                 $oldColumnName
             );
         }
-        $columnTaxConfig = 'valitor_price_includes_tax';
+        /**
+         * Replace database priceInclusive column
+         */
+        $columnTaxConfig    = 'altapay_price_includes_tax';
+        $oldColumnTaxConfig = 'valitor_price_includes_tax';
         if (!$setup->getConnection()->tableColumnExists($setup->getTable($orderTable), $columnTaxConfig)) {
-            $setup->getConnection()->addColumn(
+            if ($setup->getConnection()->tableColumnExists($setup->getTable($orderTable), $oldColumnTaxConfig)) {
+                $setup->getConnection()->changeColumn(
+                    $setup->getTable('sales_order'),
+                    $oldColumnTaxConfig,
+                    $columnTaxConfig,
+                    [
+                        'type'     => Table::TYPE_BOOLEAN,
+                        'nullable' => true,
+                        'visible'  => false,
+                        'comment'  => 'Whether catalog prices entered from Magento Admin include tax.',
+                    ]
+                );
+            } else {
+                $setup->getConnection()->addColumn(
+                    $setup->getTable($orderTable),
+                    $columnTaxConfig,
+                    [
+                        'type'     => Table::TYPE_BOOLEAN,
+                        'nullable' => true,
+                        'visible'  => false,
+                        'comment'  => 'Whether catalog prices entered from Magento Admin include tax.',
+                    ]
+                );
+            }
+        } elseif ($setup->getConnection()->tableColumnExists($setup->getTable($orderTable), $oldColumnTaxConfig)) {
+            $setup->getConnection()->dropColumn(
                 $setup->getTable($orderTable),
-                $columnTaxConfig,
-                [
-                    'type'     => Table::TYPE_BOOLEAN,
-                    'nullable' => true,
-                    'visible'  => false,
-                    'comment'  => 'Whether catalog prices entered from Magento Admin include tax.',
-                ]
+                $oldColumnTaxConfig
             );
         }
-
-        $valitorTableToken = $setup->getTable('valitor_token');
-        if ($setup->getConnection()->isTableExists($valitorTableToken) != true) {
-            $valitorTableToken = $setup->getConnection()->newTable(
-                $valitorTableToken
+        /**
+         * Replace database table from sdm_valitor to sdm_altapay
+         */
+        if ($setup->getConnection()->isTableExists($setup->getTable('sdm_valitor')) == true
+            && $setup->getConnection()->isTableExists($setup->getTable(TransactionInterface::TABLE_NAME)) == false
+        ) {
+            $setup->getConnection()->renameTable($setup->getTable('sdm_valitor'), $setup->getTable(TransactionInterface::TABLE_NAME));
+        }
+        /**
+         * Replace database table from valitor_token to altapay_token
+         */
+        $altapayTokenTableName = $setup->getTable('altapay_token');
+        if ($setup->getConnection()->isTableExists($setup->getTable('valitor_token')) == true) {
+            $setup->getConnection()->renameTable($setup->getTable('valitor_token'), $setup->getTable('altapay_token'));
+        } elseif ($setup->getConnection()->isTableExists($altapayTokenTableName) != true) {
+            $altapayTokenTableName = $setup->getConnection()->newTable(
+                $altapayTokenTableName
             )->addColumn(
                 'id',
                 Table::TYPE_INTEGER,
@@ -141,8 +177,8 @@ class UpgradeSchema implements UpgradeSchemaInterface
                 null,
                 ['nullable' => false, 'default' => ''],
                 'Card Type'
-            )->setComment('Valitor Tokens');
-            $setup->getConnection()->createTable($valitorTableToken);
+            )->setComment('Altapay Tokens');
+            $setup->getConnection()->createTable($altapayTokenTableName);
         }
         $setup->endSetup();
     }

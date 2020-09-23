@@ -1,16 +1,16 @@
 <?xml version="1.0"?>
 <!--
 /**
- * Valitor Module for Magento 2.x.
+ * Altapay Module for Magento 2.x.
  *
- * Copyright © 2018 Valitor. All rights reserved.
+ * Copyright © 2018 Altapay. All rights reserved.
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
 -->
 <routes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Webapi:etc/webapi.xsd">
-    <route url="/V1/valitor/createrequest" method="POST">
-        <service class="SDM\Valitor\Api\GatewayInterface" method="createRequest"/>
+    <route url="/V1/altapay/createrequest" method="POST">
+        <service class="SDM\Altapay\Api\GatewayInterface" method="createRequest"/>
         <resources>
             <resource ref="anonymous"/>
         </resources>

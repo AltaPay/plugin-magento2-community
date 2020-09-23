@@ -1,9 +1,9 @@
 <?xml version="1.0"?>
 <!--
 /**
- * Valitor Module for Magento 2.x.
+ * Altapay Module for Magento 2.x.
  *
- * Copyright © 2018 Valitor. All rights reserved.
+ * Copyright © 2018 Altapay. All rights reserved.
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -19,8 +19,8 @@
             </action>
         </referenceBlock>
         <referenceContainer name="content">
-            <block class="SDM\Valitor\Block\Customer\Savedtoken" name="saved_credit_card"
-                   template="SDM_Valitor::saved_credit_card.phtml" cacheable="false">
+            <block class="SDM\Altapay\Block\Customer\Savedtoken" name="saved_credit_card"
+                   template="SDM_Altapay::saved_credit_card.phtml" cacheable="false">
 
             </block>
         </referenceContainer>

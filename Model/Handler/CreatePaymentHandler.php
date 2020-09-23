@@ -1,21 +1,21 @@
 <?php
 /**
- * Valitor Module for Magento 2.x.
+ * Altapay Module for Magento 2.x.
  *
- * Copyright © 2018 Valitor. All rights reserved.
+ * Copyright © 2018 Altapay. All rights reserved.
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
 
-namespace SDM\Valitor\Model\Handler;
+namespace SDM\Altapay\Model\Handler;
 
-use SDM\Valitor\Model\SystemConfig;
+use SDM\Altapay\Model\SystemConfig;
 use Magento\Sales\Model\Order;
 
 /**
  * Class CreatePaymentHandler
  * To handle the functionality related to create payment
- * request at valitor.
+ * request at altapay.
  */
 class CreatePaymentHandler
 {

@@ -1,15 +1,15 @@
 <?php
 /**
- * Valitor Module for Magento 2.x.
+ * Altapay Module for Magento 2.x.
  *
- * Copyright © 2018 Valitor. All rights reserved.
+ * Copyright © 2018 Altapay. All rights reserved.
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
 
-namespace SDM\Valitor\Model;
+namespace SDM\Altapay\Model;
 
-use SDM\Valitor\Authentication;
+use SDM\Altapay\Authentication;
 use Magento\Config\Model\Config\Backend\Encrypted;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Store\Model\StoreManagerInterface;
@@ -86,11 +86,11 @@ class SystemConfig
     public static function getTerminalCodes()
     {
         return [
-            \SDM\Valitor\Model\Method\Terminal1::METHOD_CODE,
-            \SDM\Valitor\Model\Method\Terminal2::METHOD_CODE,
-            \SDM\Valitor\Model\Method\Terminal3::METHOD_CODE,
-            \SDM\Valitor\Model\Method\Terminal4::METHOD_CODE,
-            \SDM\Valitor\Model\Method\Terminal5::METHOD_CODE
+            \SDM\Altapay\Model\Method\Terminal1::METHOD_CODE,
+            \SDM\Altapay\Model\Method\Terminal2::METHOD_CODE,
+            \SDM\Altapay\Model\Method\Terminal3::METHOD_CODE,
+            \SDM\Altapay\Model\Method\Terminal4::METHOD_CODE,
+            \SDM\Altapay\Model\Method\Terminal5::METHOD_CODE
         ];
     }
 
@@ -130,7 +130,7 @@ class SystemConfig
 
         return $this->scopeConfig->getValue(
             sprintf(
-                'payment/valitor_status/%s',
+                'payment/altapay_status/%s',
                 $configKey
             ),
             $storeScope,
@@ -192,7 +192,7 @@ class SystemConfig
 
         return $this->scopeConfig->getValue(
             sprintf(
-                'payment/valitor_config/%s',
+                'payment/altapay_config/%s',
                 $configKey
             ),
             $storeScope,

@@ -21,12 +21,12 @@
  * THE SOFTWARE.
  */
 
-namespace SDM\Valitor\Api\Payments;
+namespace SDM\Altapay\Api\Payments;
 
-use SDM\Valitor\AbstractApi;
-use SDM\Valitor\Response\RefundResponse;
-use SDM\Valitor\Serializer\ResponseSerializer;
-use SDM\Valitor\Traits;
+use SDM\Altapay\AbstractApi;
+use SDM\Altapay\Response\RefundResponse;
+use SDM\Altapay\Serializer\ResponseSerializer;
+use SDM\Altapay\Traits;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -119,7 +119,7 @@ class RefundCapturedReservation extends AbstractApi
      * @param Request  $request
      * @param Response $response
      *
-     * @return \Valitor\Response\AbstractResponse|array
+     * @return \Altapay\Response\AbstractResponse|array
      * @throws \Exception
      */
     protected function handleResponse(Request $request, Response $response)
@@ -169,7 +169,6 @@ class RefundCapturedReservation extends AbstractApi
         return $url;
     }
 
-
     /**
      * @return string
      */
@@ -178,11 +177,10 @@ class RefundCapturedReservation extends AbstractApi
         return 'POST';
     }
 
-
     /**
      * Generate the response
      *
-     * @return array|bool|\Valitor\Response\AbstractResponse|void
+     * @return array|bool|\Altapay\Response\AbstractResponse|void
      */
     protected function doResponse()
     {
@@ -203,9 +201,7 @@ class RefundCapturedReservation extends AbstractApi
 
             return $output;
         } catch (GuzzleHttpClientException $e) {
-            $exception = new Exceptions\ClientException($e->getMessage(), $e->getRequest(), $e->getResponse());
-
-            return $this->handleExceptionResponse($exception);
+            throw new Exceptions\ClientException($e->getMessage(), $e->getRequest(), $e->getResponse());
         }
     }
 

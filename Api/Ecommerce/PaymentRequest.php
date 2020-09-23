@@ -21,14 +21,14 @@
  * THE SOFTWARE.
  */
 
-namespace SDM\Valitor\Api\Ecommerce;
+namespace SDM\Altapay\Api\Ecommerce;
 
-use SDM\Valitor\AbstractApi;
-use SDM\Valitor\Request\Config;
-use SDM\Valitor\Response\PaymentRequestResponse;
-use SDM\Valitor\Serializer\ResponseSerializer;
-use SDM\Valitor\Traits;
-use SDM\Valitor\Types;
+use SDM\Altapay\AbstractApi;
+use SDM\Altapay\Request\Config;
+use SDM\Altapay\Response\PaymentRequestResponse;
+use SDM\Altapay\Serializer\ResponseSerializer;
+use SDM\Altapay\Traits;
+use SDM\Altapay\Types;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
 use Symfony\Component\OptionsResolver\Options;
@@ -354,9 +354,9 @@ class PaymentRequest extends AbstractApi
     }
 
     /**
-     * @return \Valitor\Response\AbstractResponse|PaymentRequestResponse|bool|void
-     * @throws \Valitor\Exceptions\ResponseHeaderException
-     * @throws \Valitor\Exceptions\ResponseMessageException
+     * @return \Altapay\Response\AbstractResponse|PaymentRequestResponse|bool|void
+     * @throws \Altapay\Exceptions\ResponseHeaderException
+     * @throws \Altapay\Exceptions\ResponseMessageException
      * @throws \GuzzleHttp\Exception\GuzzleException
      */
     protected function doResponse()
@@ -378,9 +378,7 @@ class PaymentRequest extends AbstractApi
 
             return $output;
         } catch (GuzzleHttpClientException $e) {
-            $exception = new Exceptions\ClientException($e->getMessage(), $e->getRequest(), $e->getResponse());
-
-            return $this->handleExceptionResponse($exception);
+            throw new Exceptions\ClientException($e->getMessage(), $e->getRequest(), $e->getResponse());
         }
     }
 

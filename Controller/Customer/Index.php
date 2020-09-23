@@ -1,18 +1,18 @@
 <?php
 /**
- * Valitor Module for Magento 2.x.
+ * Altapay Module for Magento 2.x.
  *
- * Copyright © 2018 Valitor. All rights reserved.
+ * Copyright © 2018 Altapay. All rights reserved.
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
 
-namespace SDM\Valitor\Controller\Customer;
+namespace SDM\Altapay\Controller\Customer;
 
 use Magento\Framework\App\Action\Action;
 use Magento\Framework\App\Action\Context;
 use Magento\Customer\Model\Session;
-use SDM\Valitor\Model\TokenFactory;
+use SDM\Altapay\Model\TokenFactory;
 use Magento\Framework\Controller\ResultFactory;
 
 class Index extends Action
@@ -47,16 +47,16 @@ class Index extends Action
         $action = $this->getRequest()->getParam('action');
         $model  = $this->tokenFactory->create();
         if ($action == "delete") {
-            $response = array('status' => 'error');
+            $response = ['status' => 'error'];
             $tokenId  = $this->getRequest()->getParam('token_id');
             $token    = $model->load($tokenId);
             if ($token->getId()) {
                 if ($this->checkoutSession->getCustomer()->getId() == $token->getCustomerId()) {
                     try {
                         $model->load($tokenId)->delete();
-                        $response = array('status' => 'deleted');
+                        $response = ['status' => 'deleted'];
                     } catch (\Exception $e) {
-                        $response = array('status' => 'error');
+                        $response = ['status' => 'error'];
                     }
                 }
             }
@@ -67,7 +67,7 @@ class Index extends Action
                                            'status'       => $response
                                        ]);
         } elseif ($action == "primary") {
-            $response = array('status' => 'error');
+            $response = ['status' => 'error'];
             $tokenId  = $this->getRequest()->getParam('token_id');
             $token    = $model->load($tokenId);
             if ($token->getId()) {
@@ -78,14 +78,14 @@ class Index extends Action
                         $model->save();
                         $collection = $this->tokenFactory->create()->getCollection()
                                                          ->addFieldToFilter('customer_id', $token->getCustomerId())
-                                                         ->addFieldToFilter('id', array('neq' => $token->getId()))
+                                                         ->addFieldToFilter('id', ['neq' => $token->getId()])
                                                          ->addFieldToFilter('primary', 1);
                         foreach ($collection as $model) {
                             $model->setPrimary(0)->save();
                         }
-                        $response = array('status' => 'updated');
+                        $response = ['status' => 'updated'];
                     } catch (Exception $e) {
-                        $response = array('status' => 'error');
+                        $response = ['status' => 'error'];
                     }
                 }
             }

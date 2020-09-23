@@ -1,18 +1,18 @@
 <?php
 /**
- * Valitor Module for Magento 2.x.
+ * Altapay Module for Magento 2.x.
  *
- * Copyright © 2018 Valitor. All rights reserved.
+ * Copyright © 2018 Altapay. All rights reserved.
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
 
-namespace SDM\Valitor\Block\Customer;
+namespace SDM\Altapay\Block\Customer;
 
 use Magento\Framework\View\Element\Template;
 use Magento\Customer\Model\Session;
 use Magento\Framework\View\Element\Template\Context;
-use SDM\Valitor\Model\TokenFactory;
+use SDM\Altapay\Model\TokenFactory;
 
 class Savedtoken extends Template
 {
@@ -48,6 +48,6 @@ class Savedtoken extends Template
 
     public function getAjaxUrl()
     {
-        return $this->getUrl("sdmvalitor/customer/index"); // Controller Url
+        return $this->getUrl("sdmaltapay/customer/index"); // Controller Url
     }
 }

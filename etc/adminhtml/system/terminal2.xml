@@ -1,9 +1,9 @@
 <?xml version="1.0"?>
 <!--
 /**
- * Valitor Module for Magento 2.x.
+ * Altapay Module for Magento 2.x.
  *
- * Copyright © 2018 Valitor. All rights reserved.
+ * Copyright © 2018 Altapay. All rights reserved.
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
@@ -25,13 +25,13 @@
             <label>Terminal name</label>
             <comment>Select terminal - Remember to save configuration after you have added your API login and password, to get your terminals</comment>
             <config_path>payment/terminal2/terminalname</config_path>
-            <source_model>SDM\Valitor\Model\Config\Source\Terminals</source_model>
-            <frontend_class>valitor-terminal-name</frontend_class>
+            <source_model>SDM\Altapay\Model\Config\Source\Terminals</source_model>
+            <frontend_class>altapay-terminal-name</frontend_class>
         </field>
         <field id="language" translate="label comment" type="select" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
             <label>Force language</label>
             <comment>Force the language of the payment page</comment>
-            <source_model>SDM\Valitor\Model\Config\Source\Languages</source_model>
+            <source_model>SDM\Altapay\Model\Config\Source\Languages</source_model>
             <config_path>payment/terminal2/language</config_path>
         </field>
         <field id="capture" translate="label comment" type="select" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
@@ -44,7 +44,7 @@
             <label>Terminal Logo</label>
             <comment>Select terminal logo that will be displayed on the store with the terminal name.</comment>
             <config_path>payment/terminal2/terminallogo</config_path>
-            <source_model>SDM\Valitor\Model\Config\Source\TerminalLogo</source_model>
+            <source_model>SDM\Altapay\Model\Config\Source\TerminalLogo</source_model>
         </field>
         <field id="showlogoandtitle" translate="label comment" type="select" sortOrder="50" showInDefault="1" showInWebsite="1" showInStore="1">
             <label>Show both logo and title</label>
@@ -57,7 +57,7 @@
             <comment>If you allow customer to save credit card token</comment>
             <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
             <config_path>payment/terminal2/savecardtoken</config_path>
-            <frontend_class>valitor-terminal-token-control</frontend_class>
+            <frontend_class>altapay-terminal-token-control</frontend_class>
         </field>
         <field id="avscontrol" translate="label comment" type="select" sortOrder="70" showInDefault="1" showInWebsite="1" showInStore="1">
             <label>AVS</label>

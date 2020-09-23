@@ -1,21 +1,21 @@
 <?php
 /**
- * Valitor Module for Magento 2.x.
+ * Altapay Module for Magento 2.x.
  *
- * Copyright © 2018 Valitor. All rights reserved.
+ * Copyright © 2018 Altapay. All rights reserved.
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
 
-namespace SDM\Valitor\Controller;
+namespace SDM\Altapay\Controller;
 
 use Magento\Framework\App\Action\Action;
-use SDM\Valitor\Controller\Index as ClassToTest;
+use SDM\Altapay\Controller\Index as ClassToTest;
 use Magento\Framework\App\Action\Context;
 use Magento\Framework\App\ResponseInterface;
 use Magento\Framework\View\Result\PageFactory;
 use Magento\Framework\TestFramework\Unit\Helper\ObjectManager;
-use SDM\Valitor\Test\Unit\MainTestCase;
+use SDM\Altapay\Test\Unit\MainTestCase;
 
 class IndexTest extends MainTestCase
 {

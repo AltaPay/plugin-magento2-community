@@ -5,6 +5,15 @@ Valitor has made it much easier for you as merchant/developer to receive secure 
 
 == Change log ==
 
+** Version 3.1.0
+
+    * Improvements:
+        - Rebranding from Valitor to Altapay
+        - Supporting fixed product tax configurations
+    * Bug fixes:
+        - Fixed order creation issue with free shipping
+        - Fixed translation issue for status code
+
 ** Version 3.0.0
 
     * Improvements:
