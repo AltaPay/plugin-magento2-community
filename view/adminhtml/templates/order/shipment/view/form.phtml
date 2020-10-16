@@ -25,7 +25,7 @@ $helper = $this->helper('SDM\Altapay\Helper\Data');
                 <span class="title"><?= $block->escapeHtml(__('Payment Information')); ?></span>
             </div>
             <div class="admin__page-section-item-content">
-                <div><?php echo $helper->getPaymentTitleTerminal($_order->getId());?></div>
+                <div><?php echo $helper->getPaymentTitleTerminal($order->getId());?></div>
                 <div class="order-payment-currency">
                     <?= $block->escapeHtml(__('The order was placed using %1.', $order->getOrderCurrencyCode())); ?>
                 </div>
