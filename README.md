@@ -1,9 +1,14 @@
-# ValitorOmni for Magento2 community
+# Altapay for Magento2 community
 
-Valitor has made it much easier for you as merchant/developer to receive secure payments in your Magento2.3.x web shop.
+Altapay has made it much easier for you as merchant/developer to receive secure payments in your Magento2.3.x web shop.
 
 
 == Change log ==
+
+** Version 3.1.1
+
+    * Bug fixes:
+        - Updated shipping template with the minor bug fix
 
 ** Version 3.1.0
 
