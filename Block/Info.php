@@ -1,28 +1,23 @@
 <?php
 /**
- * Valitor Module for Magento 2.x.
+ * Altapay Module for Magento 2.x.
  *
+ * Copyright © 2018 Altapay. All rights reserved.
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
- *
- * @copyright 2018 Valitor
- * @category  payment
- * @package   valitor
  */
-namespace SDM\Valitor\Block;
+
+namespace SDM\Altapay\Block;
 
 use Magento\Payment\Block\Info as BaseInfo;
 
-/**
- * Class Info
- * @package SDM\Valitor\Block
- */
 class Info extends BaseInfo
 {
     /**
      * Prepare credit card related payment info
      *
      * @param \Magento\Framework\DataObject|array $transport
+     *
      * @return \Magento\Framework\DataObject
      */
     protected function _prepareSpecificInformation($transport = null)
@@ -32,15 +27,13 @@ class Info extends BaseInfo
         }
 
         $transport = parent::_prepareSpecificInformation($transport);
-        $data = [];
+        $data      = [];
         if ($transId = $this->getInfo()->getLastTransId()) {
             $data['Transaction Id'] = $transId;
         }
-
         if ($ccTransId = $this->getInfo()->getCcTransId()) {
             $data['Credit card token'] = $ccTransId;
         }
-        
         if ($paymentId = $this->getInfo()->getPaymentId()) {
             $data['Payment ID'] = $paymentId;
         }

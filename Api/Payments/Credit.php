@@ -21,15 +21,15 @@
  * THE SOFTWARE.
  */
 
-namespace SDM\Valitor\Api\Payments;
+namespace SDM\Altapay\Api\Payments;
 
-use SDM\Valitor\AbstractApi;
-use SDM\Valitor\Request\Card;
-use SDM\Valitor\Exceptions\CreditCardTokenAndCardUsedException;
-use SDM\Valitor\Response\CreditResponse;
-use SDM\Valitor\Serializer\ResponseSerializer;
-use SDM\Valitor\Traits;
-use SDM\Valitor\Types\PaymentSources;
+use SDM\Altapay\AbstractApi;
+use SDM\Altapay\Request\Card;
+use SDM\Altapay\Exceptions\CreditCardTokenAndCardUsedException;
+use SDM\Altapay\Response\CreditResponse;
+use SDM\Altapay\Serializer\ResponseSerializer;
+use SDM\Altapay\Traits;
+use SDM\Altapay\Types\PaymentSources;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
 use Symfony\Component\OptionsResolver\Options;

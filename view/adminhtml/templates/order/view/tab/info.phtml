@@ -1,7 +1,10 @@
 <?php
 /**
- * Copyright © Magento, Inc. All rights reserved.
- * See COPYING.txt for license details.
+ * Altapay Module for Magento 2.x.
+ *
+ * Copyright © 2018 Altapay. All rights reserved.
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
  */
 
 // @codingStandardsIgnoreFile
@@ -9,7 +12,7 @@
 ?>
 <?php /** @var $block \Magento\Sales\Block\Adminhtml\Order\View\Tab\Info */ ?>
 <?php $_order = $block->getOrder() ?>
-<?php $helper = $this->helper('SDM\Valitor\Helper\Data'); ?>
+<?php $helper = $this->helper('SDM\Altapay\Helper\Data'); ?>
 <div id="order-messages">
     <?= $block->getChildHtml('order_messages') ?>
 </div>

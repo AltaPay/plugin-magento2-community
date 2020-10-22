@@ -21,9 +21,9 @@
  * THE SOFTWARE.
  */
 
-namespace SDM\Valitor\Response;
+namespace SDM\Altapay\Response;
 
-use SDM\Valitor\Response\Embeds\Transaction;
+use SDM\Altapay\Response\Embeds\Transaction;
 
 /**
  * Class ReleaseReservation
@@ -64,4 +64,9 @@ class ReleaseReservationResponse extends AbstractResponse
      * @var Transaction[]
      */
     public $Transactions;
+
+    /**
+     * @var string
+     */
+    public $MerchantErrorMessage;
 }

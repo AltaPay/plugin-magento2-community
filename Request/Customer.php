@@ -21,9 +21,9 @@
  * THE SOFTWARE.
  */
 
-namespace SDM\Valitor\Request;
+namespace SDM\Altapay\Request;
 
-use SDM\Valitor\Exceptions\Exception;
+use SDM\Altapay\Exceptions\Exception;
 
 class Customer extends AbstractSerializer
 {
@@ -43,6 +43,48 @@ class Customer extends AbstractSerializer
      * @var string
      */
     private $username;
+
+    /**
+     * Indicator of whether the customer is an individual or a business.
+     *
+     * @var string
+     */
+    private $type;
+
+    /**
+     * Name of the customer,if the customer type is Business.
+     *
+     * @var string
+     */
+    private $companyName;
+
+    /**
+     * The nature of the company.
+     *
+     * @var string
+     */
+    private $companyType;
+
+    /**
+     * The company's VAT registration number.
+     *
+     * @var string
+     */
+    private $vatId;
+
+    /**
+     * The name of the person/role who manages the billing for the company.
+     *
+     * @var string
+     */
+    private $billingAtt;
+
+    /**
+     * The name of the person receiving the purchase on behalf of the company.
+     *
+     * @var string
+     */
+    private $shippingAtt;
 
     /**
      * The customer's telephone number.
@@ -116,6 +158,55 @@ class Customer extends AbstractSerializer
     private $gender;
 
     /**
+     * Text entered by the consumer referencing a procurement order, internal ID or similar..
+     *
+     * @var string
+     */
+    private $billingRef;
+
+    /**
+     * Text entered by the consumer referencing a procurement order, internal ID or similar..
+     *
+     * @var string
+     */
+    private $shippingRef;
+
+    /**
+     * Client IP Address.
+     *
+     * @var string
+     */
+    private $clientIP;
+
+    /**
+     * Client accept language.
+     *
+     * @var string
+     */
+    private $clientAcceptLanguage;
+
+    /**
+     * HTTP User Agent.
+     *
+     * @var string
+     */
+    private $httpUserAgent;
+
+    /**
+     * Header that is used by the trusted proxy to refer to.
+     *
+     * @var string
+     */
+    private $httpXForwardedFor;
+
+    /**
+     * Client Session ID.
+     *
+     * @var string
+     */
+    private $clientSessionID;
+
+    /**
      * Customer constructor.
      *
      * @param Address $billingAddress Billing address
@@ -127,11 +218,13 @@ class Customer extends AbstractSerializer
 
     /**
      * @param Address $shipping
+     *
      * @return Customer
      */
     public function setShipping(Address $shipping)
     {
         $this->shipping = $shipping;
+
         return $this;
     }
 
@@ -139,6 +232,7 @@ class Customer extends AbstractSerializer
      * Set Email
      *
      * @param string $email
+     *
      * @return Customer
      */
     public function setEmail($email)
@@ -152,6 +246,7 @@ class Customer extends AbstractSerializer
      * Set Username
      *
      * @param string $username
+     *
      * @return Customer
      */
     public function setUsername($username)
@@ -162,9 +257,94 @@ class Customer extends AbstractSerializer
     }
 
     /**
+     * Set Customer Type
+     *
+     * @param string $type
+     *
+     * @return Customer
+     */
+    public function setType($type)
+    {
+        $this->type = $type;
+
+        return $this;
+    }
+
+    /**
+     * Set Company Name
+     *
+     * @param string $companyName
+     *
+     * @return Customer
+     */
+    public function setCompanyName($companyName)
+    {
+        $this->companyName = $companyName;
+
+        return $this;
+    }
+
+    /**
+     * Set Company Type
+     *
+     * @param string $companyType
+     *
+     * @return Customer
+     */
+    public function setCompanyType($companyType)
+    {
+        $this->companyType = $companyType;
+
+        return $this;
+    }
+
+    /**
+     * Set VAT Id
+     *
+     * @param string $vatId
+     *
+     * @return Customer
+     */
+    public function setVatId($vatId)
+    {
+        $this->vatId = $vatId;
+
+        return $this;
+    }
+
+    /**
+     * Set billingAtt
+     *
+     * @param string $billingAtt
+     *
+     * @return Customer
+     */
+    public function setBillingAtt($billingAtt)
+    {
+        $this->billingAtt = $billingAtt;
+
+        return $this;
+    }
+
+    /**
+     * Set shippingAtt
+     *
+     * @param string $shippingAtt
+     *
+     * @return Customer
+     */
+    public function setShippingAtt($shippingAtt)
+    {
+        $this->shippingAtt = $shippingAtt;
+
+        return $this;
+    }
+
+    /**
      * Set Phone
      *
      * @param string $phone
+     *
      * @return Customer
      */
     public function setPhone($phone)
@@ -178,6 +358,7 @@ class Customer extends AbstractSerializer
      * Set BankName
      *
      * @param string $bankName
+     *
      * @return Customer
      */
     public function setBankName($bankName)
@@ -191,6 +372,7 @@ class Customer extends AbstractSerializer
      * Set BankPhone
      *
      * @param string $bankPhone
+     *
      * @return Customer
      */
     public function setBankPhone($bankPhone)
@@ -204,6 +386,7 @@ class Customer extends AbstractSerializer
      * Set Birthdate
      *
      * @param \DateTime $birthdate
+     *
      * @return Customer
      */
     public function setBirthdate($birthdate)
@@ -217,6 +400,7 @@ class Customer extends AbstractSerializer
      * Set CreatedDate
      *
      * @param \DateTime $createdDate
+     *
      * @return Customer
      */
     public function setCreatedDate(\DateTime $createdDate)
@@ -236,21 +420,49 @@ class Customer extends AbstractSerializer
 
     /**
      * @param string $organisationNumber
+     *
      * @return Customer
      */
     public function setOrganisationNumber($organisationNumber)
     {
         $this->organisationNumber = $organisationNumber;
+
         return $this;
     }
 
     /**
      * @param string $personalIdentifyNumber
+     *
      * @return Customer
      */
     public function setPersonalIdentifyNumber($personalIdentifyNumber)
     {
         $this->personalIdentifyNumber = $personalIdentifyNumber;
+
+        return $this;
+    }
+
+    /**
+     * @param string $billingRef
+     *
+     * @return Customer
+     */
+    public function setBillingRef($billingRef)
+    {
+        $this->billingRef = $billingRef;
+
+        return $this;
+    }
+
+    /**
+     * @param string $shippingRef
+     *
+     * @return Customer
+     */
+    public function setShippingRef($shippingRef)
+    {
+        $this->shippingRef = $shippingRef;
+
         return $this;
     }
 
@@ -258,6 +470,7 @@ class Customer extends AbstractSerializer
      * Sets the gender
      *
      * @param string $gender
+     *
      * @return Customer
      * @throws Exception
      */
@@ -267,14 +480,86 @@ class Customer extends AbstractSerializer
             case 'male':
             case 'm':
                 $this->gender = self::MALE;
+
                 return $this;
             case 'female':
             case 'f':
                 $this->gender = self::FEMALE;
+
                 return $this;
         }
 
         throw new Exception('setGender() only allows the value (m, male, f or female)');
+    }
+
+    /**
+     * Set Client IP
+     *
+     * @param string $clientIP
+     *
+     * @return Customer
+     */
+    public function setClientIP($clientIP)
+    {
+        $this->clientIP = $clientIP;
+
+        return $this;
+    }
+
+    /**
+     * Set Client Accept Language
+     *
+     * @param $clientAcceptLanguage
+     *
+     * @return Customer
+     */
+    public function setClientAcceptLanguage($clientAcceptLanguage)
+    {
+        $this->clientAcceptLanguage = $clientAcceptLanguage;
+
+        return $this;
+    }
+
+    /**
+     * Set Client Accept Language
+     *
+     * @param $httpUserAgent
+     *
+     * @return Customer
+     */
+    public function setHttpUserAgent($httpUserAgent)
+    {
+        $this->httpUserAgent = $httpUserAgent;
+
+        return $this;
+    }
+
+    /**
+     * Set Client Accept Language
+     *
+     * @param $httpXForwardedFor
+     *
+     * @return Customer
+     */
+    public function setHttpXForwardedFor($httpXForwardedFor)
+    {
+        $this->httpXForwardedFor = $httpXForwardedFor;
+
+        return $this;
+    }
+
+    /**
+     * Set Client Session ID
+     *
+     * @param $clientSessionID
+     *
+     * @return Customer
+     */
+    public function setClientSessionID($clientSessionID)
+    {
+        $this->clientSessionID = $clientSessionID;
+
+        return $this;
     }
 
     /**
@@ -296,6 +581,30 @@ class Customer extends AbstractSerializer
 
         if ($this->username) {
             $output['username'] = $this->username;
+        }
+
+        if ($this->type) {
+            $output['type'] = $this->type;
+        }
+
+        if ($this->companyName) {
+            $output['company_name'] = $this->companyName;
+        }
+
+        if ($this->companyType) {
+            $output['company_type'] = $this->companyType;
+        }
+
+        if ($this->vatId) {
+            $output['vat_id'] = $this->vatId;
+        }
+
+        if ($this->billingAtt) {
+            $output['billing_att'] = $this->billingAtt;
+        }
+
+        if ($this->shippingAtt) {
+            $output['shipping_att'] = $this->shippingAtt;
         }
 
         if ($this->phone) {
@@ -322,22 +631,55 @@ class Customer extends AbstractSerializer
             $output['gender'] = $this->gender;
         }
 
+        if ($this->clientIP) {
+            $output['client_ip'] = $this->clientIP;
+        }
+
+        if ($this->clientSessionID) {
+            $output['client_session_id'] = $this->clientSessionID;
+        }
+
+        if ($this->clientAcceptLanguage) {
+            $output['client_accept_language'] = $this->clientAcceptLanguage;
+        }
+
+        if ($this->httpUserAgent) {
+            $output['client_user_agent'] = $this->httpUserAgent;
+        }
+
+        if ($this->httpXForwardedFor) {
+            $output['client_forwarded_ip'] = $this->httpXForwardedFor;
+        }
+
+        if ($this->billingRef) {
+            $output['billing_ref'] = $this->billingRef;
+        }
+
+        if ($this->shippingRef) {
+            $output['shipping_ref'] = $this->shippingRef;
+        }
+
         $this->setAddress($output, 'billing_', $this->billing);
         $this->setAddress($output, 'shipping_', $this->shipping);
 
         return $output;
     }
 
+    /**
+     * @param array   $output
+     * @param         $key
+     * @param Address $object
+     */
     private static function setAddress(array &$output, $key, Address $object)
     {
         $fields = [
-            'Firstname' => 'firstname',
-            'Lastname' => 'lastname',
-            'Address' => 'address',
-            'City' => 'city',
-            'Region' => 'region',
+            'Firstname'  => 'firstname',
+            'Lastname'   => 'lastname',
+            'Address'    => 'address',
+            'City'       => 'city',
+            'Region'     => 'region',
             'PostalCode' => 'postal',
-            'Country' => 'country'
+            'Country'    => 'country'
         ];
 
         foreach ($fields as $fieldKey => $fieldName) {

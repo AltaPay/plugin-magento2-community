@@ -1,21 +1,18 @@
 <?php
 /**
- * Valitor Module for Magento 2.x.
+ * Altapay Module for Magento 2.x.
  *
+ * Copyright © 2018 Altapay. All rights reserved.
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
- *
- * @copyright 2018 Valitor
- * @category  payment
- * @package   valitor
  */
 
-namespace SDM\Valitor\Test\Unit\Model\Config\Source;
+namespace SDM\Altapay\Test\Unit\Model\Config\Source;
 
-use SDM\Valitor\Model\Config\Source\Languages as ClassToTest;
+use SDM\Altapay\Model\Config\Source\Languages as ClassToTest;
 use Magento\Config\Model\Config\Source\Locale;
 use Magento\Framework\TestFramework\Unit\Helper\ObjectManager;
-use SDM\Valitor\Test\Unit\MainTestCase;
+use SDM\Altapay\Test\Unit\MainTestCase;
 
 class LanguagesTest extends MainTestCase
 {
@@ -26,7 +23,7 @@ class LanguagesTest extends MainTestCase
 
     protected function setUp()
     {
-        $objectManager = $this->getObjectManager();
+        $objectManager     = $this->getObjectManager();
         $this->classToTest = $objectManager->getObject(ClassToTest::class);
     }
 

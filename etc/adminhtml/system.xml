@@ -1,14 +1,11 @@
 <?xml version="1.0"?>
 <!--
 /**
- * Valitor Module for Magento 2.x.
+ * Altapay Module for Magento 2.x.
  *
+ * Copyright © 2018 Altapay. All rights reserved.
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
- *
- * @copyright 2018 Valitor
- * @category  payment
- * @package   valitor
  */
 -->
 
@@ -16,54 +13,53 @@
     <system>
         <section id="payment">
 
-            <group id="sdm_valitor_config" translate="label comment" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
-                <label>Valitor</label>
+            <group id="sdm_altapay_config" translate="label comment" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Altapay</label>
                 <comment><![CDATA[]]></comment>
                 <attribute type="expanded">1</attribute>
 
-                <group id="valitor_config_api" translate="label" type="text" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
+                <group id="altapay_config_api" translate="label" type="text" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
                     <attribute type="expanded">0</attribute>
 
                     <label>API login</label>
-                     <comment><![CDATA[For enabling capture/cancel in backend, you need to provide your API username and password.<br>You can find your Api Keys in your <a href="https://testgateway.altapaysecure.com/merchant.php" title="Mollie Profiles">Valitor Merchnat Account</a>]]></comment>
-                    <field id="version" translate="label" type="text" sortOrder="1" showInDefault="1" showInWebsite="1"
-                           showInStore="1">
+                     <comment><![CDATA[For enabling capture/cancel in backend, you need to provide your API username and password.<br>You can find your Api Keys in your <a href="https://testgateway.altapaysecure.com/merchant.php" title="Mollie Profiles">Altapay Merchnat Account</a>]]></comment>
+                    <field id="version" translate="label" type="text" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
                         <label>Version</label>
-                        <frontend_model>SDM\Valitor\Block\Adminhtml\Render\Version</frontend_model>
+                        <frontend_model>SDM\Altapay\Block\Adminhtml\Render\Version</frontend_model>
                     </field>
                     <field id="api_log_in" translate="label comment" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
                         <label>API Login:</label>
                         <comment>Your username to use API</comment>
-                        <config_path>payment/valitor_config/api_log_in</config_path>
+                        <config_path>payment/altapay_config/api_log_in</config_path>
                     </field>
                     <field id="api_pass_word" translate="label comment" type="obscure" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
                         <backend_model>Magento\Config\Model\Config\Backend\Encrypted</backend_model>
                         <label>API Password:</label>
                         <comment>Your password to use API</comment>
-                        <config_path>payment/valitor_config/api_pass_word</config_path>
+                        <config_path>payment/altapay_config/api_pass_word</config_path>
                     </field>
 
                     <field id="productionurl" translate="label comment" type="text" sortOrder="25" showInDefault="1" showInWebsite="1" showInStore="1">
                         <label>Production URL</label>
                         <comment><![CDATA[Your production url fx (https://YourShopName.altapaysecure.com)]]></comment>
-                        <config_path>payment/valitor_config/productionurl</config_path>
+                        <config_path>payment/altapay_config/productionurl</config_path>
                     </field>
 
                     <field id="api_test_connection" translate="label comment" type="select" sortOrder="30" showInDefault="1" showInWebsite="0" showInStore="0">
                         <label>Test connection</label>
-                        <comment>Can we connect to Valitor</comment>
-                        <source_model>SDM\Valitor\Model\Config\Source\Connection</source_model>
+                        <comment>Can we connect to Altapay</comment>
+                        <source_model>SDM\Altapay\Model\Config\Source\Connection</source_model>
                     </field>
 
                     <field id="api_test_auth" translate="label comment" type="select" sortOrder="40" showInDefault="1" showInWebsite="0" showInStore="0">
                         <label>Test authentication</label>
-                        <comment>Can we authenticate to Valitor - Remember to save after you have typed your API login and password</comment>
-                        <source_model>SDM\Valitor\Model\Config\Source\Authentication</source_model>
+                        <comment>Can we authenticate to Altapay - Remember to save after you have typed your API login and password</comment>
+                        <source_model>SDM\Altapay\Model\Config\Source\Authentication</source_model>
                     </field>
 
                 </group>
 
-                <group id="valitor_config_status" translate="label comment" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                <group id="altapay_config_status" translate="label comment" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
                     <attribute type="expanded">0</attribute>
 
                     <label>Order status</label>
@@ -72,43 +68,43 @@
                     <field id="orderstatus_before_payment" translate="label comment" type="select" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
                         <label>Order status - before payment</label>
                         <comment>The status on the order before payment (if the user closes the browser inside the payment windows, the order will have this status)</comment>
-                        <source_model>SDM\Valitor\Model\Config\Source\Order\Status\Pending</source_model>
-                        <config_path>payment/valitor_status/before</config_path>
+                        <source_model>SDM\Altapay\Model\Config\Source\Order\Status\Pending</source_model>
+                        <config_path>payment/altapay_status/before</config_path>
                     </field>
 
                     <field id="orderstatus_after_payment" translate="label comment" type="select" sortOrder="2" showInDefault="1" showInWebsite="1" showInStore="1">
                         <label>Order status - after payment</label>
                         <comment>The status on the order after payment is approved</comment>
-                        <source_model>SDM\Valitor\Model\Config\Source\Order\Status\Processing</source_model>
-                        <config_path>payment/valitor_status/process</config_path>
+                        <source_model>SDM\Altapay\Model\Config\Source\Order\Status\Processing</source_model>
+                        <config_path>payment/altapay_status/process</config_path>
                     </field>
 
                     <field id="orderstatus_fraud_detected" translate="label comment" type="select" sortOrder="4" showInDefault="1" showInWebsite="1" showInStore="1">
                         <label>Order status - Fraud detected</label>
                         <comment>The status on the order if fraud is detected</comment>
-                        <source_model>SDM\Valitor\Model\Config\Source\Order\Status\Fraud</source_model>
-                        <config_path>payment/valitor_status/fraud</config_path>
+                        <source_model>SDM\Altapay\Model\Config\Source\Order\Status\Fraud</source_model>
+                        <config_path>payment/altapay_status/fraud</config_path>
                     </field>
 
                     <field id="orderstatus_cancel" translate="label comment" type="select" sortOrder="5" showInDefault="1" showInWebsite="1" showInStore="1">
                         <label>Order status - cancel</label>
                         <comment>The status on the order if a user cancel the order in the payment window</comment>
-                        <source_model>SDM\Valitor\Model\Config\Source\Order\Status\Cancel</source_model>
-                        <config_path>payment/valitor_status/cancel</config_path>
+                        <source_model>SDM\Altapay\Model\Config\Source\Order\Status\Cancel</source_model>
+                        <config_path>payment/altapay_status/cancel</config_path>
                     </field>
                     <field id="orderstatus_autocapture" translate="label comment" type="select" sortOrder="5" showInDefault="1" showInWebsite="1" showInStore="1">
                         <label>Order status - autocapture</label>
                         <comment>The status on the order if autocapture is enabled</comment>
-                        <source_model>SDM\Valitor\Model\Config\Source\Order\Status\Autocapture</source_model>
-                        <config_path>payment/valitor_status/autocapture</config_path>
+                        <source_model>SDM\Altapay\Model\Config\Source\Order\Status\Autocapture</source_model>
+                        <config_path>payment/altapay_status/autocapture</config_path>
                     </field>
                 </group>
 
-                <include path="SDM_Valitor::system/terminal1.xml"/>
-                <include path="SDM_Valitor::system/terminal2.xml"/>
-                <include path="SDM_Valitor::system/terminal3.xml"/>
-                <include path="SDM_Valitor::system/terminal4.xml"/>
-                <include path="SDM_Valitor::system/terminal5.xml"/>
+                <include path="SDM_Altapay::system/terminal1.xml"/>
+                <include path="SDM_Altapay::system/terminal2.xml"/>
+                <include path="SDM_Altapay::system/terminal3.xml"/>
+                <include path="SDM_Altapay::system/terminal4.xml"/>
+                <include path="SDM_Altapay::system/terminal5.xml"/>
 
             </group>
         </section>

@@ -1,15 +1,13 @@
 <?php
 /**
- * Valitor Module for Magento 2.x.
+ * Altapay Module for Magento 2.x.
  *
+ * Copyright © 2018 Altapay. All rights reserved.
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
- *
- * @copyright 2018 Valitor
- * @category  payment
- * @package   valitor
  */
-namespace SDM\Valitor\Controller\Index;
+
+namespace SDM\Altapay\Controller\Index;
 
 use Magento\Framework\App\Action\Action;
 use Magento\Framework\App\Action\Context;
@@ -19,10 +17,6 @@ use Magento\Framework\App\CsrfAwareActionInterface;
 use Magento\Framework\App\RequestInterface;
 use Magento\Framework\App\Request\InvalidRequestException;
 
-/**
- * Class Callbackform
- * @package SDM\Valitor\Controller\Index
- */
 class Callbackform extends Action implements CsrfAwareActionInterface
 {
 
@@ -33,7 +27,8 @@ class Callbackform extends Action implements CsrfAwareActionInterface
 
     /**
      * Callbackform constructor.
-     * @param Context $context
+     *
+     * @param Context     $context
      * @param PageFactory $resultPageFactory
      */
     public function __construct(Context $context, PageFactory $resultPageFactory)
@@ -41,10 +36,10 @@ class Callbackform extends Action implements CsrfAwareActionInterface
         $this->resultPageFactory = $resultPageFactory;
         parent::__construct($context);
     }
-    
+
     /**
-    * @inheritDoc
-    */
+     * @inheritDoc
+     */
     public function createCsrfValidationException(
         RequestInterface $request
     ): ?InvalidRequestException {

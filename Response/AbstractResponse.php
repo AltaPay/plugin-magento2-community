@@ -21,10 +21,10 @@
  * THE SOFTWARE.
  */
 
-namespace SDM\Valitor\Response;
+namespace SDM\Altapay\Response;
 
-use SDM\Valitor\Response\Embeds\Header;
-use SDM\Valitor\Serializer\ResponseSerializer;
+use SDM\Altapay\Response\Embeds\Header;
+use SDM\Altapay\Serializer\ResponseSerializer;
 
 /**
  * Class AbstractResponse
@@ -57,6 +57,7 @@ abstract class AbstractResponse
      * Deserialize XML to object
      *
      * @param \SimpleXMLElement $xml
+     *
      * @return AbstractResponse
      */
     public function deserialize(\SimpleXMLElement $xml = null)
@@ -69,13 +70,14 @@ abstract class AbstractResponse
             try {
                 $this->elementSetter($object, trim((string)$xml), $xml);
             } catch (\InvalidArgumentException $e) {
+                // Do nothing if element setter not found.
             }
 
             /** @var \SimpleXMLElement $child */
             foreach ($xml->children() as $child) {
                 if (isset($this->childs[$child->getName()])) {
                     $builder = $this->childs[$child->getName()];
-                    $data = ResponseSerializer::serialize($builder['class'], $child, $builder['array']);
+                    $data    = ResponseSerializer::serialize($builder['class'], $child, $builder['array']);
                 } else {
                     $data = trim((string)$child);
                     $this->attributeSetter($object, $child);
@@ -91,7 +93,7 @@ abstract class AbstractResponse
     /**
      * Sets attributes
      *
-     * @param object $object
+     * @param object            $object
      * @param \SimpleXMLElement $element
      */
     private function attributeSetter($object, \SimpleXMLElement $element)
@@ -118,13 +120,13 @@ abstract class AbstractResponse
     /**
      * Sets elements
      *
-     * @param object $object
-     * @param mixed $data
+     * @param object            $object
+     * @param mixed             $data
      * @param \SimpleXMLElement $element
      */
     private function elementSetter($object, $data, \SimpleXMLElement $element)
     {
-        if (! $this->set($object, $data, $element)) {
+        if (!$this->set($object, $data, $element)) {
             throw new \InvalidArgumentException(
                 sprintf(
                     'The parameter "%s" does not have a setter or a property in class "%s"',
@@ -138,9 +140,10 @@ abstract class AbstractResponse
     /**
      * Setter
      *
-     * @param object $object
-     * @param mixed $data
+     * @param object            $object
+     * @param mixed             $data
      * @param \SimpleXMLElement $element
+     *
      * @return bool
      */
     private function set($object, $data, \SimpleXMLElement $element)
@@ -149,11 +152,13 @@ abstract class AbstractResponse
             $setter = 'set' . ucfirst($element->getName());
             if (method_exists($object, $setter)) {
                 $object->{$setter}($data);
+
                 return true;
             }
 
             if (property_exists($object, $element->getName())) {
                 $object->{$element->getName()} = $data;
+
                 return true;
             }
         }

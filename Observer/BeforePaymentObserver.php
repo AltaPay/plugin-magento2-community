@@ -1,25 +1,19 @@
 <?php
 /**
- * Valitor Module for Magento 2.x.
+ * Altapay Module for Magento 2.x.
  *
+ * Copyright © 2018 Altapay. All rights reserved.
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
- *
- * @copyright 2018 Valitor
- * @category  payment
- * @package   valitor
  */
-namespace SDM\Valitor\Observer;
+
+namespace SDM\Altapay\Observer;
 
 use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
 use Magento\Sales\Model\Order;
-use SDM\Valitor\Model\SystemConfig;
+use SDM\Altapay\Model\SystemConfig;
 
-/**
- * Class BeforePaymentObserver
- * @package SDM\Valitor\Observer
- */
 class BeforePaymentObserver implements ObserverInterface
 {
     /**
@@ -29,6 +23,7 @@ class BeforePaymentObserver implements ObserverInterface
 
     /**
      * BeforePaymentObserver constructor.
+     *
      * @param SystemConfig $systemConfig
      */
     public function __construct(SystemConfig $systemConfig)
@@ -38,27 +33,28 @@ class BeforePaymentObserver implements ObserverInterface
 
     /**
      * @param Observer $observer
+     *
      * @return void
      */
     public function execute(Observer $observer)
     {
-        $orderState = Order::STATE_NEW;
+        $orderState  = Order::STATE_NEW;
         $orderStatus = Order::STATE_NEW;
-        $payment = $observer['payment'];
+        $payment     = $observer['payment'];
         if (in_array($payment->getMethod(), SystemConfig::getTerminalCodes())) {
             /**
              * @var \Magento\Sales\Model\Order
              */
-            $order = $payment->getOrder();
+            $order      = $payment->getOrder();
             $storeScope = \Magento\Store\Model\ScopeInterface::SCOPE_STORE;
-            $storeCode = $order->getStore()->getCode();
+            $storeCode  = $order->getStore()->getCode();
 
             //Set the first order state and status (custom, if applicable)
             $customFirstOrderStatus = $this->systemConfig->getStatusConfig('before', $storeScope, $storeCode);
             if ($customFirstOrderStatus) {
                 $orderStatus = $customFirstOrderStatus;
             }
- 
+
             $order->setState($orderState)->setStatus($orderStatus);
             // Do not send any mails until payment is complete
             $order->setCanSendNewEmailFlag(false);

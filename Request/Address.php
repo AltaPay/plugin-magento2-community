@@ -21,9 +21,9 @@
  * THE SOFTWARE.
  */
 
-namespace SDM\Valitor\Request;
+namespace SDM\Altapay\Request;
 
-use SDM\Valitor\Response\Embeds\Address as BaseAddress;
+use SDM\Altapay\Response\Embeds\Address as BaseAddress;
 
 class Address extends BaseAddress
 {

@@ -21,26 +21,26 @@
  * THE SOFTWARE.
  */
 
-namespace SDM\Valitor\Response\Embeds;
+namespace SDM\Altapay\Response\Embeds;
 
-use SDM\Valitor\Response\AbstractResponse;
+use SDM\Altapay\Response\AbstractResponse;
 
 class Transaction extends AbstractResponse
 {
     protected $childs = [
-        'PaymentNatureService' => [
+        'PaymentNatureService'      => [
             'class' => PaymentNatureService::class,
             'array' => false
         ],
-        'PaymentInfos' => [
+        'PaymentInfos'              => [
             'class' => PaymentInfo::class,
             'array' => 'PaymentInfo',
         ],
-        'ChargebackEvents' => [
+        'ChargebackEvents'          => [
             'class' => ChargebackEvent::class,
             'array' => 'ChargebackEvent'
         ],
-        'CustomerInfo' => [
+        'CustomerInfo'              => [
             'class' => CustomerInfo::class,
             'array' => false
         ],
@@ -48,86 +48,169 @@ class Transaction extends AbstractResponse
             'class' => ReconciliationIdentifier::class,
             'array' => 'ReconciliationIdentifier'
         ],
-        'CreditCardExpiry' => [
+        'CreditCardExpiry'          => [
             'class' => CreditCard::class,
-            'array' => null
+            'array' => false
         ]
     ];
 
+    /**
+     * @var TransactionId
+     */
     public $TransactionId;
+
+    /**
+     * @var PaymentId
+     */
     public $PaymentId;
+
+    /**
+     * @var CardStatus
+     */
     public $CardStatus;
 
     /**
-     * @var CreditCard
+     * @var CreditCardExpiry
      */
     public $CreditCardExpiry;
 
-    public $CreditCardToken;
-    public $CreditCardMaskedPan;
     /**
-     * @var boolean
+     * @var CreditCardToken
+     */
+    public $CreditCardToken;
+
+    /**
+     * @var CreditCardMaskedPan
+     */
+    public $CreditCardMaskedPan;
+
+    /**
+     * @var IsTokenized
      */
     public $IsTokenized;
+
+    /**
+     * @var ThreeDSecureResult
+     */
     public $ThreeDSecureResult;
+
+    /**
+     * @var LiableForChargeback
+     */
     public $LiableForChargeback;
+
+    /**
+     * @var CVVCheckResult
+     */
     public $CVVCheckResult;
+
+    /**
+     * @var BlacklistToken
+     */
     public $BlacklistToken;
+
+    /**
+     * @var ShopOrderId
+     */
     public $ShopOrderId;
+
+    /**
+     * @var Shop
+     */
     public $Shop;
+
+    /**
+     * @var Terminal
+     */
     public $Terminal;
+
+    /**
+     * @var TransactionStatus
+     */
     public $TransactionStatus;
+
+    /**
+     * @var ReasonCode
+     */
     public $ReasonCode;
+
+    /**
+     * @var MerchantCurrency
+     */
     public $MerchantCurrency;
+
+    /**
+     * @var MerchantCurrencyAlpha
+     */
     public $MerchantCurrencyAlpha;
+
+    /**
+     * @var CardHolderCurrency
+     */
     public $CardHolderCurrency;
+
+    /**
+     * @var CardHolderCurrencyAlpha
+     */
     public $CardHolderCurrencyAlpha;
+
+    /**
+     * @var AuthType
+     */
     public $AuthType;
 
     /**
-     * @var float
+     * @var ReservedAmount
      */
     public $ReservedAmount;
 
     /**
-     * @var float
+     * @var CapturedAmount
      */
     public $CapturedAmount;
 
     /**
-     * @var float
+     * @var RefundedAmount
      */
     public $RefundedAmount;
 
     /**
-     * @var float
+     * @var RecurringDefaultAmount
      */
     public $RecurringDefaultAmount;
 
     /**
-     * @var float
+     * @var CreditedAmount
      */
     public $CreditedAmount;
 
     /**
-     * @var float
+     * @var SurchargeAmount
      */
     public $SurchargeAmount;
 
     /**
-     * @var \DateTime
+     * @var CreatedDate
      */
     public $CreatedDate;
 
     /**
-     * @var \DateTime
+     * @var UpdatedDate
      */
     public $UpdatedDate;
+
+    /**
+     * @var PaymentNature
+     */
     public $PaymentNature;
+
+    /**
+     * @var PaymentSchemeName
+     */
     public $PaymentSchemeName;
 
     /**
-     * @var string
+     * @var PaymentSource
      */
     public $PaymentSource;
 
@@ -137,22 +220,37 @@ class Transaction extends AbstractResponse
     public $PaymentNatureService;
 
     /**
-     * @var float
+     * @var FraudRiskScore
      */
     public $FraudRiskScore;
+
+    /**
+     * @var FraudExplanation
+     */
     public $FraudExplanation;
+
+    /**
+     * @var FraudRecommendation
+     */
     public $FraudRecommendation;
-    
+
+    /**
+     * @var AddressVerification
+     */
     public $AddressVerification;
+
+    /**
+     * @var AddressVerificationDescription
+     */
     public $AddressVerificationDescription;
 
     /**
-     * @var ChargebackEvent[]
+     * @var ChargebackEvents
      */
     public $ChargebackEvents;
 
     /**
-     * @var PaymentInfo[]
+     * @var PaymentInfos
      */
     public $PaymentInfos;
 
@@ -162,97 +260,120 @@ class Transaction extends AbstractResponse
     public $CustomerInfo;
 
     /**
-     * @var ReconciliationIdentifier[]
+     * @var ReconciliationIdentifiers
      */
     public $ReconciliationIdentifiers;
 
     /**
-     * @param string $CreatedDate
-     * @return Transaction
+     * @var InvoiceOrderInfo
+     */
+    public $InvoiceOrderInfo;
+
+    /**
+     * @param $CreatedDate
+     *
+     * @return $this
      */
     protected function setCreatedDate($CreatedDate)
     {
         $this->CreatedDate = new \DateTime($CreatedDate);
+
         return $this;
     }
 
     /**
-     * @param string $UpdatedDate
-     * @return Transaction
+     * @param $UpdatedDate
+     *
+     * @return $this
      */
     protected function setUpdatedDate($UpdatedDate)
     {
         $this->UpdatedDate = new \DateTime($UpdatedDate);
+
         return $this;
     }
 
     /**
-     * @param float $ReservedAmount
-     * @return Transaction
+     * @param $ReservedAmount
+     *
+     * @return $this
      */
     public function setReservedAmount($ReservedAmount)
     {
-        $this->ReservedAmount = (float) $ReservedAmount;
+        $this->ReservedAmount = (float)$ReservedAmount;
+
         return $this;
     }
 
     /**
-     * @param float $CapturedAmount
-     * @return Transaction
+     * @param $CapturedAmount
+     *
+     * @return $this
      */
     public function setCapturedAmount($CapturedAmount)
     {
-        $this->CapturedAmount = (float) $CapturedAmount;
+        $this->CapturedAmount = (float)$CapturedAmount;
+
         return $this;
     }
 
     /**
-     * @param float $CreditedAmount
-     * @return Transaction
+     * @param $CreditedAmount
+     *
+     * @return $this
      */
     public function setCreditedAmount($CreditedAmount)
     {
-        $this->CreditedAmount = (float) $CreditedAmount;
+        $this->CreditedAmount = (float)$CreditedAmount;
+
         return $this;
     }
 
     /**
-     * @param float $SurchargeAmount
-     * @return Transaction
+     * @param $SurchargeAmount
+     *
+     * @return $this
      */
     public function setSurchargeAmount($SurchargeAmount)
     {
-        $this->SurchargeAmount = (float) $SurchargeAmount;
+        $this->SurchargeAmount = (float)$SurchargeAmount;
+
         return $this;
     }
 
     /**
-     * @param float $RefundedAmount
-     * @return Transaction
+     * @param $RefundedAmount
+     *
+     * @return $this
      */
     public function setRefundedAmount($RefundedAmount)
     {
-        $this->RefundedAmount = (float) $RefundedAmount;
+        $this->RefundedAmount = (float)$RefundedAmount;
+
         return $this;
     }
 
     /**
-     * @param float $RecurringDefaultAmount
-     * @return Transaction
+     * @param $RecurringDefaultAmount
+     *
+     * @return $this
      */
     public function setRecurringDefaultAmount($RecurringDefaultAmount)
     {
-        $this->RecurringDefaultAmount = (float) $RecurringDefaultAmount;
+        $this->RecurringDefaultAmount = (float)$RecurringDefaultAmount;
+
         return $this;
     }
 
     /**
-     * @param float $FraudRiskScore
-     * @return Transaction
+     * @param $FraudRiskScore
+     *
+     * @return $this
      */
     public function setFraudRiskScore($FraudRiskScore)
     {
-        $this->FraudRiskScore = (float) $FraudRiskScore;
+        $this->FraudRiskScore = (float)$FraudRiskScore;
+
         return $this;
     }
 }

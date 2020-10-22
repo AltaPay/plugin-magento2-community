@@ -1,51 +1,80 @@
 <?xml version="1.0"?>
 <!--
 /**
- * Valitor Module for Magento 2.x.
+ * Altapay Module for Magento 2.x.
  *
+ * Copyright © 2018 Altapay. All rights reserved.
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
- *
- * @copyright 2018 Valitor
- * @category  payment
- * @package   valitor
  */
 -->
 
 <include xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_include.xsd">
     <group id="terminal4" translate="label" type="text" sortOrder="400" showInDefault="1" showInWebsite="1" showInStore="1">
         <label>Terminal #4</label>
-
         <field id="active" translate="label" type="select" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
             <label>Enabled</label>
             <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
             <config_path>payment/terminal4/active</config_path>
         </field>
-
         <field id="title" translate="label" type="text" sortOrder="5" showInDefault="1" showInWebsite="1" showInStore="1">
             <label>Title</label>
             <config_path>payment/terminal4/title</config_path>
         </field>
-
         <field id="terminalname" translate="label comment" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
             <label>Terminal name</label>
             <comment>Select terminal - Remember to save configuration after you have added your API login and password, to get your terminals</comment>
             <config_path>payment/terminal4/terminalname</config_path>
-            <source_model>SDM\Valitor\Model\Config\Source\Terminals</source_model>
+            <source_model>SDM\Altapay\Model\Config\Source\Terminals</source_model>
+            <frontend_class>altapay-terminal-name</frontend_class>
         </field>
-
         <field id="language" translate="label comment" type="select" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
             <label>Force language</label>
             <comment>Force the language of the payment page</comment>
-            <source_model>SDM\Valitor\Model\Config\Source\Languages</source_model>
+            <source_model>SDM\Altapay\Model\Config\Source\Languages</source_model>
             <config_path>payment/terminal4/language</config_path>
         </field>
-
         <field id="capture" translate="label comment" type="select" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
             <label>Auto capture</label>
             <comment>If you only sell download products, which are delivered immediately you can turn this on</comment>
             <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
             <config_path>payment/terminal4/capture</config_path>
+        </field>
+        <field id="terminallogo" translate="label comment" type="select" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1">
+            <label>Terminal Logo</label>
+            <comment>Select terminal logo that will be displayed on the store with the terminal name.</comment>
+            <config_path>payment/terminal4/terminallogo</config_path>
+            <source_model>SDM\Altapay\Model\Config\Source\TerminalLogo</source_model>
+        </field>
+        <field id="showlogoandtitle" translate="label comment" type="select" sortOrder="50" showInDefault="1" showInWebsite="1" showInStore="1">
+            <label>Show both logo and title</label>
+            <comment>If you want to show both terminal logo and title</comment>
+            <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+            <config_path>payment/terminal4/showlogoandtitle</config_path>
+        </field>
+        <field id="savecardtoken" translate="label comment" type="select" sortOrder="60" showInDefault="1" showInWebsite="1" showInStore="1">
+            <label>Enable Customer Token Control</label>
+            <comment>If you allow customer to save credit card token</comment>
+            <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+            <config_path>payment/termina4/savecardtoken</config_path>
+            <frontend_class>altapay-terminal-token-control</frontend_class>
+        </field>
+        <field id="avscontrol" translate="label comment" type="select" sortOrder="70" showInDefault="1" showInWebsite="1" showInStore="1">
+            <label>AVS</label>
+            <comment>Address Verification System</comment>
+            <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+            <config_path>payment/terminal4/avscontrol</config_path>
+        </field>
+        <field id="enforceavs" translate="label comment" type="select" sortOrder="80" showInDefault="1" showInWebsite="1" showInStore="1">
+            <label>Enforce AVS</label>
+            <comment>All transactions <u>without</u> AVS response will be rejected</comment>
+            <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+            <config_path>payment/terminal4/enforceavs</config_path>
+        </field>
+        <field id="avs_acceptance" translate="label" type="text" sortOrder="90" showInDefault="1" showInWebsite="1" showInStore="1">
+            <label>AVS accepted codes</label>
+            <comment>All codes upercase, comma separated</comment>
+            <config_path>payment/terminal4/avs_acceptance</config_path>
         </field>
     </group>
 </include>

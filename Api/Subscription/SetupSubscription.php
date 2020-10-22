@@ -21,11 +21,11 @@
  * THE SOFTWARE.
  */
 
-namespace SDM\Valitor\Api\Subscription;
+namespace SDM\Altapay\Api\Subscription;
 
-use SDM\Valitor\Api\Payments\ReservationOfFixedAmount;
-use SDM\Valitor\Response\SetupSubscriptionResponse;
-use SDM\Valitor\Serializer\ResponseSerializer;
+use SDM\Altapay\Api\Payments\ReservationOfFixedAmount;
+use SDM\Altapay\Response\SetupSubscriptionResponse;
+use SDM\Altapay\Serializer\ResponseSerializer;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
 use Symfony\Component\OptionsResolver\OptionsResolver;

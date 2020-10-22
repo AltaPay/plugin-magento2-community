@@ -21,13 +21,13 @@
  * THE SOFTWARE.
  */
 
-namespace SDM\Valitor\Api\Payments;
+namespace SDM\Altapay\Api\Payments;
 
-use SDM\Valitor\AbstractApi;
-use SDM\Valitor\Response\InvoiceReservationResponse;
-use SDM\Valitor\Serializer\ResponseSerializer;
-use SDM\Valitor\Traits;
-use SDM\Valitor\Types;
+use SDM\Altapay\AbstractApi;
+use SDM\Altapay\Response\InvoiceReservationResponse;
+use SDM\Altapay\Serializer\ResponseSerializer;
+use SDM\Altapay\Traits;
+use SDM\Altapay\Types;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
 use Symfony\Component\OptionsResolver\OptionsResolver;

@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Altapay Module for Magento 2.x.
+ *
+ * Copyright © 2018 Altapay. All rights reserved.
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+-->
+
+<page layout="2columns-left" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <update handle="customer_account"/>
+    <body>
+        <referenceBlock name="page.main.title">
+            <action method="setPageTitle">
+                <argument translate="true" name="title" xsi:type="string">Saved Credit Cards</argument>
+            </action>
+        </referenceBlock>
+        <referenceContainer name="content">
+            <block class="SDM\Altapay\Block\Customer\Savedtoken" name="saved_credit_card"
+                   template="SDM_Altapay::saved_credit_card.phtml" cacheable="false">
+
+            </block>
+        </referenceContainer>
+    </body>
+</page>

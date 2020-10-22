@@ -1,25 +1,18 @@
 <?php
 /**
- * Valitor Module for Magento 2.x.
+ * Altapay Module for Magento 2.x.
  *
+ * Copyright © 2018 Altapay. All rights reserved.
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
- *
- * @copyright 2018 Valitor
- * @category  payment
- * @package   valitor
  */
 
-namespace SDM\Valitor\Model;
+namespace SDM\Altapay\Model;
 
 use Magento\Framework\DataObject\IdentityInterface;
 use Magento\Framework\Model\AbstractModel;
-use SDM\Valitor\Api\Data\TransactionInterface;
+use SDM\Altapay\Api\Data\TransactionInterface;
 
-/**
- * Class Transaction
- * @package SDM\Valitor\Model
- */
 class Transaction extends AbstractModel implements TransactionInterface, IdentityInterface
 {
 
@@ -30,7 +23,7 @@ class Transaction extends AbstractModel implements TransactionInterface, Identit
      */
     protected function _construct()
     {
-        $this->_init(\SDM\Valitor\Model\ResourceModel\Transaction::class);
+        $this->_init(\SDM\Altapay\Model\ResourceModel\Transaction::class);
     }
 
     /**
@@ -65,6 +58,7 @@ class Transaction extends AbstractModel implements TransactionInterface, Identit
 
     /**
      * @param string $paymentid
+     *
      * @see TransactionInterface
      */
     public function setPaymentid($paymentid)
@@ -83,6 +77,7 @@ class Transaction extends AbstractModel implements TransactionInterface, Identit
 
     /**
      * @param string $orderid
+     *
      * @see TransactionInterface
      */
     public function setOrderid($orderid)
@@ -101,6 +96,7 @@ class Transaction extends AbstractModel implements TransactionInterface, Identit
 
     /**
      * @param string $transactiondata
+     *
      * @see TransactionInterface
      */
     public function setTransactiondata($transactiondata)
@@ -119,6 +115,7 @@ class Transaction extends AbstractModel implements TransactionInterface, Identit
 
     /**
      * @param string $parametersdata
+     *
      * @see TransactionInterface
      */
     public function setParametersdata($parametersdata)

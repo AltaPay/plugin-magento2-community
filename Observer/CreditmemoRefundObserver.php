@@ -1,249 +1,299 @@
 <?php
 /**
- * Valitor Module for Magento 2.x.
+ * Altapay Module for Magento 2.x.
  *
+ * Copyright © 2018 Altapay. All rights reserved.
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
- *
- * @copyright 2018 Valitor
- * @category  payment
- * @package   valitor
  */
-namespace SDM\Valitor\Observer;
 
-use SDM\Valitor\Api\Payments\RefundCapturedReservation;
-use SDM\Valitor\Exceptions\ResponseHeaderException;
-use SDM\Valitor\Response\RefundResponse;
-use SDM\Valitor\Request\OrderLine;
+namespace SDM\Altapay\Observer;
+
+use Magento\Sales\Model\Order\Payment;
+use SDM\Altapay\Api\Payments\RefundCapturedReservation;
+use SDM\Altapay\Exceptions\ResponseHeaderException;
 use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
-use SDM\Valitor\Logger\Logger;
-use SDM\Valitor\Model\SystemConfig;
+use SDM\Altapay\Logger\Logger;
+use SDM\Altapay\Model\SystemConfig;
 use Magento\Sales\Model\Order;
-use Magento\Catalog\Model\ProductFactory;
-use Magento\Framework\App\Config\ScopeConfigInterface;
+use SDM\Altapay\Helper\Data;
+use SDM\Altapay\Helper\Config as storeConfig;
+use SDM\Altapay\Model\Handler\OrderLinesHandler;
+use SDM\Altapay\Model\Handler\PriceHandler;
+use SDM\Altapay\Model\Handler\DiscountHandler;
+
 /**
  * Class CreditmemoRefundObserver
- * @package SDM\Valitor\Observer
+ * Handle the refund functionality.
  */
 class CreditmemoRefundObserver implements ObserverInterface
 {
-
     /**
      * @var SystemConfig
      */
     private $systemConfig;
     /**
-     * @var ScopeConfigInterface
-     */
-    private $scopeConfig;
-    /**
      * @var Logger
      */
-    private $valitorLogger;
+    private $altapayLogger;
     /**
      * @var Order
-    */
+     */
     private $order;
     /**
-     * @var productFactory
-    */
-    private $productFactory;
-    /**
-     * CaptureObserver constructor.
-     * @param SystemConfig $systemConfig
-     * @param Logger $valitorLogger
+     * @var Helper Data
      */
-    public function __construct(SystemConfig $systemConfig, Logger $valitorLogger, Order $order, ProductFactory $productFactory
-    ,ScopeConfigInterface $scopeConfig)
-    {
-        $this->systemConfig = $systemConfig;
-        $this->valitorLogger = $valitorLogger;
-        $this->order = $order;
-        $this->productFactory = $productFactory;
-        $this->scopeConfig = $scopeConfig;
+    private $helper;
+
+    /**
+     * @var Helper Config
+     */
+    private $storeConfig;
+    /**
+     * @var OrderLinesHandler
+     */
+    private $orderLines;
+    /**
+     * @var PriceHandler
+     */
+    private $priceHandler;
+    /**
+     * @var DiscountHandler
+     */
+    private $discountHandler;
+
+    /**
+     * CreditmemoRefundObserver constructor.
+     *
+     * @param SystemConfig      $systemConfig
+     * @param Logger            $altapayLogger
+     * @param Order             $order
+     * @param Data              $helper
+     * @param storeConfig       $storeConfig
+     * @param OrderLinesHandler $orderLines
+     * @param PriceHandler      $priceHandler
+     * @param DiscountHandler   $discountHandler
+     */
+    public function __construct(
+        SystemConfig $systemConfig,
+        Logger $altapayLogger,
+        Order $order,
+        Data $helper,
+        storeConfig $storeConfig,
+        OrderLinesHandler $orderLines,
+        PriceHandler $priceHandler,
+        DiscountHandler $discountHandler
+    ) {
+        $this->systemConfig    = $systemConfig;
+        $this->altapayLogger   = $altapayLogger;
+        $this->order           = $order;
+        $this->helper          = $helper;
+        $this->storeConfig     = $storeConfig;
+        $this->orderLines      = $orderLines;
+        $this->priceHandler    = $priceHandler;
+        $this->discountHandler = $discountHandler;
     }
-    public function getProductPrice($id)
-    {
-    $product = $this->productFactory->create();
-    $productPriceById = $product->load($id)->getPrice();
-    return $productPriceById;
-    }
+
     /**
      * @param Observer $observer
      *
-     * @return void
      * @throws ResponseHeaderException
      */
     public function execute(\Magento\Framework\Event\Observer $observer)
     {
-        /** @var \Magento\Sales\Api\Data\CreditmemoInterface $memo */
         $memo = $observer['creditmemo'];
-        $creditOnline = $memo->getDoTransaction();
-        if ($creditOnline) {
-            /** @var \Magento\Sales\Model\Order $order */
+        //proceed if online refund
+        if ($memo->getDoTransaction()) {
             $orderIncrementId = $memo->getOrder()->getIncrementId();
-            $orderObject = $this->order->loadByIncrementId($orderIncrementId);
-            $storeScope = \Magento\Store\Model\ScopeInterface::SCOPE_STORE;
-            $storeCode = $memo->getStore()->getCode();
-            /** @var \Magento\Sales\Model\Order\Payment $payment */
-            $payment = $memo->getOrder()->getPayment();
-            $storeScope = \Magento\Store\Model\ScopeInterface::SCOPE_STORE;
+            $orderObject      = $this->order->loadByIncrementId($orderIncrementId);
+            $storeCode        = $memo->getStore()->getCode();
+            $payment          = $memo->getOrder()->getPayment();
+            //If payment method belongs to terminal codes
             if (in_array($payment->getMethod(), SystemConfig::getTerminalCodes())) {
-                $orderlines = [];
-                $appliedRule = $memo->getAppliedRuleIds();
-                $couponCode = $memo->getDiscountDescription();
-                $couponCodeAmount = $memo->getDiscountAmount();
-                $compAmount = $memo->getOrder()->getShippingDiscountTaxCompensationAmount();
-                foreach ($memo->getItems() as $item) {
-                    $quantity = $item->getQty();
-                    if($quantity > 0){
-                        $id = $item->getProductId();                
-                        $priceExcTax = $item->getPrice();
-                        if ((int) $this->scopeConfig->getValue('tax/calculation/price_includes_tax', $storeScope) === 1) {
-                            //Handle only if we have coupon Code
-                            $taxPercent = $item->getOrderItem()->getTaxPercent();
-                            $taxCalculatedAmount = $priceExcTax *  ($taxPercent/100);
-                            $taxAmount = (number_format($taxCalculatedAmount, 2, '.', '') * $quantity);
-                        }else{
-                            $taxAmount = $item->getTaxAmount();
-                        }
-                        if ($item->getPriceInclTax()) {
-                            $orderline = new OrderLine(
-                                $item->getName(),
-                                $item->getSku(),
-                                $quantity,
-                                $item->getPrice()
-                                );
-                            $orderline->setGoodsType('item');
-                            $orderline->taxAmount = $taxAmount;
-                            $orderlines[] = $orderline;
-                        }
-                    }
-                }
-
-                if (abs($couponCodeAmount) > 0) {
-                    if(empty($couponCode)){
-                        $couponCode = 'Cart Price Rule';
-                    }
-                    // Handling price reductions
-                    $orderline = new OrderLine(
-                        $couponCode,
-                        'discount',
-                        1,
-                        $couponCodeAmount
-                    );
-                    $orderline->setGoodsType('handling');
-                    $orderlines[] = $orderline;
-                }
-
-
-                if ($memo->getShippingInclTax()) {
-                    $orderline = new OrderLine(
-                        'Shipping',
-                        'shipping',
-                        1,
-                        $memo->getShippingAmount() + $compAmount
-                    );
-                    $orderline->setGoodsType('shipment');
-                    $orderline->taxAmount = $memo->getShippingTaxAmount();
-                    $orderlines[] = $orderline;
-                }
-                $refund = new RefundCapturedReservation($this->systemConfig->getAuth($storeCode));
-            if ($memo->getTransactionId()) {
-                $refund->setTransaction($payment->getLastTransId());
-            }
-                $refund->setAmount((float) number_format($memo->getGrandTotal(), 2, '.', ''));
-                $refund->setOrderLines($orderlines);
-                /** @var RefundResponse $response */
-                try {
-                    $response = $refund->call();
-                } catch (ResponseHeaderException $e) {
-                    $this->valitorLogger->addCritical('Response header exception: ' . $e->getMessage());
-                    throw $e;
-                } catch (\Exception $e) {
-                    $this->valitorLogger->addCritical('Exception: ' . $e->getMessage());
-                }
-                
-                $rawresponse = $refund->getRawResponse();
-                $body = $rawresponse->getBody();
-                $this->valitorLogger->addInfo('Response body: ' . $body);
-                
-                //Update comments if refund fail
-                $xml = simplexml_load_string($body);
-                if ($xml->Body->Result == 'Error' || $xml->Body->Result == 'Failed') {
-                    $orderObject->addStatusHistoryComment('Refund failed: '. $xml->Body->MerchantErrorMessage)->setIsCustomerNotified(false);
-                    $orderObject->getResource()->save($orderObject);
-                }
-          
-                if ($xml->Body->Result != 'Success') {
-                    throw new \InvalidArgumentException('Could not refund captured reservation');
-                }
+                //Create orderlines from order items
+                $orderLines = $this->processRefundOrderItems($memo);
+                //Send request for payment refund
+                $this->sendRefundRequest($memo, $orderLines, $orderObject, $payment, $storeCode);
             }
         }
     }
+
     /**
-     * @param \Magento\Sales\Model\Order\Invoice\Item $item
+     * @param $memo
+     *
+     * @return array
      */
-    protected function logItem($item)
+
+    private function processRefundOrderItems($memo)
     {
-        $this->valitorLogger->addInfoLog(
-            'Log Item',
-            sprintf(
-                implode(' - ', [
-                    'getSku: %s',
-                    'getQty: %s',
-                    'getDescription: %s',
-                    'getPrice(): %s',
-                    'getDiscountAmount(): %s',
-                    'getPrice() - getDiscountAmount(): %s',
-                    'getRowTotalInclTax: %s',
-                    'getRowTotal: %s'
-                ]),
-                $item->getSku(),
-                $item->getQty(),
-                $item->getDescription(),
-                $item->getPrice(),
-                $item->getDiscountAmount(),
-                $item->getPrice() - $item->getDiscountAmount(),
-                $item->getRowTotalInclTax(),
-                $item->getRowTotal()
-            )
-        );
+        $couponCode       = $memo->getDiscountDescription();
+        $couponCodeAmount = $memo->getDiscountAmount();
+        //Return true if discount enabled on all items
+        $discountAllItems = $this->discountHandler->allItemsHaveDiscount($memo->getOrder()->getAllVisibleItems());
+        //order lines for items
+        $orderLines = $this->itemOrderLines($couponCodeAmount, $discountAllItems, $memo);
+        //send the discount into separate orderline if discount applied to all items
+        if ($discountAllItems == true && abs($couponCodeAmount) > 0) {
+            //order lines for discounts
+            $orderLines[] = $this->orderLines->discountOrderLine($couponCodeAmount, $couponCode);
+        }
+        if ($memo->getShippingInclTax() > 0) {
+            //order lines for shipping
+            $orderLines[] = $this->orderLines->handleShipping($memo, $discountAllItems, false);
+            //Shipping Discount Tax Compensation Amount
+            $compAmount = $this->discountHandler->hiddenTaxDiscountCompensation($memo, $discountAllItems, false);
+            if ($compAmount > 0 && $discountAllItems == false) {
+                $orderLines[] = $this->orderLines->compensationOrderLine(
+                    "Shipping compensation",
+                    "comp-ship",
+                    $compAmount
+                );
+            }
+        }
+        if(!empty($this->fixedProductTax($memo))){
+            //order lines for FPT
+            $orderLines[] = $this->orderLines->fixedProductTaxOrderLine($this->fixedProductTax($memo));
+        }
+
+        return $orderLines;
     }
 
     /**
-     * @param \Magento\Sales\Model\Order\Payment $payment
-     * @param \Magento\Sales\Model\Order\Invoice $invoice
+     * @param $couponCodeAmount
+     * @param $discountAllItems
+     * @param $memo
+     *
+     * @return array
      */
-    protected function logPayment($payment, $invoice)
+    private function itemOrderLines($couponCodeAmount, $discountAllItems, $memo)
     {
-        $logs = [
-            'invoice.getTransactionId: %s',
-            'invoice->getOrder()->getIncrementId: %s',
-            '$invoice->getGrandTotal(): %s',
-            'getLastTransId: %s',
-            'getAmountAuthorized: %s',
-            'getAmountCanceled: %s',
-            'getAmountOrdered: %s',
-            'getAmountPaid: %s',
-            'getAmountRefunded: %s',
-        ];
+        $orderLines       = [];
+        $storePriceIncTax = $this->storeConfig->storePriceIncTax($memo->getOrder());
+        foreach ($memo->getAllItems() as $item) {
+            $qty         = $item->getQty();
+            $taxPercent  = $item->getOrderItem()->getTaxPercent();
+            $productType = $item->getOrderItem()->getProductType();
+            if ($qty > 0 && $productType != 'bundle') {
+                $discountAmount = $item->getDiscountAmount();
+                $originalPrice  = $item->getOrderItem()->getOriginalPrice();
 
-        $this->valitorLogger->addInfoLog(
-            'Log Transaction',
-            sprintf(
-                implode(' - ', $logs),
-                $invoice->getTransactionId(),
-                $invoice->getOrder()->getIncrementId(),
-                $invoice->getGrandTotal(),
-                $payment->getLastTransId(),
-                $payment->getAmountAuthorized(),
-                $payment->getAmountCanceled(),
-                $payment->getAmountOrdered(),
-                $payment->getAmountPaid(),
-                $payment->getAmountRefunded()
-            )
-        );
+                if ($originalPrice == 0) {
+                    $originalPrice = $item->getPriceInclTax();
+                }
+
+                if ($storePriceIncTax) {
+                    $priceWithoutTax = $this->priceHandler->getPriceWithoutTax($originalPrice, $taxPercent);
+                    $price           = $item->getPriceInclTax();
+                    $unitPrice       = bcdiv($priceWithoutTax, 1, 2);
+                    $taxAmount       = $this->priceHandler->calculateTaxAmount($priceWithoutTax, $taxPercent, $qty);
+                } else {
+                    $price           = $item->getPrice();
+                    $unitPrice       = $originalPrice;
+                    $priceWithoutTax = $originalPrice;
+                    $taxAmount       = $this->priceHandler->calculateTaxAmount($unitPrice, $taxPercent, $qty);
+                }
+                $itemDiscountInformation = $this->discountHandler->getItemDiscountInformation(
+                    $originalPrice,
+                    $price,
+                    $discountAmount,
+                    $qty,
+                    $discountAllItems
+                );
+                if ($item->getPriceInclTax()) {
+                    $discountedAmount = $itemDiscountInformation['discount'];
+                    $catalogDiscount  = $itemDiscountInformation['catalogDiscount'];
+                    $orderLines[]     = $this->orderLines->itemOrderLine(
+                        $item,
+                        $unitPrice,
+                        $discountedAmount,
+                        $taxAmount,
+                        $memo->getOrder(),
+                        false
+                    );
+                    // Gateway and cms rounding amount
+                    $roundingCompensation = $this->priceHandler->compensationAmountCal(
+                        $item,
+                        $unitPrice,
+                        $priceWithoutTax,
+                        $taxAmount,
+                        $discountedAmount,
+                        $couponCodeAmount,
+                        $catalogDiscount,
+                        $storePriceIncTax,
+                        false
+                    );
+                    //send the rounding mismatch value into separate orderline if any
+                    if ($roundingCompensation > 0 || $roundingCompensation < 0) {
+                        $orderLines[] = $this->orderLines->compensationOrderLine(
+                            "Compensation Amount",
+                            "comp-" . $item->getOrderItem()->getItemId(),
+                            $roundingCompensation
+                        );
+                    }
+                }
+            }
+        }
+
+        return $orderLines;
+    }
+
+    /**
+     * @param $memo
+     * @param $orderLines
+     * @param $orderObject
+     * @param $payment
+     * @param $storeCode
+     *
+     * @throws ResponseHeaderException
+     */
+    private function sendRefundRequest($memo, $orderLines, $orderObject, $payment, $storeCode)
+    {
+        $refund = new RefundCapturedReservation($this->systemConfig->getAuth($storeCode));
+        if ($memo->getTransactionId()) {
+            $refund->setTransaction($payment->getLastTransId());
+        }
+        $refund->setAmount((float)number_format($memo->getGrandTotal(), 2, '.', ''));
+        $refund->setOrderLines($orderLines);
+        try {
+            $refund->call();
+        } catch (ResponseHeaderException $e) {
+            $this->altapayLogger->addCritical('Response header exception: ' . $e->getMessage());
+            throw $e;
+        } catch (\Exception $e) {
+            $this->altapayLogger->addCritical('Exception: ' . $e->getMessage());
+        }
+
+        $rawResponse = $refund->getRawResponse();
+        $body        = $rawResponse->getBody();
+        //add information to the altapay log
+        $this->altapayLogger->addInfo('Response body: ' . $body);
+
+        //Update comments if refund fail
+        $xml = simplexml_load_string($body);
+        if ($xml->Body->Result == 'Error' || $xml->Body->Result == 'Failed') {
+            $orderObject->addStatusHistoryComment('Refund failed: ' . $xml->Body->MerchantErrorMessage)
+                        ->setIsCustomerNotified(false);
+            $orderObject->getResource()->save($orderObject);
+        }
+        //throw exception if result is not success
+        if ($xml->Body->Result != 'Success') {
+            throw new \InvalidArgumentException('Could not refund captured reservation');
+        }
+    }
+        
+    /**
+     * @param $order
+     *
+     * @return float|int
+     */
+    public function fixedProductTax($memo){
+
+        $weeTaxAmount = 0;
+        foreach ($memo->getAllItems() as $item) {
+           $weeTaxAmount +=  $item->getWeeeTaxAppliedRowAmount();
+        }
+
+       return $weeTaxAmount;
     }
 }

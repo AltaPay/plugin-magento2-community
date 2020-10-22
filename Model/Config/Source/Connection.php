@@ -1,24 +1,18 @@
 <?php
 /**
- * Valitor Module for Magento 2.x.
+ * Altapay Module for Magento 2.x.
  *
+ * Copyright © 2018 Altapay. All rights reserved.
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
- *
- * @copyright 2018 Valitor
- * @category  payment
- * @package   valitor
  */
-namespace SDM\Valitor\Model\Config\Source;
 
-use SDM\Valitor\Api\Test\TestConnection;
+namespace SDM\Altapay\Model\Config\Source;
+
+use SDM\Altapay\Api\Test\TestConnection;
 use Magento\Framework\Option\ArrayInterface;
-use SDM\Valitor\Model\SystemConfig;
+use SDM\Altapay\Model\SystemConfig;
 
-/**
- * Class Connection
- * @package SDM\Valitor\Model\Config\Source
- */
 class Connection implements ArrayInterface
 {
 
@@ -29,6 +23,7 @@ class Connection implements ArrayInterface
 
     /**
      * Connection constructor.
+     *
      * @param SystemConfig $systemConfig
      */
     public function __construct(SystemConfig $systemConfig)
@@ -45,7 +40,7 @@ class Connection implements ArrayInterface
     {
         try {
             $response = new TestConnection($this->systemConfig->getApiConfig('productionurl'));
-            if (! $response) {
+            if (!$response) {
                 $result = false;
             } else {
                 $result = $response->call();

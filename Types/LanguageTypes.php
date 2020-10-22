@@ -21,7 +21,7 @@
  * THE SOFTWARE.
  */
 
-namespace SDM\Valitor\Types;
+namespace SDM\Altapay\Types;
 
 class LanguageTypes implements TypeInterface
 {

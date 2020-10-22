@@ -21,12 +21,13 @@
  * THE SOFTWARE.
  */
 
-namespace SDM\Valitor\Serializer;
+namespace SDM\Altapay\Serializer;
 
-use SDM\Valitor\Response\AbstractResponse;
+use SDM\Altapay\Response\AbstractResponse;
 
 /**
  * Response serializer
+ * Serialize response from XML Element.
  */
 class ResponseSerializer
 {
@@ -34,10 +35,11 @@ class ResponseSerializer
     /**
      * Serialize a response
      *
-     * @param string $objectName
+     * @param string            $objectName
      * @param \SimpleXMLElement $data
-     * @param bool $childKey
+     * @param bool              $childKey
      * @param \SimpleXMLElement $header
+     *
      * @return AbstractResponse|array
      */
     public static function serialize(
@@ -50,15 +52,17 @@ class ResponseSerializer
             $documents = [];
             foreach ($data->{$childKey} as $d) {
                 /** @var AbstractResponse $object */
-                $object = new $objectName;
+                $object      = new $objectName;
                 $documents[] = $object->deserialize($d);
             }
+
             return $documents;
         }
 
         /** @var AbstractResponse $object */
         $object = new $objectName;
         $object->headerSetter($header);
+
         return $object->deserialize($data);
     }
 }

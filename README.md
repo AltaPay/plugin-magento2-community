@@ -1,9 +1,51 @@
-# ValitorOmni Magento2 extension
+# Altapay for Magento2 community
 
-Valitor has made it much easier for you as merchant/developer to receive secure payments in your Magento2.3.x web shop.
+Altapay has made it much easier for you as merchant/developer to receive secure payments in your Magento2.3.x web shop.
 
 
 == Change log ==
+
+** Version 3.1.1
+
+    * Bug fixes:
+        - Updated shipping template with the minor bug fix
+
+** Version 3.1.0
+
+    * Improvements:
+        - Rebranding from Valitor to Altapay
+        - Supporting fixed product tax configurations
+    * Bug fixes:
+        - Fixed order creation issue with free shipping
+        - Fixed translation issue for status code
+
+** Version 3.0.0
+
+    * Improvements:
+        - Added plugin disclaimer
+        - Code refactored according to latest coding standards
+        - Added support for Klarna Payments (Klarna reintegration) and credit card token
+        - Added the option of choosing a logo for each payment method
+        - Added new parameters, according to the payment gateway Klarna Payments updates, for the following:
+            - Create payment request
+            - Capture and refund
+        - Added support for AVS
+        - Added support for fixed amount and Buy X get Y free discount type
+    * Bug fixes:
+        - Discount applied to shipping not sent to the payment gateway accordingly
+        - Order details dependent on the current tax configuration rather than the one at the time when order was placed
+
+** Version 2.2.0
+
+    * Improvements:
+            - Added a fix in relation to a bug in Magento core source code
+            - Completed the rebranding changes
+            - Revamped orderlines for capture and refund calls
+            - Added support for bundle product and multiple tax rules
+    * Bug fixtures:
+            - Failed order when coupon code applied only to shipping
+            - Duplicated confirmation email sent when e-payments
+            - Rounding mismatch issue in compensation amounts
 
 ** Version 2.1.0
 

@@ -21,12 +21,12 @@
  * THE SOFTWARE.
  */
 
-namespace SDM\Valitor\Api\Payments;
+namespace SDM\Altapay\Api\Payments;
 
-use SDM\Valitor\AbstractApi;
-use SDM\Valitor\Response\ReleaseReservationResponse;
-use SDM\Valitor\Serializer\ResponseSerializer;
-use SDM\Valitor\Traits\TransactionsTrait;
+use SDM\Altapay\AbstractApi;
+use SDM\Altapay\Response\ReleaseReservationResponse;
+use SDM\Altapay\Serializer\ResponseSerializer;
+use SDM\Altapay\Traits\TransactionsTrait;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -47,6 +47,7 @@ class ReleaseReservation extends AbstractApi
      * Configure options
      *
      * @param OptionsResolver $resolver
+     *
      * @return void
      */
     protected function configureOptions(OptionsResolver $resolver)
@@ -57,26 +58,94 @@ class ReleaseReservation extends AbstractApi
     /**
      * Handle response
      *
-     * @param Request $request
+     * @param Request  $request
      * @param Response $response
+     *
      * @return ReleaseReservationResponse
      */
     protected function handleResponse(Request $request, Response $response)
     {
-        $body = (string) $response->getBody();
-        $xml = simplexml_load_string($body);
+        $body = (string)$response->getBody();
+        $xml  = simplexml_load_string($body);
+
         return ResponseSerializer::serialize(ReleaseReservationResponse::class, $xml->Body, false, $xml->Header);
+    }
+
+    /**
+     * @return array
+     */
+    protected function getBasicHeaders()
+    {
+        $headers = parent::getBasicHeaders();
+        if (strtolower($this->getHttpMethod()) == 'post') {
+            $headers['Content-Type'] = 'application/x-www-form-urlencoded';
+        }
+
+        return $headers;
     }
 
     /**
      * Url to api call
      *
      * @param array $options Resolved options
+     *
      * @return string
      */
     protected function getUrl(array $options)
     {
-        $query = $this->buildUrl($options);
-        return sprintf('releaseReservation/?%s', $query);
+        $url = 'releaseReservation';
+        if (strtolower($this->getHttpMethod()) == 'get') {
+            $query = $this->buildUrl($options);
+            $url   = sprintf('%s/?%s', $url, $query);
+        }
+
+        return $url;
+    }
+
+    /**
+     * @return string
+     */
+    protected function getHttpMethod()
+    {
+        return 'POST';
+    }
+
+    /**
+     * @return \Altapay\Response\AbstractResponse|PaymentRequestResponse|bool|void
+     * @throws \Altapay\Exceptions\ResponseHeaderException
+     * @throws \Altapay\Exceptions\ResponseMessageException
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     */
+    protected function doResponse()
+    {
+        $this->doConfigureOptions();
+        $headers           = $this->getBasicHeaders();
+        $requestParameters = [$this->getHttpMethod(), $this->parseUrl(), $headers];
+        if (strtolower($this->getHttpMethod()) == 'post') {
+            $requestParameters[] = $this->getPostOptions();
+        }
+        $request       = new Request(...$requestParameters);
+        $this->request = $request;
+        try {
+            $response       = $this->getClient()->send($request);
+            $this->response = $response;
+
+            $output = $this->handleResponse($request, $response);
+            $this->validateResponse($output);
+
+            return $output;
+        } catch (GuzzleHttpClientException $e) {
+            throw new Exceptions\ClientException($e->getMessage(), $e->getRequest(), $e->getResponse());
+        }
+    }
+
+    /**
+     * @return string
+     */
+    protected function getPostOptions()
+    {
+        $options = $this->options;
+
+        return http_build_query($options, null, '&');
     }
 }

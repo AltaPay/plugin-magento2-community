@@ -1,36 +1,34 @@
 <?php
 /**
- * Valitor Module for Magento 2.x.
+ * Altapay Module for Magento 2.x.
  *
+ * Copyright © 2018 Altapay. All rights reserved.
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
- *
- * @copyright 2018 Valitor
- * @category  payment
- * @package   valitor
  */
-namespace SDM\Valitor\Model;
 
-use SDM\Valitor\Api\Ecommerce\Callback;
-use SDM\Valitor\Request\Config;
-use SDM\Valitor\Response\CallbackResponse;
-use SDM\Valitor\Model\ConstantConfig;
+namespace SDM\Altapay\Model;
+
+use Magento\Framework\Exception\AlreadyExistsException;
+use SDM\Altapay\Api\Ecommerce\Callback;
+use SDM\Altapay\Response\CallbackResponse;
 use Magento\Checkout\Model\Session;
 use Magento\Framework\App\Request\Http;
 use Magento\Framework\App\RequestInterface;
-use SDM\Valitor\Logger\Logger;
-use Magento\Payment\Helper\Data as PaymentData;
+use SDM\Altapay\Logger\Logger;
 use Magento\Quote\Model\Quote;
 use Magento\Sales\Model\Order;
 use Magento\Sales\Model\Order\Email\Sender\OrderSender;
-use SDM\Valitor\Api\TransactionRepositoryInterface;
-use SDM\Valitor\Api\OrderLoaderInterface;
+use SDM\Altapay\Api\TransactionRepositoryInterface;
+use SDM\Altapay\Api\OrderLoaderInterface;
 use Magento\Framework\DB\TransactionFactory;
 use Magento\Sales\Model\Service\InvoiceService;
+use SDM\Altapay\Model\Handler\OrderLinesHandler;
+use SDM\Altapay\Model\Handler\CreatePaymentHandler;
 
 /**
  * Class Generator
- * @package SDM\Valitor\Model
+ * Handle the create payment related functionality.
  */
 class Generator
 {
@@ -38,11 +36,6 @@ class Generator
      * @var Quote
      */
     private $quote;
-
-    /**
-     * @var PaymentData
-     */
-    private $paymentData;
 
     /**
      * @var Session
@@ -59,9 +52,9 @@ class Generator
      */
     private $order;
     /**
-    * @var \Magento\Sales\Model\Service\InvoiceService
-    */
-    private $_invoiceService;
+     * @var InvoiceService
+     */
+    private $invoiceService;
     /**
      * @var OrderSender
      */
@@ -75,7 +68,7 @@ class Generator
     /**
      * @var Logger
      */
-    private $valitorLogger;
+    private $altapayLogger;
 
     /**
      * @var TransactionRepositoryInterface
@@ -88,52 +81,68 @@ class Generator
     private $orderLoader;
 
     /**
-     * @var \Magento\Framework\DB\TransactionFactory
+     * @var TransactionFactory
      */
     private $transactionFactory;
     /**
+     * @var OrderLinesHandler
+     */
+    private $orderLines;
+    /**
+     * @var CreatePaymentHandler
+     */
+    private $paymentHandler;
+
+    /**
      * Generator constructor.
-     * @param Quote $quote
-     * @param PaymentData $paymentData
-     * @param Session $checkoutSession
-     * @param Http $request
-     * @param Order $order
-     * @param OrderSender $orderSender
-     * @param SystemConfig $systemConfig
-     * @param Logger $valitorLogger
+     *
+     * @param Quote                          $quote
+     * @param Session                        $checkoutSession
+     * @param Http                           $request
+     * @param Order                          $order
+     * @param OrderSender                    $orderSender
+     * @param SystemConfig                   $systemConfig
+     * @param Logger                         $altapayLogger
      * @param TransactionRepositoryInterface $transactionRepository
-     * @param OrderLoaderInterface $orderLoader
+     * @param OrderLoaderInterface           $orderLoader
+     * @param TransactionFactory             $transactionFactory
+     * @param InvoiceService                 $invoiceService
+     * @param OrderLinesHandler              $orderLines
+     * @param CreatePaymentHandler           $paymentHandler
      */
     public function __construct(
         Quote $quote,
-        PaymentData $paymentData,
         Session $checkoutSession,
         Http $request,
         Order $order,
         OrderSender $orderSender,
         SystemConfig $systemConfig,
-        Logger $valitorLogger,
+        Logger $altapayLogger,
         TransactionRepositoryInterface $transactionRepository,
         OrderLoaderInterface $orderLoader,
         TransactionFactory $transactionFactory,
-        InvoiceService $invoiceService
+        InvoiceService $invoiceService,
+        OrderLinesHandler $orderLines,
+        CreatePaymentHandler $paymentHandler
     ) {
-        $this->quote = $quote;
-        $this->paymentData = $paymentData;
-        $this->checkoutSession = $checkoutSession;
-        $this->request = $request;
-        $this->order = $order;
-        $this->orderSender = $orderSender;
-        $this->_invoiceService = $invoiceService;
-        $this->systemConfig = $systemConfig;
-        $this->valitorLogger = $valitorLogger;
+        $this->quote                 = $quote;
+        $this->checkoutSession       = $checkoutSession;
+        $this->request               = $request;
+        $this->order                 = $order;
+        $this->orderSender           = $orderSender;
+        $this->invoiceService        = $invoiceService;
+        $this->systemConfig          = $systemConfig;
+        $this->altapayLogger         = $altapayLogger;
         $this->transactionRepository = $transactionRepository;
-        $this->transactionFactory = $transactionFactory;
-        $this->orderLoader = $orderLoader;
+        $this->transactionFactory    = $transactionFactory;
+        $this->orderLoader           = $orderLoader;
+        $this->orderLines            = $orderLines;
+        $this->paymentHandler        = $paymentHandler;
     }
 
     /**
      * @param RequestInterface $request
+     *
      * @return bool
      * @throws \Exception
      */
@@ -142,17 +151,15 @@ class Generator
         $callback = new Callback($request->getPostValue());
         $response = $callback->call();
         if ($response) {
-            $this->valitorLogger->addDebugLog('[restoreOrderFromRequest] Response correct', $response);
+            $this->altapayLogger->addDebugLog('[restoreOrderFromRequest] Response correct', $response);
             $order = $this->orderLoader->getOrderByOrderIncrementId($response->shopOrderId);
             if ($order->getQuoteId()) {
-                $this->valitorLogger->addDebugLog('[restoreOrderFromRequest] Order quote id', $order->getQuoteId());
+                $this->altapayLogger->addDebugLog('[restoreOrderFromRequest] Order quote id', $order->getQuoteId());
                 if ($quote = $this->quote->loadByIdWithoutStore($order->getQuoteId())) {
-                    $this->valitorLogger->addDebugLog('[restoreOrderFromRequest] Quote found', $order->getQuoteId());
-                    $quote
-                        ->setIsActive(1)
-                        ->setReservedOrderId(null)
-                        ->save();
+                    $this->altapayLogger->addDebugLog('[restoreOrderFromRequest] Quote found', $order->getQuoteId());
+                    $quote->setIsActive(1)->setReservedOrderId(null)->save();
                     $this->checkoutSession->replaceQuote($quote);
+
                     return true;
                 }
             }
@@ -161,18 +168,29 @@ class Generator
         return false;
     }
 
-    public function createInvoice($order)
+    /**
+     * @param      $order
+     * @param bool $requireCapture
+     */
+    public function createInvoice($order, $requireCapture = false)
     {
+        if (filter_var($requireCapture, FILTER_VALIDATE_BOOLEAN) === true) {
+            $captureType = \Magento\Sales\Model\Order\Invoice::CAPTURE_ONLINE;
+        } else {
+            $captureType = \Magento\Sales\Model\Order\Invoice::CAPTURE_OFFLINE;
+        }
+
         if (!$order->getInvoiceCollection()->count()) {
-            $invoice = $this->_invoiceService->prepareInvoice($order);
-            $invoice->setRequestedCaptureCase(\Magento\Sales\Model\Order\Invoice::CAPTURE_OFFLINE);
+            $invoice = $this->invoiceService->prepareInvoice($order);
+            $invoice->setRequestedCaptureCase($captureType);
             $invoice->register();
             $invoice->getOrder()->setCustomerNoteNotify(false);
             $invoice->getOrder()->setIsInProcess(true);
-            $transactionSave = $this->transactionFactory->create()->addObject($invoice)->addObject($invoice->getOrder());
-            $transactionSave->save();
+            $transaction = $this->transactionFactory->create()->addObject($invoice)->addObject($invoice->getOrder());
+            $transaction->save();
         }
     }
+
     /**
      * @param RequestInterface $request
      */
@@ -183,51 +201,67 @@ class Generator
 
     /**
      * @param RequestInterface $request
+     * @param                  $responseStatus
      */
     public function handleCancelStatusAction(RequestInterface $request, $responseStatus)
     {
-        $stateWhenRedirectCancel = Order::STATE_CANCELED;
-        $statusWhenRedirectCancel = Order::STATE_CANCELED;
         $responseComment = __(ConstantConfig::CONSUMER_CANCEL_PAYMENT);
         if ($responseStatus != 'cancelled') {
             $responseComment = __(ConstantConfig::UNKNOWN_PAYMENT_STATUS_MERCHANT);
         }
-        $historyComment = __(ConstantConfig::CANCELLED).'|'.$responseComment;
+        $historyComment = __(ConstantConfig::CANCELLED) . '|' . $responseComment;
         //TODO: fetch the MerchantErrorMessage and use it as historyComment
         $callback = new Callback($request->getPostValue());
         $response = $callback->call();
         if ($response) {
             $order = $this->loadOrderFromCallback($response);
-        }
+            //check if order status set in configuration
+            $statusKey         = Order::STATE_CANCELED;
+            $storeCode         = $order->getStore()->getCode();
+            $storeScope        = \Magento\Store\Model\ScopeInterface::SCOPE_STORE;
+            $orderStatusCancel = $this->systemConfig->getStatusConfig('cancel', $storeScope, $storeCode);
 
-        $storeCode = $order->getStore()->getCode();
-        $storeScope = \Magento\Store\Model\ScopeInterface::SCOPE_STORE;
-        $orderStatusCancel = $this->systemConfig->getStatusConfig('cancel', $storeScope, $storeCode);
-
-        if ($orderStatusCancel) {
-            $statusWhenRedirectCancel = $orderStatusCancel;
+            if ($orderStatusCancel) {
+                $statusKey = $orderStatusCancel;
+            }
+            $this->handleOrderStateAction($request, Order::STATE_CANCELED, $statusKey, $historyComment);
+            //save failed transaction data
+            $this->saveTransactionData($request, $response, $order);
         }
-        $this->handleOrderStateAction($request, $stateWhenRedirectCancel, $statusWhenRedirectCancel, $historyComment);
-        
-        //save faild transaction data
-        $parametersData = json_encode($request->getPostValue());
+    }
+
+    /**
+     * @param $request
+     * @param $response
+     * @param $order
+     */
+    private function saveTransactionData($request, $response, $order)
+    {
+        $parametersData  = json_encode($request->getPostValue());
         $transactionData = json_encode($response);
-        $this->transactionRepository->addTransactionData($order->getIncrementId(), $response->transactionId, $response->paymentId, $transactionData, $parametersData);
+        $this->transactionRepository->addTransactionData(
+            $order->getIncrementId(),
+            $response->transactionId,
+            $response->paymentId,
+            $transactionData,
+            $parametersData
+        );
     }
 
     /**
      * @param RequestInterface $request
+     *
+     * @return mixed
      */
     public function handleFailStatusRedirectFormAction(RequestInterface $request)
     {
         //TODO:refactor this method
-        $formUrl = null;
-        $transInfo = null;
+        $formUrl  = null;
         $callback = new Callback($request->getPostValue());
         $response = $callback->call();
         if ($response) {
-            $order = $this->orderLoader->getOrderByOrderIncrementId($response->shopOrderId);
-            $formUrl = $order->getValitorPaymentFormUrl();
+            $order   = $this->orderLoader->getOrderByOrderIncrementId($response->shopOrderId);
+            $formUrl = $order->getAltapayPaymentFormUrl();
             if ($formUrl) {
                 $order->addStatusHistoryComment(__(ConstantConfig::DECLINED_PAYMENT_FORM));
             } else {
@@ -240,81 +274,60 @@ class Generator
         return $formUrl;
     }
 
-    
     /**
      * @param RequestInterface $request
+     * @param                  $msg
+     * @param                  $merchantErrorMsg
+     * @param                  $responseStatus
+     *
+     * @throws \Exception
      */
     public function handleFailedStatusAction(RequestInterface $request, $msg, $merchantErrorMsg, $responseStatus)
     {
-        $historyComment = $responseStatus.'|'.$msg;
-        if (!is_null($merchantErrorMsg)) {
-            $historyComment = $responseStatus.'|'.$msg.'|'.$merchantErrorMsg;
+        $historyComment = $responseStatus . '|' . $msg;
+        if (!empty($merchantErrorMsg)) {
+            $historyComment = $historyComment . '|' . $merchantErrorMsg;
         }
         $transInfo = null;
-        $callback = new Callback($request->getPostValue());
-        $response = $callback->call();
+        $callback  = new Callback($request->getPostValue());
+        $response  = $callback->call();
         if ($response) {
-            $order = $this->loadOrderFromCallback($response);
-            $transInfo = sprintf(
-                "Transaction ID: %s - Payment ID: %s - Credit card token: %s",
-                $response->transactionId,
-                $response->paymentId,
-                $response->creditCardToken
-            );
-        }
-        
-        //check if order status set oin configuaration
-        $stateWhenRedirectFail = Order::STATE_CANCELED;
-        $statusWhenRedirectFail = Order::STATE_CANCELED;
-        $storeCode = $order->getStore()->getCode();
-        $storeScope = \Magento\Store\Model\ScopeInterface::SCOPE_STORE;
-        $orderStatusCancel = $this->systemConfig->getStatusConfig('cancel', $storeScope, $storeCode);
+            $order     = $this->loadOrderFromCallback($response);
+            $transInfo = $this->getTransactionInfoFromResponse($response);
+            //check if order status set in configuration
+            $statusKey         = Order::STATE_CANCELED;
+            $storeCode         = $order->getStore()->getCode();
+            $storeScope        = \Magento\Store\Model\ScopeInterface::SCOPE_STORE;
+            $orderStatusCancel = $this->systemConfig->getStatusConfig('cancel', $storeScope, $storeCode);
 
-        if ($orderStatusCancel) {
-            $statusWhenRedirectFail = $orderStatusCancel;
+            if ($orderStatusCancel) {
+                $statusKey = $orderStatusCancel;
+            }
+            $this->handleOrderStateAction($request, Order::STATE_CANCELED, $statusKey, $historyComment, $transInfo);
+            //save failed transaction data
+            $this->saveTransactionData($request, $response, $order);
         }
-
-        $this->handleOrderStateAction(
-            $request,
-            $stateWhenRedirectFail,
-            $statusWhenRedirectFail,
-            $historyComment,
-            $transInfo
-        );
-        
-        //save faild transaction data
-        $parametersData = json_encode($request->getPostValue());
-        $transactionData = json_encode($response);
-        $this->transactionRepository->addTransactionData($order->getIncrementId(), $response->transactionId, $response->paymentId, $transactionData, $parametersData);
     }
 
     /**
      * @param CallbackResponse $response
+     *
      * @return Order
      */
     private function loadOrderFromCallback(CallbackResponse $response)
     {
-        return $this->loadOrderFromOrderId($response->shopOrderId);
+        return $this->order->loadByIncrementId($response->shopOrderId);
     }
-    
-    /**
-     * @param string $orderId
-     * @return Order
-     */
-    private function loadOrderFromOrderId($orderId)
-    {
-        $order = $this->order->loadByIncrementId($orderId);
-        return $order;
-    }
-    
+
     /**
      * @param RequestInterface $request
-     * @param string $orderState
-     * @param string $orderStatus
-     * @param string $historyComment
-     * @param null $transactionInfo
-     * @throws \Exception
-     * @throws \Magento\Framework\Exception\AlreadyExistsException
+     * @param string           $orderState
+     * @param string           $orderStatus
+     * @param string           $historyComment
+     * @param null             $transactionInfo
+     *
+     * @return bool
+     * @throws AlreadyExistsException
      */
     public function handleOrderStateAction(
         RequestInterface $request,
@@ -329,7 +342,7 @@ class Generator
             $order = $this->loadOrderFromCallback($response);
             $order->setState($orderState);
             $order->setIsNotified(false);
-            if (!is_null($transactionInfo)) {
+            if ($transactionInfo !== null) {
                 $order->addStatusHistoryComment($transactionInfo);
             }
             $order->addStatusHistoryComment($historyComment, $orderStatus);
@@ -350,119 +363,280 @@ class Generator
     }
 
     /**
-     * @param $comment
+     * @param                  $comment
      * @param RequestInterface $request
-     * @throws \Exception
-     * @throws \Magento\Framework\Exception\AlreadyExistsException
+     *
+     * @throws AlreadyExistsException
      */
     private function completeCheckout($comment, RequestInterface $request)
     {
-        $callback = new Callback($request->getPostValue());
-        $response = $callback->call();
+        $callback       = new Callback($request->getPostValue());
+        $response       = $callback->call();
+        $paymentStatus  = $response->type;
+        $requireCapture = $response->requireCapture;
         if ($response) {
-            $order = $this->orderLoader->getOrderByOrderIncrementId($response->shopOrderId);
+            $order      = $this->orderLoader->getOrderByOrderIncrementId($response->shopOrderId);
             $storeScope = \Magento\Store\Model\ScopeInterface::SCOPE_STORE;
-            $storeCode = $order->getStore()->getCode();
+            $storeCode  = $order->getStore()->getCode();
             if ($order->getId()) {
-                // @todo Write data to DB
+                $cardType = '';
+                $expires  = '';
+                if (isset($response->Transactions[0])) {
+                    $transaction = $response->Transactions[0];
+                    if (isset($transaction->CreditCardExpiry->Month) && isset($transaction->CreditCardExpiry->Year)) {
+                        $expires = $transaction->CreditCardExpiry->Month . '/' . $transaction->CreditCardExpiry->Year;
+                    }
+                    if (isset($transaction->PaymentSchemeName)) {
+                        $cardType = $transaction->PaymentSchemeName;
+                    }
+                }
                 $payment = $order->getPayment();
                 $payment->setPaymentId($response->paymentId);
                 $payment->setLastTransId($response->transactionId);
                 $payment->setCcTransId($response->creditCardToken);
+                $payment->setAdditionalInformation('cc_token', $response->creditCardToken);
+                $payment->setAdditionalInformation('masked_credit_card', $response->maskedCreditCard);
+                $payment->setAdditionalInformation('expires', $expires);
+                $payment->setAdditionalInformation('card_type', $cardType);
                 $payment->save();
-            }
-            //If the product is shipping product then check
-            $shippedProduct = false;
-            if (!$order->getEmailSent()) {
-                $this->orderSender->send($order);
-            }
-            foreach ($order->getAllVisibleItems() as $item) {
-                $product_type = $item->getProductType();
-            }
-            if ($product_type != 'virtual' && $product_type != 'downloadable') {
-                $shippedProduct = true;
-            }
-            //unset redirect if success
-            $this->checkoutSession->unsValitorCustomerRedirect();
-            //save transaction data
-            $parametersData = json_encode($request->getPostValue());
-            $transactionData = json_encode($response);
-            $this->transactionRepository->addTransactionData($order->getIncrementId(), $response->transactionId, $response->paymentId, $transactionData, $parametersData);
-            
-            $isCaptured = false;
-            foreach (SystemConfig::getTerminalCodes() as $terminalName) {
-                if ($this->systemConfig->getTerminalConfigFromTerminalName(
-                    $terminalName,
-                    'terminalname',
-                    $storeScope,
-                    $storeCode
-                ) === $response->Transactions[0]->Terminal
-                ) {
-                    $isCaptured = $this->systemConfig->getTerminalConfigFromTerminalName($terminalName, 'capture', $storeScope, $storeCode);
-                    break;
-                }
-            }
-            $orderStatusAfterPayment = $this->systemConfig->getStatusConfig('process', $storeScope, $storeCode);
-            $orderStatus_capture = $this->systemConfig->getStatusConfig('autocapture', $storeScope, $storeCode);
-
-            if ($isCaptured) {
-                if ($orderStatus_capture == "complete") {
-                    if ($shippedProduct) {
-                        $this->setCustomOrderStatus($order, Order::STATE_COMPLETE, 'autocapture');
-                        $order->addStatusHistoryComment(__(ConstantConfig::PAYMENT_COMPLETE));
-                    } else {
-                        $order->addStatusToHistory($orderStatus_capture, ConstantConfig::PAYMENT_COMPLETE, false);
-                    }
-                } else {
-                    $this->setCustomOrderStatus($order, Order::STATE_PROCESSING, 'process');
-                }
-            } else {
-                if ($orderStatusAfterPayment) {
-                    $this->setCustomOrderStatus($order, $orderStatusAfterPayment, 'process');
-                } else {
-                    $this->setCustomOrderStatus($order, Order::STATE_PROCESSING, 'process');
-                }
-            }
-            $order->addStatusHistoryComment($comment);
-            $order->addStatusHistoryComment(
-                sprintf(
-                    "Transaction ID: %s - Payment ID: %s - Credit card token: %s",
+                //send order confirmation email
+                $this->sendOrderConfirmationEmail($comment, $order);
+                //unset redirect if success
+                $this->checkoutSession->unsAltapayCustomerRedirect();
+                //save transaction data
+                $parametersData  = json_encode($request->getPostValue());
+                $transactionData = json_encode($response);
+                $this->transactionRepository->addTransactionData(
+                    $order->getIncrementId(),
                     $response->transactionId,
                     $response->paymentId,
-                    $response->creditCardToken
-                )
-            );
-            $order->setIsNotified(false);
-            $order->getResource()->save($order);
-            if ($response->type == "paymentAndCapture") {
-                $this->createInvoice($order);
+                    $transactionData,
+                    $parametersData
+                );
+                $orderStatusAfterPayment = $this->systemConfig->getStatusConfig('process', $storeScope, $storeCode);
+                $orderStatusCapture      = $this->systemConfig->getStatusConfig('autocapture', $storeScope, $storeCode);
+                $setOrderStatus          = true;
+                $orderState              = Order::STATE_PROCESSING;
+                $statusKey               = 'process';
+
+                if ($this->isCaptured($response, $storeCode, $storeScope)) {
+                    if ($orderStatusCapture == "complete") {
+                        if ($this->orderLines->sendShipment($order)) {
+                            $orderState = Order::STATE_COMPLETE;
+                            $statusKey  = 'autocapture';
+                            $order->addStatusHistoryComment(__(ConstantConfig::PAYMENT_COMPLETE));
+                        } else {
+                            $setOrderStatus = false;
+                            $order->addStatusToHistory($orderStatusCapture, ConstantConfig::PAYMENT_COMPLETE, false);
+                        }
+                    }
+                } else {
+                    if ($orderStatusAfterPayment) {
+                        $orderState = $orderStatusAfterPayment;
+                    }
+                }
+                if ($setOrderStatus) {
+                    $this->paymentHandler->setCustomOrderStatus($order, $orderState, $statusKey);
+                }
+                $order->addStatusHistoryComment($comment);
+                $order->addStatusHistoryComment($this->getTransactionInfoFromResponse($response));
+                $order->setIsNotified(false);
+                $order->getResource()->save($order);
+
+                if (strtolower($paymentStatus) == 'paymentandcapture') {
+                    $this->createInvoice($order, $requireCapture);
+                }
             }
         }
     }
 
     /**
-     * @param Order $order
-     * @param $state
-     * @param $statusKey
-     * @throws \Exception
-     * @throws \Magento\Framework\Exception\AlreadyExistsException
+     * @param $response
+     *
+     * @return string
      */
-    private function setCustomOrderStatus(Order $order, $state, $statusKey)
+    private function getTransactionInfoFromResponse($response)
     {
-        $order->setState($state);
-        $storeScope = \Magento\Store\Model\ScopeInterface::SCOPE_STORE;
-        $storeCode = $order->getStore()->getCode();
-        if ($status = $this->systemConfig->getStatusConfig($statusKey, $storeScope, $storeCode)) {
-            $order->setStatus($status);
-        }
-        $order->getResource()->save($order);
+        return sprintf(
+            "Transaction ID: %s - Payment ID: %s - Credit card token: %s",
+            $response->transactionId,
+            $response->paymentId,
+            $response->creditCardToken
+        );
     }
 
     /**
-     * @return Session
+     * @param $response
+     * @param $storeCode
+     * @param $storeScope
+     *
+     * @return bool|\Magento\Payment\Model\MethodInterface
      */
-    public function getCheckoutSession()
+    private function isCaptured($response, $storeCode, $storeScope)
     {
-        return $this->checkoutSession;
+        $isCaptured = false;
+        foreach (SystemConfig::getTerminalCodes() as $terminalName) {
+            $terminalConfig = $this->systemConfig->getTerminalConfigFromTerminalName(
+                $terminalName,
+                'terminalname',
+                $storeScope,
+                $storeCode
+            );
+            if ($terminalConfig === $response->Transactions[0]->Terminal) {
+                $isCaptured = $this->systemConfig->getTerminalConfigFromTerminalName(
+                    $terminalName,
+                    'capture',
+                    $storeScope,
+                    $storeCode
+                );
+                break;
+            }
+        }
+
+        return $isCaptured;
+    }
+
+    /**
+     * @param $comment
+     * @param $order
+     */
+    private function sendOrderConfirmationEmail($comment, $order)
+    {
+        $currentStatus        = $order->getStatus();
+        $orderHistories       = $order->getStatusHistories();
+        $latestHistoryComment = array_pop($orderHistories);
+        $prevStatus           = $latestHistoryComment->getStatus();
+
+        $sendMail = true;
+        if (strpos($comment, ConstantConfig::NOTIFICATION_CALLBACK) !== false && $currentStatus == $prevStatus) {
+            $sendMail = false;
+        }
+        if (!$order->getEmailSent() && $sendMail == true) {
+            $this->orderSender->send($order);
+        }
+    }
+
+    /**
+     * @param RequestInterface $request
+     * @param                  $avsCode
+     * @param                  $historyComment
+     *
+     * @return bool
+     */
+    public function avsCheck(RequestInterface $request, $avsCode, $historyComment)
+    {
+        $checkRejectionCase = false;
+        $transInfo          = null;
+        $callback           = new Callback($request->getPostValue());
+        $response           = $callback->call();
+        if ($response) {
+            $order                 = $this->loadOrderFromCallback($response);
+            $storeScope            = \Magento\Store\Model\ScopeInterface::SCOPE_STORE;
+            $storeCode             = $order->getStore()->getCode();
+            $transInfo             = $this->getTransactionInfoFromResponse($response);
+            $isAvsEnabled          = $this->checkAvsConfig($response, $storeCode, $storeScope, 'avscontrol');
+            $isAvsEnforced         = $this->checkAvsConfig($response, $storeCode, $storeScope, 'enforceavs');
+            $getAcceptedAvsResults = $this->getAcceptedAvsResults($response, $storeCode, $storeScope);
+
+            if ($isAvsEnabled) {
+                if ($isAvsEnforced && empty($avsCode)) {
+                    $checkRejectionCase = true;
+                } elseif (stripos($getAcceptedAvsResults, $avsCode) === false) {
+                    $checkRejectionCase = true;
+                }
+            }
+            if ($checkRejectionCase) {
+                //check if order status set in configuration
+                $statusKey         = Order::STATE_CANCELED;
+                $orderStatusCancel = $this->systemConfig->getStatusConfig('cancel', $storeScope, $storeCode);
+                //Save payment info in order to retrieve it for release operation
+                if ($order->getId()) {
+                    $this->savePaymentData($response, $order);
+                }
+                if ($orderStatusCancel) {
+                    $statusKey = $orderStatusCancel;
+                }
+                $this->handleOrderStateAction($request, Order::STATE_CANCELED, $statusKey, $historyComment, $transInfo);
+                //save failed transaction data
+                $this->saveTransactionData($request, $response, $order);
+            }
+        }
+
+        return $checkRejectionCase;
+    }
+
+    /**
+     * @param $response
+     * @param $storeCode
+     * @param $storeScope
+     * @param $configField
+     *
+     * @return bool
+     */
+    public function checkAvsConfig($response, $storeCode, $storeScope, $configField)
+    {
+        $isEnabled = false;
+        foreach (SystemConfig::getTerminalCodes() as $terminalName) {
+            $terminalConfig = $this->systemConfig->getTerminalConfigFromTerminalName(
+                $terminalName,
+                'terminalname',
+                $storeScope,
+                $storeCode
+            );
+            if ($terminalConfig === $response->Transactions[0]->Terminal) {
+                $isEnabled = $this->systemConfig->getTerminalConfigFromTerminalName(
+                    $terminalName,
+                    $configField,
+                    $storeScope,
+                    $storeCode
+                );
+                break;
+            }
+        }
+
+        return $isEnabled;
+    }
+
+    /**
+     * @param $response
+     * @param $storeCode
+     * @param $storeScope
+     *
+     * @return |null
+     */
+    public function getAcceptedAvsResults($response, $storeCode, $storeScope)
+    {
+        $acceptedAvsResults = null;
+        foreach (SystemConfig::getTerminalCodes() as $terminalName) {
+            $terminalConfig = $this->systemConfig->getTerminalConfigFromTerminalName(
+                $terminalName,
+                'terminalname',
+                $storeScope,
+                $storeCode
+            );
+            if ($terminalConfig === $response->Transactions[0]->Terminal) {
+                $acceptedAvsResults = $this->systemConfig->getTerminalConfigFromTerminalName(
+                    $terminalName,
+                    'avs_acceptance',
+                    $storeScope,
+                    $storeCode
+                );
+                break;
+            }
+        }
+
+        return $acceptedAvsResults;
+    }
+
+    /**
+     * @param $response
+     * @param $order
+     */
+    public function savePaymentData($response, $order)
+    {
+        $payment = $order->getPayment();
+        $payment->setPaymentId($response->paymentId);
+        $payment->setLastTransId($response->transactionId);
+        $payment->save();
     }
 }

@@ -1,161 +1,179 @@
 <?php
 /**
- * Valitor Module for Magento 2.x.
+ * Altapay Module for Magento 2.x.
  *
+ * Copyright © 2018 Altapay. All rights reserved.
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
- *
- * @copyright 2018 Valitor
- * @category  payment
- * @package   valitor
  */
 ?>
-<link rel="stylesheet" type="text/css" href="<?php echo $block->getViewFileUrl('SDM_Valitor::css/ordersummary.css')?>">
+<link rel="stylesheet" type="text/css" href="<?= /* @noEscape */
+$block->getViewFileUrl('SDM_Altapay::css/ordersummary.css') ?>">
 <?php $order = $block->getOrder(); ?>
-
 <!-- Order Shipping Details -->
 <aside style="float:left" class="modal-custom opc-sidebar opc-summary-wrapper">
-<div class="opc-block-shipping-information">
-   <div class="shipping-information">
-      <div class="ship-to">
-         <div class="shipping-information-title">
-            <span>Ship To:</span>
-         </div>
-         <div class="shipping-information-content">
-           <?php echo $block->getFormattedAddress(); ?>
-         </div>
-      </div>
-      <div class="ship-via">
-         <div class="shipping-information-title">
-            <span>Shipping Method:</span>
-         </div>
-         <div class="shipping-information-content">
-            <span class="value"><?php echo $order->getShippingDescription(); ?></span>
-         </div>
-      </div>
-      <div class="ship-via">
-         <div class="shipping-information-title">
-            <span>Payment Method:</span>
-         </div>
-         <div class="shipping-information-content">
-          <span class="value"><?php echo $block->getPaymentMethodtitle(); ?></span>
-         </div>
-      </div>
-   </div>
-</div>
+    <div class="opc-block-shipping-information">
+        <div class="shipping-information">
+            <div class="ship-to">
+                <div class="shipping-information-title">
+                    <span>Ship To:</span>
+                </div>
+                <div class="shipping-information-content">
+                    <?= /* @noEscape */ $block->getFormattedAddress(); ?>
+                </div>
+            </div>
+            <div class="ship-via">
+                <div class="shipping-information-title">
+                    <span>Shipping Method:</span>
+                </div>
+                <div class="shipping-information-content">
+                    <span class="value"><?= $block->escapeHtml($order->getShippingDescription()); ?></span>
+                </div>
+            </div>
+            <div class="ship-via">
+                <div class="shipping-information-title">
+                    <span>Payment Method:</span>
+                </div>
+                <div class="shipping-information-content">
+                    <span class="value"><?= $block->escapeHtml($block->getPaymentMethodtitle()); ?></span>
+                </div>
+            </div>
+        </div>
+    </div>
 </aside>
-
 <!-- Order Item Details -->
 <aside class="modal-custom opc-sidebar opc-summary-wrapper">
-<div class="opc-block-summary">
-   <span class="title">Order Summary</span>
-   <table class="data table table-totals">
-      <caption class="table-caption">Order Summary</caption>
-      <tbody>
-         <tr class="totals sub">
-            <th class="mark" scope="row">Cart Subtotal</th>
-            <td class="amount">
-               <span class="price" data-th="Cart Subtotal"><?php echo $block->getFormatedPrice($order->getSubtotal()); ?></span>
-            </td>
-         </tr>
-         <tr class="totals discount">
-          <th class="mark" >
-              <span class="title">Discount</span>
-              <span class="discount coupon"><?php echo $order->getCouponCode(); ?></span>
-          </th>
-          <td class="amount">
-              <span class="price">-<?php echo $block->getFormatedPrice($order->getDiscountAmount()); ?></span>
-          </td>
-        </tr>
-         <tr class="totals shipping excl">
-            <th class="mark" scope="row">
-               <span class="label">Shipping</span>
-               <span class="value"><?php echo $order->getShippingDescription(); ?></span>
-            </th>
-            <td class="amount">
-               <span class="price" data-th="Shipping"><?php echo $block->getFormatedPrice($order->getShippingAmount()); ?></span>
-            </td>
-         </tr>
-         <tr class="totals-tax">
-             <th class="mark">Tax</th>
-             <td class="amount">
-                     <span class="price"><?php echo $block->getFormatedPrice($order->getTaxAmount()); ?></span>
-             </td>
-         </tr>
-         <tr class="grand totals">
-            <th class="mark" scope="row">
-               <strong>Order Total</strong>
-            </th>
-            <td class="amount" data-th="Order Total">
-               <strong><span class="price"><?php echo $block->getFormatedPrice($order->getGrandTotal()); ?></span></strong>
-            </td>
-         </tr>
-      </tbody>
-   </table>
-   <div class="block items-in-cart active">
-      <div style="position: unset;" class="title">
-         <strong role="heading">
-         <span><?php echo count($order->getAllVisibleItems()); ?></span>
-         <span>Item in Cart</span>
-         </strong>
-      </div>
-      <div class="content minicart-items">
-         <div class="minicart-items-wrapper overflowed">
-            <ol class="minicart-items">
-            <?php 
-               foreach ($order->getAllVisibleItems() as $item) {
-                  $product = $block->getProductById($item->getProductId());
-                  $options = $item->getProductOptions();
-                  $imageBlock = $block->getLayout()->createBlock('Magento\Catalog\Block\Product\ListProduct');
-                  $productImage = $imageBlock->getImage($product, 'category_page_list');
+    <div class="opc-block-summary">
+        <span class="title">Order Summary</span>
+        <table class="data table table-totals">
+            <caption class="table-caption">Order Summary</caption>
+            <tbody>
+            <tr class="totals sub">
+                <th class="mark" scope="row">Cart Subtotal</th>
+                <td class="amount">
+                    <span class="price" data-th="Cart Subtotal">
+                    <?= $block->escapeHtml($block->getFormatedPrice($order->getSubtotal())); ?>
+                    </span>
+                </td>
+            </tr>
+            <tr class="totals discount">
+                <th class="mark">
+                    <span class="title">Discount</span>
+                    <span class="discount coupon"><?= $block->escapeHtml($order->getCouponCode()); ?></span>
+                </th>
+                <td class="amount">
+                    <span class="price">
+                        -<?= $block->escapeHtml($block->getFormatedPrice($order->getDiscountAmount())); ?>
+                    </span>
+                </td>
+            </tr>
+            <tr class="totals shipping excl">
+                <th class="mark" scope="row">
+                    <span class="label">Shipping</span>
+                    <span class="value"><?= $block->escapeHtml($order->getShippingDescription()); ?></span>
+                </th>
+                <td class="amount">
+                    <span class="price" data-th="Shipping">
+                        <?= $block->escapeHtml($block->getFormatedPrice($order->getShippingAmount())); ?>
+                    </span>
+                </td>
+            </tr>
+            <tr class="totals-tax">
+                <th class="mark">Tax</th>
+                <td class="amount">
+                    <span class="price">
+                        <?= $block->escapeHtml($block->getFormatedPrice($order->getTaxAmount())); ?>
+                    </span>
+                </td>
+            </tr>
+            <tr class="grand totals">
+                <th class="mark" scope="row">
+                    <strong>Order Total</strong>
+                </th>
+                <td class="amount" data-th="Order Total">
+                    <strong>
+                        <span class="price">
+                            <?= $block->escapeHtml($block->getFormatedPrice($order->getGrandTotal())); ?>
+                        </span>
+                    </strong>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+        <div class="block items-in-cart active">
+            <div style="position: unset;" class="title">
+                <strong role="heading">
+                    <span><?= count($order->getAllVisibleItems()); ?></span>
+                    <span>Item in Cart</span>
+                </strong>
+            </div>
+            <div class="content minicart-items">
+                <div class="minicart-items-wrapper overflowed">
+                    <ol class="minicart-items">
+                        <?php
+                        foreach ($order->getAllVisibleItems() as $item) {
+                        $product      = $block->getProductById($item->getProductId());
+                        $options      = $item->getProductOptions();
+                        $imageBlock   = $block->getLayout()
+                                              ->createBlock(\Magento\Catalog\Block\Product\ListProduct::class);
+                        $productImage = $imageBlock->getImage($product, 'category_page_list');
                         ?>
-               <li class="product-item">
-                  <div class="product">
-                     <span class="product-image-container" style="height: 75px; width: 75px;">
-                     <span class="product-image-wrapper">
-                     <?php echo $productImage->toHtml(); ?>
-                     </span>
-                     </span>
-                     <div class="product-item-details">
-                        <div class="product-item-inner">
-                           <div class="product-item-name-block">
-                              <strong class="product-item-name"><?php echo $item->getName(); ?></strong>
-                              <div class="details-qty">
-                                 <span class="label"><span>Qty</span></span>
-                                 <span class="value"><?php echo (int)$item->getQtyOrdered(); ?></span>
-                              </div>
-                           </div>
-                           <div class="subtotal">
-                              <span class="price-excluding-tax">
-                              <span class="cart-price">
-                              <span class="price"><?php echo $block->getFormatedPrice($item->getBaseRowTotal()); ?></span>
-                              </span>
-                              </span>
-                           </div>
-                        </div>
-                        <div class="product options active">
-                           <div class="content" style="display: block;">
-                              <dl class="item-option">
-                              <?php
-                                if (!empty($options['attributes_info'])) {
-                                    foreach ($options['attributes_info'] as $option) {
-                                        ?>
-                                            <dt class="label"><?php echo $option['label']; ?></dt>
-                                            <dd class="values"><?php echo $option['value']; ?></dd>
-                                        <?php
-                                    }
-                                }?>
-                              </dl>  
-                           </div>
-                        </div>
-                        <?php } ?>
-                     </div>
-                  </div>
-               </li>
-            </ol>
-         </div>
-      </div>
-   </div>
-</div>
+                        <li class="product-item">
+                            <div class="product">
+                                <span class="product-image-container" style="height: 75px; width: 75px;">
+                                    <span class="product-image-wrapper">
+                                        <?= $productImage->toHtml(); ?>
+                                    </span>
+                                </span>
+                                <div class="product-item-details">
+                                    <div class="product-item-inner">
+                                        <div class="product-item-name-block">
+                                            <strong class="product-item-name">
+                                                <?= $block->escapeHtml($item->getName()); ?>
+                                            </strong>
+                                            <div class="details-qty">
+                                                <span class="label"><span>Qty</span></span>
+                                                <span class="value">
+                                                    <?= $block->escapeHtml((int)$item->getQtyOrdered()); ?>
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <div class="subtotal">
+                                            <span class="price-excluding-tax">
+                                                <span class="cart-price">
+                                                    <span class="price">
+                                                        <?= $block->escapeHtml($block->getFormatedPrice($item->getBaseRowTotal())); ?>
+                                                    </span>
+                                                </span>
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div class="product options active">
+                                        <div class="content" style="display: block;">
+                                            <dl class="item-option">
+                                                <?php
+                                                if (!empty($options['attributes_info'])) {
+                                                    foreach ($options['attributes_info'] as $option) {
+                                                        ?>
+                                                        <dt class="label">
+                                                            <?= $block->escapeHtml($option['label']); ?>
+                                                        </dt>
+                                                        <dd class="values">
+                                                            <?= $block->escapeHtml($option['value']); ?>
+                                                        </dd>
+                                                        <?php
+                                                    }
+                                                } ?>
+                                            </dl>
+                                        </div>
+                                    </div>
+                                    <?php } ?>
+                                </div>
+                            </div>
+                        </li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
 </aside>
-

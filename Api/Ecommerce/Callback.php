@@ -21,15 +21,25 @@
  * THE SOFTWARE.
  */
 
-namespace SDM\Valitor\Api\Ecommerce;
+namespace SDM\Altapay\Api\Ecommerce;
 
-use SDM\Valitor\Response\CallbackResponse;
-use SDM\Valitor\Serializer\ResponseSerializer;
+use SDM\Altapay\Response\CallbackResponse;
+use SDM\Altapay\Serializer\ResponseSerializer;
 
+/**
+ * Class Callback
+ * Handle callback functionality.
+ * Store the data to the response.
+ */
 class Callback
 {
     private $postedData;
 
+    /**
+     * Callback constructor.
+     *
+     * @param $postedData
+     */
     public function __construct($postedData)
     {
         $this->postedData = $postedData;
@@ -69,10 +79,6 @@ class Callback
 
         if (isset($this->postedData['payment_id'])) {
             $response->paymentId = $this->postedData['payment_id'];
-        }
-
-        if (isset($this->postedData['shop_orderid'])) {
-            $response->shopOrderId = $this->postedData['shop_orderid'];
         }
 
         if (isset($this->postedData['nature'])) {

@@ -1,30 +1,33 @@
 <?php
 /**
- * Valitor Module for Magento 2.x.
+ * Altapay Module for Magento 2.x.
  *
+ * Copyright © 2018 Altapay. All rights reserved.
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
- *
- * @copyright 2018 Valitor
- * @category  payment
- * @package   valitor
  */
-namespace SDM\Valitor\Observer;
 
-use SDM\Valitor\Api\Payments\CaptureReservation;
-use SDM\Valitor\Exceptions\ResponseHeaderException;
-use SDM\Valitor\Request\OrderLine;
-use SDM\Valitor\Response\CaptureReservationResponse;
+namespace SDM\Altapay\Observer;
+
+use Magento\Sales\Model\Order\Invoice;
+use Magento\Sales\Model\Order\Payment;
+use SDM\Altapay\Api\Payments\CaptureReservation;
+use SDM\Altapay\Exceptions\ResponseHeaderException;
+use SDM\Altapay\Response\CaptureReservationResponse;
 use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
-use SDM\Valitor\Logger\Logger;
-use SDM\Valitor\Model\SystemConfig;
+use SDM\Altapay\Logger\Logger;
+use SDM\Altapay\Model\SystemConfig;
 use Magento\Sales\Model\Order;
-use Magento\Catalog\Model\ProductFactory;
-use Magento\Framework\App\Config\ScopeConfigInterface;
+use SDM\Altapay\Helper\Data;
+use SDM\Altapay\Helper\Config as storeConfig;
+use SDM\Altapay\Model\Handler\OrderLinesHandler;
+use SDM\Altapay\Model\Handler\PriceHandler;
+use SDM\Altapay\Model\Handler\DiscountHandler;
+
 /**
  * Class CaptureObserver
- * @package SDM\Valitor\Observer
+ * Handle the invoice capture functionality.
  */
 class CaptureObserver implements ObserverInterface
 {
@@ -33,46 +36,67 @@ class CaptureObserver implements ObserverInterface
      */
     private $systemConfig;
     /**
-     * @var ScopeConfigInterface
-     */
-    private $scopeConfig;
-    /**
      * @var Logger
      */
-    private $valitorLogger;
+    private $altapayLogger;
     /**
      * @var Order
-    */
+     */
     private $order;
     /**
-     * @var productFactory
-    */
-    private $productFactory;
-    /**
-     * CaptureObserver constructor.
-     * @param SystemConfig $systemConfig
-     * @param Logger $valitorLogger
+     * @var Helper Data
      */
-    public function __construct(SystemConfig $systemConfig, Logger $valitorLogger, Order $order, ProductFactory $productFactory
-    ,ScopeConfigInterface $scopeConfig)
-    {
-        $this->systemConfig = $systemConfig;
-        $this->valitorLogger = $valitorLogger;
-        $this->order = $order;
-        $this->productFactory = $productFactory;
-        $this->scopeConfig = $scopeConfig;
-    }
+    private $helper;
 
     /**
-      * @param $id
-      * @return productPrice
-      */
-    public function getProductPrice($id)
-    {
-        $product = $this->productFactory->create();
-        $productPrice = $product->load($id)->getPrice();
-        return $productPrice;
+     * @var Helper Config
+     */
+    private $storeConfig;
+    /**
+     * @var OrderLinesHandler
+     */
+    private $orderLines;
+    /**
+     * @var PriceHandler
+     */
+    private $priceHandler;
+    /**
+     * @var DiscountHandler
+     */
+    private $discountHandler;
+
+    /**
+     * CaptureObserver constructor.
+     *
+     * @param SystemConfig      $systemConfig
+     * @param Logger            $altapayLogger
+     * @param Order             $order
+     * @param Data              $helper
+     * @param storeConfig       $storeConfig
+     * @param OrderLinesHandler $orderLines
+     * @param PriceHandler      $priceHandler
+     * @param DiscountHandler   $discountHandler
+     */
+    public function __construct(
+        SystemConfig $systemConfig,
+        Logger $altapayLogger,
+        Order $order,
+        Data $helper,
+        storeConfig $storeConfig,
+        OrderLinesHandler $orderLines,
+        PriceHandler $priceHandler,
+        DiscountHandler $discountHandler
+    ) {
+        $this->systemConfig    = $systemConfig;
+        $this->altapayLogger   = $altapayLogger;
+        $this->order           = $order;
+        $this->helper          = $helper;
+        $this->storeConfig     = $storeConfig;
+        $this->orderLines      = $orderLines;
+        $this->priceHandler    = $priceHandler;
+        $this->discountHandler = $discountHandler;
     }
+
     /**
      * @param Observer $observer
      *
@@ -81,182 +105,227 @@ class CaptureObserver implements ObserverInterface
      */
     public function execute(\Magento\Framework\Event\Observer $observer)
     {
-        /** @var \Magento\Sales\Model\Order\Payment $payment */
-        $payment = $observer['payment'];
-
-        /** @var \Magento\Sales\Model\Order\Invoice $invoice */
-        $invoice = $observer['invoice'];
+        $payment          = $observer['payment'];
+        $invoice          = $observer['invoice'];
         $orderIncrementId = $invoice->getOrder()->getIncrementId();
-        $orderObject = $this->order->loadByIncrementId($orderIncrementId);
-        $storeScope = \Magento\Store\Model\ScopeInterface::SCOPE_STORE;
-        $storeCode = $invoice->getStore()->getCode();
+        $orderObject      = $this->order->loadByIncrementId($orderIncrementId);
+        $storeCode        = $invoice->getStore()->getCode();
         if (in_array($payment->getMethod(), SystemConfig::getTerminalCodes())) {
-            $orderlines = [];
-            $couponCode = $invoice->getDiscountDescription();
-            $couponCodeAmount = $invoice->getDiscountAmount();
-            $compAmount = $invoice->getShippingDiscountTaxCompensationAmount();
-            /** @var \Magento\Sales\Model\Order\Invoice\Item $item */
-            foreach ($invoice->getItems() as $item) {
-                $id = $item->getProductId();
-                $quantity = $item->getQty();
-                if($quantity > 0){
-                    $priceExcTax = $item->getPrice();
-                    if ((int) $this->scopeConfig->getValue('tax/calculation/price_includes_tax', $storeScope) === 1) {
-                        //Handle only if we have coupon Code
-                        $taxPercent = $item->getOrderItem()->getTaxPercent();
-                        $taxCalculatedAmount = $priceExcTax *  ($taxPercent/100);
-                        $taxAmount = (number_format($taxCalculatedAmount, 2, '.', '') * $quantity);
-                    }else{
-                        $taxAmount = $item->getTaxAmount();
-                    }
-                    if ($item->getPriceInclTax()) {
-                        $orderline = new OrderLine(
-                            $item->getName(),
-                            $item->getSku(),
-                            $quantity,
-                            $item->getPrice()
-                        );
-                        $orderline->setGoodsType('item');
-                        $orderline->taxAmount = $taxAmount;
-                        $orderlines[] = $orderline;
-                    }
-                }
-            }
-            
-            if (abs($couponCodeAmount) > 0) {
-                if(empty($couponCode)){
-                    $couponCode = 'Cart Price Rule';
-                }
-                // Handling price reductions
-                $orderline = new OrderLine(
-                    $couponCode,
-                    'discount',
-                    1,
-                    $couponCodeAmount
-                );
-                $orderline->setGoodsType('handling');
-                $orderlines[] = $orderline;
-            }
-
-            if ($invoice->getShippingInclTax() > 0) {
-                $orderline = new OrderLine(
-                    'Shipping',
-                    'shipping',
-                    1,
-                    $invoice->getShippingAmount() + $compAmount
-                );
-                $orderline->setGoodsType('shipment');
-                $orderline->taxAmount = $invoice->getShippingTaxAmount();
-                $orderlines[] = $orderline;
-            }
-
-            $api = new CaptureReservation($this->systemConfig->getAuth($storeCode));
-            if ($invoice->getTransactionId()) {
-                $api->setInvoiceNumber($invoice->getTransactionId());
-            }
-
-            $api->setAmount((float) number_format($invoice->getGrandTotal(), 2, '.', ''));
-            $api->setOrderLines($orderlines);
-            $api->setTransaction($payment->getLastTransId());
-            /** @var CaptureReservationResponse $response */
-            try {
-                $response = $api->call();
-            } catch (ResponseHeaderException $e) {
-                $this->valitorLogger->addInfoLog('Info', $e->getHeader());
-                $this->valitorLogger->addCriticalLog('Response header exception', $e->getMessage());
-                throw $e;
-            } catch (\Exception $e) {
-                $this->valitorLogger->addCriticalLog('Exception', $e->getMessage());
-            }
-
-            $rawresponse = $api->getRawResponse();
-            if (!empty($rawresponse)) {
-                $body = $rawresponse->getBody();
-                $this->valitorLogger->addInfo('Response body: ' . $body);
-            }
-
-          
-            //Update comments if capture fail
-            $xml = simplexml_load_string($body);    
-            if ($xml->Body->Result == 'Error' || $xml->Body->Result == 'Failed') {
-                $orderObject->addStatusHistoryComment('Refund failed: '. $xml->Body->MerchantErrorMessage)->setIsCustomerNotified(false);
-                $orderObject->getResource()->save($orderObject);
-            }
-
-            $headdata = [];
-            foreach ($rawresponse->getHeaders() as $k => $v) {
-                $headdata[] = $k . ': ' . json_encode($v);
-            }
-            $this->valitorLogger->addInfoLog('Response headers', implode(", ", $headdata));
-
-            if (!isset($response->Result) || $response->Result != 'Success') {
-                throw new \InvalidArgumentException('Could not capture reservation');
-            }
+            //Create orderlines from order items
+            $orderLines = $this->processInvoiceOrderLines($invoice);
+            //Send request for payment refund
+            $this->sendInvoiceRequest($invoice, $orderLines, $orderObject, $payment, $storeCode);
         }
     }
 
     /**
-     * @param \Magento\Sales\Model\Order\Invoice\Item $item
+     * @param $invoice
+     *
+     * @return array
      */
-    protected function logItem($item)
+    private function processInvoiceOrderLines($invoice)
     {
-        $this->valitorLogger->addInfoLog(
-            'Log Item',
-            sprintf(
-                implode(' - ', [
-                    'getSku: %s',
-                    'getQty: %s',
-                    'getDescription: %s',
-                    'getPrice(): %s',
-                    'getDiscountAmount(): %s',
-                    'getPrice() - getDiscountAmount(): %s',
-                    'getRowTotalInclTax: %s',
-                    'getRowTotal: %s'
-                ]),
-                $item->getSku(),
-                $item->getQty(),
-                $item->getDescription(),
-                $item->getPrice(),
-                $item->getDiscountAmount(),
-                $item->getPrice() - $item->getDiscountAmount(),
-                $item->getRowTotalInclTax(),
-                $item->getRowTotal()
-            )
-        );
+        $couponCode       = $invoice->getDiscountDescription();
+        $couponCodeAmount = $invoice->getDiscountAmount();
+        //Return true if discount enabled on all items
+        $discountAllItems = $this->discountHandler->allItemsHaveDiscount($invoice->getOrder()->getAllVisibleItems());
+        //order lines for items
+        $orderLines = $this->itemOrderLines($couponCodeAmount, $invoice, $discountAllItems);
+        //send the discount into separate orderline if discount applied to all items
+        if ($discountAllItems && abs($couponCodeAmount) > 0) {
+            //order lines for discounts
+            $orderLines[] = $this->orderLines->discountOrderLine($couponCodeAmount, $couponCode);
+        }
+        if ($invoice->getShippingInclTax() > 0) {
+            //order lines for shipping
+            $orderLines[] = $this->orderLines->handleShipping($invoice, $discountAllItems, false);
+            //Shipping Discount Tax Compensation Amount
+            $compAmount = $this->discountHandler->hiddenTaxDiscountCompensation($invoice, $discountAllItems, false);
+            if ($compAmount > 0 && $discountAllItems == false) {
+                $orderLines[] = $this->orderLines->compensationOrderLine(
+                    "Shipping compensation",
+                    "comp-ship",
+                    $compAmount
+                );
+            }
+        }
+        if(!empty($this->fixedProductTax($invoice))){
+            //order lines for FPT
+            $orderLines[] = $this->orderLines->fixedProductTaxOrderLine($this->fixedProductTax($invoice));
+        }
+
+        return $orderLines;
     }
 
     /**
-     * @param \Magento\Sales\Model\Order\Payment $payment
-     * @param \Magento\Sales\Model\Order\Invoice $invoice
+     * @param $couponCodeAmount
+     * @param $invoice
+     * @param $discountAllItems
+     *
+     * @return array
      */
-    protected function logPayment($payment, $invoice)
+    private function itemOrderLines($couponCodeAmount, $invoice, $discountAllItems)
     {
-        $logs = [
-            'invoice.getTransactionId: %s',
-            'invoice->getOrder()->getIncrementId: %s',
-            '$invoice->getGrandTotal(): %s',
-            'getLastTransId: %s',
-            'getAmountAuthorized: %s',
-            'getAmountCanceled: %s',
-            'getAmountOrdered: %s',
-            'getAmountPaid: %s',
-            'getAmountRefunded: %s',
-        ];
+        $orderLines       = [];
+        $storePriceIncTax = $this->storeConfig->storePriceIncTax($invoice->getOrder());
+        foreach ($invoice->getAllItems() as $item) {
+            $qty         = $item->getQty();
+            $taxPercent  = $item->getOrderItem()->getTaxPercent();
+            $productType = $item->getOrderItem()->getProductType();
+            if ($qty > 0 && $productType != 'bundle' && $item->getPriceInclTax()) {
+                $discountAmount = $item->getDiscountAmount();
+                $originalPrice  = $item->getOrderItem()->getOriginalPrice();
 
-        $this->valitorLogger->addInfoLog(
-            'Log Transaction',
-            sprintf(
-                implode(' - ', $logs),
-                $invoice->getTransactionId(),
-                $invoice->getOrder()->getIncrementId(),
-                $invoice->getGrandTotal(),
-                $payment->getLastTransId(),
-                $payment->getAmountAuthorized(),
-                $payment->getAmountCanceled(),
-                $payment->getAmountOrdered(),
-                $payment->getAmountPaid(),
-                $payment->getAmountRefunded()
-            )
-        );
+                if ($originalPrice == 0) {
+                    $originalPrice = $item->getPriceInclTax();
+                }
+
+                if ($storePriceIncTax) {
+                    $priceWithoutTax = $this->priceHandler->getPriceWithoutTax($originalPrice, $taxPercent);
+                    $price           = $item->getPriceInclTax();
+                    $unitPrice       = bcdiv($priceWithoutTax, 1, 2);
+                    $taxAmount       = $this->priceHandler->calculateTaxAmount($priceWithoutTax, $taxPercent, $qty);
+                } else {
+                    $price           = $item->getPrice();
+                    $unitPrice       = $originalPrice;
+                    $priceWithoutTax = $originalPrice;
+                    $taxAmount       = $this->priceHandler->calculateTaxAmount($unitPrice, $taxPercent, $qty);
+                }
+                $itemDiscountInformation = $this->discountHandler->getItemDiscountInformation(
+                    $originalPrice,
+                    $price,
+                    $discountAmount,
+                    $qty,
+                    $discountAllItems
+                );
+                $discountedAmount        = $itemDiscountInformation['discount'];
+                $catalogDiscountCheck    = $itemDiscountInformation['catalogDiscount'];
+                $orderLines[]            = $this->orderLines->itemOrderLine(
+                    $item,
+                    $unitPrice,
+                    $discountedAmount,
+                    $taxAmount,
+                    $invoice->getOrder(),
+                    false
+                );
+                $roundingCompensation    = $this->priceHandler->compensationAmountCal(
+                    $item,
+                    $unitPrice,
+                    $priceWithoutTax,
+                    $taxAmount,
+                    $discountedAmount,
+                    $couponCodeAmount,
+                    $catalogDiscountCheck,
+                    $storePriceIncTax,
+                    false
+                );
+                // check if rounding compensation amount, send in the separate orderline
+                if ($roundingCompensation > 0 || $roundingCompensation < 0) {
+                    $orderLines[] = $this->orderLines->compensationOrderLine(
+                        "Compensation Amount",
+                        "comp-" . $item->getOrderItem()->getItemId(),
+                        $roundingCompensation
+                    );
+                }
+            }
+        }
+
+        return $orderLines;
+    }
+
+    /**
+     * @param $invoice
+     *
+     * @return array
+     */
+    private function shippingTrackingInfo($invoice)
+    {
+        $trackingInfo     = [];
+        $tracksCollection = $invoice->getOrder()->getTracksCollection();
+        $trackItems       = $tracksCollection->getItems();
+
+        if ($trackItems && is_array($trackItems)) {
+            foreach ($trackItems as $track) {
+                $trackingInfo[] = [
+                    'shippingCompany' => $track->getTitle(),
+                    'trackingNumber'  => $track->getTrackNumber()
+                ];
+            }
+        }
+
+        return $trackingInfo;
+    }
+
+    /**
+     * @param $invoice
+     * @param $orderLines
+     * @param $orderObject
+     * @param $payment
+     * @param $storeCode
+     *
+     * @throws ResponseHeaderException
+     */
+    private function sendInvoiceRequest($invoice, $orderLines, $orderObject, $payment, $storeCode)
+    {
+        $api = new CaptureReservation($this->systemConfig->getAuth($storeCode));
+        if ($invoice->getTransactionId()) {
+            $api->setInvoiceNumber($invoice->getTransactionId());
+        }
+        $api->setAmount((float)number_format($invoice->getGrandTotal(), 2, '.', ''));
+        $api->setOrderLines($orderLines);
+        $shippingTrackingInfo = $this->shippingTrackingInfo($invoice);
+        /*send shipping tracking info if exists*/
+        if (!empty($shippingTrackingInfo)) {
+            $api->setTrackingInfo($shippingTrackingInfo);
+        }
+
+        $api->setTransaction($payment->getLastTransId());
+        /** @var CaptureReservationResponse $response */
+        try {
+            $response = $api->call();
+        } catch (ResponseHeaderException $e) {
+            $this->altapayLogger->addInfoLog('Info', $e->getHeader());
+            $this->altapayLogger->addCriticalLog('Response header exception', $e->getMessage());
+            throw $e;
+        } catch (\Exception $e) {
+            $this->altapayLogger->addCriticalLog('Exception', $e->getMessage());
+        }
+
+        $rawResponse = $api->getRawResponse();
+        if (!empty($rawResponse)) {
+            $body = $rawResponse->getBody();
+            $this->altapayLogger->addInfo('Response body: ' . $body);
+            //Update comments if capture fail
+            $xml = simplexml_load_string($body);
+            if ($xml->Body->Result == 'Error' || $xml->Body->Result == 'Failed') {
+                $orderObject->addStatusHistoryComment('Capture failed: ' . $xml->Body->MerchantErrorMessage)
+                            ->setIsCustomerNotified(false);
+                $orderObject->getResource()->save($orderObject);
+            }
+
+            $headData = [];
+            foreach ($rawResponse->getHeaders() as $k => $v) {
+                $headData[] = $k . ': ' . json_encode($v);
+            }
+            $this->altapayLogger->addInfoLog('Response headers', implode(", ", $headData));
+        }
+        if (!isset($response->Result) || $response->Result != 'Success') {
+            throw new \InvalidArgumentException('Could not capture reservation');
+        }
+    }
+
+    /**
+     * @param $order
+     *
+     * @return float|int
+     */
+    public function fixedProductTax($invoice){
+
+        $weeTaxAmount = 0;
+        foreach ($invoice->getAllItems() as $item) {
+           $weeTaxAmount +=  $item->getWeeeTaxAppliedRowAmount();
+        }
+
+       return $weeTaxAmount;
     }
 }

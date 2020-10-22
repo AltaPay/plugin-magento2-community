@@ -1,30 +1,21 @@
 <?php
 /**
- * Valitor Module for Magento 2.x.
+ * Altapay Module for Magento 2.x.
  *
+ * Copyright © 2018 Altapay. All rights reserved.
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
- *
- * @copyright 2018 Valitor
- * @category  payment
- * @package   valitor
  */
-namespace SDM\Valitor\Model\Config\Source\Order\Status;
+
+namespace SDM\Altapay\Model\Config\Source\Order\Status;
 
 use Magento\Sales\Model\Config\Source\Order\Status;
 use Magento\Sales\Model\Order;
 
-/**
- * Class Cancel
- * @package SDM\Valitor\Model\Config\Source\Order\Status
- */
 class Cancel extends Status
 {
-
     /**
      * @var string[]
      */
-    protected $_stateStatuses = [
-        Order::STATE_CANCELED,
-    ];
+    protected $_stateStatuses = [Order::STATE_CANCELED];
 }

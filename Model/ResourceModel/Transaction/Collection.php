@@ -1,23 +1,17 @@
 <?php
 /**
- * Valitor Module for Magento 2.x.
+ * Altapay Module for Magento 2.x.
  *
+ * Copyright © 2018 Altapay. All rights reserved.
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
- *
- * @copyright 2018 Valitor
- * @category  payment
- * @package   valitor
  */
-namespace SDM\Valitor\Model\ResourceModel\Transaction;
+
+namespace SDM\Altapay\Model\ResourceModel\Transaction;
 
 use Magento\Framework\Model\ResourceModel\Db\Collection\AbstractCollection;
-use SDM\Valitor\Api\Data\TransactionInterface;
+use SDM\Altapay\Api\Data\TransactionInterface;
 
-/**
- * Class Collection
- * @package SDM\Valitor\Model\ResourceModel\Transaction
- */
 class Collection extends AbstractCollection
 {
     /**
@@ -32,6 +26,6 @@ class Collection extends AbstractCollection
      */
     protected function _construct()
     {
-        $this->_init(\SDM\Valitor\Model\Transaction::class, \SDM\Valitor\Model\ResourceModel\Transaction::class);
+        $this->_init(\SDM\Altapay\Model\Transaction::class, \SDM\Altapay\Model\ResourceModel\Transaction::class);
     }
 }

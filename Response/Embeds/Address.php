@@ -21,43 +21,88 @@
  * THE SOFTWARE.
  */
 
-namespace SDM\Valitor\Response\Embeds;
+namespace SDM\Altapay\Response\Embeds;
 
-use SDM\Valitor\Response\AbstractResponse;
+use SDM\Altapay\Response\AbstractResponse;
 
 class Address extends AbstractResponse
 {
+    /**
+     * @var Firstname
+     */
     public $Firstname;
 
+    /**
+     * @var Lastname
+     */
     public $Lastname;
 
+    /**
+     * @var Address
+     */
     public $Address;
 
+    /**
+     * @var City
+     */
     public $City;
 
+    /**
+     * @var PostalCode
+     */
     public $PostalCode;
 
+    /**
+     * @var Region
+     */
     public $Region;
 
+    /**
+     * @var Country
+     */
     public $Country;
 
     /**
-     * @param string $FirstName
-     * @return Address
+     * @var billingAddress
+     */
+    public $billingAddress;
+
+    /**
+     * @var paymentMethod
+     */
+    public $paymentMethod;
+
+    /**
+     * @var currency
+     */
+    public $currency;
+
+    /**
+     * @var orderAmount
+     */
+    public $orderAmount;
+
+    /**
+     * @param $FirstName
+     *
+     * @return $this
      */
     public function setFirstName($FirstName)
     {
         $this->Firstname = $FirstName;
+
         return $this;
     }
 
     /**
      * @param string $LastName
+     *
      * @return Address
      */
     public function setLastName($LastName)
     {
         $this->Lastname = $LastName;
+
         return $this;
     }
 }

@@ -1,10 +1,14 @@
 <?xml version="1.0"?>
 <!--
 /**
- * Copyright © 2015 Magento. All rights reserved.
- * See COPYING.txt for license details.
+ * Altapay Module for Magento 2.x.
+ *
+ * Copyright © 2018 Altapay. All rights reserved.
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
  */
 -->
+
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../Store/etc/config.xsd">
     <default>
         <payment>
@@ -12,8 +16,8 @@
                 <active>0</active>
                 <title />
                 <payment_action>true</payment_action>
-                <model>SDM\Valitor\Model\Method\Terminal1</model>
-                <place_order_url>sdmvalitor/index/request</place_order_url>
+                <model>SDM\Altapay\Model\Method\Terminal1</model>
+                <place_order_url>sdmaltapay/index/request</place_order_url>
                 <can_authorize>1</can_authorize>
                 <can_capture>1</can_capture>
                 <can_capture_partial>1</can_capture_partial>
@@ -29,8 +33,8 @@
                 <active>0</active>
                 <title />
                 <payment_action>true</payment_action>
-                <model>SDM\Valitor\Model\Method\Terminal2</model>
-                <place_order_url>sdmvalitor/index/request</place_order_url>
+                <model>SDM\Altapay\Model\Method\Terminal2</model>
+                <place_order_url>sdmaltapay/index/request</place_order_url>
                 <can_authorize>1</can_authorize>
                 <can_capture>1</can_capture>
                 <can_capture_partial>1</can_capture_partial>
@@ -46,8 +50,8 @@
                 <active>0</active>
                 <title />
                 <payment_action>true</payment_action>
-                <model>SDM\Valitor\Model\Method\Terminal3</model>
-                <place_order_url>sdmvalitor/index/request</place_order_url>
+                <model>SDM\Altapay\Model\Method\Terminal3</model>
+                <place_order_url>sdmaltapay/index/request</place_order_url>
                 <can_authorize>1</can_authorize>
                 <can_capture>1</can_capture>
                 <can_capture_partial>1</can_capture_partial>
@@ -63,8 +67,8 @@
                 <active>0</active>
                 <title />
                 <payment_action>true</payment_action>
-                <model>SDM\Valitor\Model\Method\Terminal4</model>
-                <place_order_url>sdmvalitor/index/request</place_order_url>
+                <model>SDM\Altapay\Model\Method\Terminal4</model>
+                <place_order_url>sdmaltapay/index/request</place_order_url>
                 <can_authorize>1</can_authorize>
                 <can_capture>1</can_capture>
                 <can_capture_partial>1</can_capture_partial>
@@ -80,8 +84,8 @@
                 <active>0</active>
                 <title />
                 <payment_action>true</payment_action>
-                <model>SDM\Valitor\Model\Method\Terminal5</model>
-                <place_order_url>sdmvalitor/index/request</place_order_url>
+                <model>SDM\Altapay\Model\Method\Terminal5</model>
+                <place_order_url>sdmaltapay/index/request</place_order_url>
                 <can_authorize>1</can_authorize>
                 <can_capture>1</can_capture>
                 <can_capture_partial>1</can_capture_partial>

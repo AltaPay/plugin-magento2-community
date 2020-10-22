@@ -21,8 +21,19 @@
  * THE SOFTWARE.
  */
 
-namespace SDM\Valitor\Response\Embeds;
+namespace SDM\Altapay\Response\Embeds;
 
-class CreditCard
+use SDM\Altapay\Response\AbstractResponse;
+
+class CreditCard extends AbstractResponse
 {
+    /**
+     * @var Year
+     */
+    public $Year;
+
+    /**
+     * @var Month
+     */
+    public $Month;
 }

@@ -21,7 +21,7 @@
  * THE SOFTWARE.
  */
 
-namespace SDM\Valitor\Exceptions;
+namespace SDM\Altapay\Exceptions;
 
 use GuzzleHttp\Exception\ClientException as GuzzleHttpClientException;
 

@@ -1,0 +1,65 @@
+<?php
+/**
+ * Altapay Module for Magento 2.x.
+ *
+ * Copyright © 2018 Altapay. All rights reserved.
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+$collection = $block->getCustomerTokens();
+
+if ($collection->getSize() > 0) {
+    ?>
+    <div class="table-wrapper orders-history" data-url="<?= $block->escapeUrl($block->getAjaxUrl()); ?>">
+        <table class="data table table-order-items history" id="my-orders-table">
+            <caption class="table-caption">
+                <?= $block->escapeHtml(__('Orders')); ?>
+            </caption>
+            <thead>
+            <tr>
+                <th scope="col" class="col card"><?= $block->escapeHtml(__('Card type')); ?></th>
+                <th scope="col" class="col card"><?= $block->escapeHtml(__('Masked pan')); ?></th>
+                <th scope="col" class="col expires"><?= $block->escapeHtml(__('Expires')); ?></th>
+                <th scope="col" class="col primary" style="text-align: center;">
+                    <?= $block->escapeHtml(__('Primary')); ?>
+                </th>
+                <th scope="col" class="col delete" style="text-align: right;">
+                    <?= $block->escapeHtml(__('Action')); ?>
+                </th>
+            </tr>
+            </thead>
+            <tbody>
+            <?php foreach ($collection as $item): ?>
+                <tr id="token-custom-name-status-<?= $block->escapeHtml($item->getId()); ?>">
+                    <td data-th="CardType" class="col card-type"><?= $block->escapeHtml($item->getCardType()); ?></td>
+                    <td data-th="CardType" class="col card-type"><?= $block->escapeHtml($item->getMaskedPan()); ?></td>
+                    <td data-th="CardExpires"
+                        class="col card-expiry-date"><?= $block->escapeHtml($item->getExpires()); ?></td>
+                    <td data-th="Date" class="col created_at" align="center">
+                            <span class="token-primay">
+                                <input class="token-primay-selection"
+                                       type="radio" name="primary-token"
+                                       data-token-id="<?= $block->escapeHtml($item->getId()); ?>"
+                                       value="<?= $block->escapeHtml($item->getId()); ?>"
+                                       <?php if ($item->getPrimary()): ?>checked="checked"<?php endif; ?> />
+                            </span>
+                    </td>
+                    <td data-th="Actions" class="col actions" align="right">
+                        <button type="button"
+                                class="button token-delete"
+                                data-token-id="<?= $block->escapeHtml($item->getId()); ?>">
+                            Delete
+                        </button>
+                    </td>
+                </tr>
+            <?php endforeach; ?>
+            </tbody>
+        </table>
+    </div>
+    <script type="text/x-magento-init">
+        {"*": {"SDM_Altapay/js/Altapay": {}}}
+    </script>
+<?php } else { ?>
+    <div class="message info empty"><span>No saved credit cards.</span></div>
+<?php } ?>

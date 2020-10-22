@@ -1,25 +1,18 @@
 <?php
 /**
- * Valitor Module for Magento 2.x.
+ * Altapay Module for Magento 2.x.
  *
+ * Copyright © 2018 Altapay. All rights reserved.
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
- *
- * @copyright 2018 Valitor
- * @category  payment
- * @package   valitor
  */
 
-namespace SDM\Valitor\Test\Unit\Model\Config\Source;
+namespace SDM\Altapay\Test\Unit\Model\Config\Source;
 
-use SDM\Valitor\Model\Config\Source\Authentication as ClassToTest;
+use SDM\Altapay\Model\Config\Source\Authentication as ClassToTest;
 use Magento\Framework\TestFramework\Unit\Helper\ObjectManager;
-use SDM\Valitor\Test\Unit\MainTestCase;
+use SDM\Altapay\Test\Unit\MainTestCase;
 
-/**
- * Class AuthenticationTest
- * @package SDM\Valitor\Test\Unit\Model\Config\Source
- */
 class AuthenticationTest extends MainTestCase
 {
     /**
@@ -27,18 +20,12 @@ class AuthenticationTest extends MainTestCase
      */
     private $classToTest;
 
-    /**
-     *
-     */
     protected function setUp()
     {
-        $objectManager = $this->getObjectManager();
+        $objectManager     = $this->getObjectManager();
         $this->classToTest = $objectManager->getObject(ClassToTest::class);
     }
 
-    /**
-     *
-     */
     public function testToOptionArray()
     {
         $result = $this->classToTest->toOptionArray();

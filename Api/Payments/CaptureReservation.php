@@ -21,14 +21,14 @@
  * THE SOFTWARE.
  */
 
-namespace SDM\Valitor\Api\Payments;
+namespace SDM\Altapay\Api\Payments;
 
-use SDM\Valitor\AbstractApi;
-use SDM\Valitor\Response\CaptureReservationResponse;
-use SDM\Valitor\Serializer\ResponseSerializer;
-use SDM\Valitor\Traits\AmountTrait;
-use SDM\Valitor\Traits\OrderlinesTrait;
-use SDM\Valitor\Traits\TransactionsTrait;
+use SDM\Altapay\AbstractApi;
+use SDM\Altapay\Response\CaptureReservationResponse;
+use SDM\Altapay\Serializer\ResponseSerializer;
+use SDM\Altapay\Traits\AmountTrait;
+use SDM\Altapay\Traits\OrderlinesTrait;
+use SDM\Altapay\Traits\TransactionsTrait;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -41,7 +41,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  * which means if the capture fails the system will automatically try to reauth the payment and then capture again.
  * Reauthed payments, however, do not have cvv or 3d-secure protection, which means the
  * protection against chargebacks is not as good.
- * If you wish to disable auto reauth for one or more of your terminals please contact AltaPay.
+ * If you wish to disable auto reauth for one or more of your terminals please contact Altapay.
  */
 class CaptureReservation extends AbstractApi
 {
@@ -53,11 +53,13 @@ class CaptureReservation extends AbstractApi
      * If you wish to define the reconciliation identifier used in the reconciliation csv files
      *
      * @param string $identifier
+     *
      * @return $this
      */
     public function setReconciliationIdentifier($identifier)
     {
         $this->unresolvedOptions['reconciliation_identifier'] = $identifier;
+
         return $this;
     }
 
@@ -66,11 +68,13 @@ class CaptureReservation extends AbstractApi
      * Note that the invoice number is used as an OCR Number in regard to Klarna captures.
      *
      * @param string $number
+     *
      * @return $this
      */
     public function setInvoiceNumber($number)
     {
         $this->unresolvedOptions['invoice_number'] = $number;
+
         return $this;
     }
 
@@ -78,11 +82,28 @@ class CaptureReservation extends AbstractApi
      * The sales tax amount is used if you wish to indicate how much of the gross amount was sales tax
      *
      * @param string $salesTax
+     *
      * @return $this
      */
     public function setSalesTax($salesTax)
     {
         $this->unresolvedOptions['sales_tax'] = $salesTax;
+
+        return $this;
+    }
+
+    /**
+     * The shipping tracking info is used if you want to send the shipping tracking info
+     * with invoice.
+     *
+     * @param $shippingTrackingInfo
+     *
+     * @return $this
+     */
+    public function setTrackingInfo($shippingTrackingInfo)
+    {
+        $this->unresolvedOptions['shippingTrackingInfo'] = $shippingTrackingInfo;
+
         return $this;
     }
 
@@ -90,12 +111,20 @@ class CaptureReservation extends AbstractApi
      * Configure options
      *
      * @param OptionsResolver $resolver
+     *
      * @return void
      */
     protected function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setRequired('transaction_id');
-        $resolver->setDefined(['amount', 'reconciliation_identifier', 'invoice_number', 'sales_tax', 'orderLines']);
+        $resolver->setDefined([
+            'amount',
+            'reconciliation_identifier',
+            'invoice_number',
+            'sales_tax',
+            'orderLines',
+            'shippingTrackingInfo'
+        ]);
         $resolver->addAllowedTypes('reconciliation_identifier', 'string');
         $resolver->addAllowedTypes('invoice_number', 'string');
         $resolver->addAllowedTypes('sales_tax', ['string', 'int', 'float']);
@@ -104,35 +133,98 @@ class CaptureReservation extends AbstractApi
     /**
      * Handle response
      *
-     * @param Request $request
+     * @param Request  $request
      * @param Response $response
+     *
      * @return CaptureReservationResponse
      */
     protected function handleResponse(Request $request, Response $response)
     {
-        $body = (string) $response->getBody();
-        $xml = simplexml_load_string($body);
+        $body = (string)$response->getBody();
+        $xml  = simplexml_load_string($body);
         if ($xml->Body->Result == 'Error') {
             throw new \Exception($xml->Body->MerchantErrorMessage);
         }
 
         try {
-            $data = ResponseSerializer::serialize(CaptureReservationResponse::class, $xml->Body, false, $xml->Header);
-            return $data;
+            return ResponseSerializer::serialize(CaptureReservationResponse::class, $xml->Body, false, $xml->Header);
         } catch (\Exception $e) {
             throw $e;
         }
     }
 
     /**
+     * @return array
+     */
+    protected function getBasicHeaders()
+    {
+        $headers = parent::getBasicHeaders();
+        if (strtolower($this->getHttpMethod()) == 'post') {
+            $headers['Content-Type'] = 'application/x-www-form-urlencoded';
+        }
+
+        return $headers;
+    }
+
+    /**
      * Url to api call
      *
      * @param array $options Resolved options
+     *
      * @return string
      */
     protected function getUrl(array $options)
     {
-        $query = $this->buildUrl($options);
-        return sprintf('captureReservation/?%s', $query);
+        $url = 'captureReservation';
+        if (strtolower($this->getHttpMethod()) == 'get') {
+            $query = $this->buildUrl($options);
+            $url   = sprintf('%s/?%s', $url, $query);
+        }
+
+        return $url;
+    }
+
+    /**
+     * @return string
+     */
+    protected function getHttpMethod()
+    {
+        return 'POST';
+    }
+
+    /**
+     * Generate the response
+     */
+    protected function doResponse()
+    {
+        $this->doConfigureOptions();
+        $headers           = $this->getBasicHeaders();
+        $requestParameters = [$this->getHttpMethod(), $this->parseUrl(), $headers];
+        if (strtolower($this->getHttpMethod()) == 'post') {
+            $requestParameters[] = $this->getPostOptions();
+        }
+
+        $request       = new Request(...$requestParameters);
+        $this->request = $request;
+        try {
+            $response       = $this->getClient()->send($request);
+            $this->response = $response;
+            $output         = $this->handleResponse($request, $response);
+            $this->validateResponse($output);
+
+            return $output;
+        } catch (GuzzleHttpClientException $e) {
+            throw new Exceptions\ClientException($e->getMessage(), $e->getRequest(), $e->getResponse());
+        }
+    }
+
+    /**
+     * @return string
+     */
+    protected function getPostOptions()
+    {
+        $options = $this->options;
+
+        return http_build_query($options, null, '&');
     }
 }
