@@ -5,6 +5,12 @@ Altapay has made it much easier for you as merchant/developer to receive secure 
 
 == Change log ==
 
+** Version 3.1.2
+
+    * Improvements:
+        - Add a shell script that creates the zip folder
+        - Redirect failed orders to cart details page
+        
 ** Version 3.1.1
 
     * Bug fixes:
