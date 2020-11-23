@@ -5,6 +5,11 @@ Altapay has made it much easier for you as merchant/developer to receive secure 
 
 == Change log ==
 
+** Version 3.1.3
+
+    * Bug fixes:
+        - Remove payment terminal shown upon editing order from backend.
+      
 ** Version 3.1.2
 
     * Improvements:
