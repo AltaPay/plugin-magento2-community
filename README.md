@@ -5,6 +5,12 @@ Altapay has made it much easier for you as merchant/developer to receive secure 
 
 == Change log ==
 
+** Version 3.1.4
+
+    * Bug fixes:
+        - Remove deprecated validation file from the bash script
+        - Remove unnecessary files while creating zip package
+
 ** Version 3.1.3
 
     * Bug fixes:
