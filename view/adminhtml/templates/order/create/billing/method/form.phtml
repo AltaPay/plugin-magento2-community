@@ -1,0 +1,80 @@
+<?php if ($block->hasMethods()): ?>
+    <?php $helper = $this->helper('SDM\Altapay\Helper\Data'); ?>
+    <div id="order-billing_method_form">
+        <dl class="admin__payment-methods control">
+            <?php
+            $methodCode = [];
+            $method              = $block->getMethods();
+            $methodsCount         = count($method);
+            $counter              = 0;
+            $currentSelectedMethod = $block->getSelectedMethodCode();?>
+            <?php foreach ($method as $method):
+                $code = $method->getCode();
+                $counter++;
+                if (!in_array($code, $helper->getTerminalCodes())):
+                ?>
+                <dt class="admin__field-option">
+                    <?php if ($methodsCount > 1): ?>
+                        <input id="p_method_<?= $block->escapeHtmlAttr($code); ?>"
+                               value="<?= $block->escapeHtmlAttr($code); ?>"
+                               type="radio" name="payment[method]"
+                               title="<?= $block->escapeHtmlAttr($method->getTitle()); ?>"
+                            <?php if ($currentSelectedMethod == $code): ?>
+                                checked="checked"
+                            <?php endif; ?>
+                               data-validate="{'validate-one-required-by-name':true}"
+                               class="admin__control-radio"/>
+                        <?= /* @noEscape */
+                        $secureRenderer->renderEventListenerAsTag(
+                            'onclick',
+                            "payment.switchMethod('" . $block->escapeJs($code) . "')",
+                            'input#p_method_' . $block->escapeJs($code)
+                        ) ?>
+                    <?php else: ?>
+                        <span class="no-display">
+                <input id="p_method_<?= $block->escapeHtmlAttr($code); ?>"
+                       value="<?= $block->escapeHtmlAttr($code); ?>"
+                       type="radio"
+                       name="payment[method]" class="admin__control-radio"
+                       checked="checked"/>
+            </span>
+                    <?php endif; ?>
+
+                    <label class="admin__field-label" for="p_method_<?= $block->escapeHtmlAttr($code); ?>">
+                        <?= $block->escapeHtml($method->getTitle()) ?>
+                    </label>
+                </dt>
+                <dd class="admin__payment-method-wrapper">
+                    <?= $block->getChildHtml('payment.method.' . $code) ?>
+                </dd>
+                    <?php endif; endforeach; ?>
+        </dl>
+    </div>
+    <?php $scriptString = <<<script
+        require([
+            'mage/apply/main',
+            'Magento_Sales/order/create/form'
+        ], function(mage) {
+            mage.apply();
+
+script;
+    if ($methodsCount !== 1):
+        $scriptString .= <<<script
+            order.setPaymentMethod('{$block->escapeJs($currentSelectedMethod)}');
+script;
+    else:
+        $scriptString .= <<<script
+            payment.switchMethod('{$block->escapeJs($currentSelectedMethod)}');
+script;
+    endif;
+    $scriptString .= <<<script
+
+        });
+
+script;
+    ?>
+    <?= /* @noEscape */
+    $secureRenderer->renderTag('script', [], $scriptString, false) ?>
+<?php else: ?>
+    <div class="admin__message-empty"><?= $block->escapeHtml(__('No Payment Methods')); ?></div>
+<?php endif; ?>

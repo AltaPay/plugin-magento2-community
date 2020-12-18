@@ -138,4 +138,18 @@ class Data extends AbstractHelper
 
         return $shippingTaxPercent;
     }
+
+    /**
+     * @return array
+     */
+    public function getTerminalCodes()
+    {
+        return [
+            \SDM\Altapay\Model\Method\Terminal1::METHOD_CODE,
+            \SDM\Altapay\Model\Method\Terminal2::METHOD_CODE,
+            \SDM\Altapay\Model\Method\Terminal3::METHOD_CODE,
+            \SDM\Altapay\Model\Method\Terminal4::METHOD_CODE,
+            \SDM\Altapay\Model\Method\Terminal5::METHOD_CODE,
+        ];
+    }
 }
