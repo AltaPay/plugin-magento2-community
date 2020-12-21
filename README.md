@@ -5,6 +5,11 @@ Altapay has made it much easier for you as merchant/developer to receive secure 
 
 == Change log ==
 
+** Version 3.1.5
+
+    * Improvements:
+        - Added support for terminal sorting
+
 ** Version 3.1.4
 
     * Bug fixes:

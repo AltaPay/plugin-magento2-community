@@ -76,5 +76,10 @@
             <comment>All codes upercase, comma separated</comment>
             <config_path>payment/terminal1/avs_acceptance</config_path>
         </field>
+        <field id="sort_order" translate="label" type="text" sortOrder="100" showInDefault="1" showInWebsite="1" showInStore="1">
+            <label>Sort Order</label>
+            <frontend_class>validate-number</frontend_class>
+            <config_path>payment/terminal1/sort_order</config_path>
+        </field>
     </group>
 </include>
