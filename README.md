@@ -5,6 +5,11 @@ Altapay has made it much easier for you as merchant/developer to receive secure 
 
 == Change log ==
 
+** Version 3.1.6
+
+    * Improvements:
+        - Added version node in composer file
+
 ** Version 3.1.5
 
     * Improvements:
