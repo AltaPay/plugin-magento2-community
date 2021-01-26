@@ -2,7 +2,7 @@
 
 Altapay has made it much easier for you as merchant/developer to receive secure payments in your Magento2.3.x web shop.
 
-** Note: If you are getting 403 forbidden error in "Magento Commerce Cloud". It can be caused by "Fastly", which blocks our callbacks. In this case, please contact fastly support. **
+**Note, If you are getting 403 forbidden error in "Magento Commerce Cloud". It can be caused by "Fastly", which blocks our callbacks. In this case, please contact fastly support.**
 
 == Change log ==
 
