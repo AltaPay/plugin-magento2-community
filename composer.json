@@ -2,11 +2,12 @@
   "name": "altapay/magento2-community",
   "license": "MIT",
   "description": "AltaPay: Payments less complicated",
+  "version": "3.1.6",
    "require": {
         "php": ">=5.6",
         "guzzlehttp/psr7": "^1.4",
         "guzzlehttp/guzzle": "^6.0",
-        "symfony/options-resolver": "~2.6 || ~3.0 || ^4.0"
+        "symfony/options-resolver": "~2.6 || ~3.0 || ^4.0 || ^5.0"
   },
   "type": "magento2-module",
   "autoload": {
