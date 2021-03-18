@@ -269,16 +269,17 @@ class CaptureObserver implements ObserverInterface
      */
     private function sendInvoiceRequest($paymentType, $invoice, $orderLines, $orderObject, $payment, $storeCode)
     {
+        $grandTotal = (float)$invoice->getGrandTotal();
         if ($paymentType === 'subscription') {
             $api = new ChargeSubscription($this->systemConfig->getAuth($storeCode));
             $api->setTransaction($payment->getLastTransId());
-            $api->setAmount(round($invoice->getGrandTotal()));
+            $api->setAmount(round($grandTotal, 2));
         } else {
             $api = new CaptureReservation($this->systemConfig->getAuth($storeCode));
             if ($invoice->getTransactionId()) {
                 $api->setInvoiceNumber($invoice->getTransactionId());
             }
-            $api->setAmount(round($invoice->getGrandTotal()));
+            $api->setAmount(round($grandTotal, 2));
             $api->setOrderLines($orderLines);
             $shippingTrackingInfo = $this->shippingTrackingInfo($invoice);
             // Send shipping tracking info
