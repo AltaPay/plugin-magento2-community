@@ -25,7 +25,9 @@ namespace SDM\Altapay\Response;
 
 class ChargeSubscriptionResponse extends ReservationOfFixedAmountResponse
 {
+    /** @var float */
     public $CaptureResult;
+    
     /**
      * @param float $CaptureAmount
      * @return CaptureReservationResponse

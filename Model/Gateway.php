@@ -389,7 +389,7 @@ class Gateway implements GatewayInterface
             }
         }
         $quote = $this->quote->loadByIdWithoutStore($order->getQuoteId());
-        if($this->validateQuote($quote)){
+        if ($this->validateQuote($quote)) {
             $request->setType("subscription");
         }
         // check if auto capture enabled
@@ -506,7 +506,7 @@ class Gateway implements GatewayInterface
      *
      * @return bool
      */
-    public function validateQuote($quote): bool
+    public function validateQuote($quote)
     {
         $isRecurring = false;
         $items = $quote->getAllItems();
