@@ -120,7 +120,7 @@ class CaptureObserver implements ObserverInterface
     }
 
     /**
-     * @param $invoice
+     * @param null|object $invoice
      *
      * @return array
      */
@@ -159,9 +159,9 @@ class CaptureObserver implements ObserverInterface
     }
 
     /**
-     * @param $couponCodeAmount
-     * @param $invoice
-     * @param $discountAllItems
+     * @param int|float $couponCodeAmount
+     * @param null|object $invoice
+     * @param bool $discountAllItems
      *
      * @return array
      */
@@ -235,7 +235,7 @@ class CaptureObserver implements ObserverInterface
     }
 
     /**
-     * @param $invoice
+     * @param null|object $invoice
      *
      * @return array
      */
@@ -258,12 +258,12 @@ class CaptureObserver implements ObserverInterface
     }
 
     /**
-     * @param $invoice
-     * @param $orderLines
-     * @param $orderObject
-     * @param $payment
-     * @param $storeCode
-     * @param $paymentType
+     * @param null|object $invoice
+     * @param array $orderLines
+     * @param null|object $orderObject
+     * @param array $payment
+     * @param int|string $storeCode
+     * @param string $paymentType
      *
      * @throws ResponseHeaderException
      */
@@ -321,7 +321,7 @@ class CaptureObserver implements ObserverInterface
     }
 
     /**
-     * @param $order
+     * @param null|object $invoice
      *
      * @return float|int
      */
