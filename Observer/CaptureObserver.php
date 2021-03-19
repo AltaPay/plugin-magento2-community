@@ -120,7 +120,7 @@ class CaptureObserver implements ObserverInterface
     }
 
     /**
-     * @param null|object $invoice
+     * @param Magento\Sales\Model\Order\Invoice $invoice
      *
      * @return array
      */
@@ -160,7 +160,7 @@ class CaptureObserver implements ObserverInterface
 
     /**
      * @param int|float $couponCodeAmount
-     * @param null|object $invoice
+     * @param Magento\Sales\Model\Order\Invoice $invoice
      * @param bool $discountAllItems
      *
      * @return array
@@ -235,7 +235,7 @@ class CaptureObserver implements ObserverInterface
     }
 
     /**
-     * @param null|object $invoice
+     * @param Magento\Sales\Model\Order\Invoice $invoice
      *
      * @return array
      */
@@ -258,9 +258,9 @@ class CaptureObserver implements ObserverInterface
     }
 
     /**
-     * @param null|object $invoice
+     * @param Magento\Sales\Model\Order\Invoice $invoice
      * @param array $orderLines
-     * @param null|object $orderObject
+     * @param Magento\Sales\Model\Order $orderObject
      * @param array $payment
      * @param int|string $storeCode
      * @param string $paymentType
@@ -321,13 +321,13 @@ class CaptureObserver implements ObserverInterface
     }
 
     /**
-     * @param null|object $invoice
+     * @param Magento\Sales\Model\Order\Invoice $invoice
      *
      * @return float|int
      */
     public function fixedProductTax($invoice){
 
-        $weeTaxAmount = 0;
+        $weeTaxAmount = 0.0;
         foreach ($invoice->getAllItems() as $item) {
            $weeTaxAmount +=  $item->getWeeeTaxAppliedRowAmount();
         }

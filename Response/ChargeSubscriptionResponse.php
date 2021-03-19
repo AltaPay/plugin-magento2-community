@@ -30,7 +30,7 @@ class ChargeSubscriptionResponse extends ReservationOfFixedAmountResponse
     
     /**
      * @param float $CaptureAmount
-     * @return CaptureReservationResponse
+     * @return $this
      */
     public function setCaptureAmount($CaptureAmount)
     {
