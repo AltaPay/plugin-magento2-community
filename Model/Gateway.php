@@ -32,6 +32,7 @@ use SDM\Altapay\Model\Handler\PriceHandler;
 use SDM\Altapay\Model\Handler\DiscountHandler;
 use SDM\Altapay\Model\Handler\CreatePaymentHandler;
 use SDM\Altapay\Model\TokenFactory;
+use Magento\Quote\Model\Quote\Item\AbstractItem;
 
 /**
  * Class Gateway
@@ -387,6 +388,10 @@ class Gateway implements GatewayInterface
                 $request->setLanguage($langArr[0]);
             }
         }
+        $quote = $this->quote->loadByIdWithoutStore($order->getQuoteId());
+        if ($this->validateQuote($quote)) {
+            $request->setType("subscription");
+        }
         // check if auto capture enabled
         if ($this->systemConfig->getTerminalConfig($terminalId, 'capture', $storeScope, $storeCode)) {
             $request->setType('paymentAndCapture');
@@ -462,5 +467,58 @@ class Gateway implements GatewayInterface
         }
 
        return $weeTaxAmount;
+    }
+
+    /**
+     * @param AbstractItem $item
+     * @return DataObject
+     */
+    public function getBuyRequestObject(AbstractItem $item)
+    {
+        /** @var DataObject $request */
+        $request = $item->getBuyRequest();
+        if (!$request && $item->getQuoteItem()) {
+            $request = $item->getQuoteItem()->getBuyRequest();
+        }
+        if (!$request) {
+            $request = new DataObject();
+        }
+
+        if (is_array($request)) {
+            $request = new DataObject($request);
+        }
+
+        return $request;
+    }
+
+    /**
+     * @param AbstractItem $item
+     * @return bool
+     */
+    public function isSubscription(AbstractItem $item)
+    {
+        $buyRequest = $this->getBuyRequestObject($item);
+
+        return $buyRequest->getData('subscribe') === 'subscribe';
+    }
+    /**
+     * @param CartInterface $quote
+     *
+     * @return bool
+     */
+    public function validateQuote($quote)
+    {
+        $isRecurring = false;
+        $items = $quote->getAllItems();
+
+        /** @var Item $item */
+        foreach ($items as $item) {
+            if ($this->isSubscription($item)) {
+                $isRecurring = true;
+                break;
+            }
+        }
+
+        return $isRecurring;
     }
 }

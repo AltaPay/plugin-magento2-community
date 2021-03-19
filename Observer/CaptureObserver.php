@@ -24,7 +24,7 @@ use SDM\Altapay\Helper\Config as storeConfig;
 use SDM\Altapay\Model\Handler\OrderLinesHandler;
 use SDM\Altapay\Model\Handler\PriceHandler;
 use SDM\Altapay\Model\Handler\DiscountHandler;
-
+use SDM\Altapay\Api\Subscription\ChargeSubscription;
 /**
  * Class CaptureObserver
  * Handle the invoice capture functionality.
@@ -108,18 +108,19 @@ class CaptureObserver implements ObserverInterface
         $payment          = $observer['payment'];
         $invoice          = $observer['invoice'];
         $orderIncrementId = $invoice->getOrder()->getIncrementId();
+        $paymentType      = $payment->getAdditionalInformation('payment_type');
         $orderObject      = $this->order->loadByIncrementId($orderIncrementId);
         $storeCode        = $invoice->getStore()->getCode();
         if (in_array($payment->getMethod(), SystemConfig::getTerminalCodes())) {
             //Create orderlines from order items
             $orderLines = $this->processInvoiceOrderLines($invoice);
             //Send request for payment refund
-            $this->sendInvoiceRequest($invoice, $orderLines, $orderObject, $payment, $storeCode);
+            $this->sendInvoiceRequest($paymentType, $invoice, $orderLines, $orderObject, $payment, $storeCode);
         }
     }
 
     /**
-     * @param $invoice
+     * @param Magento\Sales\Model\Order\Invoice $invoice
      *
      * @return array
      */
@@ -158,9 +159,9 @@ class CaptureObserver implements ObserverInterface
     }
 
     /**
-     * @param $couponCodeAmount
-     * @param $invoice
-     * @param $discountAllItems
+     * @param int|float $couponCodeAmount
+     * @param Magento\Sales\Model\Order\Invoice $invoice
+     * @param bool $discountAllItems
      *
      * @return array
      */
@@ -234,7 +235,7 @@ class CaptureObserver implements ObserverInterface
     }
 
     /**
-     * @param $invoice
+     * @param Magento\Sales\Model\Order\Invoice $invoice
      *
      * @return array
      */
@@ -257,29 +258,34 @@ class CaptureObserver implements ObserverInterface
     }
 
     /**
-     * @param $invoice
-     * @param $orderLines
-     * @param $orderObject
-     * @param $payment
-     * @param $storeCode
+     * @param Magento\Sales\Model\Order\Invoice $invoice
+     * @param array $orderLines
+     * @param Magento\Sales\Model\Order $orderObject
+     * @param array $payment
+     * @param int|string $storeCode
+     * @param string $paymentType
      *
      * @throws ResponseHeaderException
      */
-    private function sendInvoiceRequest($invoice, $orderLines, $orderObject, $payment, $storeCode)
+    private function sendInvoiceRequest($paymentType, $invoice, $orderLines, $orderObject, $payment, $storeCode)
     {
-        $api = new CaptureReservation($this->systemConfig->getAuth($storeCode));
-        if ($invoice->getTransactionId()) {
-            $api->setInvoiceNumber($invoice->getTransactionId());
-        }
-        $api->setAmount((float)number_format($invoice->getGrandTotal(), 2, '.', ''));
-        $api->setOrderLines($orderLines);
-        $shippingTrackingInfo = $this->shippingTrackingInfo($invoice);
-        /*send shipping tracking info if exists*/
-        if (!empty($shippingTrackingInfo)) {
+        $grandTotal = (float)$invoice->getGrandTotal();
+        if ($paymentType === 'subscription') {
+            $api = new ChargeSubscription($this->systemConfig->getAuth($storeCode));
+            $api->setTransaction($payment->getLastTransId());
+            $api->setAmount(round($grandTotal, 2));
+        } else {
+            $api = new CaptureReservation($this->systemConfig->getAuth($storeCode));
+            if ($invoice->getTransactionId()) {
+                $api->setInvoiceNumber($invoice->getTransactionId());
+            }
+            $api->setAmount(round($grandTotal, 2));
+            $api->setOrderLines($orderLines);
+            $shippingTrackingInfo = $this->shippingTrackingInfo($invoice);
+            // Send shipping tracking info
             $api->setTrackingInfo($shippingTrackingInfo);
+            $api->setTransaction($payment->getLastTransId());
         }
-
-        $api->setTransaction($payment->getLastTransId());
         /** @var CaptureReservationResponse $response */
         try {
             $response = $api->call();
@@ -315,13 +321,13 @@ class CaptureObserver implements ObserverInterface
     }
 
     /**
-     * @param $order
+     * @param Magento\Sales\Model\Order\Invoice $invoice
      *
-     * @return float|int
+     * @return float
      */
     public function fixedProductTax($invoice){
 
-        $weeTaxAmount = 0;
+        $weeTaxAmount = 0.0;
         foreach ($invoice->getAllItems() as $item) {
            $weeTaxAmount +=  $item->getWeeeTaxAppliedRowAmount();
         }

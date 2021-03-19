@@ -398,6 +398,7 @@ class Generator
                 $payment->setAdditionalInformation('masked_credit_card', $response->maskedCreditCard);
                 $payment->setAdditionalInformation('expires', $expires);
                 $payment->setAdditionalInformation('card_type', $cardType);
+                $payment->setAdditionalInformation('payment_type', $paymentStatus);
                 $payment->save();
                 //send order confirmation email
                 $this->sendOrderConfirmationEmail($comment, $order);
