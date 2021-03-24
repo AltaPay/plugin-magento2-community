@@ -323,7 +323,7 @@ class CaptureObserver implements ObserverInterface
     /**
      * @param Magento\Sales\Model\Order\Invoice $invoice
      *
-     * @return float|int
+     * @return float
      */
     public function fixedProductTax($invoice){
 
