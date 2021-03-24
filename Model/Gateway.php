@@ -393,7 +393,7 @@ class Gateway implements GatewayInterface
             if ($this->systemConfig->getTerminalConfig($terminalId, 'capture', $storeScope, $storeCode)) {
                 $request->setType('subscriptionAndCharge');
             } else {
-                $request->setType("subscription");
+                $request->setType('subscription');
             }
         }
         // check if auto capture enabled
