@@ -444,7 +444,7 @@ class Generator
                 $order->setIsNotified(false);
                 $order->getResource()->save($order);
 
-                if (strtolower($paymentStatus) == 'paymentandcapture') {
+                if (strtolower($paymentStatus) === 'paymentandcapture' || strtolower($paymentStatus) === 'subscriptionandcharge') {
                     $this->createInvoice($order, $requireCapture);
                 }
             }

@@ -390,10 +390,14 @@ class Gateway implements GatewayInterface
         }
         $quote = $this->quote->loadByIdWithoutStore($order->getQuoteId());
         if ($this->validateQuote($quote)) {
-            $request->setType("subscription");
+            if ($this->systemConfig->getTerminalConfig($terminalId, 'capture', $storeScope, $storeCode)) {
+                $request->setType('subscriptionAndCharge');
+            } else {
+                $request->setType('subscription');
+            }
         }
         // check if auto capture enabled
-        if ($this->systemConfig->getTerminalConfig($terminalId, 'capture', $storeScope, $storeCode)) {
+        if (!$this->validateQuote($quote) && $this->systemConfig->getTerminalConfig($terminalId, 'capture', $storeScope, $storeCode)) {
             $request->setType('paymentAndCapture');
         }
         //set orderlines to the request
