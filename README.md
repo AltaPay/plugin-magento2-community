@@ -6,6 +6,11 @@ Altapay has made it much easier for you as merchant/developer to receive secure 
 
 == Change log ==
 
+** Version 3.1.8
+
+    * Improvements:
+        - Support AutoCapture functionality with subscription product
+
 ** Version 3.1.7
 
     * Improvements:
