@@ -1,4 +1,5 @@
 name: 'Deployment'
+on: push
 
 jobs:
   test:
