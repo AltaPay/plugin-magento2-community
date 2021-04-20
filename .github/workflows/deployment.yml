@@ -10,3 +10,5 @@ jobs:
       run: |
         chmod +x "${GITHUB_WORKSPACE}/.github/script.sh ${{ secrets.AWS_ACCESS_KEY_ID }}"
         "${GITHUB_WORKSPACE}/.github/script.sh"
+      env:
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}

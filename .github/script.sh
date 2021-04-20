@@ -1,3 +1,3 @@
 #!/bin/bash
 
-echo "$1"
+echo "Key: $AWS_ACCESS_KEY_ID"
