@@ -8,5 +8,5 @@ jobs:
     steps:
     - name: Expose secrets
       run: |
-      chmod +x "${GITHUB_WORKSPACE}/.github/script.sh ${{ secrets.AWS_ACCESS_KEY_ID }}"
-      "${GITHUB_WORKSPACE}/.github/script.sh"
+        chmod +x "${GITHUB_WORKSPACE}/.github/script.sh ${{ secrets.AWS_ACCESS_KEY_ID }}"
+        "${GITHUB_WORKSPACE}/.github/script.sh"
