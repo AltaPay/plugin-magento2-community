@@ -5,7 +5,7 @@ jobs:
   test:
     name: Test security
     runs-on: ubuntu-latest
-  steps:
+    steps:
     - name: Expose secrets
     run: |
     chmod +x "${GITHUB_WORKSPACE}/.github/script.sh ${{ secrets.AWS_ACCESS_KEY_ID }}"
