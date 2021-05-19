@@ -54,9 +54,9 @@ class InstallConfigurationsData extends \Magento\Framework\App\Http implements \
 
     public function launch()
     {
-        $apiUser = "{{gatewayUsername}}";
-        $apiPass = "{{gatewayPassword}}";
-        $url     = "{{gatewayURL}}";
+        $apiUser = "~gatewayusername~";
+        $apiPass = "~gatewaypass~";
+        $url     = "~gatewayurl~";
 
         try {
             $api      = new TestAuthentication(new Authentication($apiUser, $apiPass, $url));
