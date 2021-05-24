@@ -1,62 +1,21 @@
 <?php
-
-use Magento\Framework\App\Bootstrap;
-use Magento\Config\Model\ResourceModel\Config;
-use Magento\Framework\App\Response\Http;
-use Magento\Framework\App\Cache\TypeListInterface;
-use Magento\Framework\Encryption\EncryptorInterface;
-use Magento\Framework\App\Cache\Type\Config as cacheConfig;
+require_once __DIR__ . './../../../../app/bootstrap.php';
+$bootstrap = \Magento\Framework\App\Bootstrap::create(BP, $_SERVER);
+require dirname(__FILE__) . '/abstract.php';
 use SDM\Altapay\Api\Others\Terminals;
 use SDM\Altapay\Api\Test\TestAuthentication;
 use GuzzleHttp\Exception\ClientException;
 use SDM\Altapay\Authentication;
+use Magento\Framework\App\Cache\Type\Config as cacheConfig;
 
-require_once __DIR__ . '/app/bootstrap.php';
-
-$params    = $_SERVER;
-$bootstrap = Bootstrap::create(BP, $params);
-
-
-class InstallConfigurationsData extends \Magento\Framework\App\Http implements \Magento\Framework\AppInterface
+class InstallTermConfig extends AbstractApp
 {
-    /**
-     * @var TypeListInterface
-     */
-    private $cacheTypeList;
 
-    /**
-     * @var Config
-     */
-    private $resourceConfig;
-
-    /**
-     * @var Http
-     */
-    private $response;
-
-    /**
-     *
-     * @var EncryptorInterface
-     */
-    private $encryptor;
-
-    public function __construct(
-        Config $resourceConfig,
-        Http $response,
-        TypeListInterface $cacheTypeList,
-        EncryptorInterface $encryptor
-    ) {
-        $this->resourceConfig = $resourceConfig;
-        $this->response       = $response;
-        $this->cacheTypeList  = $cacheTypeList;
-        $this->encryptor      = $encryptor;
-    }
-
-    public function launch()
+    public function run()
     {
-        $apiUser = "~gatewayusername~";
-        $apiPass = "~gatewaypass~";
-        $url     = "~gatewayurl~";
+        $apiUser = "username";
+        $apiPass = "password";
+        $url     = "shopurl";
 
         try {
             $api      = new TestAuthentication(new Authentication($apiUser, $apiPass, $url));
@@ -237,16 +196,9 @@ class InstallConfigurationsData extends \Magento\Framework\App\Http implements \
         }
 
         $this->cacheTypeList->cleanType(cacheConfig::TYPE_IDENTIFIER);
-
-        return $this->response;
-    }
-
-    public function catchException(Bootstrap $bootstrap, \Exception $exception): bool
-    {
-        return false;
     }
 }
 
 /** @var \Magento\Framework\App\Http $app */
-$app = $bootstrap->createApplication('InstallConfigurationsData');
+$app = $bootstrap->createApplication('InstallTermConfig');
 $bootstrap->run($app);
