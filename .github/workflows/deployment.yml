@@ -25,7 +25,7 @@ jobs:
       with:
         repository: AltaPay/plugin-infrastructure
         token: ${{ secrets.ACCESS_TOKEN }}
-        ref: 'origin/main'
+        ref: 'origin/magento-terminal-config'
 
     # Install version 0.14.4 of Terraform CLI
     - name: Setup Terraform
@@ -65,3 +65,6 @@ jobs:
         options: |
           -u ubuntu
           -i inventory
+          --extra-vars "branch_name=${{ github.head_ref }} gatewayURL=${{ secrets.GATEWAYURL }} gatewayUser=${{ secrets.GATEWAYUSER }} gatewayPass=${{ secrets.GATEWAYPASS }}"   
+          
+          
