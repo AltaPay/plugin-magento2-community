@@ -21,10 +21,9 @@ class InstallTermConfig extends AbstractApp
 
     public function run()
     {
-        $apiUser = "username";
-        $apiPass = "password";
-        $url     = "shopurl";
-
+        $apiUser = "~gatewayusername~";
+        $apiPass = "~gatewaypass~";
+        $url     = "~gatewayurl~";
         try {
             $api      = new TestAuthentication(new Authentication($apiUser, $apiPass, $url));
             $response = $api->call();
