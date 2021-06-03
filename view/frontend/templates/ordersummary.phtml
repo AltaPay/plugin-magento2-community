@@ -16,7 +16,7 @@ $block->getViewFileUrl('SDM_Altapay::css/ordersummary.css') ?>">
         <div class="shipping-information">
             <div class="ship-to">
                 <div class="shipping-information-title">
-                    <span>Ship To:</span>
+                    <span><?= $block->escapeHtml(__('Ship To')) ?>:</span>
                 </div>
                 <div class="shipping-information-content">
                     <?= /* @noEscape */ $block->getFormattedAddress(); ?>
@@ -24,7 +24,7 @@ $block->getViewFileUrl('SDM_Altapay::css/ordersummary.css') ?>">
             </div>
             <div class="ship-via">
                 <div class="shipping-information-title">
-                    <span>Shipping Method:</span>
+                    <span><?= $block->escapeHtml(__('Shipping Method')) ?>:</span>
                 </div>
                 <div class="shipping-information-content">
                     <span class="value"><?= $block->escapeHtml($order->getShippingDescription()); ?></span>
@@ -32,7 +32,7 @@ $block->getViewFileUrl('SDM_Altapay::css/ordersummary.css') ?>">
             </div>
             <div class="ship-via">
                 <div class="shipping-information-title">
-                    <span>Payment Method:</span>
+                    <span><?= $block->escapeHtml(__('Payment Method')) ?>:</span>
                 </div>
                 <div class="shipping-information-content">
                     <span class="value"><?= $block->escapeHtml($block->getPaymentMethodtitle()); ?></span>
@@ -44,12 +44,12 @@ $block->getViewFileUrl('SDM_Altapay::css/ordersummary.css') ?>">
 <!-- Order Item Details -->
 <aside class="modal-custom opc-sidebar opc-summary-wrapper">
     <div class="opc-block-summary">
-        <span class="title">Order Summary</span>
+        <span class="title"><?= $block->escapeHtml(__('Order Summary')) ?></span>
         <table class="data table table-totals">
-            <caption class="table-caption">Order Summary</caption>
+            <caption class="table-caption"><?= $block->escapeHtml(__('Order Summary')) ?></caption>
             <tbody>
             <tr class="totals sub">
-                <th class="mark" scope="row">Cart Subtotal</th>
+                <th class="mark" scope="row"><?= $block->escapeHtml(__('Cart Subtotal')) ?></th>
                 <td class="amount">
                     <span class="price" data-th="Cart Subtotal">
                     <?= $block->escapeHtml($block->getFormatedPrice($order->getSubtotal())); ?>
@@ -58,7 +58,7 @@ $block->getViewFileUrl('SDM_Altapay::css/ordersummary.css') ?>">
             </tr>
             <tr class="totals discount">
                 <th class="mark">
-                    <span class="title">Discount</span>
+                    <span class="title"><?= $block->escapeHtml(__('Discount')) ?></span>
                     <span class="discount coupon"><?= $block->escapeHtml($order->getCouponCode()); ?></span>
                 </th>
                 <td class="amount">
@@ -69,7 +69,7 @@ $block->getViewFileUrl('SDM_Altapay::css/ordersummary.css') ?>">
             </tr>
             <tr class="totals shipping excl">
                 <th class="mark" scope="row">
-                    <span class="label">Shipping</span>
+                    <span class="label"><?= $block->escapeHtml(__('Shipping')) ?></span>
                     <span class="value"><?= $block->escapeHtml($order->getShippingDescription()); ?></span>
                 </th>
                 <td class="amount">
@@ -88,7 +88,7 @@ $block->getViewFileUrl('SDM_Altapay::css/ordersummary.css') ?>">
             </tr>
             <tr class="grand totals">
                 <th class="mark" scope="row">
-                    <strong>Order Total</strong>
+                    <strong><?= $block->escapeHtml(__('Order Total')) ?></strong>
                 </th>
                 <td class="amount" data-th="Order Total">
                     <strong>
@@ -104,7 +104,7 @@ $block->getViewFileUrl('SDM_Altapay::css/ordersummary.css') ?>">
             <div style="position: unset;" class="title">
                 <strong role="heading">
                     <span><?= count($order->getAllVisibleItems()); ?></span>
-                    <span>Item in Cart</span>
+                    <span><?= $block->escapeHtml(__('Item in Cart')) ?></span>
                 </strong>
             </div>
             <div class="content minicart-items">
