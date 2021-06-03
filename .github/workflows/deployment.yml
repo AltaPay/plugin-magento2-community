@@ -3,7 +3,7 @@ name: 'Deployment'
 # Only trigger, when the build workflow succeeded
 on:
   pull_request:
-    branches: [ main ]
+    branches: [ master ]
     
 jobs:
   terraform:
