@@ -52,7 +52,7 @@ jobs:
 
     # Run Terraform Apply      
     - name: Terraform Apply
-      run: terraform apply -auto-approve
+      run: terraform apply -var ec2_type=t2.medium -auto-approve
       working-directory: ../plugin-infrastructure/provision/plugins
    
     # Run Ansible playbook
