@@ -55,6 +55,12 @@ jobs:
       run: terraform apply -var ec2_type=t2.medium -auto-approve
       working-directory: ../plugin-infrastructure/provision/plugins
    
+   # Add a sleep of 20 seconds, in case instance needs to warm up  
+    - name: Sleep for 20 seconds
+      uses: jakejarvis/wait-action@master
+      with:
+        time: '20s'
+   
     # Run Ansible playbook
     - name: Run playbook
       uses: dawidd6/action-ansible-playbook@v2
