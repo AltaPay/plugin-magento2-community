@@ -2,3 +2,4 @@
 /vendor/
 /composer.lock
 altapay_magento2-community_*.zip
+Test/integration-test/node-modules/

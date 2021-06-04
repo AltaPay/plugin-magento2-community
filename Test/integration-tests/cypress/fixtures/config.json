@@ -1,0 +1,7 @@
+
+{
+  "shopURL": "http://yoursite.com",
+  "adminURL": "http://yoursite.com/admin",
+  "adminUsername": "admin_user",
+  "adminPass": "admin_password"
+}
