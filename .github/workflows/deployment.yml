@@ -73,4 +73,60 @@ jobs:
           -i inventory
           --extra-vars "branch_name=${{ github.head_ref }} gatewayURL=${{ secrets.GATEWAYURL }} gatewayUser=${{ secrets.GATEWAYUSER }} gatewayPass=${{ secrets.GATEWAYPASS }}"   
           
-          
+      
+      
+    # Export IP for use in cypress tests config
+    - name: Export IP
+      run: |
+        testvar=$(sed '4!d' inventory)
+        echo $testvar
+        echo "IP=$testvar">> $GITHUB_ENV
+        echo $IP
+      working-directory: ../plugin-infrastructure/deploy/plugins
+
+
+    # Setting branch name for running cypress tests
+    - name: Set env TEST_BRANCH_NAME
+      run: |
+          if [[ $GITHUB_EVENT_NAME == 'pull_request' ]]; then
+              echo "TEST_BRANCH_NAME=${{ github.head_ref }}" >> "$GITHUB_ENV"
+          else
+              echo "TEST_BRANCH_NAME=main" >> "$GITHUB_ENV"
+          fi  	
+
+    # Run Cypress tests   
+    - uses: actions/checkout@v1
+      with:
+        repository: AltaPay/plugin-magento2-community
+        ref: 'origin/cypress-test'
+        path: plugin-magento2-community
+
+    - name: Create Cypress fixture config json
+      id: create-json-2  # Second ID
+      uses: jsdaniell/create-json@1.1.2
+      with:
+        name: "config.json"
+        json: '{"shopURL": "http://${{env.IP}}/magento","adminURL": "http://${{env.IP}}magento/wp-admin","adminUsername": "${{secrets.SHOP_ADMIN_USERNAME}}","adminPass": "${{secrets.SHOP_ADMIN_PASS}}"}'
+        dir: Test/integration-tests/cypress/fixtures/
+
+    - name: Install Cypress Dependencies 
+      run: npm i
+      working-directory: Test/integration-tests
+
+    - name: Run Cypress tests 
+      run: ./node_modules/.bin/cypress run --config video=false
+      working-directory: Test/integration-tests
+
+      # after the test run completes
+      # store screenshots
+      # NOTE: screenshots will be generated only if E2E test failed
+      # thus we store screenshots only on failures
+      # Alternative: create and commit an empty cypress/screenshots folder
+      # to always have something to upload
+    - uses: actions/upload-artifact@v1
+      if: failure()
+      with:
+        name: cypress-screenshots
+        path: ./Test/integration-tests/cypress/screenshots
+
+
