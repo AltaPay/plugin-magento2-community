@@ -1,7 +1,10 @@
 name: 'Deployment'
 
 # Only trigger, when the build workflow succeeded
+# Triggers the workflow on push or pull request events but only for the main branch
 on:
+  push:
+    branches: [ master ]
   pull_request:
     branches: [ master ]
     
@@ -27,72 +30,74 @@ jobs:
         token: ${{ secrets.ACCESS_TOKEN }}
         ref: 'origin/magento-terminal-config'
 
-#     # Install version 0.14.4 of Terraform CLI
-#     - name: Setup Terraform
-#       uses: hashicorp/setup-terraform@v1
-#       with:
-#         terraform_version: 0.14.4
+    # Install version 0.14.4 of Terraform CLI
+    - name: Setup Terraform
+      uses: hashicorp/setup-terraform@v1
+      with:
+        terraform_version: 0.14.4
 
-#     # Initialize a new or existing Terraform working directory by creating initial files, loading any remote state, downloading modules, etc.
-#     - name: Terraform Init
-#       run: terraform init 
-#       working-directory: ../plugin-infrastructure/provision/plugins
+    # Initialize a new or existing Terraform working directory by creating initial files, loading any remote state, downloading modules, etc.
+    - name: Terraform Init
+      run: terraform init 
+      working-directory: ../plugin-infrastructure/provision/plugins
 
 
-#     # Select a terraofrm workspace
-#     - name: Terraform workspace
-#       run: terraform workspace select magento24x
-#       working-directory: ../plugin-infrastructure/provision/plugins
+    # Select a terraofrm workspace
+    - name: Terraform workspace
+      run: terraform workspace select magento24x
+      working-directory: ../plugin-infrastructure/provision/plugins
       
       
-#     # Generates an execution plan for Terraform
-#     - name: Terraform Plan
-#       run: terraform plan
-#       working-directory: ../plugin-infrastructure/provision/plugins
+    # Generates an execution plan for Terraform
+    - name: Terraform Plan
+      run: terraform plan
+      working-directory: ../plugin-infrastructure/provision/plugins
 
-#     # Run Terraform Apply      
-#     - name: Terraform Apply
-#       run: terraform apply -var ec2_type=t2.medium -auto-approve
-#       working-directory: ../plugin-infrastructure/provision/plugins
+    # Run Terraform Apply      
+    - name: Terraform Apply
+      run: terraform apply -var ec2_type=t2.medium -auto-approve
+      working-directory: ../plugin-infrastructure/provision/plugins
    
-#    # Add a sleep of 20 seconds, in case instance needs to warm up  
-#     - name: Sleep for 20 seconds
-#       uses: jakejarvis/wait-action@master
-#       with:
-#         time: '20s'
+   # Add a sleep of 20 seconds, in case instance needs to warm up  
+    - name: Sleep for 20 seconds
+      uses: jakejarvis/wait-action@master
+      with:
+        time: '20s'
    
-#     # Run Ansible playbook
-#     - name: Run playbook
-#       uses: dawidd6/action-ansible-playbook@v2
-#       with:
-#         playbook: magento2-4-x.yml
-#         directory: ../plugin-infrastructure/deploy/plugins
-#         key: ${{secrets.SSHKEY}}
-#         options: |
-#           -u ubuntu
-#           -i inventory
-#           --extra-vars "branch_name=${{ github.head_ref }} gatewayURL=${{ secrets.GATEWAYURL }} gatewayUser=${{ secrets.GATEWAYUSER }} gatewayPass=${{ secrets.GATEWAYPASS }}"   
+   
+    # Setting branch name for running cypress tests
+    - name: Set env TEST_BRANCH_NAME
+      run: |
+          if [[ $GITHUB_EVENT_NAME == 'pull_request' ]]; then
+              echo "TEST_BRANCH_NAME=${{ github.head_ref }}" >> "$GITHUB_ENV"
+          else
+              echo "TEST_BRANCH_NAME=master" >> "$GITHUB_ENV"
+          fi  	
+          
+   
+    # Run Ansible playbook
+    - name: Run playbook
+      uses: dawidd6/action-ansible-playbook@v2
+      with:
+        playbook: magento2-4-x.yml
+        directory: ../plugin-infrastructure/deploy/plugins
+        key: ${{secrets.SSHKEY}}
+        options: |
+          -u ubuntu
+          -i inventory
+          --extra-vars "branch_name=master gatewayURL=${{ secrets.GATEWAYURL }} gatewayUser=${{ secrets.GATEWAYUSER }} gatewayPass=${{ secrets.GATEWAYPASS }}"   
+          
           
       
-      
-#     # Export IP for use in cypress tests config
-#     - name: Export IP
-#       run: |
-#         testvar=$(sed '4!d' inventory)
-#         echo $testvar
-#         echo "IP=$testvar">> $GITHUB_ENV
-#         echo $IP
-#       working-directory: ../plugin-infrastructure/deploy/plugins
+    # Export IP for use in cypress tests config
+    - name: Export IP
+      run: |
+        testvar=$(sed '4!d' inventory)
+        echo $testvar
+        echo "IP=$testvar">> $GITHUB_ENV
+        echo $IP
+      working-directory: ../plugin-infrastructure/deploy/plugins
 
-
-#     # Setting branch name for running cypress tests
-#     - name: Set env TEST_BRANCH_NAME
-#       run: |
-#           if [[ $GITHUB_EVENT_NAME == 'pull_request' ]]; then
-#               echo "TEST_BRANCH_NAME=${{ github.head_ref }}" >> "$GITHUB_ENV"
-#           else
-#               echo "TEST_BRANCH_NAME=main" >> "$GITHUB_ENV"
-#           fi  	
 
     # Run Cypress tests   
     - uses: actions/checkout@v1
@@ -106,7 +111,7 @@ jobs:
       uses: jsdaniell/create-json@1.1.2
       with:
         name: "config.json"
-        json: '{"shopURL": "http://34.253.195.24/magento","adminURL": "http://34.253.195.24/magento/wp-admin","adminUsername": "${{secrets.SHOP_ADMIN_USERNAME}}","adminPass": "${{secrets.SHOP_ADMIN_PASS}}"}'
+        json: '{"shopURL": "http://${{env.IP}}/magento","adminURL": "http://${{env.IP}}/magento/wp-admin","adminUsername": "${{secrets.SHOP_ADMIN_USERNAME}}","adminPass": "${{secrets.SHOP_ADMIN_PASS}}"}'
         dir: Test/integration-tests/cypress/fixtures/
 
     - name: Install Cypress Dependencies 
