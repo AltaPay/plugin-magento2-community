@@ -61,5 +61,5 @@ if ($collection->getSize() > 0) {
         {"*": {"SDM_Altapay/js/Altapay": {}}}
     </script>
 <?php } else { ?>
-    <div class="message info empty"><span>No saved credit cards.</span></div>
+    <div class="message info empty"><span><?= $block->escapeHtml(__('No saved credit cards.')); ?></span></div>
 <?php } ?>
