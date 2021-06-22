@@ -111,7 +111,7 @@ jobs:
       uses: jsdaniell/create-json@1.1.2
       with:
         name: "config.json"
-        json: '{"shopURL": "http://${{env.IP}}/magento","adminURL": "http://${{env.IP}}/magento/wp-admin","adminUsername": "${{secrets.SHOP_ADMIN_USERNAME}}","adminPass": "${{secrets.SHOP_ADMIN_PASS}}"}'
+        json: '{"shopURL": "http://${{env.IP}}/magento","adminURL": "http://${{env.IP}}/magento/admin","adminUsername": "${{secrets.SHOP_ADMIN_USERNAME}}","adminPass": "${{secrets.SHOP_ADMIN_PASS}}"}'
         dir: Test/integration-tests/cypress/fixtures/
 
     - name: Install Cypress Dependencies 
