@@ -28,5 +28,13 @@ describe ('Magento2', function(){
     })
 
 
+    it('Subscription', function(){
 
+        const ord = new Order()
+        ord.clrcookies()
+        ord.visit()
+        ord.signin()
+        ord.subscription_product()
+
+    })
 })

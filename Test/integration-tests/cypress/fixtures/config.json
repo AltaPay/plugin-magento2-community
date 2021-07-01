@@ -1,7 +1,10 @@
 
 {
-  "shopURL": "http://yoursite.com",
-  "adminURL": "http://yoursite.com/admin",
-  "adminUsername": "admin_user",
-  "adminPass": "admin_password"
+  "shopURL":"http://yoursite.com",
+  "adminURL":"http://yoursite.com/wp-admin",
+  "adminUsername":"admin_username",
+  "adminPass":"admin_password",
+  "CC_TERMINAL_NAME":"EmbraceIT Test Terminal",
+  "KLARNA_DKK_TERMINAL_NAME":"EmbraceIT Klarna DKK Test Terminal",
+  "SUBSCRIPTION_TERMINAL_NAME":"Credit Card for Subscription"
 }
