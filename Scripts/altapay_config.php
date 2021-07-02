@@ -1,25 +1,66 @@
 <?php
+
 $bootstrap = __DIR__ . './../../../../app/bootstrap.php';
+
 if (file_exists ($bootstrap)){
     require_once $bootstrap;
 }
 else {
     require_once __DIR__ . '/../../../../../app/bootstrap.php';
 }
-
 $bootstrap = \Magento\Framework\App\Bootstrap::create(BP, $_SERVER);
-require __DIR__ . '/abstract.php';
 
 use SDM\Altapay\Api\Others\Terminals;
 use SDM\Altapay\Api\Test\TestAuthentication;
 use GuzzleHttp\Exception\ClientException;
 use SDM\Altapay\Authentication;
 use Magento\Framework\App\Cache\Type\Config as cacheConfig;
+use \Magento\Framework\AppInterface as AppInterface;
+use \Magento\Framework\App\Http as Http;
+use Magento\Framework\ObjectManager\ConfigLoaderInterface;
+use Magento\Framework\App\Request\Http as RequestHttp;
+use Magento\Framework\App\Response\Http as ResponseHttp;
+use Magento\Framework\Event;
+use Magento\Framework\Filesystem;
+use Magento\Framework\App\AreaList as AreaList;
+use Magento\Framework\App\State as State;
+use Magento\Framework\Encryption\EncryptorInterface;
+use Magento\Framework\Registry;
+use Magento\Framework\ObjectManagerInterface;
+use Magento\Config\Model\ResourceModel\Config;
+use Magento\Framework\App\Cache\TypeListInterface;
 
-class InstallTermConfig extends AbstractApp
+class InstallTermConfig extends Http implements AppInterface
 {
+    public function __construct(
+        ObjectManagerInterface $objectManager,
+        Event\Manager $eventManager,
+        AreaList $areaList,
+        RequestHttp $request,
+        ResponseHttp $response,
+        ConfigLoaderInterface $configLoader,
+        State $state,
+        Filesystem $filesystem,
+        Registry $registry,
+        Config $resourceConfig,
+        EncryptorInterface $encryptor,
+        TypeListInterface $cacheTypeList
+    ) {
+        $this->_objectManager = $objectManager;
+        $this->_eventManager = $eventManager;
+        $this->_areaList = $areaList;
+        $this->_request = $request;
+        $this->_response = $response;
+        $this->_configLoader = $configLoader;
+        $this->_state = $state;
+        $this->_filesystem = $filesystem;
+        $this->registry = $registry;
+        $this->resourceConfig = $resourceConfig;
+        $this->encryptor      = $encryptor;
+        $this->cacheTypeList  = $cacheTypeList;
+    }
 
-    public function run()
+    public function launch()
     {
         $apiUser = "~gatewayusername~";
         $apiPass = "~gatewaypass~";
@@ -203,9 +244,12 @@ class InstallTermConfig extends AbstractApp
         }
 
         $this->cacheTypeList->cleanType(cacheConfig::TYPE_IDENTIFIER);
+        
+        return $this->_response;
     }
+
 }
 
 /** @var \Magento\Framework\App\Http $app */
 $app = $bootstrap->createApplication('InstallTermConfig');
-$bootstrap->run($app);
+// $bootstrap->run($app);
