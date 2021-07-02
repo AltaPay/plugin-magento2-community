@@ -6,6 +6,11 @@ Altapay has made it much easier for you as merchant/developer to receive secure 
 
 == Change log ==
 
+** Version 3.1.9
+
+    * Improvements:
+        - Support multi-language for order summary section in form rendering
+
 ** Version 3.1.8
 
     * Improvements:
