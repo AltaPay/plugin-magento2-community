@@ -2,4 +2,6 @@
 /vendor/
 /composer.lock
 altapay_magento2-community_*.zip
-Test/integration-tests/node-modules/
+Tests/integration-tests/node_modules/
+Tests/integration-tests/cypress/screenshots/
+Tests/integration-tests/cypress/videos/
