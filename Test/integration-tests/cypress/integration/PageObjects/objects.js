@@ -36,9 +36,9 @@ class Order
         cy.get('.button').click().wait(3000)
     }
 
-    cc_payment(){
-        cy.fixture('config').then((admin)=>{
-            cy.contains(admin.CC_TERMINAL_NAME).click({force: true})
+    cc_payment(CC_TERMINAL_NAME){
+        
+        cy.contains(CC_TERMINAL_NAME).click({force: true})
         cy.get('._active > .payment-method-content > :nth-child(5) > div.primary > .action').click().wait(2000)
         cy.get('#creditCardNumberInput').type('4111111111111111')
         cy.get('#emonth').type('01')
@@ -53,13 +53,12 @@ class Order
             cy.log(txt)
             }
             )
-        })
+       
         }
 
-    klarna_payment(){
+    klarna_payment(KLARNA_DKK_TERMINAL_NAME){
 
-        cy.fixture('config').then((admin)=>{
-            cy.contains(admin.KLARNA_DKK_TERMINAL_NAME).click({force: true})
+            cy.contains(KLARNA_DKK_TERMINAL_NAME).click({force: true})
             
         cy.wait(3000)
         cy.get('._active > .payment-method-content > :nth-child(5) > div.primary > .action').click()
@@ -84,7 +83,7 @@ class Order
             cy.log(txt)
             }
             )
-        })   
+       
     }
 
     admin()
@@ -126,13 +125,15 @@ class Order
     subscription_product()
         {
             cy.get('img').click()
-            cy.contains('Push It Messenger Bag').click({force: true})
+            cy.contains('Push It Messenger Bag').click({force: true}).wait(5000)
             //subscription check start
 
-            cy.get('body').then(($a) => { 
-                if ($a.find('[for="radio_subscribe_product"]').length) {
-                    cy.get('[for="radio_subscribe_product"]')
-                    .click({force:true})
+            // cy.get('body').then(($a) => { 
+            //     if ($a.find('[for="radio_subscribe_product"]').length) {
+            //         cy.get('[for="radio_subscribe_product"]')
+            //         .click({force:true})
+        }
+    subscrition_check(){
 
             cy.get('[for="radio_subscribe_product"]').wait(1000).click()
             cy.contains('Add to Cart').click()
@@ -143,11 +144,18 @@ class Order
             cy.wait(3000)
 
             cy.get('.button').click().wait(3000)
+
+        }
+    //})
+//}
             
             //Subscription payment
-            
+    subscription_payment(){
+                
             cy.fixture('config').then((admin)=>{
                 cy.contains(admin.SUBSCRIPTION_TERMINAL_NAME).click({force: true})
+
+                
 
             cy.get('._active > .payment-method-content > :nth-child(5) > div.primary > .action').click().wait(3000)
             cy.get('#creditCardNumberInput').type('4111111111111111')
@@ -163,17 +171,22 @@ class Order
 
             const txt = $btn.text()
             cy.log(txt)
-            }
-        )
+            })
+            
+            })
+    }
+
         
-            //Login dmin
+    admin(){
             cy.fixture('config').then((admin)=>{
                 cy.visit(admin.adminURL)
                 cy.get('#username').type(admin.adminUsername)
                 cy.get('#login').type(admin.adminPass)
                 cy.get('.action-login').click().wait(2000)
                 })
+    }
 
+    capture(){
             //Capture payment
             cy.get('#menu-magento-sales-sales > [onclick="return false;"]').click().wait(3000)
             cy.get('.item-sales-order > a').click().wait(5000)
@@ -187,18 +200,18 @@ class Order
             
         } 
         
-        )}
+        //)}
     
-                else {
+                // else {
                         
-                    cy.log('Subscription Process not found')   
+                //     cy.log('Subscription Process not found')   
 
-                }
-})
+                // }
+//})
 
             //subscription check end
 
-        }
+        
 
     
         signin(){
@@ -226,12 +239,13 @@ class Order
                 cy.contains('Manage Addresses').click()
                 cy.get('#street_1').type('Sæffleberggate 56,1 mf')
                 cy.get('#telephone').type('20123456')
+                cy.get('#country').select('Denmark')
                 cy.get('#city').type('Varde')
                 cy.get('#zip').type('6800')
                 cy.get('#form-validate > .actions-toolbar > div.primary > .action').click()
         }
     
-        }  
-
+          
+    }
 
 export default Order
