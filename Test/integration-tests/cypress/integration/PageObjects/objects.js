@@ -126,12 +126,7 @@ class Order
         {
             cy.get('img').click()
             cy.contains('Push It Messenger Bag').click({force: true}).wait(5000)
-            //subscription check start
 
-            // cy.get('body').then(($a) => { 
-            //     if ($a.find('[for="radio_subscribe_product"]').length) {
-            //         cy.get('[for="radio_subscribe_product"]')
-            //         .click({force:true})
         }
     subscrition_check(){
 
@@ -146,8 +141,7 @@ class Order
             cy.get('.button').click().wait(3000)
 
         }
-    //})
-//}
+
             
             //Subscription payment
     subscription_payment(){
@@ -200,20 +194,6 @@ class Order
             
         } 
         
-        //)}
-    
-                // else {
-                        
-                //     cy.log('Subscription Process not found')   
-
-                // }
-//})
-
-            //subscription check end
-
-        
-
-    
         signin(){
 
             cy.contains('Create an Account').click()
