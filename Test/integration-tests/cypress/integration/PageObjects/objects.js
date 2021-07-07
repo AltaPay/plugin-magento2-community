@@ -22,7 +22,7 @@ class Order
         cy.contains('Add to Cart').click()
         cy.wait(3000)
         cy.get('.message-success > div > a').wait(2000).click()
-        cy.get('.checkout-methods-items > :nth-child(1) > .action').click().wait(5000)
+        cy.get('.checkout-methods-items > :nth-child(1) > .action').wait(5000).click().wait(5000)
         cy.get('#customer-email-fieldset > .required > .control > #customer-email').type('demo@example.com')
         cy.xpath('/html/body/div[2]/main/div[2]/div/div[2]/div[4]/ol/li[1]/div[2]/form[2]/div/div[1]/div/input').type('Testperson-dk')
         cy.xpath('/html/body/div[2]/main/div[2]/div/div[2]/div[4]/ol/li[1]/div[2]/form[2]/div/div[2]/div/input').type('Testperson-dk')
@@ -31,7 +31,7 @@ class Order
         cy.xpath('/html/body/div[2]/main/div[2]/div/div[2]/div[4]/ol/li[1]/div[2]/form[2]/div/div[7]/div/input').type('Varde')
         cy.xpath('/html/body/div[2]/main/div[2]/div/div[2]/div[4]/ol/li[1]/div[2]/form[2]/div/div[8]/div/input').type('6800')
         cy.xpath('/html/body/div[2]/main/div[2]/div/div[2]/div[4]/ol/li[1]/div[2]/form[2]/div/div[9]/div/input').type('20123456')
-        cy.get(':nth-child(2) > :nth-child(1) > .radio').click()
+        cy.get('.radio').click({ multiple: true })
         cy.wait(1000)
         cy.get('.button').click().wait(3000)
     }
@@ -92,8 +92,13 @@ class Order
             cy.visit(admin.adminURL)
             cy.get('#username').type(admin.adminUsername)
             cy.get('#login').type(admin.adminPass)
-            cy.get('.action-login').click().wait(2000)
+            cy.get('.action-login').click().wait(5000)
+            cy.get('body').then(($a) => {
+                if($a.find(".action-secondary").length){
+                        cy.get('.action-secondary').click()
+                }
             })
+        })
 
     }
 
@@ -108,8 +113,8 @@ class Order
             cy.xpath('/html/body/div[2]/main/div[2]/div/div/form/section[4]/section[2]/div[2]/div[2]/div[2]/div[4]/button/span').click()
             cy.wait(6000)
             cy.get(':nth-child(1) > .note-list-comment').should('include.text', 'Captured amount')
-            cy.xpath('//*[@id="sales_order_view_tabs_order_invoices"]/span[1]').click()
-            cy.xpath('//*[@id="sales_order_view_tabs_order_invoices_content"]/div/div[3]/table/tbody/tr').click()
+            cy.xpath('//*[@id="sales_order_view_tabs_order_invoices"]/span[1]').wait(2000).click()
+            cy.xpath('//*[@id="sales_order_view_tabs_order_invoices_content"]/div/div[3]/table/tbody/tr').wait(2000).click()
             cy.wait(2000)
             cy.get('#credit-memo > span').click()
             cy.wait(2000)
@@ -170,29 +175,6 @@ class Order
             })
     }
 
-        
-    admin(){
-            cy.fixture('config').then((admin)=>{
-                cy.visit(admin.adminURL)
-                cy.get('#username').type(admin.adminUsername)
-                cy.get('#login').type(admin.adminPass)
-                cy.get('.action-login').click().wait(2000)
-                })
-    }
-
-    capture(){
-            //Capture payment
-            cy.get('#menu-magento-sales-sales > [onclick="return false;"]').click().wait(3000)
-            cy.get('.item-sales-order > a').click().wait(5000)
-            cy.xpath('//*[@id="container"]/div/div[4]/table/tbody/tr[1]/td[2]/div').click()
-            cy.get('#order_invoice > span').wait(5000).click()
-            cy.wait(5000)
-            cy.xpath('/html/body/div[2]/main/div[2]/div/div/form/section[4]/section[2]/div[2]/div[2]/div[2]/div[4]/button/span').click()
-            cy.wait(5000)
-            cy.get(':nth-child(1) > .note-list-comment').should('include.text', 'Captured amount')
-
-            
-        } 
         
         signin(){
 
