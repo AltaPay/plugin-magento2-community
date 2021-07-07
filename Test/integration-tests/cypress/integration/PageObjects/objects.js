@@ -33,7 +33,7 @@ class Order
         cy.xpath('/html/body/div[2]/main/div[2]/div/div[2]/div[4]/ol/li[1]/div[2]/form[2]/div/div[9]/div/input').type('20123456')
         cy.get('.radio').click({ multiple: true })
         cy.wait(1000)
-        cy.get('.button').click().wait(3000)
+        cy.get('.button').click().wait(5000)
     }
 
     cc_payment(CC_TERMINAL_NAME){
@@ -62,8 +62,8 @@ class Order
             
         cy.wait(3000)
         cy.get('._active > .payment-method-content > :nth-child(5) > div.primary > .action').click()
-        cy.get('[id=submitbutton]').click().wait(3000)
-        cy.wait(3000)
+        cy.get('[id=submitbutton]').click().wait(5000)
+        cy.wait(5000)
         cy.get('[id=klarna-pay-later-fullscreen]').then(function($iFrame){
             const mobileNum = $iFrame.contents().find('[id=invoice_kp-purchase-approval-form-phone-number]')
             cy.wrap(mobileNum).type('(452) 012-3456')
@@ -88,13 +88,13 @@ class Order
 
     admin()
     {
-        cy.fixture('config').then((admin)=>{
-            cy.visit(admin.adminURL)
-            cy.get('#username').type(admin.adminUsername)
-            cy.get('#login').type(admin.adminPass)
+        cy.fixture('config').then((conf)=>{
+            cy.visit(conf.adminURL).wait(5000)
+            cy.get('#username').type(conf.adminUsername)
+            cy.get('#login').type(conf.adminPass)
             cy.get('.action-login').click().wait(5000)
-            cy.get('body').then(($a) => {
-                if($a.find(".action-secondary").length){
+            cy.get('body').then(($p) => {
+                if($p.find(".action-secondary").length){
                         cy.get('.action-secondary').click()
                 }
             })
