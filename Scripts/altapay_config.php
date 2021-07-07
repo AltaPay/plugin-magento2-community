@@ -2,10 +2,9 @@
 
 $bootstrap = __DIR__ . './../../../../app/bootstrap.php';
 
-if (file_exists ($bootstrap)){
+if (file_exists($bootstrap)) {
     require_once $bootstrap;
-}
-else {
+} else {
     require_once __DIR__ . '/../../../../../app/bootstrap.php';
 }
 $bootstrap = \Magento\Framework\App\Bootstrap::create(BP, $_SERVER);
@@ -47,14 +46,14 @@ class InstallTermConfig extends Http implements AppInterface
         TypeListInterface $cacheTypeList
     ) {
         $this->_objectManager = $objectManager;
-        $this->_eventManager = $eventManager;
-        $this->_areaList = $areaList;
-        $this->_request = $request;
-        $this->_response = $response;
-        $this->_configLoader = $configLoader;
-        $this->_state = $state;
-        $this->_filesystem = $filesystem;
-        $this->registry = $registry;
+        $this->_eventManager  = $eventManager;
+        $this->_areaList      = $areaList;
+        $this->_request       = $request;
+        $this->_response      = $response;
+        $this->_configLoader  = $configLoader;
+        $this->_state         = $state;
+        $this->_filesystem    = $filesystem;
+        $this->registry       = $registry;
         $this->resourceConfig = $resourceConfig;
         $this->encryptor      = $encryptor;
         $this->cacheTypeList  = $cacheTypeList;
@@ -65,6 +64,7 @@ class InstallTermConfig extends Http implements AppInterface
         $apiUser = "~gatewayusername~";
         $apiPass = "~gatewaypass~";
         $url     = "~gatewayurl~";
+        $terminals = array();
         try {
             $api      = new TestAuthentication(new Authentication($apiUser, $apiPass, $url));
             $response = $api->call();
@@ -80,13 +80,17 @@ class InstallTermConfig extends Http implements AppInterface
             exit();
         }
 
-        $terminals = array();
+        // Get Terminals
 
         try {
             $api      = new Terminals(new Authentication($apiUser, $apiPass, $url));
             $response = $api->call();
+            $i        = 1;
             foreach ($response->Terminals as $terminal) {
-                $terminals[] = $terminal->Title;
+                if ($i <= 5) {
+                    $terminals[] = $terminal->Title;
+                    $i++;
+                }
             }
         } catch (ClientException $e) {
             echo "Error:" . $e->getMessage();
@@ -156,8 +160,8 @@ class InstallTermConfig extends Http implements AppInterface
             0
         );
 
-        for ($i = 1; $i <= 5; $i++) {
-
+        $i = 1;
+        foreach ($terminals as $terminal) {
             $this->resourceConfig->saveConfig(
                 'payment/terminal' . $i . '/active',
                 1,
@@ -167,7 +171,7 @@ class InstallTermConfig extends Http implements AppInterface
 
             $this->resourceConfig->saveConfig(
                 'payment/terminal' . $i . '/title',
-                $terminals[$i],
+                $terminal,
                 'default',
                 0
             );
@@ -237,14 +241,16 @@ class InstallTermConfig extends Http implements AppInterface
 
             $this->resourceConfig->saveConfig(
                 'payment/terminal' . $i . '/terminalname',
-                $terminals[$i],
+                $terminal,
                 'default',
                 0
             );
+
+            $i++;
         }
 
         $this->cacheTypeList->cleanType(cacheConfig::TYPE_IDENTIFIER);
-        
+
         return $this->_response;
     }
 
