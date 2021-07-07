@@ -28,7 +28,7 @@ jobs:
       with:
         repository: AltaPay/plugin-infrastructure
         token: ${{ secrets.ACCESS_TOKEN }}
-        ref: 'origin/magento-terminal-config'
+        ref: 'origin/main'
 
     # Install version 0.14.4 of Terraform CLI
     - name: Setup Terraform
@@ -85,12 +85,9 @@ jobs:
         options: |
           -u ubuntu
           -i inventory
-          --extra-vars "branch_name=altapay-config gatewayURL=${{ secrets.GATEWAYURL }} gatewayUser=${{ secrets.GATEWAYUSER }} gatewayPass=${{ secrets.GATEWAYPASS }}"   
-          --verbose
-
+          --extra-vars "branch_name=${{env.TEST_BRANCH_NAME}} gatewayURL=${{ secrets.GATEWAYURL }} gatewayUser=${{ secrets.GATEWAYUSER }} gatewayPass=${{ secrets.GATEWAYPASS }}"   
           
           
-      
     # Export IP for use in cypress tests config
     - name: Export IP
       run: |
@@ -105,7 +102,7 @@ jobs:
     - uses: actions/checkout@v1
       with:
         repository: AltaPay/plugin-magento2-community
-        ref: 'origin/cypress-test'
+        ref: 'origin/master'
         path: plugin-magento2-community
 
     - name: Create Cypress fixture config json
