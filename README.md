@@ -126,3 +126,23 @@ Altapay has made it much easier for you as merchant/developer to receive secure 
     * First release
 
 
+# How to run cypress test successfully in your environment 
+
+## Prerequisites: 
+
+1) Magento2 and default dummy data should be installed on publically accessible URL
+2) Cypress should be installed
+3) For subscription test, "Push It Messenger Bag" product should be configured as Subscription product
+
+## Information: 
+
+i) These tests are for only Credit Card, Klarna DKK and AltaPay Subscription (Credit Card for Subscription)
+ii) In case, you dont want to test any of the above mentioned payment methods, please leave it blank in the config file. i.e "CC_TERMINAL_NAME":""
+
+## Steps: 
+
+1) Install dependencies `npm i`
+
+2) Update "cypress/fixtures/config.json" 
+
+3) Execute `./node_modules/.bin/cypress run` in the terminal to run all the tests
