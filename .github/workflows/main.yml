@@ -1,0 +1,137 @@
+name: 'Deployment'
+
+# Only trigger, when the build workflow succeeded
+# Triggers the workflow on push or pull request events but only for the main branch
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+    
+jobs:
+  terraform:
+    name: 'Terraform'
+    runs-on: ubuntu-latest
+
+    steps:
+    
+    # Configure AWS credentials
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: eu-west-1
+          
+    # Checkout the repository to the GitHub Actions runner      
+    - uses: actions/checkout@v1  
+      with:
+        repository: AltaPay/plugin-infrastructure
+        token: ${{ secrets.ACCESS_TOKEN }}
+        ref: 'origin/main'
+
+    # Install version 0.14.4 of Terraform CLI
+    - name: Setup Terraform
+      uses: hashicorp/setup-terraform@v1
+      with:
+        terraform_version: 0.14.4
+
+    # Initialize a new or existing Terraform working directory by creating initial files, loading any remote state, downloading modules, etc.
+    - name: Terraform Init
+      run: terraform init 
+      working-directory: ../plugin-infrastructure/provision/plugins
+
+
+    # Select a terraofrm workspace
+    - name: Terraform workspace
+      run: terraform workspace select magento24x
+      working-directory: ../plugin-infrastructure/provision/plugins
+      
+      
+    # Generates an execution plan for Terraform
+    - name: Terraform Plan
+      run: terraform plan
+      working-directory: ../plugin-infrastructure/provision/plugins
+
+    # Run Terraform Apply      
+    - name: Terraform Apply
+      run: terraform apply -var ec2_type=t2.medium -auto-approve
+      working-directory: ../plugin-infrastructure/provision/plugins
+   
+   # Add a sleep of 20 seconds, in case instance needs to warm up  
+    - name: Sleep for 20 seconds
+      uses: jakejarvis/wait-action@master
+      with:
+        time: '20s'
+   
+   
+    # Setting branch name for running cypress tests
+    - name: Set env TEST_BRANCH_NAME
+      run: |
+          if [[ $GITHUB_EVENT_NAME == 'pull_request' ]]; then
+              echo "TEST_BRANCH_NAME=${{ github.head_ref }}" >> "$GITHUB_ENV"
+          else
+              echo "TEST_BRANCH_NAME=master" >> "$GITHUB_ENV"
+          fi  	
+          
+   
+    # Run Ansible playbook
+    - name: Run playbook
+      uses: dawidd6/action-ansible-playbook@v2
+      with:
+        playbook: magento2-4-x.yml
+        directory: ../plugin-infrastructure/deploy/plugins
+        key: ${{secrets.SSHKEY}}
+        options: |
+          -u ubuntu
+          -i inventory
+          --extra-vars "branch_name=${{env.TEST_BRANCH_NAME}} gatewayURL=${{ secrets.GATEWAYURL }} gatewayUser=${{ secrets.GATEWAYUSER }} gatewayPass=${{ secrets.GATEWAYPASS }}"   
+          
+          
+    # Export IP for use in cypress tests config
+    - name: Export IP
+      run: |
+        testvar=$(sed '4!d' inventory)
+        echo $testvar
+        echo "IP=$testvar">> $GITHUB_ENV
+        echo $IP
+      working-directory: ../plugin-infrastructure/deploy/plugins
+
+
+    # Run Cypress tests   
+    - uses: actions/checkout@v1
+      with:
+        repository: AltaPay/plugin-magento2-community
+        ref: 'origin/master'
+        path: plugin-magento2-community
+
+    - name: Create Cypress fixture config json
+      id: create-json-2  # Second ID
+      uses: jsdaniell/create-json@1.1.2
+      with:
+        name: "config.json"
+        json: '{"shopURL": "http://${{env.IP}}/magento","adminURL": "http://${{env.IP}}/magento/admin","adminUsername": "${{secrets.CMS_ADMIN_USER}}","adminPass": "${{secrets.CMS_ADMIN_PASS}}", "CC_TERMINAL_NAME": "${{secrets.CC_TERMINAL_NAME}}", "KLARNA_DKK_TERMINAL_NAME": "${{secrets.KLARNA_DKK_TERMINAL_NAME}}", "SUBSCRIPTION_TERMINAL_NAME": "${{secrets.SUBSCRIPTION_TERMINAL_NAME}}"}'
+        dir: Test/integration-tests/cypress/fixtures/
+
+    - name: Install Cypress Dependencies 
+      run: npm i
+      working-directory: Test/integration-tests
+
+    - name: Run Cypress tests 
+      run: ./node_modules/.bin/cypress run --config video=false
+      working-directory: Test/integration-tests
+
+      # after the test run completes
+      # store screenshots
+      # NOTE: screenshots will be generated only if E2E test failed
+      # thus we store screenshots only on failures
+      # Alternative: create and commit an empty cypress/screenshots folder
+      # to always have something to upload
+    - uses: actions/upload-artifact@v1
+      if: failure()
+      with:
+        name: cypress-screenshots
+        path: ./Test/integration-tests/cypress/screenshots
+        
+
+
