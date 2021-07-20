@@ -55,15 +55,21 @@ class PriceHandler
         $taxPercent              = $item->getTaxPercent();
         $quantity                = $item->getQtyOrdered();
         $originalPrice           = $item->getBaseOriginalPrice();
+        $data["taxAmount"]       = $this->calculateTaxAmount($unitPrice, $taxPercent, $quantity);
+        $rowTotal = ($item->getRowTotal()-$item->getDiscountAmount()+$item->getTaxAmount()+$item->getDiscountTaxCompensationAmount());
         if ($this->storeConfig->storePriceIncTax()) {
             $price = $item->getPriceInclTax();
         } else {
             $price = $item->getPrice();
         }
-        $data["taxAmount"] = $this->calculateTaxAmount($unitPrice, $taxPercent, $quantity);
         if ($originalPrice > $price && empty($couponCode)) {
             $data["catalogDiscount"] = true;
             $data["discount"]        = $this->discountHandler->catalogDiscount($originalPrice, $price);
+        } 
+        elseif ($originalPrice > $price && !empty($couponCode)) {
+            $originalPrice = $originalPrice * $quantity;
+            $data["catalogDiscount"] = true;
+            $data["discount"]        = $this->discountHandler->combinationDiscount($originalPrice, $rowTotal);
         } else {
             $data["discount"] = $itemDiscount;
         }
