@@ -167,7 +167,7 @@ class DiscountHandler
     }
 
     /**
-     * Calculate combination discount of cart and catalog price rule.
+     * Calculate combination of cart and catalog price rule.
      *
      * @param $originalPrice
      * @param $rowTotal
@@ -176,8 +176,8 @@ class DiscountHandler
      */
     public function combinationDiscount($originalPrice, $rowTotal)
     {
-        $discountPercentage = $originalPrice - $rowTotal;
-        $discountPercentage = ($discountPercentage / $originalPrice) * 100;
+        $discountAmount = $originalPrice - $rowTotal;
+        $discountPercentage = ($discountAmount / $originalPrice) * 100;
 
         return number_format($discountPercentage, 2, '.', '');
     }
