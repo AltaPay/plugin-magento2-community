@@ -6,6 +6,12 @@ Altapay has made it much easier for you as merchant/developer to receive secure 
 
 == Change log ==
 
+** Version 3.2.0
+
+    * Improvements:
+        - Add support when cart and catalog rules are applied simultaneously
+        - Make text "No saved credit cards" translatable
+
 ** Version 3.1.9
 
     * Improvements:
