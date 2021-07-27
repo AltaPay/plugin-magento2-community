@@ -246,7 +246,5 @@ describe ('Magento2', function(){
                 } 
             })
 
-            // ord.admin()
-            //                 ord.release_payment()
         })
 })
