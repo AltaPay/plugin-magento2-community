@@ -1,11 +1,9 @@
 <?php
 
-$bootstrap = __DIR__ . './../../../../app/bootstrap.php';
+$bootstrap = __DIR__ . './../../../app/bootstrap.php';
 
 if (file_exists($bootstrap)) {
     require_once $bootstrap;
-} else {
-    require_once __DIR__ . '/../../../../../app/bootstrap.php';
 }
 $bootstrap = \Magento\Framework\App\Bootstrap::create(BP, $_SERVER);
 
