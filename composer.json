@@ -2,7 +2,7 @@
   "name": "altapay/magento2-community",
   "license": "MIT",
   "description": "AltaPay: Payments less complicated",
-  "version": "3.1.9",
+  "version": "3.2.0",
    "require": {
         "php": ">=5.6",
         "guzzlehttp/psr7": "^1.4",
