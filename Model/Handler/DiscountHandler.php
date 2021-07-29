@@ -111,12 +111,13 @@ class DiscountHandler
      *
      * @param $discountOnAllItems
      * @param $discount
+     * @param $catalogDiscount
      *
      * @return int|string
      */
-    public function orderLineDiscount($discountOnAllItems, $discount)
+    public function orderLineDiscount($discountOnAllItems, $discount, $catalogDiscount)
     {
-        if ($discountOnAllItems) {
+        if ($discountOnAllItems && !$catalogDiscount) {
             $discount = 0;
         }
 
@@ -166,6 +167,22 @@ class DiscountHandler
     }
 
     /**
+     * Calculate combination of cart and catalog price rule.
+     *
+     * @param $originalPrice
+     * @param $rowTotal
+     *
+     * @return float|int
+     */
+    public function combinationDiscount($originalPrice, $rowTotal)
+    {
+        $discountAmount = $originalPrice - $rowTotal;
+        $discountPercentage = ($discountAmount / $originalPrice) * 100;
+
+        return number_format($discountPercentage, 2, '.', '');
+    }
+
+    /**
      * @param $originalPrice
      * @param $discountedPrice
      * @param $discountAmount
@@ -185,10 +202,13 @@ class DiscountHandler
         if (!empty($discountAmount)) {
             $discountAmount = ($discountAmount * 100) / ($originalPrice * $quantity);
         } elseif ($originalPrice > 0 && $originalPrice > $discountedPrice) {
-            $discount['catalog'] = true;
+            $discount['catalogDiscount'] = true;
             $discountAmount      = $this->catalogDiscount($originalPrice, $discountedPrice);
+        } elseif ($originalPrice > 0 && $originalPrice > $discountedPrice && !empty($discountAmount)) {
+            $discount['catalogDiscount'] = true;
+            $discountAmount      = $this->combinationDiscount($originalPrice, $discountedPrice);
         }
-        $discount['discount'] = $this->orderLineDiscount($discountOnAllItems, $discountAmount);
+        $discount['discount'] = $this->orderLineDiscount($discountOnAllItems, $discountAmount, $discount['catalogDiscount']);
 
         return $discount;
     }
@@ -204,9 +224,18 @@ class DiscountHandler
     {
         $discountOnAllItems = true;
         foreach ($orderItems as $item) {
-            $appliedRule = $item->getAppliedRuleIds();
-            $productType = $item->getProductType();
-            if (!empty($appliedRule)) {
+            $appliedRule    = $item->getAppliedRuleIds();
+            $productType    = $item->getProductType();
+            $originalPrice  = $item->getBaseOriginalPrice();
+            
+            if ($this->storeConfig->storePriceIncTax()) {
+                $price = $item->getPriceInclTax();
+            } else {
+                $price = $item->getPrice();
+            }        
+            if ($originalPrice > $price) {
+                $discountOnAllItems = false;
+            } elseif (!empty($appliedRule)) {
                 $appliedRuleArr = explode(",", $appliedRule);
                 foreach ($appliedRuleArr as $ruleId) {
                     $coupon = $this->storeConfig->getRuleInformationByID($ruleId);
