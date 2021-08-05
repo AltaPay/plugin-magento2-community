@@ -28,6 +28,5 @@ jobs:
       
      - name: Run php7.1 linter
        run: |
-         pwd && ls -lah
          find . -path ./vendor -prune -false -o -type f -name '*.php' -print0 | xargs -0 -n1 -P$(nproc) php7.1 -l -n | (! grep -v "No syntax errors detected" )
        working-directory: plugin-magento2-community
