@@ -8,13 +8,13 @@ on:
     branches: [ master ]
 
 jobs:
-  php-stan:
+  php-l:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        php-versions: ['5.6']
+        php-versions: ['7.1']
     steps:
-     - name: Install PHP 5.6
+     - name: Install PHP 7.1
        uses: shivammathur/setup-php@v2
        with:
          php-version: ${{ matrix.php-versions }}
@@ -26,8 +26,8 @@ jobs:
        with: 
          path: plugin-magento2-community
       
-     - name: Run php5.6 linter
+     - name: Run php7.1 linter
        run: |
          pwd && ls -lah
-         find . -path ./vendor -prune -false -o -type f -name '*.php' -print0 | xargs -0 -n1 -P$(nproc) php5.6 -l -n | (! grep -v "No syntax errors detected" )
+         find . -path ./vendor -prune -false -o -type f -name '*.php' -print0 | xargs -0 -n1 -P$(nproc) php7.1 -l -n | (! grep -v "No syntax errors detected" )
        working-directory: plugin-magento2-community
