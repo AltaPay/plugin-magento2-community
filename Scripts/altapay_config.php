@@ -53,7 +53,8 @@ class InstallTermConfig extends Http implements AppInterface
         State $state,
         Registry $registry,
         EncryptorInterface $encryptor,
-        TypeListInterface $_cacheTypeList
+        TypeListInterface $_cacheTypeList,
+        Config $resourceConfig
     ) {
         $this->_objectManager = $objectManager;
         $this->_eventManager  = $eventManager;
@@ -65,6 +66,7 @@ class InstallTermConfig extends Http implements AppInterface
         $this->registry       = $registry;
         $this->encryptor      = $encryptor;
         $this->_cacheTypeList  = $_cacheTypeList;
+        $this->resourceConfig = $resourceConfig;
     }
 
     public function launch()
