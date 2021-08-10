@@ -21,6 +21,7 @@ use Magento\Framework\Event;
 use Magento\Framework\Filesystem;
 use Magento\Framework\App\AreaList as AreaList;
 use Magento\Framework\App\State as State;
+use Magento\Framework\Encryption\Encryptor;
 use Magento\Framework\Encryption\EncryptorInterface;
 use Magento\Framework\Registry;
 use Magento\Framework\ObjectManagerInterface;
@@ -29,6 +30,19 @@ use Magento\Framework\App\Cache\TypeListInterface;
 
 class InstallTermConfig extends Http implements AppInterface
 {
+    /**
+     * @var EncryptorInterface
+     */
+    private $encryptor;
+    /**
+     * @var Config $config
+     */
+    private $resourceConfig;
+    /**
+     * @var \Magento\Framework\App\Cache\TypeListInterface
+     */
+    protected $_cacheTypeList;
+
     public function __construct(
         ObjectManagerInterface $objectManager,
         Event\Manager $eventManager,
@@ -37,11 +51,9 @@ class InstallTermConfig extends Http implements AppInterface
         ResponseHttp $response,
         ConfigLoaderInterface $configLoader,
         State $state,
-        Filesystem $filesystem,
         Registry $registry,
-        Config $resourceConfig,
         EncryptorInterface $encryptor,
-        TypeListInterface $cacheTypeList
+        TypeListInterface $_cacheTypeList
     ) {
         $this->_objectManager = $objectManager;
         $this->_eventManager  = $eventManager;
@@ -50,11 +62,9 @@ class InstallTermConfig extends Http implements AppInterface
         $this->_response      = $response;
         $this->_configLoader  = $configLoader;
         $this->_state         = $state;
-        $this->_filesystem    = $filesystem;
         $this->registry       = $registry;
-        $this->resourceConfig = $resourceConfig;
         $this->encryptor      = $encryptor;
-        $this->cacheTypeList  = $cacheTypeList;
+        $this->_cacheTypeList  = $_cacheTypeList;
     }
 
     public function launch()
@@ -247,7 +257,7 @@ class InstallTermConfig extends Http implements AppInterface
             $i++;
         }
 
-        $this->cacheTypeList->cleanType(cacheConfig::TYPE_IDENTIFIER);
+        $this->_cacheTypeList->cleanType(cacheConfig::TYPE_IDENTIFIER);
 
         return $this->_response;
     }
