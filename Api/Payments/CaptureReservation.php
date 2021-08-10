@@ -32,6 +32,8 @@ use SDM\Altapay\Traits\TransactionsTrait;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use GuzzleHttp\Exception\ClientException as GuzzleHttpClientException;
+use SDM\Altapay\Exceptions\ClientException;
 
 /**
  * When the funds of a payment has been reserved and the goods are ready for delivery
@@ -214,7 +216,7 @@ class CaptureReservation extends AbstractApi
 
             return $output;
         } catch (GuzzleHttpClientException $e) {
-            throw new Exceptions\ClientException($e->getMessage(), $e->getRequest(), $e->getResponse());
+            throw new ClientException($e->getMessage(), $e->getRequest(), $e->getResponse());
         }
     }
 

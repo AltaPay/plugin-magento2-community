@@ -30,6 +30,8 @@ use SDM\Altapay\Traits;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use GuzzleHttp\Exception\ClientException as GuzzleHttpClientException;
+use SDM\Altapay\Exceptions\ClientException;
 
 /**
  * Sometimes after delivering the goods/services and capturing the funds you want to repay/refund the customer.
@@ -201,7 +203,7 @@ class RefundCapturedReservation extends AbstractApi
 
             return $output;
         } catch (GuzzleHttpClientException $e) {
-            throw new Exceptions\ClientException($e->getMessage(), $e->getRequest(), $e->getResponse());
+            throw new ClientException($e->getMessage(), $e->getRequest(), $e->getResponse());
         }
     }
 
