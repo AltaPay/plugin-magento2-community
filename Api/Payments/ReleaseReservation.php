@@ -30,6 +30,8 @@ use SDM\Altapay\Traits\TransactionsTrait;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use GuzzleHttp\Exception\ClientException as GuzzleHttpClientException;
+use SDM\Altapay\Exceptions\ClientException;
 
 /**
  * Every now and then you for some reason do not want to capture a payment.
@@ -135,7 +137,7 @@ class ReleaseReservation extends AbstractApi
 
             return $output;
         } catch (GuzzleHttpClientException $e) {
-            throw new Exceptions\ClientException($e->getMessage(), $e->getRequest(), $e->getResponse());
+            throw new ClientException($e->getMessage(), $e->getRequest(), $e->getResponse());
         }
     }
 

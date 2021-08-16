@@ -33,6 +33,8 @@ use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use GuzzleHttp\Exception\ClientException as GuzzleHttpClientException;
+use SDM\Altapay\Exceptions\ClientException;
 
 class PaymentRequest extends AbstractApi
 {
@@ -378,7 +380,7 @@ class PaymentRequest extends AbstractApi
 
             return $output;
         } catch (GuzzleHttpClientException $e) {
-            throw new Exceptions\ClientException($e->getMessage(), $e->getRequest(), $e->getResponse());
+            throw new ClientException($e->getMessage(), $e->getRequest(), $e->getResponse());
         }
     }
 
