@@ -232,7 +232,6 @@ class OrderLinesHandler
                 return true;
             }
         }
-        return false;
     }
     /**
      * @param $fixedTaxAmount

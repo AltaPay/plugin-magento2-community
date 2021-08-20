@@ -27,6 +27,11 @@ use SDM\Altapay\Response\Embeds\Funding;
 
 class FundingsResponse extends AbstractResponse
 {
+    /**
+     * Childs of the response
+     *
+     * @var array<string, array<string, mixed>>
+     */
     protected $childs = [
         'Fundings' => [
             'class' => Funding::class,

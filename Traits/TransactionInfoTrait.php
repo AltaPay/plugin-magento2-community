@@ -32,7 +32,8 @@ trait TransactionInfoTrait
      * This is a one-dimensional associative array.
      * This is where you put any value that you would like to bind to the payment.
      *
-     * @param array $transaction
+     * @param array<int, string> $transaction
+     *
      * @return $this
      */
     public function setTransactionInfo(array $transaction)
@@ -45,6 +46,8 @@ trait TransactionInfoTrait
      * Resolve transaction info option
      *
      * @param OptionsResolver $resolver
+     *
+     * @return void
      */
     public function setTransactionInfoResolver(OptionsResolver $resolver)
     {

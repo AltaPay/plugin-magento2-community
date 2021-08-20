@@ -43,6 +43,6 @@ class Verifyorder extends Index implements CsrfAwareActionInterface
 
     public function execute()
     {
-        return $this->writeLog();
+        $this->writeLog();
     }
 }

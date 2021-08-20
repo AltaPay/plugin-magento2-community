@@ -27,7 +27,9 @@ use SDM\Altapay\Response\AbstractResponse;
 
 class GiftCardAccount extends AbstractResponse
 {
+    /** @var string */
     public $Currency;
 
+    /** @var numeric */
     public $Balance;
 }

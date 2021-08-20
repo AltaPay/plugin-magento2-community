@@ -17,7 +17,5 @@ class Verify extends Template
     {
         $message = __('OKAY');
         $this->setMessage($message);
-        
-        return $this;
     }
 }

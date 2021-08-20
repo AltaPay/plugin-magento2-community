@@ -42,13 +42,6 @@ class Index extends Action
         parent::__construct($context);
     }
 
-
-    /**
-     * Dispatch request
-     *
-     * @return \Magento\Framework\Controller\ResultInterface|ResponseInterface|void
-     * @throws \Magento\Framework\Exception\NotFoundException
-     */
     public function execute()
     {
         $action = $this->getRequest()->getParam('action');
@@ -91,7 +84,7 @@ class Index extends Action
                             $model->setPrimary(0)->save();
                         }
                         $response = ['status' => 'updated'];
-                    } catch (\Exception $e) {
+                    } catch (Exception $e) {
                         $response = ['status' => 'error'];
                     }
                 }

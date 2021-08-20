@@ -27,6 +27,11 @@ use SDM\Altapay\Response\AbstractResponse;
 
 class Funding extends AbstractResponse
 {
+    /**
+     * Childs of the response
+     *
+     * @var array<string, array<string, mixed>>
+     */
     protected $childs = [
         'Shops' => [
             'class' => Shop::class,
@@ -34,8 +39,10 @@ class Funding extends AbstractResponse
         ],
     ];
 
+    /** @var string */
     public $Filename;
 
+    /** @var numeric */
     public $ContractIdentifier;
 
     /**
@@ -43,6 +50,7 @@ class Funding extends AbstractResponse
      */
     public $Shops;
 
+    /** @var string */
     public $Acquirer;
 
     /**
@@ -50,6 +58,7 @@ class Funding extends AbstractResponse
      */
     public $FundingDate;
 
+    /** @var string */
     public $Amount;
 
     /**
@@ -57,11 +66,13 @@ class Funding extends AbstractResponse
      */
     public $CreatedDate;
 
+    /** @var string */
     public $DownloadLink;
 
     /**
      * @param string $FundingDate
-     * @return Funding
+     *
+     * @return $this
      */
     public function setFundingDate($FundingDate)
     {
@@ -71,7 +82,8 @@ class Funding extends AbstractResponse
 
     /**
      * @param string $CreatedDate
-     * @return Funding
+     *
+     * @return $this
      */
     public function setCreatedDate($CreatedDate)
     {

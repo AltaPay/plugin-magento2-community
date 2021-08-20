@@ -24,12 +24,13 @@
 namespace SDM\Altapay\Api\Others;
 
 use SDM\Altapay\AbstractApi;
-use SDM\Altapay\Request\Giftcard;
+use SDM\Request\Giftcard;
 use SDM\Altapay\Response\GiftcardResponse;
 use SDM\Altapay\Serializer\ResponseSerializer;
 use SDM\Altapay\Traits\TerminalTrait;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
+use Psr\Http\Message\ResponseInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
@@ -43,6 +44,7 @@ class QueryGiftcard extends AbstractApi
      * Gift card to check
      *
      * @param Giftcard $giftcard
+     *
      * @return $this
      */
     public function setGiftcard(Giftcard $giftcard)
@@ -55,6 +57,7 @@ class QueryGiftcard extends AbstractApi
      * Configure options
      *
      * @param OptionsResolver $resolver
+     *
      * @return void
      */
     protected function configureOptions(OptionsResolver $resolver)
@@ -66,31 +69,37 @@ class QueryGiftcard extends AbstractApi
     /**
      * Handle response
      *
-     * @param Request $request
-     * @param Response $response
-     * @return mixed
+     * @param Request           $request
+     * @param ResponseInterface $response
+     *
+     * @return GiftcardResponse
      */
-    protected function handleResponse(Request $request, Response $response)
+    protected function handleResponse(Request $request, ResponseInterface $response)
     {
         $body = (string) $response->getBody();
-        $xml = simplexml_load_string($body);
-        return ResponseSerializer::serialize(GiftcardResponse::class, $xml->Body, false, $xml->Header);
+        $xml = new \SimpleXMLElement($body);
+
+        return ResponseSerializer::serialize(GiftcardResponse::class, $xml->Body, $xml->Header);
     }
 
     /**
      * Url to api call
      *
-     * @param array $options Resolved options
+     * @param array<string, mixed> $options Resolved options
+     *
      * @return string
      */
     protected function getUrl(array $options)
     {
         /** @var Giftcard $card */
         $card = $options['giftcard'];
-        unset($options['giftcard']);
-        $options['giftcard']['account_identifier'] = $card->getAccount();
-        $options['giftcard']['provider'] = $card->getProvider();
-        $options['giftcard']['token'] = $card->getToken();
+
+        $options['giftcard'] = [
+            'account_identifier' => $card->getAccount(),
+            'provider'           => $card->getProvider(),
+            'token'              => $card->getToken(),
+        ];
+
         $query = $this->buildUrl($options);
         return sprintf('queryGiftCard/?%s', $query);
     }

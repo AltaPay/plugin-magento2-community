@@ -19,12 +19,12 @@ class ResponseInfo extends Callback
     }
 
     /**
-     * @return RegisteredAddress
+     * @return Address|null
      */
     public function getRegisteredAddress()
     {
         $response          = $this->call();
-        $registeredAddress = '';
+        $registeredAddress = null;
         if (isset($response->Transactions[0]->CustomerInfo->RegisteredAddress)) {
             $registeredAddress = $response->Transactions[0]->CustomerInfo->RegisteredAddress;
         }

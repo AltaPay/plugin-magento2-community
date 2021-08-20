@@ -24,14 +24,16 @@
 namespace SDM\Altapay\Api\Payments;
 
 use SDM\Altapay\AbstractApi;
+use SDM\Altapay\Exceptions;
 use SDM\Altapay\Response\ReleaseReservationResponse;
+use SDM\Altapay\Response\PaymentRequestResponse;
 use SDM\Altapay\Serializer\ResponseSerializer;
 use SDM\Altapay\Traits\TransactionsTrait;
+use GuzzleHttp\Exception\ClientException as GuzzleHttpClientException;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
+use Psr\Http\Message\ResponseInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use GuzzleHttp\Exception\ClientException as GuzzleHttpClientException;
-use SDM\Altapay\Exceptions\ClientException;
 
 /**
  * Every now and then you for some reason do not want to capture a payment.
@@ -60,26 +62,26 @@ class ReleaseReservation extends AbstractApi
     /**
      * Handle response
      *
-     * @param Request  $request
-     * @param Response $response
+     * @param Request           $request
+     * @param ResponseInterface $response
      *
      * @return ReleaseReservationResponse
      */
-    protected function handleResponse(Request $request, Response $response)
+    protected function handleResponse(Request $request, ResponseInterface $response)
     {
         $body = (string)$response->getBody();
-        $xml  = simplexml_load_string($body);
+        $xml  = new \SimpleXMLElement($body);
 
-        return ResponseSerializer::serialize(ReleaseReservationResponse::class, $xml->Body, false, $xml->Header);
+        return ResponseSerializer::serialize(ReleaseReservationResponse::class, $xml->Body, $xml->Header);
     }
 
     /**
-     * @return array
+     * @return array<string, string>
      */
     protected function getBasicHeaders()
     {
         $headers = parent::getBasicHeaders();
-        if (strtolower($this->getHttpMethod()) == 'post') {
+        if (mb_strtolower($this->getHttpMethod()) == 'post') {
             $headers['Content-Type'] = 'application/x-www-form-urlencoded';
         }
 
@@ -89,14 +91,14 @@ class ReleaseReservation extends AbstractApi
     /**
      * Url to api call
      *
-     * @param array $options Resolved options
+     * @param array<string, mixed> $options Resolved options
      *
      * @return string
      */
     protected function getUrl(array $options)
     {
         $url = 'releaseReservation';
-        if (strtolower($this->getHttpMethod()) == 'get') {
+        if (mb_strtolower($this->getHttpMethod()) == 'get') {
             $query = $this->buildUrl($options);
             $url   = sprintf('%s/?%s', $url, $query);
         }
@@ -113,7 +115,8 @@ class ReleaseReservation extends AbstractApi
     }
 
     /**
-     * @return \Altapay\Response\AbstractResponse|PaymentRequestResponse|bool|void
+     * @return \Altapay\Response\AbstractResponse|PaymentRequestResponse|bool
+     *
      * @throws \Altapay\Exceptions\ResponseHeaderException
      * @throws \Altapay\Exceptions\ResponseMessageException
      * @throws \GuzzleHttp\Exception\GuzzleException
@@ -123,7 +126,7 @@ class ReleaseReservation extends AbstractApi
         $this->doConfigureOptions();
         $headers           = $this->getBasicHeaders();
         $requestParameters = [$this->getHttpMethod(), $this->parseUrl(), $headers];
-        if (strtolower($this->getHttpMethod()) == 'post') {
+        if (mb_strtolower($this->getHttpMethod()) == 'post') {
             $requestParameters[] = $this->getPostOptions();
         }
         $request       = new Request(...$requestParameters);
@@ -137,7 +140,7 @@ class ReleaseReservation extends AbstractApi
 
             return $output;
         } catch (GuzzleHttpClientException $e) {
-            throw new ClientException($e->getMessage(), $e->getRequest(), $e->getResponse());
+            throw new Exceptions\ClientException($e->getMessage(), $e->getRequest(), $e->getResponse(), $e);
         }
     }
 
@@ -148,6 +151,6 @@ class ReleaseReservation extends AbstractApi
     {
         $options = $this->options;
 
-        return http_build_query($options, null, '&');
+        return http_build_query($options, '', '&');
     }
 }

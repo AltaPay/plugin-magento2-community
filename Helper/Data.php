@@ -72,24 +72,23 @@ class Data extends AbstractHelper
      * @param $orderId
      *
      * @return array
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
     public function transactionDetail($orderId)
     {
-        $versionDetails                         = [];
         $order = $this->order->load($orderId);
         if ($order->getId()) {
             $storeName                           = $order->getStore()->getName();
             $websiteName                         = $order->getStore()->getWebsite()->getName();
             $moduleInfo                          = $this->moduleList->getOne(self::MODULE_CODE);
+            $versionDetails                      = [];
             $versionDetails['ecomPlatform']      = 'Magento';
             $versionDetails['ecomVersion']       = $this->productMetadata->getVersion();
             $versionDetails['ecomPluginName']    = $moduleInfo['name'];
             $versionDetails['ecomPluginVersion'] = $moduleInfo['setup_version'];
             $versionDetails['otherInfo']         = 'websiteName - ' . $websiteName . ', storeName - ' . $storeName;
-        }
 
-        return $versionDetails;
+            return $versionDetails;
+        }
     }
 
     /**

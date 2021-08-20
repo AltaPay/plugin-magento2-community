@@ -30,6 +30,7 @@ use SDM\Altapay\Traits;
 use SDM\Altapay\Types;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
+use Psr\Http\Message\ResponseInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class InvoiceReservation extends AbstractApi
@@ -46,6 +47,8 @@ class InvoiceReservation extends AbstractApi
      * The type of payment.
      *
      * @param string $type
+     *
+     * @return void
      */
     public function setType($type)
     {
@@ -56,6 +59,8 @@ class InvoiceReservation extends AbstractApi
      * For Arvato germany an account number and bank code (BLZ) can be passed in, to pay via a secure elv bank transfer.
      *
      * @param string $accountnumber
+     *
+     * @return void
      */
     public function setAccountNumber($accountnumber)
     {
@@ -66,6 +71,8 @@ class InvoiceReservation extends AbstractApi
      * The source of the payment
      *
      * @param string $paymentsource
+     *
+     * @return void
      */
     public function setPaymentSource($paymentsource)
     {
@@ -76,6 +83,8 @@ class InvoiceReservation extends AbstractApi
      * For Arvato germany an account number and bank code (BLZ) can be passed in, to pay via a secure elv bank transfer
      *
      * @param string $bankcode
+     *
+     * @return void
      */
     public function setBankCode($bankcode)
     {
@@ -86,6 +95,8 @@ class InvoiceReservation extends AbstractApi
      * If you wish to decide pr. Payment wich fraud detection service to use
      *
      * @param string $fraudservice
+     *
+     * @return void
      */
     public function setFraudService($fraudservice)
     {
@@ -96,6 +107,7 @@ class InvoiceReservation extends AbstractApi
      * Configure options
      *
      * @param OptionsResolver $resolver
+     *
      * @return void
      */
     protected function configureOptions(OptionsResolver $resolver)
@@ -122,21 +134,24 @@ class InvoiceReservation extends AbstractApi
     /**
      * Handle response
      *
-     * @param Request $request
-     * @param Response $response
-     * @return mixed
+     * @param Request           $request
+     * @param ResponseInterface $response
+     *
+     * @return InvoiceReservationResponse
      */
-    protected function handleResponse(Request $request, Response $response)
+    protected function handleResponse(Request $request, ResponseInterface $response)
     {
         $body = (string) $response->getBody();
-        $xml = simplexml_load_string($body);
-        return ResponseSerializer::serialize(InvoiceReservationResponse::class, $xml->Body, false, $xml->Header);
+        $xml = new \SimpleXMLElement($body);
+
+        return ResponseSerializer::serialize(InvoiceReservationResponse::class, $xml->Body, $xml->Header);
     }
 
     /**
      * Url to api call
      *
-     * @param array $options Resolved options
+     * @param array<string, mixed> $options Resolved options
+     *
      * @return string
      */
     protected function getUrl(array $options)

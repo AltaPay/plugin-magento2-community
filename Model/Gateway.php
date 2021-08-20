@@ -33,7 +33,6 @@ use SDM\Altapay\Model\Handler\DiscountHandler;
 use SDM\Altapay\Model\Handler\CreatePaymentHandler;
 use SDM\Altapay\Model\TokenFactory;
 use Magento\Quote\Model\Quote\Item\AbstractItem;
-use Magento\Framework\DataObject;
 
 /**
  * Class Gateway

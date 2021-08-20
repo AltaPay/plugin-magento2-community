@@ -29,7 +29,7 @@ class ShippingMethods implements TypeInterface
     /**
      * Allowed payment types
      *
-     * @var array
+     * @var array<int, string>
      */
     private static $types = [
         'LowCost',
@@ -46,7 +46,7 @@ class ShippingMethods implements TypeInterface
     /**
      * Get allowed values
      *
-     * @return array
+     * @return array<int, string>
      */
     public static function getAllowed()
     {
@@ -57,6 +57,7 @@ class ShippingMethods implements TypeInterface
      * Is the requested value allowed
      *
      * @param string $value
+     *
      * @return bool
      */
     public static function isAllowed($value)

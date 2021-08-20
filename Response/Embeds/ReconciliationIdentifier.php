@@ -27,6 +27,7 @@ use SDM\Altapay\Response\AbstractResponse;
 
 class ReconciliationIdentifier extends AbstractResponse
 {
+    /** @var string */
     public $Id;
 
     /**
@@ -34,10 +35,13 @@ class ReconciliationIdentifier extends AbstractResponse
      */
     public $Amount;
 
+    /** @var numeric */
     public $currency;
 
+    /** @var string */
     public $AmountCurrency;
 
+    /** @var string */
     public $Type;
 
     /**
@@ -46,8 +50,9 @@ class ReconciliationIdentifier extends AbstractResponse
     public $Date;
 
     /**
-     * @param mixed $Date
-     * @return ReconciliationIdentifier
+     * @param string $Date
+     *
+     * @return $this
      */
     public function setDate($Date)
     {
@@ -57,7 +62,8 @@ class ReconciliationIdentifier extends AbstractResponse
 
     /**
      * @param float $Amount
-     * @return ReconciliationIdentifier
+     *
+     * @return $this
      */
     public function setAmount($Amount)
     {

@@ -29,7 +29,7 @@ interface TypeInterface
     /**
      * Get allowed values
      *
-     * @return array
+     * @return array<int, string>
      */
     public static function getAllowed();
 
@@ -37,6 +37,7 @@ interface TypeInterface
      * Is the requested value allowed
      *
      * @param string $value
+     *
      * @return bool
      */
     public static function isAllowed($value);

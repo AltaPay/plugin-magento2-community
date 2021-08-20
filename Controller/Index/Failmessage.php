@@ -46,7 +46,7 @@ class Failmessage extends Index implements CsrfAwareActionInterface
     {
         $this->writeLog();
         $msg = $this->getRequest()->getParam('msg');
-        $this->altapayLogger->addDebugLog('messageManager - Error message', $msg);
+        $this->logger->addDebugLog('messageManager - Error message', $msg);
         $this->messageManager->addErrorMessage($msg);
 
         return $this->_redirect('checkout', ['_fragment' => 'payment']);
