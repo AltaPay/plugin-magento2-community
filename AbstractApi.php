@@ -308,7 +308,7 @@ abstract class AbstractApi
         static $userAgent = '';
 
         if (!$userAgent) {
-            $userAgent = 'api-php/' . self::PHP_API_VERSION;
+            $userAgent = 'api-php/3.1.1';
             if (extension_loaded('curl') && function_exists('curl_version')) {
                 $curlInfo = \curl_version();
                 if (is_array($curlInfo) && array_key_exists("version", $curlInfo)) {
