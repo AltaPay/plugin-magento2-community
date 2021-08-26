@@ -197,7 +197,8 @@ class CaptureObserver implements ObserverInterface
                     $price,
                     $discountAmount,
                     $qty,
-                    $discountAllItems
+                    $discountAllItems,
+                    $item
                 );
                 $discountedAmount        = $itemDiscountInformation['discount'];
                 $catalogDiscountCheck    = $itemDiscountInformation['catalogDiscount'];
@@ -218,7 +219,8 @@ class CaptureObserver implements ObserverInterface
                     $couponCodeAmount,
                     $catalogDiscountCheck,
                     $storePriceIncTax,
-                    false
+                    false,
+                    $discountAllItems
                 );
                 // check if rounding compensation amount, send in the separate orderline
                 if ($roundingCompensation > 0 || $roundingCompensation < 0) {

@@ -198,7 +198,8 @@ class CreditmemoRefundObserver implements ObserverInterface
                     $price,
                     $discountAmount,
                     $qty,
-                    $discountAllItems
+                    $discountAllItems,
+                    $item
                 );
                 if ($item->getPriceInclTax()) {
                     $discountedAmount = $itemDiscountInformation['discount'];
@@ -221,7 +222,8 @@ class CreditmemoRefundObserver implements ObserverInterface
                         $couponCodeAmount,
                         $catalogDiscount,
                         $storePriceIncTax,
-                        false
+                        false,
+                        $discountAllItems
                     );
                     //send the rounding mismatch value into separate orderline if any
                     if ($roundingCompensation > 0 || $roundingCompensation < 0) {
