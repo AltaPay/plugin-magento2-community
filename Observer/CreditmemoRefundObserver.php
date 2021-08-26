@@ -177,7 +177,7 @@ class CreditmemoRefundObserver implements ObserverInterface
             if ($qty > 0 && $productType != 'bundle') {
                 $discountAmount = $item->getDiscountAmount();
                 $originalPrice  = $item->getOrderItem()->getOriginalPrice();
-
+                $totalPrice = $originalPrice * $qty;
                 if ($originalPrice == 0) {
                     $originalPrice = $item->getPriceInclTax();
                 }
@@ -194,7 +194,7 @@ class CreditmemoRefundObserver implements ObserverInterface
                     $taxAmount       = $this->priceHandler->calculateTaxAmount($unitPrice, $taxPercent, $qty);
                 }
                 $itemDiscountInformation = $this->discountHandler->getItemDiscountInformation(
-                    $originalPrice,
+                    $totalPrice,
                     $price,
                     $discountAmount,
                     $qty,

@@ -199,7 +199,6 @@ class DiscountHandler
         $discountOnAllItems,
         $item
     ) {
-        $originalPrice = $originalPrice * $quantity;
         $rowTotal = $item->getRowTotal()-$item->getDiscountAmount()+$item->getTaxAmount()+$item->getDiscountTaxCompensationAmount();
         $discount = ['discount' => 0, 'catalogDiscount' => false];
         if ($discountAmount && $originalPrice == $priceInclTax) {
