@@ -72,6 +72,7 @@ class Data extends AbstractHelper
      * @param $orderId
      *
      * @return array
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
     public function transactionDetail($orderId)
     {

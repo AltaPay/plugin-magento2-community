@@ -24,7 +24,7 @@
 namespace SDM\Altapay\Api\Others;
 
 use SDM\Altapay\AbstractApi;
-use SDM\Request\Giftcard;
+use SDM\Altapay\Request\Giftcard;
 use SDM\Altapay\Response\GiftcardResponse;
 use SDM\Altapay\Serializer\ResponseSerializer;
 use SDM\Altapay\Traits\TerminalTrait;
