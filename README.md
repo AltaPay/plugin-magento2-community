@@ -6,11 +6,6 @@ Altapay has made it much easier for you as merchant/developer to receive secure 
 
 == Change log ==
 
-** Version 3.2.2
-
-    * Bug fixes:
-        - Fix cancel order issues when there is no transaction
-
 ** Version 3.2.1
 
     * Bug fixes:
