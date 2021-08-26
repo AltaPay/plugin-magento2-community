@@ -184,7 +184,7 @@ class DiscountHandler
 
     /**
      * @param $originalPrice
-     * @param $discountedPrice
+     * @param $priceInclTax
      * @param $discountAmount
      * @param $quantity
      * @param $discountOnAllItems
@@ -193,7 +193,7 @@ class DiscountHandler
      */
     public function getItemDiscountInformation(
         $originalPrice,
-        $discountedPrice,
+        $priceInclTax,
         $discountAmount,
         $quantity,
         $discountOnAllItems,
@@ -202,12 +202,12 @@ class DiscountHandler
         $originalPrice = $originalPrice * $quantity;
         $rowTotal = $item->getRowTotal()-$item->getDiscountAmount()+$item->getTaxAmount()+$item->getDiscountTaxCompensationAmount();
         $discount = ['discount' => 0, 'catalogDiscount' => false];
-        if (!empty($discountAmount) && $originalPrice <= $discountedPrice) {
+        if ($discountAmount && $originalPrice == $priceInclTax) {
             $discountAmount = ($discountAmount * 100) / ($originalPrice * $quantity);
-        } elseif ($originalPrice > 0 && $originalPrice > $discountedPrice && empty($discountAmount)) {
+        } elseif ($originalPrice > 0 && $originalPrice > $priceInclTax && empty($discountAmount)) {
             $discount['catalogDiscount'] = true;
-            $discountAmount      = $this->catalogDiscount($originalPrice, $discountedPrice);
-        } elseif ($originalPrice > 0 && $originalPrice > $discountedPrice && !empty($discountAmount)) {
+            $discountAmount      = $this->catalogDiscount($originalPrice, $priceInclTax);
+        } elseif ($originalPrice > 0 && $originalPrice > $priceInclTax && $discountAmount) {
             $discount['catalogDiscount'] = true;
             $discountAmount      = $this->combinationDiscount($originalPrice, $rowTotal);
         }
