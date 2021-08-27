@@ -176,6 +176,7 @@ class CaptureObserver implements ObserverInterface
             if ($qty > 0 && $productType != 'bundle' && $item->getPriceInclTax()) {
                 $discountAmount = $item->getDiscountAmount();
                 $originalPrice  = $item->getOrderItem()->getOriginalPrice();
+                $totalPrice     = $originalPrice * $qty;
 
                 if ($originalPrice == 0) {
                     $originalPrice = $item->getPriceInclTax();
@@ -193,11 +194,12 @@ class CaptureObserver implements ObserverInterface
                     $taxAmount       = $this->priceHandler->calculateTaxAmount($unitPrice, $taxPercent, $qty);
                 }
                 $itemDiscountInformation = $this->discountHandler->getItemDiscountInformation(
-                    $originalPrice,
+                    $totalPrice,
                     $price,
                     $discountAmount,
                     $qty,
-                    $discountAllItems
+                    $discountAllItems,
+                    $item
                 );
                 $discountedAmount        = $itemDiscountInformation['discount'];
                 $catalogDiscountCheck    = $itemDiscountInformation['catalogDiscount'];
@@ -218,7 +220,8 @@ class CaptureObserver implements ObserverInterface
                     $couponCodeAmount,
                     $catalogDiscountCheck,
                     $storePriceIncTax,
-                    false
+                    false,
+                    $discountAllItems
                 );
                 // check if rounding compensation amount, send in the separate orderline
                 if ($roundingCompensation > 0 || $roundingCompensation < 0) {
