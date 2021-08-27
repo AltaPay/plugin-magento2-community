@@ -91,7 +91,7 @@ class Index extends Action
                             $model->setPrimary(0)->save();
                         }
                         $response = ['status' => 'updated'];
-                    } catch (Exception $e) {
+                    } catch (\Exception $e) {
                         $response = ['status' => 'error'];
                     }
                 }
