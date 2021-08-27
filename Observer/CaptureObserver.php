@@ -176,7 +176,8 @@ class CaptureObserver implements ObserverInterface
             if ($qty > 0 && $productType != 'bundle' && $item->getPriceInclTax()) {
                 $discountAmount = $item->getDiscountAmount();
                 $originalPrice  = $item->getOrderItem()->getOriginalPrice();
-                $totalPrice = $originalPrice * $qty;
+                $totalPrice     = $originalPrice * $qty;
+
                 if ($originalPrice == 0) {
                     $originalPrice = $item->getPriceInclTax();
                 }

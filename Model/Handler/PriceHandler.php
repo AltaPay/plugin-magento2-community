@@ -66,7 +66,7 @@ class PriceHandler
             $data["catalogDiscount"] = true;
             $data["discount"]        = $this->discountHandler->catalogDiscount($originalPrice, $price);
         } 
-        elseif (($originalPrice > $price) && abs((float)$couponAmount) > 0 && !$discountAllItems) {
+        elseif ($originalPrice > $price && abs((float)$couponAmount) > 0 && !$discountAllItems) {
             $originalPrice = $originalPrice * $quantity;
             $data["catalogDiscount"] = true;
             $data["discount"]        = $this->discountHandler->combinationDiscount($originalPrice, $rowTotal);
@@ -148,7 +148,7 @@ class PriceHandler
             $cmsSubTotal  = $cmsSubTotal - ($cmsSubTotal * ($discountedAmount / 100));
             $compensation = $cmsSubTotal - $gatewaySubTotal;
         } else {
-            $cmsSubTotal  = ($item->getRowTotal()-$item->getDiscountAmount()+$item->getTaxAmount()+$item->getDiscountTaxCompensationAmount());
+            $cmsSubTotal  = $item->getRowTotal()-$item->getDiscountAmount()+$item->getTaxAmount()+$item->getDiscountTaxCompensationAmount();
             $compensation = $cmsSubTotal - $gatewaySubTotal;
         }
 

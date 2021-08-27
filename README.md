@@ -9,13 +9,13 @@ Altapay has made it much easier for you as merchant/developer to receive secure 
 ** Version 3.2.2
 
     * Bug fixes:
-        - Fix order failing issue when applying a fixed discount on the cart
-        - Fix cancel order issues when there is no transaction
+        - Fix: Order failing issue when applying a fixed discount on the cart
+        - Fix: Cancel order issues when there is no transaction
 
 ** Version 3.2.1
 
     * Bug fixes:
-        - Fix compilation issue due to a missing file path
+        - Fix: Compilation issue due to a missing file path
 
 ** Version 3.2.0
 
