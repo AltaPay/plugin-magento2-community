@@ -177,7 +177,8 @@ class CreditmemoRefundObserver implements ObserverInterface
             if ($qty > 0 && $productType != 'bundle') {
                 $discountAmount = $item->getDiscountAmount();
                 $originalPrice  = $item->getOrderItem()->getOriginalPrice();
-
+                $totalPrice     = $originalPrice * $qty;
+                
                 if ($originalPrice == 0) {
                     $originalPrice = $item->getPriceInclTax();
                 }
@@ -194,11 +195,12 @@ class CreditmemoRefundObserver implements ObserverInterface
                     $taxAmount       = $this->priceHandler->calculateTaxAmount($unitPrice, $taxPercent, $qty);
                 }
                 $itemDiscountInformation = $this->discountHandler->getItemDiscountInformation(
-                    $originalPrice,
+                    $totalPrice,
                     $price,
                     $discountAmount,
                     $qty,
-                    $discountAllItems
+                    $discountAllItems,
+                    $item
                 );
                 if ($item->getPriceInclTax()) {
                     $discountedAmount = $itemDiscountInformation['discount'];
@@ -221,7 +223,8 @@ class CreditmemoRefundObserver implements ObserverInterface
                         $couponCodeAmount,
                         $catalogDiscount,
                         $storePriceIncTax,
-                        false
+                        false,
+                        $discountAllItems
                     );
                     //send the rounding mismatch value into separate orderline if any
                     if ($roundingCompensation > 0 || $roundingCompensation < 0) {
