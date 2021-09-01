@@ -50,7 +50,7 @@ jobs:
       
     # Generates an execution plan for Terraform
     - name: Terraform Plan
-      run: terraform plan
+      run: terraform plan -var ec2_type=t2.medium
       working-directory: ../plugin-infrastructure/provision/plugins
 
     # Run Terraform Apply      
