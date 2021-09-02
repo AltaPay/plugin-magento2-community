@@ -25,9 +25,12 @@ namespace SDM\Altapay\Response;
 
 class SurchargeResponse extends AbstractResponse
 {
+    /** @var string */
     public $Result;
 
+    /** @var numeric */
     public $SurchageAmount;
 
+    /** @var string|null */
     public $ThreeDSecureResult;
 }

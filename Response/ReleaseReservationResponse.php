@@ -30,11 +30,10 @@ use SDM\Altapay\Response\Embeds\Transaction;
  */
 class ReleaseReservationResponse extends AbstractResponse
 {
-
     /**
-     * Childs
+     * Childs of the response
      *
-     * @var array
+     * @var array<string, array<string, mixed>>
      */
     protected $childs = [
         'Transactions' => [
@@ -54,6 +53,7 @@ class ReleaseReservationResponse extends AbstractResponse
      * Result
      *
      * @var string
+     *
      * @deprecated
      */
     public $CancelResult;
@@ -66,7 +66,23 @@ class ReleaseReservationResponse extends AbstractResponse
     public $Transactions;
 
     /**
+     * MerchantErrorMessage
+     *
      * @var string
      */
     public $MerchantErrorMessage;
+
+    /**
+     * CardHolderErrorMessage
+     *
+     * @var string
+     */
+    public $CardHolderErrorMessage;
+
+    /**
+     * CardHolderMessageMustBeShown
+     *
+     * @var string
+     */
+    public $CardHolderMessageMustBeShown;
 }

@@ -76,7 +76,7 @@ class Data extends AbstractHelper
      */
     public function transactionDetail($orderId)
     {
-        $versionDetails                         = [];
+        $versionDetails                          = [];
         $order = $this->order->load($orderId);
         if ($order->getId()) {
             $storeName                           = $order->getStore()->getName();
@@ -88,7 +88,7 @@ class Data extends AbstractHelper
             $versionDetails['ecomPluginVersion'] = $moduleInfo['setup_version'];
             $versionDetails['otherInfo']         = 'websiteName - ' . $websiteName . ', storeName - ' . $storeName;
         }
-
+        
         return $versionDetails;
     }
 

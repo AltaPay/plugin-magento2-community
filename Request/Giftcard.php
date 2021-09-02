@@ -48,6 +48,7 @@ class Giftcard
 
     /**
      * Giftcard constructor.
+     *
      * @param string $account
      * @param string $provider
      * @param string $token

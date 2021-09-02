@@ -28,6 +28,7 @@ use SDM\Altapay\Response\Embeds\Funding;
 use SDM\Altapay\Traits\CsvToArrayTrait;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
+use Psr\Http\Message\ResponseInterface;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -42,6 +43,7 @@ class FundingDownload extends AbstractApi
      * Set the download link from a funding object
      *
      * @param Funding $funding
+     *
      * @return $this
      */
     public function setFunding(Funding $funding)
@@ -54,6 +56,7 @@ class FundingDownload extends AbstractApi
      * Set the download link directly
      *
      * @param string $link
+     *
      * @return $this
      */
     public function setFundingDownloadLink($link)
@@ -66,6 +69,7 @@ class FundingDownload extends AbstractApi
      * Configure options
      *
      * @param OptionsResolver $resolver
+     *
      * @return void
      */
     protected function configureOptions(OptionsResolver $resolver)
@@ -84,11 +88,12 @@ class FundingDownload extends AbstractApi
     /**
      * Handle response
      *
-     * @param Request $request
-     * @param Response $response
+     * @param Request           $request
+     * @param ResponseInterface $response
+     *
      * @return string
      */
-    protected function handleResponse(Request $request, Response $response)
+    protected function handleResponse(Request $request, ResponseInterface $response)
     {
         return (string) $response->getBody();
     }
@@ -96,7 +101,8 @@ class FundingDownload extends AbstractApi
     /**
      * Url to api call
      *
-     * @param array $options Resolved options
+     * @param array<string, mixed> $options Resolved options
+     *
      * @return string
      */
     protected function getUrl(array $options)

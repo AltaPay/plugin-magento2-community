@@ -31,6 +31,7 @@ use SDM\Altapay\Traits;
 use SDM\Altapay\Types;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
+use Psr\Http\Message\ResponseInterface;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -231,23 +232,23 @@ class ReservationOfFixedAmount extends AbstractApi
     /**
      * Handle response
      *
-     * @param Request  $request
-     * @param Response $response
+     * @param Request           $request
+     * @param ResponseInterface $response
      *
      * @return ReservationOfFixedAmountResponse
      */
-    protected function handleResponse(Request $request, Response $response)
+    protected function handleResponse(Request $request, ResponseInterface $response)
     {
         $body = (string)$response->getBody();
-        $xml  = simplexml_load_string($body);
+        $xml  = new \SimpleXMLElement($body);
 
-        return ResponseSerializer::serialize(ReservationOfFixedAmountResponse::class, $xml->Body, false, $xml->Header);
+        return ResponseSerializer::serialize(ReservationOfFixedAmountResponse::class, $xml->Body, $xml->Header);
     }
 
     /**
      * Url to api call
      *
-     * @param array $options Resolved options
+     * @param array<string, mixed> $options Resolved options
      *
      * @return string
      */

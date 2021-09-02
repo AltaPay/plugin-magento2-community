@@ -28,6 +28,7 @@ use SDM\Altapay\Response\FundingsResponse;
 use SDM\Altapay\Serializer\ResponseSerializer;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
+use Psr\Http\Message\ResponseInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
@@ -40,6 +41,8 @@ class FundingList extends AbstractApi
      * This method will only show 100 fundings pr. call. Setting this parameter allows you to fetch more.
      *
      * @param int $page
+     *
+     * @return void
      */
     public function setPage($page)
     {
@@ -50,6 +53,7 @@ class FundingList extends AbstractApi
      * Configure options
      *
      * @param OptionsResolver $resolver
+     *
      * @return void
      */
     protected function configureOptions(OptionsResolver $resolver)
@@ -62,21 +66,24 @@ class FundingList extends AbstractApi
     /**
      * Handle response
      *
-     * @param Request $request
-     * @param Response $response
+     * @param Request           $request
+     * @param ResponseInterface $response
+     *
      * @return FundingsResponse
      */
-    protected function handleResponse(Request $request, Response $response)
+    protected function handleResponse(Request $request, ResponseInterface $response)
     {
         $body = (string) $response->getBody();
-        $xml = simplexml_load_string($body);
-        return ResponseSerializer::serialize(FundingsResponse::class, $xml->Body, false, $xml->Header);
+        $xml = new \SimpleXMLElement($body);
+
+        return ResponseSerializer::serialize(FundingsResponse::class, $xml->Body, $xml->Header);
     }
 
     /**
      * Url to api call
      *
-     * @param array $options Resolved options
+     * @param array<string, mixed> $options Resolved options
+     *
      * @return string
      */
     protected function getUrl(array $options)

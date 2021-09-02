@@ -33,12 +33,13 @@ use SDM\Altapay\Serializer\ResponseSerializer;
  */
 class Callback
 {
+    /** @var array<string, string> */
     private $postedData;
 
     /**
      * Callback constructor.
      *
-     * @param $postedData
+     * @param array<string, string> $postedData
      */
     public function __construct($postedData)
     {
@@ -50,15 +51,15 @@ class Callback
      */
     public function call()
     {
-        $xml = simplexml_load_string($this->postedData['xml']);
-        /** @var CallbackResponse $response */
-        $response = ResponseSerializer::serialize(CallbackResponse::class, $xml->Body, false, $xml->Header);
+        $xml = new \SimpleXMLElement($this->postedData['xml']);
+
+        $response = ResponseSerializer::serialize(CallbackResponse::class, $xml->Body, $xml->Header);
         if (isset($this->postedData['shop_orderid'])) {
             $response->shopOrderId = $this->postedData['shop_orderid'];
         }
 
         if (isset($this->postedData['currency'])) {
-            $response->currency = $this->postedData['currency'];
+            $response->currency = (int) $this->postedData['currency'];
         }
 
         if (isset($this->postedData['type'])) {
@@ -66,11 +67,11 @@ class Callback
         }
 
         if (isset($this->postedData['embedded_window'])) {
-            $response->embeddedWindow = (bool)$this->postedData['embedded_window'];
+            $response->embeddedWindow = filter_var($this->postedData['embedded_window'], FILTER_VALIDATE_BOOLEAN);
         }
 
         if (isset($this->postedData['amount'])) {
-            $response->amount = (float)$this->postedData['amount'];
+            $response->amount = (float) $this->postedData['amount'];
         }
 
         if (isset($this->postedData['transaction_id'])) {
@@ -81,12 +82,16 @@ class Callback
             $response->paymentId = $this->postedData['payment_id'];
         }
 
+        if (isset($this->postedData['shop_orderid'])) {
+            $response->shopOrderId = $this->postedData['shop_orderid'];
+        }
+
         if (isset($this->postedData['nature'])) {
             $response->nature = $this->postedData['nature'];
         }
 
         if (isset($this->postedData['require_capture'])) {
-            $response->requireCapture = $this->postedData['require_capture'];
+            $response->requireCapture = filter_var($this->postedData['require_capture'], FILTER_VALIDATE_BOOLEAN);
         }
 
         if (isset($this->postedData['payment_status'])) {

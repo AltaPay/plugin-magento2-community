@@ -28,12 +28,12 @@ use SDM\Altapay\Response\AbstractResponse;
 class CreditCard extends AbstractResponse
 {
     /**
-     * @var Year
+     * @var string
      */
     public $Year;
 
     /**
-     * @var Month
+     * @var string
      */
     public $Month;
 }

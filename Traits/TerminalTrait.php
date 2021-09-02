@@ -33,6 +33,7 @@ trait TerminalTrait
      * The name of the terminal the payment will be made on.
      *
      * @param string|Terminal $terminal
+     *
      * @return $this
      */
     public function setTerminal($terminal)
@@ -40,7 +41,7 @@ trait TerminalTrait
         if ($terminal instanceof Terminal) {
             $terminal = $terminal->Title;
         }
-        
+
         $this->unresolvedOptions['terminal'] = $terminal;
         return $this;
     }
@@ -49,6 +50,8 @@ trait TerminalTrait
      * Resolve terminal option
      *
      * @param OptionsResolver $resolver
+     *
+     * @return void
      */
     public function setTerminalResolver(OptionsResolver $resolver)
     {

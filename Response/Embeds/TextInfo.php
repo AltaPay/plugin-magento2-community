@@ -27,7 +27,9 @@ use SDM\Altapay\Response\AbstractResponse;
 
 class TextInfo extends AbstractResponse
 {
+    /** @var string */
     public $Name;
 
+    /** @var string */
     public $Value;
 }

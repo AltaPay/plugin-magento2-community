@@ -32,6 +32,7 @@ use SDM\Altapay\Traits;
 use SDM\Altapay\Types\PaymentSources;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
+use Psr\Http\Message\ResponseInterface;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -50,6 +51,7 @@ class Credit extends AbstractApi
      * The source of the payment. Default is "moto"
      *
      * @param string $paymentsource
+     *
      * @return $this
      */
     public function setPaymentSource($paymentsource)
@@ -62,6 +64,7 @@ class Credit extends AbstractApi
      * Set the card used
      *
      * @param Card $card
+     *
      * @return $this
      */
     public function setCard(Card $card)
@@ -77,6 +80,7 @@ class Credit extends AbstractApi
      * A credit card token previously received from an eCommerce payment or an other MO/TO payment.
      *
      * @param string $token
+     *
      * @return $this
      */
     public function setCreditCardToken($token)
@@ -89,6 +93,7 @@ class Credit extends AbstractApi
      * Configure options
      *
      * @param OptionsResolver $resolver
+     *
      * @return void
      */
     protected function configureOptions(OptionsResolver $resolver)
@@ -117,21 +122,24 @@ class Credit extends AbstractApi
     /**
      * Handle response
      *
-     * @param Request $request
-     * @param Response $response
+     * @param Request           $request
+     * @param ResponseInterface $response
+     *
      * @return CreditResponse
      */
-    protected function handleResponse(Request $request, Response $response)
+    protected function handleResponse(Request $request, ResponseInterface $response)
     {
         $body = (string) $response->getBody();
-        $xml = simplexml_load_string($body);
-        return ResponseSerializer::serialize(CreditResponse::class, $xml->Body, false, $xml->Header);
+        $xml = new \SimpleXMLElement($body);
+
+        return ResponseSerializer::serialize(CreditResponse::class, $xml->Body, $xml->Header);
     }
 
     /**
      * Url to api call
      *
-     * @param array $options Resolved options
+     * @param array<string, mixed> $options Resolved options
+     *
      * @return string
      */
     protected function getUrl(array $options)

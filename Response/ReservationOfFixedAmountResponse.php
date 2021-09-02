@@ -27,11 +27,10 @@ use SDM\Altapay\Response\Embeds\Transaction;
 
 class ReservationOfFixedAmountResponse extends AbstractResponse
 {
-
     /**
-     * Childs
+     * Childs of the response
      *
-     * @var array
+     * @var array<string, array<string, mixed>>
      */
     protected $childs = [
         'Transactions' => [
@@ -47,10 +46,13 @@ class ReservationOfFixedAmountResponse extends AbstractResponse
      */
     public $Result;
 
+    /** @var string */
     public $MerchantErrorMessage;
 
+    /** @var string */
     public $CardHolderErrorMessage;
 
+    /** @var bool */
     public $CardHolderMessageMustBeShown;
 
     /**

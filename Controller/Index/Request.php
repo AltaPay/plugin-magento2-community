@@ -44,8 +44,6 @@ class Request extends Index
     public function execute()
     {
         $this->writeLog();
-        $result   = new DataObject();
-        $response = $this->getResponse();
 
         if ($this->checkPost()) {
             $params = $this->gateway->createRequest(
@@ -53,9 +51,11 @@ class Request extends Index
                 $this->getRequest()->getParam('orderid')
             );
 
+            $result   = new DataObject();
+            $response = $this->getResponse();
             $result->addData($params);
-        }
 
-        return $response->representJson($result->toJson());
+            return $response->representJson($result->toJson());
+        }
     }
 }

@@ -27,6 +27,11 @@ use SDM\Altapay\Response\AbstractResponse;
 
 class Terminal extends AbstractResponse
 {
+    /**
+     * Childs of the response
+     *
+     * @var array<string, array<string, mixed>>
+     */
     protected $childs = [
         'Natures' => [
             'class' => Nature::class,
@@ -38,8 +43,10 @@ class Terminal extends AbstractResponse
         ],
     ];
 
+    /** @var string */
     public $Title;
 
+    /** @var string */
     public $Country;
 
     /**
