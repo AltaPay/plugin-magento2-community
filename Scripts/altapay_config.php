@@ -288,28 +288,28 @@ class InstallTermConfig extends Http implements AppInterface
         // Create catalog price rule
         $model = $this->_objectManager->create('Magento\CatalogRule\Model\Rule');
         $model->setName($name)
-            ->setDescription($name)
-            ->setIsActive(0)
-            ->setCustomerGroupIds(array(0, 1, 2, 3))
-            ->setWebsiteIds(array(1))
-            ->setFromDate('')
-            ->setToDate('')
-            ->setSimpleAction($type)
-            ->setDiscountAmount(15)
-            ->setStopRulesProcessing(0);
+                ->setDescription($name)
+                ->setIsActive(0)
+                ->setCustomerGroupIds(array(0, 1, 2, 3))
+                ->setWebsiteIds(array(1))
+                ->setFromDate('')
+                ->setToDate('')
+                ->setSimpleAction($type)
+                ->setDiscountAmount(15)
+                ->setStopRulesProcessing(0);
 
         $conditions = array();
         $conditions["1"] = array(
-            "type" => "Magento\CatalogRule\Model\Rule\Condition\Combine",
-            "aggregator" => "all",
-            "value" => 1,
-            "new_child" => ""
+            "type"          => "Magento\CatalogRule\Model\Rule\Condition\Combine",
+            "aggregator"    => "all",
+            "value"         => 1,
+            "new_child"     => ""
         );
         $conditions["1--1"] = array(
-            "type" => "Magento\CatalogRule\Model\Rule\Condition\Product",
+            "type"      => "Magento\CatalogRule\Model\Rule\Condition\Product",
             "attribute" => "sku",
-            "operator" => "==",
-            "value" => "24-MB02"
+            "operator"  => "==",
+            "value"     => "24-MB02"
         );
 
         $model->setData('conditions', $conditions);
@@ -326,7 +326,6 @@ class InstallTermConfig extends Http implements AppInterface
         try {
             $model->loadPost($model->getData());
             $model->save();
-
             $ruleJob = $this->_objectManager->get('Magento\CatalogRule\Model\Rule\Job');
             $ruleJob->applyAll();
         } catch (Exception $e) {
