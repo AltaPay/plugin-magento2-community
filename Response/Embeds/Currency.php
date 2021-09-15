@@ -27,5 +27,6 @@ use SDM\Altapay\Response\AbstractResponse;
 
 class Currency extends AbstractResponse
 {
+    /** @var string */
     public $Currency;
 }

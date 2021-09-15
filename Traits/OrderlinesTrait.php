@@ -34,7 +34,8 @@ trait OrderlinesTrait
 {
 
     /**
-     * @param array|OrderLine $orderLines
+     * @param array<OrderLine>|OrderLine $orderLines
+     *
      * @return $this
      */
     public function setOrderLines($orderLines)
@@ -61,6 +62,9 @@ trait OrderlinesTrait
         return $this;
     }
 
+    /**
+     * @return void
+     */
     protected function setOrderLinesResolver(OptionsResolver $resolver)
     {
         $resolver->addAllowedTypes('orderLines', 'array');

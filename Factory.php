@@ -58,6 +58,13 @@ class Factory
     const TEST_AUTHENTICATION = Test\TestAuthentication::class;
     const TEST_CONNECTION = Test\TestConnection::class;
 
+    /**
+     * @template T of object
+     *
+     * @param class-string<T> $class
+     *
+     * @return T
+     */
     public static function create($class, Authentication $authentication = null)
     {
         if (class_exists($class)) {

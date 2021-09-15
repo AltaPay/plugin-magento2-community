@@ -27,6 +27,7 @@ use SDM\Altapay\Response\AbstractResponse;
 
 class PaymentNatureService extends AbstractResponse
 {
+    /** @var string */
     public $name;
 
     /**
@@ -51,7 +52,8 @@ class PaymentNatureService extends AbstractResponse
 
     /**
      * @param bool $SupportsRefunds
-     * @return PaymentNatureService
+     *
+     * @return $this
      */
     public function setSupportsRefunds($SupportsRefunds)
     {
@@ -61,7 +63,8 @@ class PaymentNatureService extends AbstractResponse
 
     /**
      * @param bool $SupportsRelease
-     * @return PaymentNatureService
+     *
+     * @return $this
      */
     public function setSupportsRelease($SupportsRelease)
     {
@@ -71,7 +74,8 @@ class PaymentNatureService extends AbstractResponse
 
     /**
      * @param bool $SupportsMultipleCaptures
-     * @return PaymentNatureService
+     *
+     * @return $this
      */
     public function setSupportsMultipleCaptures($SupportsMultipleCaptures)
     {
@@ -81,7 +85,8 @@ class PaymentNatureService extends AbstractResponse
 
     /**
      * @param bool $SupportsMultipleRefunds
-     * @return PaymentNatureService
+     *
+     * @return $this
      */
     public function setSupportsMultipleRefunds($SupportsMultipleRefunds)
     {

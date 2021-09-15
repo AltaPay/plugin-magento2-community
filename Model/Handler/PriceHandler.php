@@ -49,7 +49,7 @@ class PriceHandler
      *
      * @return mixed
      */
-    public function dataForPrice($item, $unitPrice, $couponCode, $itemDiscount)
+    public function dataForPrice($item, $unitPrice, $couponAmount, $itemDiscount, $discountAllItems)
     {
         $data["catalogDiscount"] = false;
         $taxPercent              = $item->getTaxPercent();
@@ -62,11 +62,11 @@ class PriceHandler
         } else {
             $price = $item->getPrice();
         }
-        if ($originalPrice > $price && empty($couponCode)) {
+        if ($originalPrice > $price && !(float)$couponAmount) {
             $data["catalogDiscount"] = true;
             $data["discount"]        = $this->discountHandler->catalogDiscount($originalPrice, $price);
         } 
-        elseif ($originalPrice > $price && !empty($couponCode)) {
+        elseif ($originalPrice > $price && abs((float)$couponAmount) > 0 && !$discountAllItems) {
             $originalPrice = $originalPrice * $quantity;
             $data["catalogDiscount"] = true;
             $data["discount"]        = $this->discountHandler->combinationDiscount($originalPrice, $rowTotal);
@@ -125,7 +125,8 @@ class PriceHandler
         $couponCodeAmount,
         $catalogDiscountCheck,
         $storePriceIncTax,
-        $newOrder
+        $newOrder,
+        $discountAllItems
     ) {
         if ($newOrder) {
             $quantity   = $item->getQtyOrdered();
@@ -140,14 +141,14 @@ class PriceHandler
         $gatewaySubTotal = ($unitPrice * $quantity) + $taxAmount;
         $gatewaySubTotal = $gatewaySubTotal - ($gatewaySubTotal * ($discountedAmount / 100));
         // Magento calculation pattern
-        if (abs($couponCodeAmount) > 0 && $storePriceIncTax) {
+        if (abs((float)$couponCodeAmount) > 0 && $storePriceIncTax && !$catalogDiscountCheck && $discountAllItems) {
             $cmsPriceCal  = $unitPriceWithoutTax * $quantity;
             $cmsTaxCal    = $cmsPriceCal * ($taxPercent / 100);
             $cmsSubTotal  = $cmsPriceCal + $cmsTaxCal;
             $cmsSubTotal  = $cmsSubTotal - ($cmsSubTotal * ($discountedAmount / 100));
             $compensation = $cmsSubTotal - $gatewaySubTotal;
-        } elseif ($catalogDiscountCheck || empty($couponCodeAmount) || $couponCodeAmount == 0) {
-            $cmsSubTotal  = $item->getBaseRowTotal() + $item->getBaseTaxAmount();
+        } else {
+            $cmsSubTotal  = $item->getRowTotal()-$item->getDiscountAmount()+$item->getTaxAmount()+$item->getDiscountTaxCompensationAmount();
             $compensation = $cmsSubTotal - $gatewaySubTotal;
         }
 

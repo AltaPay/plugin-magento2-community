@@ -35,7 +35,7 @@ class ResponseHeaderException extends Exception
 
     public function __construct(Header $header)
     {
-        parent::__construct($header->ErrorMessage, $header->ErrorCode);
+        parent::__construct($header->ErrorMessage, (int)$header->ErrorCode);
         $this->header = $header;
     }
 

@@ -35,21 +35,68 @@ class Header extends AbstractResponse
      */
     public $Date;
 
+    /** @var string */
     public $Path;
 
+    /** @var numeric-string */
     public $ErrorCode;
 
+    /** @var string */
     public $ErrorMessage;
 
     /**
      * Set date
      *
      * @param string $date
+     *
      * @return $this
      */
     public function setDate($date)
     {
         $this->Date = new \DateTime($date);
+
+        return $this;
+    }
+
+    /**
+     * Set Path
+     *
+     * @param string $Path
+     *
+     * @return $this
+     */
+    public function setPath($Path)
+    {
+        $this->Path = $Path;
+
+        return $this;
+    }
+
+    /**
+     * Set ErrorCode
+     *
+     * @param numeric-string $ErrorCode
+     *
+     * @return $this
+     */
+    public function setErrorCode($ErrorCode)
+    {
+        $this->ErrorCode = $ErrorCode;
+
+        return $this;
+    }
+
+    /**
+     * Set ErrorMessage
+     *
+     * @param string $ErrorMessage
+     *
+     * @return $this
+     */
+    public function setErrorMessage($ErrorMessage)
+    {
+        $this->ErrorMessage = $ErrorMessage;
+
         return $this;
     }
 }

@@ -27,7 +27,9 @@ use SDM\Altapay\Response\AbstractResponse;
 
 class Country extends AbstractResponse
 {
+    /** @var string */
     public $Country;
 
+    /** @var string */
     public $Source;
 }

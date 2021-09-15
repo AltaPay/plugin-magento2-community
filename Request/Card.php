@@ -32,37 +32,38 @@ class Card
     /**
      * Card number
      *
-     * @var int
+     * @var string
      */
     private $cardNumber;
 
     /**
      * Card expiry month
      *
-     * @var int
+     * @var string
      */
     private $expiryMonth;
 
     /**
      * Card expiry year
      *
-     * @var int
+     * @var string
      */
     private $expiryYear;
 
     /**
      * Card security code
      *
-     * @var int
+     * @var string|null
      */
     private $cvc;
 
     /**
      * Card constructor.
-     * @param int $cardNumber
-     * @param int $expiryMonth
-     * @param int $expiryYear
-     * @param int $cvc
+     *
+     * @param string $cardNumber
+     * @param string $expiryMonth
+     * @param string $expiryYear
+     * @param string $cvc
      */
     public function __construct($cardNumber, $expiryMonth, $expiryYear, $cvc = null)
     {
@@ -75,7 +76,7 @@ class Card
     /**
      * Get card number
      *
-     * @return int
+     * @return string
      */
     public function getCardNumber()
     {
@@ -85,7 +86,7 @@ class Card
     /**
      * Get expiry month
      *
-     * @return int
+     * @return string
      */
     public function getExpiryMonth()
     {
@@ -95,7 +96,7 @@ class Card
     /**
      * Get expiry year
      *
-     * @return int
+     * @return string
      */
     public function getExpiryYear()
     {
@@ -105,7 +106,7 @@ class Card
     /**
      * Get cvc
      *
-     * @return int
+     * @return string|null
      */
     public function getCvc()
     {

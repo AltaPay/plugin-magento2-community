@@ -34,13 +34,15 @@ trait CustomerInfoTrait
      * Customer info - used for fraud detection
      *
      * @param Customer $customer
+     *
      * @return $this
      */
     public function setCustomerInfo(Customer $customer)
     {
         $this->unresolvedOptions['customer_info'] = $customer;
-        if ($customer->getCreatedDate()) {
-            $this->unresolvedOptions['customer_created_date'] = $customer->getCreatedDate()->format('Y-m-d');
+        $createdDate = $customer->getCreatedDate();
+        if ($createdDate) {
+            $this->unresolvedOptions['customer_created_date'] = $createdDate->format('Y-m-d');
         }
         return $this;
     }
@@ -49,6 +51,8 @@ trait CustomerInfoTrait
      * Resolve amount option
      *
      * @param OptionsResolver $resolver
+     *
+     * @return void
      */
     protected function setCustomerInfoResolver(OptionsResolver $resolver)
     {
