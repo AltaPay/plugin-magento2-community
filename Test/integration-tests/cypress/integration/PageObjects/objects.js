@@ -18,7 +18,7 @@ class Order
         cy.contains('Fusion Backpack').wait(3000).click()
         cy.contains('Add to Cart').click()
         cy.wait(3000)
-        cy.get('.message-success > div > a').wait(2000).click()
+        cy.get('.message-success > div > a').wait(2000).click().wait(2000)
         cy.get('.checkout-methods-items > :nth-child(1) > .action').wait(5000).click().wait(5000)
         cy.get('#customer-email-fieldset > .required > .control > #customer-email').type('demo@example.com')
         cy.xpath('/html/body/div[2]/main/div[2]/div/div[2]/div[4]/ol/li[1]/div[2]/form[2]/div/div[1]/div/input').type('Testperson-dk')
@@ -28,8 +28,8 @@ class Order
         cy.xpath('/html/body/div[2]/main/div[2]/div/div[2]/div[4]/ol/li[1]/div[2]/form[2]/div/div[7]/div/input').type('Varde')
         cy.xpath('/html/body/div[2]/main/div[2]/div/div[2]/div[4]/ol/li[1]/div[2]/form[2]/div/div[8]/div/input').type('6800')
         cy.xpath('/html/body/div[2]/main/div[2]/div/div[2]/div[4]/ol/li[1]/div[2]/form[2]/div/div[9]/div/input').type('20123456')
-        cy.get('.radio').click({ multiple: true })
-        cy.wait(1000)
+        //cy.get('.radio').click()
+        cy.wait(5000)
         cy.get('.button').click().wait(5000)
         
     }
@@ -124,7 +124,6 @@ class Order
         cy.wait(1000)
         cy.get(':nth-child(1) > .note-list-comment').should('include.text', 'We refunded')
     }
-
 
     subscription_product()
     {
@@ -260,6 +259,242 @@ class Order
 
     }
 
+    create_cart_percent_discount(){
+        //Check if catalog discount is active. If so, deactivate it.
+        cy.get('#menu-magento-backend-marketing > [onclick="return false;"]').click()
+        cy.get('.item-promo-catalog > a').click()
+        cy.contains("AltaPay Catalog Rule Percentage").click()
+        cy.get('input[name="is_active"]')
+            .invoke('val')
+            .then(somevalue => {
+                if (somevalue == "1"){
+                    cy.get('[data-index="is_active"] > .admin__field-control > .admin__actions-switch > .admin__actions-switch-label').click()
+                    cy.get('#save_and_apply').click()
+                    cy.wait(50000)
+                } 
+            })
+            cy.get('#menu-magento-backend-marketing > [onclick="return false;"]').click()
+            cy.get('.item-promo-catalog > a').click()
+            cy.contains("AltaPay Catalog Rule Fixed").click()
+            cy.get('input[name="is_active"]')
+                .invoke('val')
+                .then(somevalue => {
+                    if (somevalue == "1"){
+                        cy.get('[data-index="is_active"] > .admin__field-control > .admin__actions-switch > .admin__actions-switch-label').click()
+                        cy.get('#save_and_apply').click()
+                        cy.wait(50000)
+                    } 
+                })
+        //Start creating/activating cart discount    
+        cy.get('#menu-magento-backend-marketing > [onclick="return false;"] > span').click()
+        cy.get('.item-promo-quote > a > span').click()
+        cy.contains('$4 Luma water bottle (save 70%)').wait(1000).click()
+        cy.get('input[name="is_active"]')
+            .invoke('val')
+            .then(somevalue => {
+                if (somevalue == "0"){
+                    cy.get('[data-index="is_active"] > .admin__field-control > .admin__actions-switch > .admin__actions-switch-label').click()
+                } 
+            })
+        cy.xpath("/html/body/div[2]/main/div[2]/div/div/div/div[2]/div[2]/div[2]/fieldset/div[7]/div[2]/input").clear().type("percentage")
+        cy.get('[data-index="actions"] > .fieldset-wrapper-title > .admin__collapsible-title').click()
+        cy.xpath("/html/body/div[2]/main/div[2]/div/div/div/div[2]/div[4]/div[2]/fieldset/div[1]/div[2]/select").select("Percent of product price discount")
+        cy.xpath("/html/body/div[2]/main/div[2]/div/div/div/div[2]/div[4]/div[2]/fieldset/div[2]/div[2]/input").clear().type("10")
+        cy.get('body').then(($p) => {
+            if($p.find(".rule-param-remove > .v-middle").length){
+                    cy.get('.rule-param-remove > .v-middle').click()
+            }
+        })
+        
+        cy.get('#save').click()
+    }
+
+
+    apply_cart_percent_discount(){
+        cy.contains('Fusion Backpack').wait(3000).click()
+        cy.contains('Add to Cart').click()
+        cy.wait(3000)
+        cy.get('.message-success > div > a').wait(2000).click().wait(2000)
+        cy.get('#block-discount > .title').click()
+        cy.get('#coupon_code').type("percentage")
+        cy.get('#discount-coupon-form > .fieldset > .actions-toolbar > div.primary > .action > span').click()
+    }
+
+    complete_checkout(){
+
+        cy.get('.checkout-methods-items > :nth-child(1) > .action').wait(5000).click().wait(5000)
+        cy.get('#customer-email-fieldset > .required > .control > #customer-email').type('demo@example.com')
+        cy.xpath('/html/body/div[2]/main/div[2]/div/div[2]/div[4]/ol/li[1]/div[2]/form[2]/div/div[1]/div/input').type('Testperson-dk')
+        cy.xpath('/html/body/div[2]/main/div[2]/div/div[2]/div[4]/ol/li[1]/div[2]/form[2]/div/div[2]/div/input').type('Testperson-dk')
+        cy.xpath('/html/body/div[2]/main/div[2]/div/div[2]/div[4]/ol/li[1]/div[2]/form[2]/div/div[4]/div/select').select('Denmark')
+        cy.xpath('/html/body/div[2]/main/div[2]/div/div[2]/div[4]/ol/li[1]/div[2]/form[2]/div/fieldset/div/div[1]/div/input').type('Sæffleberggate 56,1 mf')
+        cy.xpath('/html/body/div[2]/main/div[2]/div/div[2]/div[4]/ol/li[1]/div[2]/form[2]/div/div[7]/div/input').type('Varde')
+        cy.xpath('/html/body/div[2]/main/div[2]/div/div[2]/div[4]/ol/li[1]/div[2]/form[2]/div/div[8]/div/input').type('6800')
+        cy.xpath('/html/body/div[2]/main/div[2]/div/div[2]/div[4]/ol/li[1]/div[2]/form[2]/div/div[9]/div/input').type('20123456')
+        cy.get('.radio').click({ multiple: true })
+        cy.wait(1000)
+        cy.get('.button').click().wait(5000)        
+    }
+    
+    create_cart_fixed_discount(){
+        //Check if catalog discount is active. If so, deactivate it.
+        cy.get('#menu-magento-backend-marketing > [onclick="return false;"]').click()
+        cy.get('.item-promo-catalog > a').click()
+        cy.contains("AltaPay Catalog Rule Percentage").click()
+        cy.get('input[name="is_active"]')
+            .invoke('val')
+            .then(somevalue => {
+                if (somevalue == "1"){
+                    cy.get('[data-index="is_active"] > .admin__field-control > .admin__actions-switch > .admin__actions-switch-label').click()
+                    cy.get('#save_and_apply').click()
+                    cy.wait(50000)
+                } 
+            })
+            cy.get('#menu-magento-backend-marketing > [onclick="return false;"]').click()
+            cy.get('.item-promo-catalog > a').click()
+            cy.contains("AltaPay Catalog Rule Fixed").click()
+            cy.get('input[name="is_active"]')
+                .invoke('val')
+                .then(somevalue => {
+                    if (somevalue == "1"){
+                        cy.get('[data-index="is_active"] > .admin__field-control > .admin__actions-switch > .admin__actions-switch-label').click()
+                        cy.get('#save_and_apply').click()
+                        cy.wait(50000)
+                    } 
+                })
+
+        cy.get('#menu-magento-backend-marketing > [onclick="return false;"] > span').click()
+        cy.get('.item-promo-quote > a > span').click()
+        cy.contains('$4 Luma water bottle (save 70%)').wait(1000).click()
+        cy.get('input[name="is_active"]')
+            .invoke('val')
+            .then(somevalue => {
+                if (somevalue == "0"){
+                    cy.get('[data-index="is_active"] > .admin__field-control > .admin__actions-switch > .admin__actions-switch-label').click()
+                } 
+            })
+        cy.xpath("/html/body/div[2]/main/div[2]/div/div/div/div[2]/div[2]/div[2]/fieldset/div[7]/div[2]/input").clear().type("fixed")
+        cy.get('[data-index="actions"] > .fieldset-wrapper-title > .admin__collapsible-title').click()
+        cy.xpath("/html/body/div[2]/main/div[2]/div/div/div/div[2]/div[4]/div[2]/fieldset/div[1]/div[2]/select").select("Fixed amount discount")
+        cy.xpath("/html/body/div[2]/main/div[2]/div/div/div/div[2]/div[4]/div[2]/fieldset/div[2]/div[2]/input").clear().type("10")
+        cy.get('body').then(($p) => {
+            if($p.find(".rule-param-remove > .v-middle").length){
+                    cy.get('.rule-param-remove > .v-middle').click()
+            }
+        })
+        cy.get('#save').click()
+    }
+
+    apply_cart_fixed_discount(){
+        cy.contains('Fusion Backpack').wait(3000).click()
+        cy.contains('Add to Cart').click()
+        cy.wait(3000)
+        cy.get('.message-success > div > a').wait(2000).click().wait(2000)
+        cy.get('#block-discount > .title').click()
+        cy.get('#coupon_code').type("fixed")
+        cy.get('#discount-coupon-form > .fieldset > .actions-toolbar > div.primary > .action > span').click()
+    }
+
+    create_catalog_percentage_discount(){
+        cy.get('#menu-magento-backend-marketing > [onclick="return false;"] > span').click()
+        cy.get('.item-promo-catalog > a > span').click()
+        cy.contains('AltaPay Catalog Rule Fixed').wait(1000).click()
+        cy.get('input[name="is_active"]')
+            .invoke('val')
+            .then(somevalue => {
+                if (somevalue == "1"){
+                    cy.get('[data-index="is_active"] > .admin__field-control > .admin__actions-switch > .admin__actions-switch-label').click()
+                    cy.wait(50000)
+                    cy.get('#save_and_apply').click()
+                }   
+            })
+        cy.get('#menu-magento-backend-marketing > [onclick="return false;"] > span').click()
+        cy.get('.item-promo-catalog > a > span').click()
+        cy.contains('AltaPay Catalog Rule Percentage').wait(1000).click()
+        cy.get('input[name="is_active"]')
+            .invoke('val')
+            .then(somevalue => {
+                if (somevalue == "0"){
+                    cy.get('[data-index="is_active"] > .admin__field-control > .admin__actions-switch > .admin__actions-switch-label').click()
+                    cy.get('#save_and_apply').click()
+                    cy.wait(50000)
+                } 
+            })
+    }
+
+    create_catalog_fixed_discount(){
+        //Check if catalog discount is active. If so, deactivate it.
+        cy.get('#menu-magento-backend-marketing > [onclick="return false;"]').click()
+        cy.get('.item-promo-catalog > a').click()
+        cy.contains("AltaPay Catalog Rule Percentage").click()
+        cy.get('input[name="is_active"]')
+            .invoke('val')
+            .then(somevalue => {
+                if (somevalue == "1"){
+                    cy.get('[data-index="is_active"] > .admin__field-control > .admin__actions-switch > .admin__actions-switch-label').click()
+                    cy.get('#save_and_apply').click()
+                    cy.wait(50000)
+                } 
+            })
+        cy.get('#menu-magento-backend-marketing > [onclick="return false;"] > span').click()
+        cy.get('.item-promo-catalog > a > span').click()
+        cy.contains('AltaPay Catalog Rule Fixed').wait(1000).click()
+        cy.get('input[name="is_active"]')
+            .invoke('val')
+            .then(somevalue => {
+                if (somevalue == "0"){
+                    cy.get('[data-index="is_active"] > .admin__field-control > .admin__actions-switch > .admin__actions-switch-label').click()
+                    cy.wait(50000)
+                    cy.get('#save_and_apply').click()
+                }   
+            })
+    }
+
+    create_cart_percentage_with_catalog(){
+        cy.get('#menu-magento-backend-marketing > [onclick="return false;"] > span').click()
+        cy.get('.item-promo-quote > a > span').click()
+        cy.contains('$4 Luma water bottle (save 70%)').wait(1000).click()
+        cy.get('input[name="is_active"]')
+            .invoke('val')
+            .then(somevalue => {
+                if (somevalue == "0"){
+                    cy.get('[data-index="is_active"] > .admin__field-control > .admin__actions-switch > .admin__actions-switch-label').click()
+                } 
+            })
+        cy.xpath("/html/body/div[2]/main/div[2]/div/div/div/div[2]/div[2]/div[2]/fieldset/div[7]/div[2]/input").clear().type("percentage")
+        cy.get('[data-index="actions"] > .fieldset-wrapper-title > .admin__collapsible-title').click()
+        cy.xpath("/html/body/div[2]/main/div[2]/div/div/div/div[2]/div[4]/div[2]/fieldset/div[1]/div[2]/select").select("Percent of product price discount")
+        cy.xpath("/html/body/div[2]/main/div[2]/div/div/div/div[2]/div[4]/div[2]/fieldset/div[2]/div[2]/input").clear().type("10")
+        cy.get('body').then(($p) => {
+            if($p.find(".rule-param-remove > .v-middle").length){
+                cy.get('.rule-param-remove > .v-middle').click()
+            }
+        })
+        cy.get('#save').click()
+    }
+
+    create_cart_fixed_with_catalog(){
+        cy.get('#menu-magento-backend-marketing > [onclick="return false;"] > span').click()
+        cy.get('.item-promo-quote > a > span').click()
+        cy.contains('$4 Luma water bottle (save 70%)').wait(1000).click()
+        cy.get('input[name="is_active"]')
+            .invoke('val')
+            .then(somevalue => {
+                if (somevalue == "0"){
+                    cy.get('[data-index="is_active"] > .admin__field-control > .admin__actions-switch > .admin__actions-switch-label').click()
+                } 
+            })
+        cy.xpath("/html/body/div[2]/main/div[2]/div/div/div/div[2]/div[2]/div[2]/fieldset/div[7]/div[2]/input").clear().type("fixed")
+        cy.get('[data-index="actions"] > .fieldset-wrapper-title > .admin__collapsible-title').click()
+        cy.xpath("/html/body/div[2]/main/div[2]/div/div/div/div[2]/div[4]/div[2]/fieldset/div[1]/div[2]/select").select("Fixed amount discount")
+        cy.xpath("/html/body/div[2]/main/div[2]/div/div/div/div[2]/div[4]/div[2]/fieldset/div[2]/div[2]/input").clear().type("10")
+        cy.get('body').then(($p) => {
+            if($p.find(".rule-param-remove > .v-middle").length){
+                    cy.get('.rule-param-remove > .v-middle').click()
+            }
+        })
+        cy.get('#save').click()
+    }
 }
 
 export default Order

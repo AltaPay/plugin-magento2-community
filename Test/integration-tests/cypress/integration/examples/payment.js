@@ -13,7 +13,7 @@ describe ('Magento2', function(){
             ord.addproduct()
             cy.fixture('config').then((admin)=>{
                 if (admin.CC_TERMINAL_NAME != "") {
-                    cy.get('body').then(($a) => {
+                    cy.get('body').wait(3000).then(($a) => {
                     if($a.find("label:contains('"+admin.CC_TERMINAL_NAME+"')").length){
                             ord.cc_payment(admin.CC_TERMINAL_NAME)
                             ord.admin()
@@ -247,4 +247,8 @@ describe ('Magento2', function(){
             })
 
         })
-})
+
+        
+
+
+    })
