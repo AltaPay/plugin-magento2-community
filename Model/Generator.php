@@ -99,17 +99,17 @@ class Generator
     /**
      * @var StockStateInterface
      */
-    protected $stockItem;
+    private $stockItem;
 
     /**
      * @var StockRegistryInterface
      */
-    protected $stockRegistry;
+    private $stockRegistry;
 
     /**
      * @var Cart
      */
-    protected  $modelCart;
+    private  $modelCart;
     /**
      * Generator constructor.
      *
