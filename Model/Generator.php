@@ -25,6 +25,9 @@ use Magento\Framework\DB\TransactionFactory;
 use Magento\Sales\Model\Service\InvoiceService;
 use SDM\Altapay\Model\Handler\OrderLinesHandler;
 use SDM\Altapay\Model\Handler\CreatePaymentHandler;
+use Magento\Checkout\Model\Cart;
+use Magento\CatalogInventory\Api\StockStateInterface;
+use Magento\CatalogInventory\Api\StockRegistryInterface;
 
 /**
  * Class Generator
@@ -94,6 +97,20 @@ class Generator
     private $paymentHandler;
 
     /**
+     * @var StockStateInterface
+     */
+    protected $stockItem;
+
+    /**
+     * @var StockRegistryInterface
+     */
+    protected $stockRegistry;
+
+    /**
+     * @var Cart
+     */
+    protected  $modelCart;
+    /**
      * Generator constructor.
      *
      * @param Quote                          $quote
@@ -109,6 +126,9 @@ class Generator
      * @param InvoiceService                 $invoiceService
      * @param OrderLinesHandler              $orderLines
      * @param CreatePaymentHandler           $paymentHandler
+     * @param StockStateInterface            $stockItem
+     * @param StockRegistryInterface         $stockRegistry
+     * @param Cart                           $modelCart
      */
     public function __construct(
         Quote $quote,
@@ -123,7 +143,10 @@ class Generator
         TransactionFactory $transactionFactory,
         InvoiceService $invoiceService,
         OrderLinesHandler $orderLines,
-        CreatePaymentHandler $paymentHandler
+        CreatePaymentHandler $paymentHandler,
+        StockStateInterface $stockItem,
+        StockRegistryInterface $stockRegistry,
+        Cart $modelCart
     ) {
         $this->quote                 = $quote;
         $this->checkoutSession       = $checkoutSession;
@@ -138,6 +161,9 @@ class Generator
         $this->orderLoader           = $orderLoader;
         $this->orderLines            = $orderLines;
         $this->paymentHandler        = $paymentHandler;
+        $this->stockItem             = $stockItem;
+        $this->stockRegistry         = $stockRegistry;
+        $this->modelCart             = $modelCart;
     }
 
     /**
@@ -442,6 +468,8 @@ class Generator
                 $order->addStatusHistoryComment($comment);
                 $order->addStatusHistoryComment($this->getTransactionInfoFromResponse($response));
                 $order->setIsNotified(false);
+                //Update stock quantity
+                $this->updateStockQty($order);
                 $order->getResource()->save($order);
 
                 if (strtolower($paymentStatus) === 'paymentandcapture' || strtolower($paymentStatus) === 'subscriptionandcharge') {
@@ -639,5 +667,27 @@ class Generator
         $payment->setPaymentId($response->paymentId);
         $payment->setLastTransId($response->transactionId);
         $payment->save();
+    }
+
+    /**
+     * @param $order
+     * return void
+     */
+    public function updateStockQty($order)
+    {
+        $cart = $this->modelCart;
+        $quoteItems = $this->checkoutSession->getQuote()->getItemsCollection();
+        foreach ($order->getAllItems() as $item) {
+            $stockQty  = $this->stockItem->getStockQty($item->getProductId(), $item->getStore()->getWebsiteId());
+            $qty       = $stockQty - $item->getQtyOrdered();                   
+            $stockItem = $this->stockRegistry->getStockItemBySku($item['sku']);         
+            $stockItem->setQty($qty);
+            $stockItem->setIsInStock((bool)$qty); 
+            $this->stockRegistry->updateStockItemBySku($item['sku'], $stockItem);
+        }
+        foreach($quoteItems as $item)
+        {
+            $cart->removeItem($item->getId())->save(); 
+        }
     }
 }
