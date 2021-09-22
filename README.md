@@ -6,6 +6,11 @@ Altapay has made it much easier for you as merchant/developer to receive secure 
 
 == Change log ==
 
+** Version 3.2.4
+
+    * Bug fixes:
+        - Fix: Product stock not updating when order status change from cancel to processing
+
 ** Version 3.2.3
 
     * Bug fixes:
