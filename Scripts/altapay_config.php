@@ -273,6 +273,24 @@ class InstallTermConfig extends Http implements AppInterface
             }
         }
 
+        $taxRate = $this->_objectManager->create(\Magento\Tax\Model\Calculation\Rate::class);
+        $taxRate->loadByCode('DKTaxRate');
+
+        // Create tax rate if not exists
+        if (!$taxRate->getId()) {
+            $taxRate = $this->altapayCreateTaxRate($taxRate);
+        }
+
+        $taxRateId = $taxRate->getId();
+
+        $taxRule = $this->_objectManager->create(\Magento\Tax\Model\Calculation\Rule::class);
+        $taxRule->load('AltaPayTaxRule', 'code');
+
+        // Create tax rule and assign tax rate
+        if (!$taxRule->getId()) {
+            $this->altapayCreateTaxRule($taxRule, $taxRateId);
+        }
+
         // Clean cache
         $this->cacheTypeList->cleanType(cacheConfig::TYPE_IDENTIFIER);
 
@@ -332,6 +350,37 @@ class InstallTermConfig extends Http implements AppInterface
             echo $e->getMessage();
         }
     }
+
+    /**
+     * @param $taxRate
+     * @return \Magento\Tax\Model\Calculation\Rate[]
+     */
+    private function altapayCreateTaxRate($taxRate)
+    {
+        $taxRate->setTaxCountryId('DK');
+        $taxRate->setTaxRegionId(0);
+        $taxRate->setTaxPostcode('*');
+        $taxRate->setCode('DKTaxRate');
+        $taxRate->setRate('12.5');
+        $taxRate->save();
+        
+        return $taxRate;
+    }
+
+    /**
+     * @param $taxRule
+     * @param $taxRateId
+     */
+    private function altapayCreateTaxRule($taxRule, $taxRateId)
+    {
+        $taxRule->setCode("AltaPayTaxRule");
+        $taxRule->setPriority(0);
+        $taxRule->setCustomerTaxClassIds(array(3));
+        $taxRule->setProductTaxClassIds(array(2));
+        $taxRule->setTaxRateIds(array($taxRateId));
+        $taxRule->save();
+    }
+
 }
 
 /** @var \Magento\Framework\App\Http $app */
