@@ -28,6 +28,7 @@ describe('Discounts', function () {
                         ord.refund()
                     } else {
                         cy.log(admin.CC_TERMINAL_NAME + ' not found in page')
+                        this.skip()
                     }
 
                 })
@@ -35,6 +36,7 @@ describe('Discounts', function () {
             }
             else {
                 cy.log('CC_TERMINAL_NAME skipped')
+                this.skip()
             }
         })
     })
@@ -56,6 +58,7 @@ describe('Discounts', function () {
                         ord.refund()
                     } else {
                         cy.log(admin.CC_TERMINAL_NAME + ' not found in page')
+                        this.skip()
                     }
 
                 })
@@ -63,6 +66,7 @@ describe('Discounts', function () {
             }
             else {
                 cy.log('CC_TERMINAL_NAME skipped')
+                this.skip()
             }
         })
     })
@@ -93,6 +97,7 @@ describe('Discounts', function () {
                         ord.refund()
                     } else {
                         cy.log(admin.CC_TERMINAL_NAME + ' not found in page')
+                        this.skip()
                     }
 
                 })
@@ -100,6 +105,7 @@ describe('Discounts', function () {
             }
             else {
                 cy.log('CC_TERMINAL_NAME skipped')
+                this.skip()
             }
         })
     })
@@ -121,6 +127,7 @@ describe('Discounts', function () {
                         ord.refund()
                     } else {
                         cy.log(admin.CC_TERMINAL_NAME + ' not found in page')
+                        this.skip()
                     }
 
                 })
@@ -128,6 +135,7 @@ describe('Discounts', function () {
             }
             else {
                 cy.log('CC_TERMINAL_NAME skipped')
+                this.skip()
             }
         })
     })
@@ -157,6 +165,7 @@ describe('Discounts', function () {
                         ord.refund()
                     } else {
                         cy.log(admin.CC_TERMINAL_NAME + ' not found in page')
+                        this.skip()
                     }
 
                 })
@@ -164,6 +173,7 @@ describe('Discounts', function () {
             }
             else {
                 cy.log('CC_TERMINAL_NAME skipped')
+                this.skip()
             }
         })
     })
@@ -184,6 +194,7 @@ describe('Discounts', function () {
                         ord.refund()
                     } else {
                         cy.log(admin.KLARNA_DKK_TERMINAL_NAME + ' not found in page')
+                        this.skip()
                     }
 
                 })
@@ -191,6 +202,7 @@ describe('Discounts', function () {
             }
             else {
                 cy.log('KLARNA_DKK_TERMINAL_NAME skipped')
+                this.skip()
             }
         })
     })
@@ -220,6 +232,7 @@ describe('Discounts', function () {
                         ord.refund()
                     } else {
                         cy.log(admin.CC_TERMINAL_NAME + ' not found in page')
+                        this.skip()
                     }
 
                 })
@@ -227,6 +240,7 @@ describe('Discounts', function () {
             }
             else {
                 cy.log('CC_TERMINAL_NAME skipped')
+                this.skip()
             }
         })
     })
@@ -247,6 +261,7 @@ describe('Discounts', function () {
                         ord.refund()
                     } else {
                         cy.log(admin.KLARNA_DKK_TERMINAL_NAME + ' not found in page')
+                        this.skip()
                     }
 
                 })
@@ -254,6 +269,7 @@ describe('Discounts', function () {
             }
             else {
                 cy.log('KLARNA_DKK_TERMINAL_NAME skipped')
+                this.skip()
             }
         })
     })
@@ -286,6 +302,7 @@ describe('Discounts', function () {
                         ord.refund()
                     } else {
                         cy.log(admin.CC_TERMINAL_NAME + ' not found in page')
+                        this.skip()
                     }
 
                 })
@@ -293,6 +310,7 @@ describe('Discounts', function () {
             }
             else {
                 cy.log('CC_TERMINAL_NAME skipped')
+                this.skip()
             }
         })
     })
@@ -314,6 +332,7 @@ describe('Discounts', function () {
                         ord.refund()
                     } else {
                         cy.log(admin.CC_TERMINAL_NAME + ' not found in page')
+                        this.skip()
                     }
 
                 })
@@ -321,6 +340,7 @@ describe('Discounts', function () {
             }
             else {
                 cy.log('CC_TERMINAL_NAME skipped')
+                this.skip()
             }
         })
     })
@@ -352,6 +372,7 @@ describe('Discounts', function () {
                         ord.refund()
                     } else {
                         cy.log(admin.CC_TERMINAL_NAME + ' not found in page')
+                        this.skip()
                     }
 
                 })
@@ -359,6 +380,7 @@ describe('Discounts', function () {
             }
             else {
                 cy.log('CC_TERMINAL_NAME skipped')
+                this.skip()
             }
         })
     })
@@ -380,6 +402,7 @@ describe('Discounts', function () {
                         ord.refund()
                     } else {
                         cy.log(admin.CC_TERMINAL_NAME + ' not found in page')
+                        this.skip()
                     }
 
                 })
@@ -387,6 +410,7 @@ describe('Discounts', function () {
             }
             else {
                 cy.log('CC_TERMINAL_NAME skipped')
+                this.skip()
             }
         })
     })
