@@ -303,7 +303,6 @@ it('Klarna partial refund', function () {
         cy.get('body').then(($body) => {
 
             if ($body.text().includes('DKK')) {
-                ord.clrcookies()
                 ord.admin()
                 ord.change_currency_to_EUR_for_iDEAL()
             } 
@@ -314,7 +313,6 @@ it('Klarna partial refund', function () {
                     cy.get('body').wait(3000).then(($a) => {
                         if ($a.find("label:contains('" + admin.iDEAl_EUR_TERMINAL + "')").length) {
                             ord.ideal_payment(admin.iDEAl_EUR_TERMINAL)
-                            ord.clrcookies()
                             ord.admin()
                             ord.ideal_refund()
                         } else {

@@ -79,7 +79,6 @@ class Order {
         cy.fixture('config').then((conf) => {
             cy.clearCookies()
             cy.visit(conf.adminURL).wait(5000)
-            cy.clearCookies()
             cy.get('#username').type(conf.adminUsername)
             cy.get('#login').type(conf.adminPass)
             cy.get('.action-login').click().wait(5000)
