@@ -4,8 +4,6 @@ $bootstrap = __DIR__ . './../../../../app/bootstrap.php';
 
 if (file_exists($bootstrap)) {
     require_once $bootstrap;
-} else {
-    require_once __DIR__ . '/../../../../../app/bootstrap.php';
 }
 $bootstrap = \Magento\Framework\App\Bootstrap::create(BP, $_SERVER);
 
@@ -28,6 +26,7 @@ use Magento\Framework\Registry;
 use Magento\Framework\ObjectManagerInterface;
 use Magento\Config\Model\ResourceModel\Config;
 use Magento\Framework\App\Cache\TypeListInterface;
+use Magento\CatalogRule\Model\ResourceModel\Rule\CollectionFactory as RuleCollectionFactory;
 
 class InstallTermConfig extends Http implements AppInterface
 {
@@ -43,7 +42,8 @@ class InstallTermConfig extends Http implements AppInterface
         Registry $registry,
         Config $resourceConfig,
         EncryptorInterface $encryptor,
-        TypeListInterface $cacheTypeList
+        TypeListInterface $cacheTypeList,
+        RuleCollectionFactory $ruleCollectionFactory
     ) {
         $this->_objectManager = $objectManager;
         $this->_eventManager  = $eventManager;
@@ -57,6 +57,7 @@ class InstallTermConfig extends Http implements AppInterface
         $this->resourceConfig = $resourceConfig;
         $this->encryptor      = $encryptor;
         $this->cacheTypeList  = $cacheTypeList;
+        $this->ruleCollectionFactory = $ruleCollectionFactory;
     }
 
     public function launch()
@@ -249,11 +250,88 @@ class InstallTermConfig extends Http implements AppInterface
             $i++;
         }
 
+        // Get All active catalog rules
+        $catalogActiveRule = $this->ruleCollectionFactory->create();
+
+        $discountRules = array(
+            'by_fixed' => 'AltaPay Catalog Rule Fixed',
+            'by_percent' => 'AltaPay Catalog Rule Percentage'
+        );
+
+        foreach ($catalogActiveRule as $rule) {
+            $ruleData = $rule->getData();
+
+            if (($key = array_search($ruleData['name'], $discountRules)) !== false) {
+                unset($discountRules[$key]);
+            }
+        }
+
+        // Create catalog rule if not exists
+        if ($discountRules) {
+            foreach ($discountRules as $key => $rule) {
+                $this->altapayCatalogPriceRule($key, $rule);
+            }
+        }
+
+        // Clean cache
         $this->cacheTypeList->cleanType(cacheConfig::TYPE_IDENTIFIER);
 
         return $this->_response;
     }
 
+    /**
+     * @param $type
+     * @param $name
+     */
+    private function altapayCatalogPriceRule($type, $name)
+    {
+        // Create catalog price rule
+        $model = $this->_objectManager->create('Magento\CatalogRule\Model\Rule');
+        $model->setName($name)
+                ->setDescription($name)
+                ->setIsActive(0)
+                ->setCustomerGroupIds(array(0, 1, 2, 3))
+                ->setWebsiteIds(array(1))
+                ->setFromDate('')
+                ->setToDate('')
+                ->setSimpleAction($type)
+                ->setDiscountAmount(15)
+                ->setStopRulesProcessing(0);
+
+        $conditions = array();
+        $conditions["1"] = array(
+            "type"          => "Magento\CatalogRule\Model\Rule\Condition\Combine",
+            "aggregator"    => "all",
+            "value"         => 1,
+            "new_child"     => ""
+        );
+        $conditions["1--1"] = array(
+            "type"      => "Magento\CatalogRule\Model\Rule\Condition\Product",
+            "attribute" => "sku",
+            "operator"  => "==",
+            "value"     => "24-MB02"
+        );
+
+        $model->setData('conditions', $conditions);
+
+        // Validating rule data before Saving
+        $validateResult = $model->validateData(new \Magento\Framework\DataObject($model->getData()));
+        if ($validateResult !== true) {
+            foreach ($validateResult as $errorMessage) {
+                echo $errorMessage;
+            }
+            return;
+        }
+
+        try {
+            $model->loadPost($model->getData());
+            $model->save();
+            $ruleJob = $this->_objectManager->get('Magento\CatalogRule\Model\Rule\Job');
+            $ruleJob->applyAll();
+        } catch (Exception $e) {
+            echo $e->getMessage();
+        }
+    }
 }
 
 /** @var \Magento\Framework\App\Http $app */

@@ -35,21 +35,24 @@ abstract class AbstractResponse
     /**
      * Header of the result
      *
-     * @var Header;
+     * @var Header
      */
     public $Header;
 
     /**
      * Childs of the response
      *
-     * @var array
+     * @var array<string, array<string, mixed>>
      */
     protected $childs = [];
 
+    /**
+     * @return void
+     */
     public function headerSetter(\SimpleXMLElement $xml = null)
     {
         if ($xml) {
-            $this->Header = ResponseSerializer::serialize(Header::class, $xml, false);
+            $this->Header = ResponseSerializer::serialize(Header::class, $xml);
         }
     }
 
@@ -58,7 +61,7 @@ abstract class AbstractResponse
      *
      * @param \SimpleXMLElement $xml
      *
-     * @return AbstractResponse
+     * @return static
      */
     public function deserialize(\SimpleXMLElement $xml = null)
     {
@@ -73,11 +76,18 @@ abstract class AbstractResponse
                 // Do nothing if element setter not found.
             }
 
-            /** @var \SimpleXMLElement $child */
             foreach ($xml->children() as $child) {
                 if (isset($this->childs[$child->getName()])) {
                     $builder = $this->childs[$child->getName()];
-                    $data    = ResponseSerializer::serialize($builder['class'], $child, $builder['array']);
+                    /** @var class-string<AbstractResponse> */
+                    $className = $builder['class'];
+                    /** @var string|false */
+                    $childKey = $builder['array'];
+                    if ($childKey === false) {
+                        $data = ResponseSerializer::serialize($className, $child);
+                    } else {
+                        $data = ResponseSerializer::serializeChildren($className, $child, $builder['array']);
+                    }
                 } else {
                     $data = trim((string)$child);
                     $this->attributeSetter($object, $child);
@@ -95,23 +105,22 @@ abstract class AbstractResponse
      *
      * @param object            $object
      * @param \SimpleXMLElement $element
+     *
+     * @return void
      */
     private function attributeSetter($object, \SimpleXMLElement $element)
     {
-        if ($element) {
-            /** @var \SimpleXMLElement $attribute */
-            foreach ($element->attributes() as $attribute) {
-                if (isset($attribute) && $attribute) {
-                    if (!$this->set($object, (string)$attribute, $attribute)) {
-                        throw new \InvalidArgumentException(
-                            sprintf(
-                                'The attribute "%s" on element "%s" does not have a setter or a property in class "%s"',
-                                $attribute->getName(),
-                                $element->getName(),
-                                get_called_class()
-                            )
-                        );
-                    }
+        if ($element->getName()) {
+            foreach ($element->attributes() ?: [] as $attribute) {
+                if (!$this->set($object, (string)$attribute, $attribute)) {
+                    throw new \InvalidArgumentException(
+                        sprintf(
+                            'The attribute "%s" on element "%s" does not have a setter or a property in class "%s"',
+                            $attribute->getName(),
+                            $element->getName(),
+                            get_called_class()
+                        )
+                    );
                 }
             }
         }
@@ -123,6 +132,8 @@ abstract class AbstractResponse
      * @param object            $object
      * @param mixed             $data
      * @param \SimpleXMLElement $element
+     *
+     * @return void
      */
     private function elementSetter($object, $data, \SimpleXMLElement $element)
     {

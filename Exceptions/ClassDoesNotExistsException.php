@@ -25,11 +25,16 @@ namespace SDM\Altapay\Exceptions;
 
 class ClassDoesNotExistsException extends Exception
 {
+    /** @var string */
     public $class;
 
-    public function __construct($class)
+    /**
+     * @param string $class
+     */
+    public function __construct(string $class)
     {
         $this->class = $class;
+        parent::__construct($class.' is not a known class.');
     }
 
     /**

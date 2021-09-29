@@ -32,6 +32,7 @@ trait AmountTrait
      * The amount to calculate the surcharge from
      *
      * @param float $amount
+     *
      * @return $this
      */
     public function setAmount($amount)
@@ -44,6 +45,8 @@ trait AmountTrait
      * Resolve amount option
      *
      * @param OptionsResolver $resolver
+     *
+     * @return void
      */
     protected function setAmountResolver(OptionsResolver $resolver)
     {

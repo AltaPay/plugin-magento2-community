@@ -28,6 +28,7 @@ use SDM\Altapay\Authentication;
 use SDM\Altapay\Exceptions\ClientException;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
+use Psr\Http\Message\ResponseInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
@@ -38,6 +39,7 @@ class TestConnection extends AbstractApi
 
     /**
      * TestConnection constructor.
+     *
      * @param string $baseUrl
      */
     public function __construct($baseUrl = null)
@@ -61,6 +63,7 @@ class TestConnection extends AbstractApi
      * Configure options
      *
      * @param OptionsResolver $resolver
+     *
      * @return void
      */
     protected function configureOptions(OptionsResolver $resolver)
@@ -70,7 +73,8 @@ class TestConnection extends AbstractApi
     /**
      * Url to api call
      *
-     * @param array $options Resolved options
+     * @param array<string, mixed> $options Resolved options
+     *
      * @return string
      */
     protected function getUrl(array $options)
@@ -81,19 +85,21 @@ class TestConnection extends AbstractApi
     /**
      * Handle response
      *
-     * @param Request $request
-     * @param Response $response
-     * @return true
+     * @param Request           $request
+     * @param ResponseInterface $response
+     *
+     * @return string
      */
-    protected function handleResponse(Request $request, Response $response)
+    protected function handleResponse(Request $request, ResponseInterface $response)
     {
-        return true;
+        return 'ok';
     }
 
     /**
      * Handle exception response
      *
      * @param ClientException $exception
+     *
      * @return false
      */
     protected function handleExceptionResponse(ClientException $exception)

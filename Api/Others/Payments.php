@@ -29,6 +29,7 @@ use SDM\Altapay\Serializer\ResponseSerializer;
 use SDM\Altapay\Traits;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
+use Psr\Http\Message\ResponseInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
@@ -50,6 +51,7 @@ class Payments extends AbstractApi
      * The id of a specific payment.
      *
      * @param string $paymentId
+     *
      * @return $this
      */
     public function setPaymentId($paymentId)
@@ -66,6 +68,7 @@ class Payments extends AbstractApi
      * Use this if you want to ensure that the payment returned exists in this context.
      *
      * @param string $shop
+     *
      * @return $this
      */
     public function setShop($shop)
@@ -78,6 +81,7 @@ class Payments extends AbstractApi
      * Configure options
      *
      * @param OptionsResolver $resolver
+     *
      * @return void
      */
     protected function configureOptions(OptionsResolver $resolver)
@@ -90,21 +94,24 @@ class Payments extends AbstractApi
     /**
      * Handle response
      *
-     * @param Request $request
-     * @param Response $response
+     * @param Request           $request
+     * @param ResponseInterface $response
+     *
      * @return Transaction[]
      */
-    protected function handleResponse(Request $request, Response $response)
+    protected function handleResponse(Request $request, ResponseInterface $response)
     {
         $body = (string) $response->getBody();
-        $xml = simplexml_load_string($body);
-        return ResponseSerializer::serialize(Transaction::class, $xml->Body->Transactions, 'Transaction', $xml->Header);
+        $xml = new \SimpleXMLElement($body);
+
+        return ResponseSerializer::serializeChildren(Transaction::class, $xml->Body->Transactions, 'Transaction');
     }
 
     /**
      * Url to api call
      *
-     * @param array $options Resolved options
+     * @param array<string, mixed> $options Resolved options
+     *
      * @return string
      */
     protected function getUrl(array $options)

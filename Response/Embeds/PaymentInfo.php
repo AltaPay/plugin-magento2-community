@@ -27,7 +27,9 @@ use SDM\Altapay\Response\AbstractResponse;
 
 class PaymentInfo extends AbstractResponse
 {
+    /** @var string */
     public $name;
 
+    /** @var string */
     public $PaymentInfo;
 }

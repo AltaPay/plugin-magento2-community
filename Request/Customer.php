@@ -139,14 +139,14 @@ class Customer extends AbstractSerializer
     /**
      * The birth date of the customer
      *
-     * @var \DateTime
+     * @var \DateTime|null
      */
     private $birthdate;
 
     /**
      * The creation date of the customer in your system
      *
-     * @var \DateTime
+     * @var \DateTime|null
      */
     private $createdDate;
 
@@ -219,7 +219,7 @@ class Customer extends AbstractSerializer
     /**
      * @param Address $shipping
      *
-     * @return Customer
+     * @return $this
      */
     public function setShipping(Address $shipping)
     {
@@ -233,7 +233,7 @@ class Customer extends AbstractSerializer
      *
      * @param string $email
      *
-     * @return Customer
+     * @return $this
      */
     public function setEmail($email)
     {
@@ -247,7 +247,7 @@ class Customer extends AbstractSerializer
      *
      * @param string $username
      *
-     * @return Customer
+     * @return $this
      */
     public function setUsername($username)
     {
@@ -261,7 +261,7 @@ class Customer extends AbstractSerializer
      *
      * @param string $type
      *
-     * @return Customer
+     * @return $this
      */
     public function setType($type)
     {
@@ -275,7 +275,7 @@ class Customer extends AbstractSerializer
      *
      * @param string $companyName
      *
-     * @return Customer
+     * @return $this
      */
     public function setCompanyName($companyName)
     {
@@ -289,7 +289,7 @@ class Customer extends AbstractSerializer
      *
      * @param string $companyType
      *
-     * @return Customer
+     * @return $this
      */
     public function setCompanyType($companyType)
     {
@@ -303,7 +303,7 @@ class Customer extends AbstractSerializer
      *
      * @param string $vatId
      *
-     * @return Customer
+     * @return $this
      */
     public function setVatId($vatId)
     {
@@ -317,7 +317,7 @@ class Customer extends AbstractSerializer
      *
      * @param string $billingAtt
      *
-     * @return Customer
+     * @return $this
      */
     public function setBillingAtt($billingAtt)
     {
@@ -331,7 +331,7 @@ class Customer extends AbstractSerializer
      *
      * @param string $shippingAtt
      *
-     * @return Customer
+     * @return $this
      */
     public function setShippingAtt($shippingAtt)
     {
@@ -345,7 +345,7 @@ class Customer extends AbstractSerializer
      *
      * @param string $phone
      *
-     * @return Customer
+     * @return $this
      */
     public function setPhone($phone)
     {
@@ -359,7 +359,7 @@ class Customer extends AbstractSerializer
      *
      * @param string $bankName
      *
-     * @return Customer
+     * @return $this
      */
     public function setBankName($bankName)
     {
@@ -373,7 +373,7 @@ class Customer extends AbstractSerializer
      *
      * @param string $bankPhone
      *
-     * @return Customer
+     * @return $this
      */
     public function setBankPhone($bankPhone)
     {
@@ -387,7 +387,7 @@ class Customer extends AbstractSerializer
      *
      * @param \DateTime $birthdate
      *
-     * @return Customer
+     * @return $this
      */
     public function setBirthdate($birthdate)
     {
@@ -401,7 +401,7 @@ class Customer extends AbstractSerializer
      *
      * @param \DateTime $createdDate
      *
-     * @return Customer
+     * @return $this
      */
     public function setCreatedDate(\DateTime $createdDate)
     {
@@ -411,7 +411,7 @@ class Customer extends AbstractSerializer
     }
 
     /**
-     * @return \DateTime
+     * @return \DateTime|null
      */
     public function getCreatedDate()
     {
@@ -421,7 +421,7 @@ class Customer extends AbstractSerializer
     /**
      * @param string $organisationNumber
      *
-     * @return Customer
+     * @return $this
      */
     public function setOrganisationNumber($organisationNumber)
     {
@@ -433,7 +433,7 @@ class Customer extends AbstractSerializer
     /**
      * @param string $personalIdentifyNumber
      *
-     * @return Customer
+     * @return $this
      */
     public function setPersonalIdentifyNumber($personalIdentifyNumber)
     {
@@ -445,7 +445,7 @@ class Customer extends AbstractSerializer
     /**
      * @param string $billingRef
      *
-     * @return Customer
+     * @return $this
      */
     public function setBillingRef($billingRef)
     {
@@ -457,7 +457,7 @@ class Customer extends AbstractSerializer
     /**
      * @param string $shippingRef
      *
-     * @return Customer
+     * @return $this
      */
     public function setShippingRef($shippingRef)
     {
@@ -471,12 +471,13 @@ class Customer extends AbstractSerializer
      *
      * @param string $gender
      *
-     * @return Customer
+     * @return $this
+     *
      * @throws Exception
      */
     public function setGender($gender)
     {
-        switch (strtolower($gender)) {
+        switch (mb_strtolower($gender)) {
             case 'male':
             case 'm':
                 $this->gender = self::MALE;
@@ -497,7 +498,7 @@ class Customer extends AbstractSerializer
      *
      * @param string $clientIP
      *
-     * @return Customer
+     * @return $this
      */
     public function setClientIP($clientIP)
     {
@@ -509,9 +510,9 @@ class Customer extends AbstractSerializer
     /**
      * Set Client Accept Language
      *
-     * @param $clientAcceptLanguage
+     * @param string $clientAcceptLanguage
      *
-     * @return Customer
+     * @return $this
      */
     public function setClientAcceptLanguage($clientAcceptLanguage)
     {
@@ -523,9 +524,9 @@ class Customer extends AbstractSerializer
     /**
      * Set Client Accept Language
      *
-     * @param $httpUserAgent
+     * @param string $httpUserAgent
      *
-     * @return Customer
+     * @return $this
      */
     public function setHttpUserAgent($httpUserAgent)
     {
@@ -537,9 +538,9 @@ class Customer extends AbstractSerializer
     /**
      * Set Client Accept Language
      *
-     * @param $httpXForwardedFor
+     * @param string $httpXForwardedFor
      *
-     * @return Customer
+     * @return $this
      */
     public function setHttpXForwardedFor($httpXForwardedFor)
     {
@@ -551,9 +552,9 @@ class Customer extends AbstractSerializer
     /**
      * Set Client Session ID
      *
-     * @param $clientSessionID
+     * @param string $clientSessionID
      *
-     * @return Customer
+     * @return $this
      */
     public function setClientSessionID($clientSessionID)
     {
@@ -565,7 +566,7 @@ class Customer extends AbstractSerializer
     /**
      * Serialize a object
      *
-     * @return array
+     * @return array<string, string>
      */
     public function serialize()
     {
@@ -666,9 +667,11 @@ class Customer extends AbstractSerializer
     }
 
     /**
-     * @param array   $output
-     * @param         $key
-     * @param Address $object
+     * @param array<string, string> $output
+     * @param string                $key
+     * @param Address               $object
+     *
+     * @return void
      */
     private static function setAddress(array &$output, $key, Address $object)
     {

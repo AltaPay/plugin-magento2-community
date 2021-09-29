@@ -29,8 +29,10 @@ use SDM\Altapay\Serializer\ResponseSerializer;
 use SDM\Altapay\Traits\AmountTrait;
 use SDM\Altapay\Traits\OrderlinesTrait;
 use SDM\Altapay\Traits\TransactionsTrait;
+use GuzzleHttp\Exception\ClientException as GuzzleHttpClientException;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
+use Psr\Http\Message\ResponseInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
@@ -81,7 +83,7 @@ class CaptureReservation extends AbstractApi
     /**
      * The sales tax amount is used if you wish to indicate how much of the gross amount was sales tax
      *
-     * @param string $salesTax
+     * @param numeric $salesTax
      *
      * @return $this
      */
@@ -96,7 +98,7 @@ class CaptureReservation extends AbstractApi
      * The shipping tracking info is used if you want to send the shipping tracking info
      * with invoice.
      *
-     * @param $shippingTrackingInfo
+     * @param string $shippingTrackingInfo
      *
      * @return $this
      */
@@ -133,33 +135,33 @@ class CaptureReservation extends AbstractApi
     /**
      * Handle response
      *
-     * @param Request  $request
-     * @param Response $response
+     * @param Request           $request
+     * @param ResponseInterface $response
      *
      * @return CaptureReservationResponse
      */
-    protected function handleResponse(Request $request, Response $response)
+    protected function handleResponse(Request $request, ResponseInterface $response)
     {
         $body = (string)$response->getBody();
-        $xml  = simplexml_load_string($body);
+        $xml  = new \SimpleXMLElement($body);
         if ($xml->Body->Result == 'Error') {
             throw new \Exception($xml->Body->MerchantErrorMessage);
         }
 
         try {
-            return ResponseSerializer::serialize(CaptureReservationResponse::class, $xml->Body, false, $xml->Header);
+            return ResponseSerializer::serialize(CaptureReservationResponse::class, $xml->Body, $xml->Header);
         } catch (\Exception $e) {
             throw $e;
         }
     }
 
     /**
-     * @return array
+     * @return array<string, string>
      */
     protected function getBasicHeaders()
     {
         $headers = parent::getBasicHeaders();
-        if (strtolower($this->getHttpMethod()) == 'post') {
+        if (mb_strtolower($this->getHttpMethod()) == 'post') {
             $headers['Content-Type'] = 'application/x-www-form-urlencoded';
         }
 
@@ -169,14 +171,14 @@ class CaptureReservation extends AbstractApi
     /**
      * Url to api call
      *
-     * @param array $options Resolved options
+     * @param array<string, mixed> $options Resolved options
      *
      * @return string
      */
     protected function getUrl(array $options)
     {
         $url = 'captureReservation';
-        if (strtolower($this->getHttpMethod()) == 'get') {
+        if (mb_strtolower($this->getHttpMethod()) == 'get') {
             $query = $this->buildUrl($options);
             $url   = sprintf('%s/?%s', $url, $query);
         }
@@ -200,7 +202,7 @@ class CaptureReservation extends AbstractApi
         $this->doConfigureOptions();
         $headers           = $this->getBasicHeaders();
         $requestParameters = [$this->getHttpMethod(), $this->parseUrl(), $headers];
-        if (strtolower($this->getHttpMethod()) == 'post') {
+        if (mb_strtolower($this->getHttpMethod()) == 'post') {
             $requestParameters[] = $this->getPostOptions();
         }
 
@@ -214,7 +216,7 @@ class CaptureReservation extends AbstractApi
 
             return $output;
         } catch (GuzzleHttpClientException $e) {
-            throw new Exceptions\ClientException($e->getMessage(), $e->getRequest(), $e->getResponse());
+            throw new Exceptions\ClientException($e->getMessage(), $e->getRequest(), $e->getResponse(), $e);
         }
     }
 
@@ -225,6 +227,6 @@ class CaptureReservation extends AbstractApi
     {
         $options = $this->options;
 
-        return http_build_query($options, null, '&');
+        return http_build_query($options, '', '&');
     }
 }

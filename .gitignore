@@ -5,3 +5,4 @@ altapay_magento2-community_*.zip
 Test/integration-tests/node_modules/
 Test/integration-tests/cypress/screenshots/
 Test/integration-tests/cypress/videos/
+.idea/

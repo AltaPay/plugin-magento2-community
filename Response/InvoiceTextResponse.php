@@ -28,6 +28,11 @@ use SDM\Altapay\Response\Embeds\TextInfo;
 
 class InvoiceTextResponse extends AbstractResponse
 {
+    /**
+     * Childs of the response
+     *
+     * @var array<string, array<string, mixed>>
+     */
     protected $childs = [
         'TextInfos' => [
             'class' => TextInfo::class,
@@ -39,20 +44,28 @@ class InvoiceTextResponse extends AbstractResponse
         ]
     ];
 
+    /** @var numeric */
     public $AccountOfferMinimumToPay;
 
+    /** @var string */
     public $AccountOfferText;
 
+    /** @var numeric */
     public $BankAccountNumber;
 
+    /** @var string */
     public $LogonText;
 
+    /** @var numeric */
     public $OcrNumber;
 
+    /** @var string */
     public $MandatoryInvoiceText;
 
+    /** @var numeric */
     public $InvoiceNumber;
 
+    /** @var numeric */
     public $CustomerNumber;
 
     /**
@@ -77,7 +90,8 @@ class InvoiceTextResponse extends AbstractResponse
 
     /**
      * @param string $InvoiceDate
-     * @return InvoiceTextResponse
+     *
+     * @return $this
      */
     public function setInvoiceDate($InvoiceDate)
     {
@@ -87,7 +101,8 @@ class InvoiceTextResponse extends AbstractResponse
 
     /**
      * @param string $DueDate
-     * @return InvoiceTextResponse
+     *
+     * @return $this
      */
     public function setDueDate($DueDate)
     {

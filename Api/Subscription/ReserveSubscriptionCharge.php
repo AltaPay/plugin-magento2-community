@@ -29,6 +29,7 @@ use SDM\Altapay\Serializer\ResponseSerializer;
 use SDM\Altapay\Traits;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
+use Psr\Http\Message\ResponseInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
@@ -44,6 +45,7 @@ class ReserveSubscriptionCharge extends AbstractApi
      * Configure options
      *
      * @param OptionsResolver $resolver
+     *
      * @return void
      */
     protected function configureOptions(OptionsResolver $resolver)
@@ -56,21 +58,24 @@ class ReserveSubscriptionCharge extends AbstractApi
     /**
      * Handle response
      *
-     * @param Request $request
-     * @param Response $response
+     * @param Request           $request
+     * @param ResponseInterface $response
+     *
      * @return ReserveSubscriptionResponse
      */
-    protected function handleResponse(Request $request, Response $response)
+    protected function handleResponse(Request $request, ResponseInterface $response)
     {
         $body = (string) $response->getBody();
-        $xml = simplexml_load_string($body);
-        return ResponseSerializer::serialize(ReserveSubscriptionResponse::class, $xml->Body, false, $xml->Header);
+        $xml = new \SimpleXMLElement($body);
+
+        return ResponseSerializer::serialize(ReserveSubscriptionResponse::class, $xml->Body, $xml->Header);
     }
 
     /**
      * Url to api call
      *
-     * @param array $options Resolved options
+     * @param array<string, mixed> $options Resolved options
+     *
      * @return string
      */
     protected function getUrl(array $options)

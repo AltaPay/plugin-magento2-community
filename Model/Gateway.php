@@ -33,6 +33,7 @@ use SDM\Altapay\Model\Handler\DiscountHandler;
 use SDM\Altapay\Model\Handler\CreatePaymentHandler;
 use SDM\Altapay\Model\TokenFactory;
 use Magento\Quote\Model\Quote\Item\AbstractItem;
+use Magento\Framework\DataObject;
 
 /**
  * Class Gateway
@@ -274,7 +275,8 @@ class Gateway implements GatewayInterface
                     $item,
                     $unitPrice,
                     $couponCodeAmount,
-                    $this->discountHandler->getItemDiscount($discountAmount, $originalPrice, $item->getQtyOrdered())
+                    $this->discountHandler->getItemDiscount($discountAmount, $originalPrice, $item->getQtyOrdered()),
+                    $discountAllItems
                 );
                 $taxAmount            = $dataForPrice["taxAmount"];
                 $catalogDiscount      = $dataForPrice["catalogDiscount"];
@@ -302,7 +304,8 @@ class Gateway implements GatewayInterface
                     $couponCodeAmount,
                     $catalogDiscount,
                     $storePriceIncTax,
-                    true
+                    true,
+                    $discountAllItems
                 );
                 // check if rounding compensation amount, send in the separate orderline
                 if ($roundingCompensation > 0 || $roundingCompensation < 0) {

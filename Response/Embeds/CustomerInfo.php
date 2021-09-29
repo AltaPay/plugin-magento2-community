@@ -27,6 +27,11 @@ use SDM\Altapay\Response\AbstractResponse;
 
 class CustomerInfo extends AbstractResponse
 {
+    /**
+     * Childs of the response
+     *
+     * @var array<string, array<string, mixed>>
+     */
     protected $childs = [
         'CountryOfOrigin' => [
             'class' => Country::class,
@@ -46,16 +51,22 @@ class CustomerInfo extends AbstractResponse
         ]
     ];
 
+    /** @var string */
     public $UserAgent;
 
+    /** @var string */
     public $IpAddress;
 
+    /** @var string */
     public $Email;
 
+    /** @var string */
     public $Username;
 
+    /** @var string */
     public $CustomerPhone;
 
+    /** @var numeric */
     public $OrganisationNumber;
 
     /**

@@ -25,23 +25,31 @@ namespace SDM\Altapay\Request;
 
 class Config extends AbstractSerializer
 {
+    /** @var string */
     private $callbackForm;
 
+    /** @var string */
     private $callbackOk;
 
+    /** @var string */
     private $callbackFail;
 
+    /** @var string */
     private $callbackRedirect;
 
+    /** @var string */
     private $callbackOpen;
 
+    /** @var string */
     private $callbackNotification;
 
+    /** @var string */
     private $callbackVerifyOrder;
 
     /**
      * @param string $callbackForm
-     * @return Config
+     *
+     * @return $this
      */
     public function setCallbackForm($callbackForm)
     {
@@ -51,7 +59,8 @@ class Config extends AbstractSerializer
 
     /**
      * @param string $callbackOk
-     * @return Config
+     *
+     * @return $this
      */
     public function setCallbackOk($callbackOk)
     {
@@ -61,7 +70,8 @@ class Config extends AbstractSerializer
 
     /**
      * @param string $callbackFail
-     * @return Config
+     *
+     * @return $this
      */
     public function setCallbackFail($callbackFail)
     {
@@ -71,7 +81,8 @@ class Config extends AbstractSerializer
 
     /**
      * @param string $callbackRedirect
-     * @return Config
+     *
+     * @return $this
      */
     public function setCallbackRedirect($callbackRedirect)
     {
@@ -81,7 +92,8 @@ class Config extends AbstractSerializer
 
     /**
      * @param string $callbackOpen
-     * @return Config
+     *
+     * @return $this
      */
     public function setCallbackOpen($callbackOpen)
     {
@@ -91,7 +103,8 @@ class Config extends AbstractSerializer
 
     /**
      * @param string $callbackNotification
-     * @return Config
+     *
+     * @return $this
      */
     public function setCallbackNotification($callbackNotification)
     {
@@ -101,7 +114,8 @@ class Config extends AbstractSerializer
 
     /**
      * @param string $callbackVerifyOrder
-     * @return Config
+     *
+     * @return $this
      */
     public function setCallbackVerifyOrder($callbackVerifyOrder)
     {
@@ -112,7 +126,7 @@ class Config extends AbstractSerializer
     /**
      * Serialize a object
      *
-     * @return array
+     * @return array<string, string>
      */
     public function serialize()
     {

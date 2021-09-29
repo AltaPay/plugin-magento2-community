@@ -25,6 +25,7 @@ namespace SDM\Altapay\Types;
 
 class CurrencyTypes
 {
+    /** @var array<string, string> */
     protected static $currencies = [
             'AED' => '784',
             'AFN' => '971',
@@ -205,11 +206,21 @@ class CurrencyTypes
             'ZMW' => '967',
         ];
 
+    /**
+     * @param string $code
+     *
+     * @return bool
+     */
     public static function currencyCodeExists($code)
     {
-        return array_key_exists(strtoupper($code), self::$currencies);
+        return array_key_exists(mb_strtoupper($code), self::$currencies);
     }
 
+    /**
+     * @param string $number
+     *
+     * @return bool
+     */
     public static function currencyNumberExists($number)
     {
         return array_key_exists($number, array_flip(self::$currencies));

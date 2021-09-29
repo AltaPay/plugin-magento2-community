@@ -33,6 +33,7 @@ trait ShopOrderIdTrait
      * this is what we will post back to you so you know which order a given payment is associated with.
      *
      * @param string $shopOrderId
+     *
      * @return $this
      */
     public function setShopOrderId($shopOrderId)
@@ -45,12 +46,14 @@ trait ShopOrderIdTrait
      * Resolve terminal option
      *
      * @param OptionsResolver $resolver
+     *
+     * @return void
      */
     public function setShopOrderIdResolver(OptionsResolver $resolver)
     {
         $resolver->setAllowedTypes('shop_orderid', ['string', 'int']);
         $resolver->setAllowedValues('shop_orderid', function ($value) {
-            return preg_match('/^[a-zA-Z0-9 ]{1,100}$/', $value);
+            return preg_match('/^[a-zA-Z0-9 ]{1,100}$/', $value) === 1;
         });
     }
 }
