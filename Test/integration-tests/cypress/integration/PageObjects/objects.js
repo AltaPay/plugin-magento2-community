@@ -17,14 +17,14 @@ class Order {
         cy.wait(3000)
         cy.get('.message-success > div > a').wait(2000).click().wait(2000)
         cy.get('.checkout-methods-items > :nth-child(1) > .action').wait(5000).click().wait(5000)
-        cy.get('#customer-email-fieldset > .required > .control > #customer-email').type('demo@example.com')
-        cy.xpath('/html/body/div[2]/main/div[2]/div/div[2]/div[4]/ol/li[1]/div[2]/form[2]/div/div[1]/div/input').type('Testperson-dk')
-        cy.xpath('/html/body/div[2]/main/div[2]/div/div[2]/div[4]/ol/li[1]/div[2]/form[2]/div/div[2]/div/input').type('Testperson-dk')
-        cy.xpath('/html/body/div[2]/main/div[2]/div/div[2]/div[4]/ol/li[1]/div[2]/form[2]/div/div[4]/div/select').select('Denmark')
-        cy.xpath('/html/body/div[2]/main/div[2]/div/div[2]/div[4]/ol/li[1]/div[2]/form[2]/div/fieldset/div/div[1]/div/input').type('Sæffleberggate 56,1 mf')
-        cy.xpath('/html/body/div[2]/main/div[2]/div/div[2]/div[4]/ol/li[1]/div[2]/form[2]/div/div[7]/div/input').type('Varde')
-        cy.xpath('/html/body/div[2]/main/div[2]/div/div[2]/div[4]/ol/li[1]/div[2]/form[2]/div/div[8]/div/input').type('6800')
-        cy.xpath('/html/body/div[2]/main/div[2]/div/div[2]/div[4]/ol/li[1]/div[2]/form[2]/div/div[9]/div/input').type('20123456')
+        cy.get('#customer-email-fieldset input[name=username]#customer-email').type('demo@example.com')
+        cy.get('input[name=firstname]').type('Testperson-dk')
+        cy.get('input[name=lastname]').type('Approved')
+        cy.get('select[name=country_id]').select('Denmark')
+        cy.get('input[name="street[0]"]').type('Sæffleberggate 56,1 mf')
+        cy.get('input[name=city]').type('Varde')
+        cy.get('input[name=postcode]').type('6800')
+        cy.get('input[name=telephone]').type('20123456')
         cy.wait(5000)
         cy.get('.button').click().wait(5000)
 
@@ -77,6 +77,7 @@ class Order {
 
     admin() {
         cy.fixture('config').then((conf) => {
+            cy.clearCookies()
             cy.visit(conf.adminURL).wait(5000)
             cy.get('#username').type(conf.adminUsername)
             cy.get('#login').type(conf.adminPass)
@@ -109,7 +110,7 @@ class Order {
         cy.get('#credit-memo > span').click()
         cy.wait(2000)
         cy.xpath('/html/body/div[2]/main/div[2]/div/div/form/div[2]/section[2]/div[2]/div[2]/div[3]/div[3]/button[2]/span').click()
-        cy.wait(1000)
+        cy.wait(3000)
         cy.get(':nth-child(1) > .note-list-comment').should('include.text', 'We refunded')
     }
 
@@ -215,7 +216,7 @@ class Order {
         cy.get('.col-refund > span').click()
         cy.contains("Update Qty's").click().wait(2000)
         cy.xpath('/html/body/div[3]/main/div[2]/div/div/form/div[2]/section[2]/div[2]/div[2]/div[3]/div[3]/button[2]').click()
-        cy.wait(1000)
+        cy.wait(3000)
         cy.get(':nth-child(1) > .note-list-comment').should('include.text', 'We refunded')
     }
 
@@ -232,8 +233,8 @@ class Order {
     create_cart_percent_discount() {
         //Check if catalog discount is active. If so, deactivate it.
         cy.get('#menu-magento-backend-marketing > [onclick="return false;"]').click()
-        cy.get('.item-promo-catalog > a').click()
-        cy.contains("AltaPay Catalog Rule Percentage").click()
+        cy.get('.item-promo-catalog > a').wait(5000).click()
+        cy.contains("AltaPay Catalog Rule Percentage").click().wait(5000)
         cy.get('input[name="is_active"]')
             .invoke('val')
             .then(somevalue => {
@@ -243,9 +244,9 @@ class Order {
                     cy.wait(50000)
                 }
             })
-        cy.get('#menu-magento-backend-marketing > [onclick="return false;"]').click()
-        cy.get('.item-promo-catalog > a').click()
-        cy.contains("AltaPay Catalog Rule Fixed").click()
+        cy.get('#menu-magento-backend-marketing > [onclick="return false;"]').wait(5000).click()
+        cy.get('.item-promo-catalog > a').wait(3000).click()
+        cy.contains("AltaPay Catalog Rule Fixed").click().wait(3000)
         cy.get('input[name="is_active"]')
             .invoke('val')
             .then(somevalue => {
@@ -293,14 +294,14 @@ class Order {
     complete_checkout() {
 
         cy.get('.checkout-methods-items > :nth-child(1) > .action').wait(5000).click().wait(5000)
-        cy.get('#customer-email-fieldset > .required > .control > #customer-email').type('demo@example.com')
-        cy.xpath('/html/body/div[2]/main/div[2]/div/div[2]/div[4]/ol/li[1]/div[2]/form[2]/div/div[1]/div/input').type('Testperson-dk')
-        cy.xpath('/html/body/div[2]/main/div[2]/div/div[2]/div[4]/ol/li[1]/div[2]/form[2]/div/div[2]/div/input').type('Testperson-dk')
-        cy.xpath('/html/body/div[2]/main/div[2]/div/div[2]/div[4]/ol/li[1]/div[2]/form[2]/div/div[4]/div/select').select('Denmark')
-        cy.xpath('/html/body/div[2]/main/div[2]/div/div[2]/div[4]/ol/li[1]/div[2]/form[2]/div/fieldset/div/div[1]/div/input').type('Sæffleberggate 56,1 mf')
-        cy.xpath('/html/body/div[2]/main/div[2]/div/div[2]/div[4]/ol/li[1]/div[2]/form[2]/div/div[7]/div/input').type('Varde')
-        cy.xpath('/html/body/div[2]/main/div[2]/div/div[2]/div[4]/ol/li[1]/div[2]/form[2]/div/div[8]/div/input').type('6800')
-        cy.xpath('/html/body/div[2]/main/div[2]/div/div[2]/div[4]/ol/li[1]/div[2]/form[2]/div/div[9]/div/input').type('20123456')
+        cy.get('#customer-email-fieldset input[name=username]#customer-email').type('demo@example.com')
+        cy.get('input[name=firstname]').type('Testperson-dk')
+        cy.get('input[name=lastname]').type('Approved')
+        cy.get('select[name=country_id]').select('Denmark')
+        cy.get('input[name="street[0]"]').type('Sæffleberggate 56,1 mf')
+        cy.get('input[name=city]').type('Varde')
+        cy.get('input[name=postcode]').type('6800')
+        cy.get('input[name=telephone]').type('20123456')
         cy.get('.radio').click({ multiple: true })
         cy.wait(1000)
         cy.get('.button').click().wait(5000)
@@ -464,6 +465,58 @@ class Order {
             }
         })
         cy.get('#save').click()
+    }
+
+    change_currency_to_EUR_for_iDEAL(){
+        cy.get('#menu-magento-backend-stores > [onclick="return false;"]').click()
+        cy.get('.item-system-config > a').click()
+        cy.contains('Currency Setup').click()
+        cy.get('#currency_options-head').click()
+        cy.get('#currency_options_base').select('Euro')
+        cy.get('#currency_options_default').select('Euro')
+        cy.get('#currency_options_allow').select('Euro')
+        cy.get('#save').click().wait(2000)
+        //Flush cache
+        cy.get('#menu-magento-backend-system > [onclick="return false;"]').scrollIntoView().click()
+        cy.get('.item-system-cache > a').click()
+        cy.get('#flush_magento').click()
+    }
+
+    ideal_payment(iDEAl_EUR_TERMINAL) {
+        cy.contains(iDEAl_EUR_TERMINAL).click({ force: true })
+        cy.get('._active > .payment-method-content > :nth-child(5) > div.primary > .action').click().wait(2000)
+        cy.get('#idealIssuer').select('AltaPay test issuer 1')
+        cy.get('#pensioPaymentIdealSubmitButton').click()
+        cy.get('[type="text"]').type('shahbaz.anjum123-facilitator@gmail.com')
+        cy.get('[type="password"]').type('Altapay@12345')
+        cy.get('#SignInButton').click()
+        cy.get(':nth-child(3) > #successSubmit').click().wait(1000)
+
+    }
+
+    ideal_refund(){
+        cy.get('#menu-magento-sales-sales > [onclick="return false;"]').click()
+        cy.get('.item-sales-order > a').click().wait(9000)
+        cy.xpath('//*[@id="container"]/div/div[4]/table/tbody/tr[1]/td[2]/div').click()
+        cy.get('#order_creditmemo > span').click()
+        cy.contains('Refund Offline').click()
+        cy.wait(3000)
+        cy.get(':nth-child(1) > .note-list-comment').should('include.text', 'We refunded')
+    }
+
+    change_currency_to_DKK(){
+        cy.get('#menu-magento-backend-stores > [onclick="return false;"]').click()
+        cy.get('.item-system-config > a').click()
+        cy.get('#save').click()
+        cy.contains('Currency Setup').click()
+        cy.get('#currency_options_base').select('Danish Krone')
+        cy.get('#currency_options_default').select('Danish Krone')
+        cy.get('#currency_options_allow').select('Danish Krone')
+        cy.get('#save').click().wait(2000)
+        //Flush cache
+        cy.get('#menu-magento-backend-system > [onclick="return false;"]').scrollIntoView().click()
+        cy.get('.item-system-cache > a').click()
+        cy.get('#flush_magento').click()
     }
 }
 
