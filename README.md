@@ -28,11 +28,11 @@ Run the following commands in Magento 2 root folder:
 
 * Magento 2 with sample data should be installed on publically accessible URL
 * Cypress should be installed
-* For subscription test, "Push It Messenger Bag" product should be configured as Subscription product
+* For subscription test, "Push It Messenger Bag" product should be configured as subscription product
 
 ### Information: 
 
-* These tests are for only Credit Card, Klarna DKK, and AltaPay Subscription (Credit Card for Subscription)
+* These tests are for only Credit Card, Klarna DKK, and AltaPay subscription (Credit Card for subscription)
 * In case, you don't want to test any of the above-mentioned payment methods, please leave it blank in the config file. i.e "CC_TERMINAL_NAME":""
 
 ### Steps:
@@ -48,3 +48,7 @@ See [Changelog](CHANGELOG.md) for all the release notes.
 ## License
 
 Distributed under the MIT License. See [LICENSE](LICENSE) for more information.
+
+## Documentation
+
+For more details please see [AltaPay docs](https://documentation.altapay.com/)
