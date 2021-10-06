@@ -30,11 +30,11 @@ jobs:
         token: ${{ secrets.ACCESS_TOKEN }}
         ref: 'origin/main'
 
-    # Install version 1.0.6 of Terraform CLI
+    # Install version 1.0.8 of Terraform CLI
     - name: Setup Terraform
       uses: hashicorp/setup-terraform@v1
       with:
-        terraform_version: 1.0.6
+        terraform_version: 1.0.8
 
     # Initialize a new or existing Terraform working directory by creating initial files, loading any remote state, downloading modules, etc.
     - name: Terraform Init
@@ -50,7 +50,7 @@ jobs:
       
     # Generates an execution plan for Terraform
     - name: Terraform Plan
-      run: terraform plan -var ec2_type=t2.medium
+      run: terraform plan -var ec2_type=t3.medium
       working-directory: ../plugin-infrastructure/provision/plugins
 
     # Run Terraform Apply      
