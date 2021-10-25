@@ -39,13 +39,13 @@ class Order {
         cy.get('#cvcInput').type('123')
         cy.get('#cardholderNameInput').type('testname')
         cy.get('#pensioCreditCardPaymentSubmitButton').click().wait(3000)
-        cy.get('.base').should('have.text', 'Thank you for your purchase!')
-        cy.get('.checkout-success > :nth-child(1) > span').then(($btn) => {
+        //cy.get('.base').should('have.text', 'Thank you for your purchase!')
+//         cy.get('.checkout-success > :nth-child(1) > span').then(($btn) => {
 
-            const txt = $btn.text()
-            cy.log(txt)
-        }
-        )
+//             const txt = $btn.text()
+//             cy.log(txt)
+//         }
+//         )
 
     }
 
@@ -65,14 +65,14 @@ class Order {
 
         })
 
-        cy.wait(3000)
-        cy.get('.base').should('have.text', 'Thank you for your purchase!')
+//         cy.wait(3000)
+//         cy.get('.base').should('have.text', 'Thank you for your purchase!')
 
-        cy.get('.checkout-success > :nth-child(1) > span').then(($btn) => {
+//         cy.get('.checkout-success > :nth-child(1) > span').then(($btn) => {
 
-            const txt = $btn.text()
-            cy.log(txt)
-        })
+//             const txt = $btn.text()
+//             cy.log(txt)
+//         })
     }
 
     admin() {
@@ -144,12 +144,12 @@ class Order {
             cy.get('#cvcInput').type('123')
             cy.get('#cardholderNameInput').type('testname')
             cy.get('#pensioCreditCardPaymentSubmitButton').click().wait(6000)
-            cy.get('.base').should('have.text', 'Thank you for your purchase!')
-            cy.get('#maincontent > div.columns > div > div.checkout-success > p:nth-child(1) > a > strong').then(($btn) => {
+//             cy.get('.base').should('have.text', 'Thank you for your purchase!')
+//             cy.get('#maincontent > div.columns > div > div.checkout-success > p:nth-child(1) > a > strong').then(($btn) => {
 
-                const txt = $btn.text()
-                cy.log(txt)
-            })
+//                 const txt = $btn.text()
+//                 cy.log(txt)
+//             })
 
         })
     }
