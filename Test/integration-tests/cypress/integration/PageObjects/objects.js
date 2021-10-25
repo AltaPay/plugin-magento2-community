@@ -6,7 +6,7 @@ class Order {
     }
     visit() {
         cy.fixture('config').then((url) => {
-            cy.visit(url.shopURL  , { timeout: 10000 })
+            cy.visit(url.shopURL)
         })
     }
 
