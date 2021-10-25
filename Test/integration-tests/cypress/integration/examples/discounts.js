@@ -2,44 +2,44 @@ import Order from '../PageObjects/objects'
 
 describe('Discounts', function () {
 
-    it('Create cart percentage discount', function () {
-
-        const ord = new Order()
-        ord.clrcookies()
-        ord.admin()
-        ord.create_cart_percent_discount()
-
-    })
-
-//     it('Apply cart percentage discount with CC', function () {
+//     it('Create cart percentage discount', function () {
 
 //         const ord = new Order()
 //         ord.clrcookies()
-//         ord.visit()
-//         ord.apply_cart_percent_discount()
-//         ord.complete_checkout()
-//         cy.fixture('config').then((admin) => {
-//             if (admin.CC_TERMINAL_NAME != "") {
-//                 cy.get('body').wait(3000).then(($a) => {
-//                     if ($a.find("label:contains('" + admin.CC_TERMINAL_NAME + "')").length) {
-//                         ord.cc_payment(admin.CC_TERMINAL_NAME)
-//                         ord.admin()
-//                         ord.capture()
-//                         ord.refund()
-//                     } else {
-//                         cy.log(admin.CC_TERMINAL_NAME + ' not found in page')
-//                         this.skip()
-//                     }
+//         ord.admin()
+//         ord.create_cart_percent_discount()
 
-//                 })
-
-//             }
-//             else {
-//                 cy.log('CC_TERMINAL_NAME skipped')
-//                 this.skip()
-//             }
-//         })
 //     })
+
+    it('Apply cart percentage discount with CC', function () {
+
+        const ord = new Order()
+        ord.clrcookies()
+        ord.visit()
+        ord.apply_cart_percent_discount()
+        ord.complete_checkout()
+        cy.fixture('config').then((admin) => {
+            if (admin.CC_TERMINAL_NAME != "") {
+                cy.get('body').wait(3000).then(($a) => {
+                    if ($a.find("label:contains('" + admin.CC_TERMINAL_NAME + "')").length) {
+                        ord.cc_payment(admin.CC_TERMINAL_NAME)
+                        ord.admin()
+                        ord.capture()
+                        ord.refund()
+                    } else {
+                        cy.log(admin.CC_TERMINAL_NAME + ' not found in page')
+                        this.skip()
+                    }
+
+                })
+
+            }
+            else {
+                cy.log('CC_TERMINAL_NAME skipped')
+                this.skip()
+            }
+        })
+    })
 
 //     it('Apply cart percentage discount with Klarna', function () {
 
