@@ -158,25 +158,25 @@ describe('Discounts', function () {
 //         cy.fixture('config').then((admin) => {
 //             if (admin.CC_TERMINAL_NAME != "") {
 //                 cy.get('body').wait(3000).then(($a) => {
-//                     if ($a.find("label:contains('" + admin.CC_TERMINAL_NAME + "')").length) {
-//                         ord.cc_payment(admin.CC_TERMINAL_NAME)
-//                         ord.admin()
-//                         ord.capture()
-//                         ord.refund()
-//                     } else {
-//                         cy.log(admin.CC_TERMINAL_NAME + ' not found in page')
-//                         this.skip()
-//                     }
+                    if ($a.find("label:contains('" + admin.CC_TERMINAL_NAME + "')").length) {
+                        ord.cc_payment(admin.CC_TERMINAL_NAME)
+                        ord.admin()
+                        ord.capture()
+                        ord.refund()
+                    } else {
+                        cy.log(admin.CC_TERMINAL_NAME + ' not found in page')
+                        this.skip()
+                    }
 
-//                 })
+                })
 
-//             }
-//             else {
-//                 cy.log('CC_TERMINAL_NAME skipped')
-//                 this.skip()
-//             }
-//         })
-//     })
+            }
+            else {
+                cy.log('CC_TERMINAL_NAME skipped')
+                this.skip()
+            }
+        })
+    })
 
     it('Apply catalog percent discount with Klarna', function () {
 
