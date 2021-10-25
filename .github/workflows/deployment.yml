@@ -76,16 +76,16 @@ jobs:
           
    
     # Run Ansible playbook
-    - name: Run playbook
-      uses: dawidd6/action-ansible-playbook@v2
-      with:
-        playbook: magento2-4-x.yml
-        directory: ../plugin-infrastructure/deploy/plugins
-        key: ${{secrets.SSHKEY}}
-        options: |
-          -u ubuntu
-          -i inventory
-          --extra-vars "branch_name=${{env.TEST_BRANCH_NAME}} gatewayURL=${{ secrets.GATEWAYURL }} gatewayUser=${{ secrets.GATEWAYUSER }} gatewayPass=${{ secrets.GATEWAYPASS }} mg2_admin_email=${{secrets.CMS_ADMIN_EMAIL}} mg2_admin_user=${{secrets.CMS_ADMIN_USER}} mg2_admin_password=${{secrets.CMS_ADMIN_PASS}}"   
+#     - name: Run playbook
+#       uses: dawidd6/action-ansible-playbook@v2
+#       with:
+#         playbook: magento2-4-x.yml
+#         directory: ../plugin-infrastructure/deploy/plugins
+#         key: ${{secrets.SSHKEY}}
+#         options: |
+#           -u ubuntu
+#           -i inventory
+#           --extra-vars "branch_name=${{env.TEST_BRANCH_NAME}} gatewayURL=${{ secrets.GATEWAYURL }} gatewayUser=${{ secrets.GATEWAYUSER }} gatewayPass=${{ secrets.GATEWAYPASS }} mg2_admin_email=${{secrets.CMS_ADMIN_EMAIL}} mg2_admin_user=${{secrets.CMS_ADMIN_USER}} mg2_admin_password=${{secrets.CMS_ADMIN_PASS}}"   
           
           
     # Export IP for use in cypress tests config
@@ -102,7 +102,7 @@ jobs:
     - uses: actions/checkout@v1
       with:
         repository: AltaPay/plugin-magento2-community
-        ref: 'origin/main'
+        ref: 'origin/test-composer-non-interactive'
         path: plugin-magento2-community
 
     - name: Create Cypress fixture config json
