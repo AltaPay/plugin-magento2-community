@@ -5,7 +5,7 @@ describe('Discounts', function () {
     it('Create cart percentage discount', function () {
 
         const ord = new Order()
-        cy.clearCookies()
+        ord.clrcookies()
         ord.admin()
         ord.create_cart_percent_discount()
 
@@ -14,7 +14,7 @@ describe('Discounts', function () {
     it('Apply cart percentage discount with CC', function () {
 
         const ord = new Order()
-        cy.clearCookies()
+        ord.clrcookies()
         ord.visit()
         ord.apply_cart_percent_discount()
         ord.complete_checkout()
@@ -44,7 +44,7 @@ describe('Discounts', function () {
     it('Apply cart percentage discount with Klarna', function () {
 
         const ord = new Order()
-        cy.clearCookies()
+        ord.clrcookies()
         ord.visit()
         ord.apply_cart_percent_discount()
         ord.complete_checkout()
@@ -74,7 +74,7 @@ describe('Discounts', function () {
     it('Create cart fixed discount', function () {
 
         const ord = new Order()
-        cy.clearCookies()
+        ord.clrcookies()
         ord.admin()
         ord.create_cart_fixed_discount()
 
@@ -83,7 +83,7 @@ describe('Discounts', function () {
     it('Apply cart fixed discount with CC', function () {
 
         const ord = new Order()
-        cy.clearCookies()
+        ord.clrcookies()
         ord.visit()
         ord.apply_cart_fixed_discount()
         ord.complete_checkout()
@@ -113,7 +113,7 @@ describe('Discounts', function () {
     it('Apply cart fixed discount with Klarna', function () {
 
         const ord = new Order()
-        cy.clearCookies()
+        ord.clrcookies()
         ord.visit()
         ord.apply_cart_fixed_discount()
         ord.complete_checkout()
@@ -143,7 +143,7 @@ describe('Discounts', function () {
     it('Create catalog percentage discount', function () {
 
         const ord = new Order()
-        cy.clearCookies()
+        ord.clrcookies()
         ord.admin()
         ord.create_catalog_percentage_discount()
 
@@ -152,7 +152,7 @@ describe('Discounts', function () {
     it('Apply catalog percent discount with CC', function () {
 
         const ord = new Order()
-        cy.clearCookies()
+        ord.clrcookies()
         ord.visit()
         ord.addproduct()
         cy.fixture('config').then((admin) => {
@@ -181,7 +181,7 @@ describe('Discounts', function () {
     it('Apply catalog percent discount with Klarna', function () {
 
         const ord = new Order()
-        cy.clearCookies()
+        ord.clrcookies()
         ord.visit()
         ord.addproduct()
         cy.fixture('config').then((admin) => {
@@ -210,7 +210,7 @@ describe('Discounts', function () {
     it('Create catalog fixed discount', function () {
 
         const ord = new Order()
-        cy.clearCookies()
+        ord.clrcookies()
         ord.admin()
         ord.create_catalog_fixed_discount()
 
@@ -219,7 +219,7 @@ describe('Discounts', function () {
     it('Apply catalog fixed discount with CC', function () {
 
         const ord = new Order()
-        cy.clearCookies()
+        ord.clrcookies()
         ord.visit()
         ord.addproduct()
         cy.fixture('config').then((admin) => {
@@ -248,7 +248,7 @@ describe('Discounts', function () {
     it('Apply catalog fixed discount with Klarna', function () {
 
         const ord = new Order()
-        cy.clearCookies()
+        ord.clrcookies()
         ord.visit()
         ord.addproduct()
         cy.fixture('config').then((admin) => {
@@ -278,7 +278,7 @@ describe('Discounts', function () {
     it('Multiple - Preparing Cart & Catalog Percentage discounts', function () {
 
         const ord = new Order()
-        cy.clearCookies()
+        ord.clrcookies()
         ord.admin()
         ord.create_catalog_percentage_discount()
         ord.create_cart_percentage_with_catalog()
@@ -288,7 +288,7 @@ describe('Discounts', function () {
     it('Multiple - Applying Cart & Catalog Percentage discounts with CC', function () {
 
         const ord = new Order()
-        cy.clearCookies()
+        ord.clrcookies()
         ord.visit()
         ord.apply_cart_percent_discount()
         ord.complete_checkout()
@@ -318,7 +318,7 @@ describe('Discounts', function () {
     it('Multiple - Applying Cart & Catalog Percentage discounts with Klarna', function () {
 
         const ord = new Order()
-        cy.clearCookies()
+        ord.clrcookies()
         ord.visit()
         ord.apply_cart_percent_discount()
         ord.complete_checkout()
@@ -348,7 +348,7 @@ describe('Discounts', function () {
     it('Multiple - Preparing Cart Fixed & Catalog Percentage discounts', function () {
 
         const ord = new Order()
-        cy.clearCookies()
+        ord.clrcookies()
         ord.admin()
         ord.create_catalog_percentage_discount()
         ord.create_cart_fixed_with_catalog()
@@ -358,7 +358,7 @@ describe('Discounts', function () {
     it('Multiple - Applying Cart Fixed & Catalog percentage discount with CC', function () {
 
         const ord = new Order()
-        cy.clearCookies()
+        ord.clrcookies()
         ord.visit()
         ord.apply_cart_fixed_discount()
         ord.complete_checkout()
@@ -388,7 +388,7 @@ describe('Discounts', function () {
     it('Multiple - Applying Cart Fixed & Catalog percentage discount with Klarna', function () {
 
         const ord = new Order()
-        cy.clearCookies()
+        ord.clrcookies()
         ord.visit()
         ord.apply_cart_fixed_discount()
         ord.complete_checkout()
