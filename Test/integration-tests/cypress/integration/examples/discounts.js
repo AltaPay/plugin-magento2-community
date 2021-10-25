@@ -71,44 +71,44 @@ describe('Discounts', function () {
 //         })
 //     })
 
-    it('Create cart fixed discount', function () {
+//     it('Create cart fixed discount', function () {
 
-        const ord = new Order()
-        ord.clrcookies()
-        ord.admin()
-        ord.create_cart_fixed_discount()
+//         const ord = new Order()
+//         ord.clrcookies()
+//         ord.admin()
+//         ord.create_cart_fixed_discount()
 
-    })
+//     })
 
-    it('Apply cart fixed discount with CC', function () {
+//     it('Apply cart fixed discount with CC', function () {
 
-        const ord = new Order()
-        ord.clrcookies()
-        ord.visit()
-        ord.apply_cart_fixed_discount()
-        ord.complete_checkout()
-        cy.fixture('config').then((admin) => {
-            if (admin.CC_TERMINAL_NAME != "") {
-                cy.get('body').wait(3000).then(($a) => {
-                    if ($a.find("label:contains('" + admin.CC_TERMINAL_NAME + "')").length) {
-                        ord.cc_payment(admin.CC_TERMINAL_NAME)
-                        ord.admin()
-                        ord.capture()
-                        ord.refund()
-                    } else {
-                        cy.log(admin.CC_TERMINAL_NAME + ' not found in page')
-                        this.skip()
-                    }
+//         const ord = new Order()
+//         ord.clrcookies()
+//         ord.visit()
+//         ord.apply_cart_fixed_discount()
+//         ord.complete_checkout()
+//         cy.fixture('config').then((admin) => {
+//             if (admin.CC_TERMINAL_NAME != "") {
+//                 cy.get('body').wait(3000).then(($a) => {
+//                     if ($a.find("label:contains('" + admin.CC_TERMINAL_NAME + "')").length) {
+//                         ord.cc_payment(admin.CC_TERMINAL_NAME)
+//                         ord.admin()
+//                         ord.capture()
+//                         ord.refund()
+//                     } else {
+//                         cy.log(admin.CC_TERMINAL_NAME + ' not found in page')
+//                         this.skip()
+//                     }
 
-                })
+//                 })
 
-            }
-            else {
-                cy.log('CC_TERMINAL_NAME skipped')
-                this.skip()
-            }
-        })
-    })
+//             }
+//             else {
+//                 cy.log('CC_TERMINAL_NAME skipped')
+//                 this.skip()
+//             }
+//         })
+//     })
 
     it('Apply cart fixed discount with Klarna', function () {
 
