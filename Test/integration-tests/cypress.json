@@ -6,7 +6,7 @@
 		"openMode": 2
 	},
 	"env": {
-		"runDiscountsTests": false
+		"runDiscountsTests": true
 	}
 
 }
