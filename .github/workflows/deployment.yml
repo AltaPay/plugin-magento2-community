@@ -114,8 +114,7 @@ jobs:
         dir: Test/integration-tests/cypress/fixtures/
 
     - name: Install Cypress Dependencies 
-      run: npm i 
-      #&& npx browserslist@latest --update-db
+      run: npm i && npx browserslist@latest --update-db
       working-directory: Test/integration-tests
 
     - name: Run Cypress tests 
