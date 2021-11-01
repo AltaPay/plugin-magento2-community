@@ -136,6 +136,7 @@ jobs:
           env: runDiscountsTests=false
           config: video=false
           working-directory: Test/integration-tests
+          quiet: true          
 
       # after the test run completes
       # store screenshots
