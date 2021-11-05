@@ -75,17 +75,17 @@ jobs:
           fi  	
           
    
-    # Run Ansible playbook
-#     - name: Run playbook
-#       uses: dawidd6/action-ansible-playbook@v2
-#       with:
-#         playbook: magento2-4-x.yml
-#         directory: ../plugin-infrastructure/deploy/plugins
-#         key: ${{secrets.SSHKEY}}
-#         options: |
-#           -u ubuntu
-#           -i inventory
-#           --extra-vars "branch_name=${{env.TEST_BRANCH_NAME}} gatewayURL=${{ secrets.GATEWAYURL }} gatewayUser=${{ secrets.GATEWAYUSER }} gatewayPass=${{ secrets.GATEWAYPASS }} mg2_admin_email=${{secrets.CMS_ADMIN_EMAIL}} mg2_admin_user=${{secrets.CMS_ADMIN_USER}} mg2_admin_password=${{secrets.CMS_ADMIN_PASS}}"   
+#    Run Ansible playbook
+    - name: Run playbook
+      uses: dawidd6/action-ansible-playbook@v2
+      with:
+        playbook: magento2-4-x.yml
+        directory: ../plugin-infrastructure/deploy/plugins
+        key: ${{secrets.SSHKEY}}
+        options: |
+          -u ubuntu
+          -i inventory
+          --extra-vars "branch_name=${{env.TEST_BRANCH_NAME}} gatewayURL=${{ secrets.GATEWAYURL }} gatewayUser=${{ secrets.GATEWAYUSER }} gatewayPass=${{ secrets.GATEWAYPASS }} mg2_admin_email=${{secrets.CMS_ADMIN_EMAIL}} mg2_admin_user=${{secrets.CMS_ADMIN_USER}} mg2_admin_password=${{secrets.CMS_ADMIN_PASS}}"   
           
           
     # Export IP for use in cypress tests config
@@ -124,10 +124,10 @@ jobs:
     - name: Install node
       uses: actions/setup-node@v2
       with:
-        node:version: '14'
+        node-version: '14'
     
     - name: Install dependencies
-      run: sudo apt-get install libgtk2.0-0 libgtk-3-0 libgbm-dev libnotify-dev libgconf-2-4 libnss3 libxss1 libasound2 libxtst6 xauth xvfb
+      run: sudo apt-get install -y libgtk2.0-0 libgtk-3-0 libgbm-dev libnotify-dev libgconf-2-4 libnss3 libxss1 libasound2 libxtst6 xauth xvfb
       
     - name: Install Cypress
       run: npm install    
