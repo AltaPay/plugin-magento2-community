@@ -55,9 +55,8 @@ class Ok extends Index implements CsrfAwareActionInterface
         }
         if ($this->checkPost() && $checkAvs == false) {
             $this->generator->handleOkAction($this->getRequest());
-            
+
             return $this->setSuccessPath($orderId);
-            
         } else {
             $this->_eventManager->dispatch('order_cancel_after', ['order' => $this->order]);
             $this->generator->restoreOrderFromRequest($this->getRequest());
