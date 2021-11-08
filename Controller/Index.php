@@ -117,10 +117,15 @@ abstract class Index extends Action
         $this->altapayLogger->addDebugLog('- END', $calledClass);
     }
 
+    /**
+     * @param string $orderId
+     *
+     * @return mixed
+     */
     protected function setSuccessPath($orderId)
     {
         $resultRedirect = $this->redirectFactory->create();
-        if ($orderId && is_numeric($orderId)) {
+        if ($orderId) {
             $order = $this->order->loadByIncrementId($orderId);
             $hashOrderID = hash("sha256", $orderId);
             $order->setAltapayOrderHash($hashOrderID);

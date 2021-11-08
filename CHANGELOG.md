@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 ## [3.2.5]
 
 **Fixes**
-- Fix: Success page rendering issue when placing an order in incognito mode with the MobilePay.
+- Fix: Success page rendering issue when placing an order in incognito mode with the MobilePay
 
 ## [3.2.4]
 
