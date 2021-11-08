@@ -3,43 +3,49 @@ namespace SDM\Altapay\Plugin\Checkout\Controller\Onepage;
 
 use Magento\Sales\Model\Order;
 use Magento\Sales\Model\ResourceModel\Order\CollectionFactory as OrderColl;
-
+use Magento\Checkout\Model\Session;
+use Magento\Framework\Registry;
 
 class Success
 {
     /**
      * @var \Magento\Framework\Registry
      */
-    protected $_coreRegistry;
+    protected $coreRegistry;
+
     /**
      * @var \Magento\Checkout\Model\Session
      */
-    protected $_checkoutSession;
+    protected $checkoutSession;
 
-    /** @var \Magento\Sales\Model\OrderFactory **/
-    protected $_orderFactory;
+    /**
+     * @var \Magento\Sales\Model\OrderFactory
+     */
+    protected $orderFactory;
+
+    /**
+     * @var \Magento\Sales\Model\Order
+     */
+    protected $orderColl;
 
     public static $table = 'sales_order';
 
-
-    protected $orderColl;
-    protected $collectionFactory;
     /**
-     * 
      * Success constructor.
      * @param \Magento\Framework\Registry $coreRegistry
      * @param \Magento\Checkout\Model\Session $checkoutSession
-     * @param \Magento\Sales\Model\OrderFactory $orderFactory
+     * @param \Magento\Sales\Model\Order $orderFactory
+     * @param \Magento\Sales\Model\ResourceModel\Order\CollectionFactory $OrderColl
      */
     public function __construct(
-        \Magento\Framework\Registry $coreRegistry,
-        \Magento\Checkout\Model\Session $checkoutSession,
-        \Magento\Sales\Model\Order $orderFactory,
+        Registry $coreRegistry,
+        Session $checkoutSession,
+        Order $orderFactory,
         OrderColl $orderColl
     ) {
-        $this->_coreRegistry = $coreRegistry;
-        $this->_checkoutSession = $checkoutSession;
-        $this->_orderFactory = $orderFactory;
+        $this->coreRegistry = $coreRegistry;
+        $this->checkoutSession = $checkoutSession;
+        $this->orderFactory = $orderFactory;
         $this->orderColl = $orderColl;
     }
 
@@ -62,13 +68,13 @@ class Success
         foreach ($collectionInfo as $data) {
             $orderId = $data['increment_id'];
             if ($orderId && is_numeric($orderId)) {
-                $order = $this->_orderFactory->loadByIncrementId($orderId);
+                $order = $this->orderFactory->loadByIncrementId($orderId);
                 if ($order && $order->getId() && $order->getAltapayOrderHash() !== null) { 
-                    $this->_checkoutSession->setLastQuoteId($order->getQuoteId());
-                    $this->_checkoutSession->setLastSuccessQuoteId($order->getQuoteId());
-                    $this->_checkoutSession->setLastOrderId($order->getId());
-                    $this->_checkoutSession->setLastRealOrderId($order->getIncrementId());
-                    $this->_checkoutSession->setLastOrderStatus($order->getStatus());
+                    $this->checkoutSession->setLastQuoteId($order->getQuoteId());
+                    $this->checkoutSession->setLastSuccessQuoteId($order->getQuoteId());
+                    $this->checkoutSession->setLastOrderId($order->getId());
+                    $this->checkoutSession->setLastRealOrderId($order->getIncrementId());
+                    $this->checkoutSession->setLastOrderStatus($order->getStatus());
                     $order->setAltapayOrderHash(null);
                     $order->getResource()->save($order);
                 }

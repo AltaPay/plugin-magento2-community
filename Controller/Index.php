@@ -120,8 +120,8 @@ abstract class Index extends Action
     protected function setSuccessPath($orderId)
     {
         $resultRedirect = $this->redirectFactory->create();
-        $order = $this->order->loadByIncrementId($orderId);
         if ($orderId && is_numeric($orderId)) {
+            $order = $this->order->loadByIncrementId($orderId);
             $hashOrderID = hash("sha256", $orderId);
             $order->setAltapayOrderHash($hashOrderID);
             $order->getResource()->save($order);
