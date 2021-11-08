@@ -14,6 +14,9 @@ use SDM\Altapay\Controller\Index;
 use Magento\Framework\App\CsrfAwareActionInterface;
 use Magento\Framework\App\RequestInterface;
 use Magento\Framework\App\Request\InvalidRequestException;
+use Magento\Framework\Encryption\EncryptorInterface;
+use Magento\Framework\Url\EncoderInterface;
+
 
 class Ok extends Index implements CsrfAwareActionInterface
 {
@@ -45,6 +48,7 @@ class Ok extends Index implements CsrfAwareActionInterface
         $this->writeLog();
         $checkAvs = false;
         $post     = $this->getRequest()->getPostValue();
+        $orderId = $post['shop_orderid'];
         if (isset($post['avs_code']) && isset($post['avs_text'])) {
             $checkAvs = $this->generator->avsCheck(
                 $this->getRequest(),
@@ -54,9 +58,8 @@ class Ok extends Index implements CsrfAwareActionInterface
         }
         if ($this->checkPost() && $checkAvs == false) {
             $this->generator->handleOkAction($this->getRequest());
-
-            return $this->_redirect('checkout/onepage/success');
-
+            
+            return $this->setSuccessPath($orderId);
         } else {
             $this->_eventManager->dispatch('order_cancel_after', ['order' => $this->order]);
             $this->generator->restoreOrderFromRequest($this->getRequest());

@@ -18,7 +18,7 @@ use Magento\Sales\Model\Order;
 use SDM\Altapay\Logger\Logger;
 use SDM\Altapay\Model\Generator;
 use SDM\Altapay\Model\Gateway;
-
+use Magento\Framework\Controller\Result\RedirectFactory;
 /**
  * Class Index
  */
@@ -80,7 +80,9 @@ abstract class Index extends Action
         Session $checkoutSession,
         Generator $generator,
         Gateway $gateway,
-        Logger $altapayLogger
+        Logger $altapayLogger,
+        RedirectFactory $redirectFactory
+        
     ) {
         parent::__construct($context);
         $this->order           = $order;
@@ -90,6 +92,7 @@ abstract class Index extends Action
         $this->gateway         = $gateway;
         $this->altapayLogger   = $altapayLogger;
         $this->pageFactory     = $pageFactory;
+        $this->redirectFactory = $redirectFactory;
     }
 
     /**
@@ -112,5 +115,21 @@ abstract class Index extends Action
         }
         $this->altapayLogger->addDebugLog('-- Params --', $this->getRequest()->getParams());
         $this->altapayLogger->addDebugLog('- END', $calledClass);
+    }
+
+    protected function setSuccessPath($orderId)
+    {
+        $resultRedirect = $this->redirectFactory->create();
+        $order = $this->order->loadByIncrementId($orderId);
+        if ($orderId && is_numeric($orderId)) {
+            $hashOrderID = hash("sha256", $orderId);
+            $order->setAltapayOrderHash($hashOrderID);
+            $order->getResource()->save($order);
+            $resultRedirect->setPath('checkout/onepage/success',['order_id' => $hashOrderID]);
+        } else {
+            $resultRedirect->setPath('checkout/onepage/success');
+        }
+
+        return $resultRedirect;
     }
 }

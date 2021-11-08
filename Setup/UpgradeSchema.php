@@ -180,6 +180,22 @@ class UpgradeSchema implements UpgradeSchemaInterface
             )->setComment('Altapay Tokens');
             $setup->getConnection()->createTable($altapayTokenTableName);
         }
+
+        $orderHash = "altapay_order_hash";
+        if (!$setup->getConnection()->tableColumnExists($setup->getTable($orderTable), $orderHash)) {
+            $setup->getConnection()->addColumn(
+                $setup->getTable($orderTable),
+                $orderHash,
+                [
+                    'type'     => Table::TYPE_TEXT,
+                    'length'   => 65536,
+                    'nullable' => true,
+                    'visible'  => false,
+                    'comment'  => 'Alapay Order Hash',
+                ]
+            ); 
+        }
+
         $setup->endSetup();
     }
 }
