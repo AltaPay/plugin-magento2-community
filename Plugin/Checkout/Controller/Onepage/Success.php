@@ -54,7 +54,7 @@ class Success
      */
     public function beforeExecute(\Magento\Checkout\Controller\Onepage\Success $subject)
     {
-        $hash = $subject->getRequest()->getParam('order_id', false);
+        $hash = $subject->getRequest()->getParam('success_token', false);
         if (!$hash) {
             return;
         }
