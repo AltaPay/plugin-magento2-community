@@ -1,6 +1,6 @@
 # AltaPay for Magento2 Community
 
-AltaPay has made it much easier for you as merchant/developer to receive secure payments in your Magento2.3.x web shop.
+AltaPay has made it much easier for you as merchant/developer to receive secure payments in your Magento2 web shop.
 
 [![Latest Stable Version](http://poser.pugx.org/altapay/magento2-community/v)](https://packagist.org/packages/altapay/magento2-community)
 [![Total Downloads](http://poser.pugx.org/altapay/magento2-community/downloads)](https://packagist.org/packages/altapay/magento2-community)

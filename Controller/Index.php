@@ -18,7 +18,9 @@ use Magento\Sales\Model\Order;
 use SDM\Altapay\Logger\Logger;
 use SDM\Altapay\Model\Generator;
 use SDM\Altapay\Model\Gateway;
-
+use Magento\Framework\Controller\Result\RedirectFactory;
+use Magento\Framework\Encryption\EncryptorInterface;
+use Magento\Framework\Math\Random;
 /**
  * Class Index
  */
@@ -80,7 +82,11 @@ abstract class Index extends Action
         Session $checkoutSession,
         Generator $generator,
         Gateway $gateway,
-        Logger $altapayLogger
+        Logger $altapayLogger,
+        EncryptorInterface $encryptor,
+        Random $random,
+        RedirectFactory $redirectFactory
+        
     ) {
         parent::__construct($context);
         $this->order           = $order;
@@ -90,6 +96,9 @@ abstract class Index extends Action
         $this->gateway         = $gateway;
         $this->altapayLogger   = $altapayLogger;
         $this->pageFactory     = $pageFactory;
+        $this->encryptor       = $encryptor;
+        $this->random          = $random;
+        $this->redirectFactory = $redirectFactory;
     }
 
     /**
@@ -112,5 +121,26 @@ abstract class Index extends Action
         }
         $this->altapayLogger->addDebugLog('-- Params --', $this->getRequest()->getParams());
         $this->altapayLogger->addDebugLog('- END', $calledClass);
+    }
+
+    /**
+     * @param string $orderId
+     *
+     * @return mixed
+     */
+    protected function setSuccessPath($orderId)
+    {
+        $resultRedirect = $this->redirectFactory->create();
+        if ($orderId) {
+            $order = $this->order->loadByIncrementId($orderId);
+            $uniqueHash = $this->random->getUniqueHash();
+            $order->setAltapayOrderHash($uniqueHash);
+            $order->getResource()->save($order);
+            $resultRedirect->setPath('checkout/onepage/success',['success_token' => $uniqueHash]);
+        } else {
+            $resultRedirect->setPath('checkout/onepage/success');
+        }
+
+        return $resultRedirect;
     }
 }

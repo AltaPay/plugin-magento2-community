@@ -27,5 +27,7 @@
     <preference for="SDM\Altapay\Api\Data\TransactionInterface" type="SDM\Altapay\Model\Transaction"/>
     <preference for="SDM\Altapay\Api\OrderLoaderInterface" type="SDM\Altapay\Model\OrderLoader"/>
     <preference for="SDM\Altapay\Api\GatewayInterface" type="SDM\Altapay\Model\Gateway" />
-
+    <type name="Magento\Checkout\Controller\Onepage\Success">
+        <plugin name="checkout.success" type="SDM\Altapay\Plugin\Checkout\Controller\Onepage\Success" sortOrder="1"/>
+    </type>
 </config>
