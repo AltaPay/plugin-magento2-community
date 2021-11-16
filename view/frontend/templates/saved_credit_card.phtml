@@ -18,10 +18,10 @@ if ($collection->getSize() > 0) {
             </caption>
             <thead>
             <tr>
-                <th scope="col" class="col card"><?= $block->escapeHtml(__('Card type')); ?></th>
+                <th scope="col" class="col card"><?= $block->escapeHtml(__('Card Type')); ?></th>
                 <th scope="col" class="col card"><?= $block->escapeHtml(__('Masked pan')); ?></th>
                 <th scope="col" class="col expires"><?= $block->escapeHtml(__('Expires')); ?></th>
-                <th scope="col" class="col primary" style="text-align: center;">
+                <th scope="col" class="col primary">
                     <?= $block->escapeHtml(__('Primary')); ?>
                 </th>
                 <th scope="col" class="col delete" style="text-align: right;">
@@ -32,11 +32,11 @@ if ($collection->getSize() > 0) {
             <tbody>
             <?php foreach ($collection as $item): ?>
                 <tr id="token-custom-name-status-<?= $block->escapeHtml($item->getId()); ?>">
-                    <td data-th="CardType" class="col card-type"><?= $block->escapeHtml($item->getCardType()); ?></td>
-                    <td data-th="CardType" class="col card-type"><?= $block->escapeHtml($item->getMaskedPan()); ?></td>
-                    <td data-th="CardExpires"
+                    <td data-th="<?= $block->escapeHtml(__('Card type')); ?>" class="col card-type"><?= $block->escapeHtml($item->getCardType()); ?></td>
+                    <td data-th="<?= $block->escapeHtml(__('Masked pan')); ?>" class="col card-type"><?= $block->escapeHtml($item->getMaskedPan()); ?></td>
+                    <td data-th="<?= $block->escapeHtml(__('Expires')); ?>"
                         class="col card-expiry-date"><?= $block->escapeHtml($item->getExpires()); ?></td>
-                    <td data-th="Date" class="col created_at" align="center">
+                    <td data-th="<?= $block->escapeHtml(__('Primary')); ?>" class="col created_at" >
                             <span class="token-primay">
                                 <input class="token-primay-selection"
                                        type="radio" name="primary-token"
@@ -45,7 +45,7 @@ if ($collection->getSize() > 0) {
                                        <?php if ($item->getPrimary()): ?>checked="checked"<?php endif; ?> />
                             </span>
                     </td>
-                    <td data-th="Actions" class="col actions" align="right">
+                    <td data-th="<?= $block->escapeHtml(__('Action')); ?>" class="col actions" align="right">
                         <button type="button"
                                 class="button token-delete"
                                 data-token-id="<?= $block->escapeHtml($item->getId()); ?>">
