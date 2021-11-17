@@ -4,7 +4,6 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 - Fix: Saved credit cards grid styling for mobile view
 - Fix: Use declarative schema, 'InstallSchema/UpgradeSchema' scripts are obsolete
-- 
 
 ## [3.2.5]
 
