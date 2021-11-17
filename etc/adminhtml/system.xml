@@ -41,7 +41,7 @@
 
                     <field id="productionurl" translate="label comment" type="text" sortOrder="25" showInDefault="1" showInWebsite="1" showInStore="1">
                         <label>Production URL</label>
-                        <comment><![CDATA[Your production url fx (https://YourShopName.altapaysecure.com)]]></comment>
+                        <comment><![CDATA[Your production url e.g (https://YourShopName.altapaysecure.com)]]></comment>
                         <config_path>payment/altapay_config/productionurl</config_path>
                     </field>
 
