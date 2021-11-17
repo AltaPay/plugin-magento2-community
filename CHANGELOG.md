@@ -1,6 +1,9 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [Unreleased]
+- Fix: Saved credit cards grid styling for mobile view
+
 ## [3.2.5]
 
 **Fixes**
