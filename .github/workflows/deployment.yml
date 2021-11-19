@@ -44,7 +44,7 @@ jobs:
 
     # Select a terraofrm workspace
     - name: Terraform workspace
-      run: terraform workspace select mahadmagento24x
+      run: terraform workspace select magento24x
       working-directory: ../plugin-infrastructure/provision/plugins
       
       
