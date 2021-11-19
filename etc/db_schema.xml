@@ -1,4 +1,14 @@
 <?xml version="1.0"?>
+<!--
+/**
+ * Altapay Module for Magento 2.x.
+ *
+ * Copyright © 2018 Altapay. All rights reserved.
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+-->
+
 <schema xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Setup/Declaration/Schema/etc/schema.xsd">
   <table name="sdm_altapay" resource="default" engine="innodb" comment="Altapay transaction data">
     <column xsi:type="int" name="id" padding="10" unsigned="true" nullable="false" identity="true" comment="id"/>
