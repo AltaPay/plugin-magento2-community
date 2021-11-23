@@ -1,0 +1,43 @@
+{
+    "sdm_altapay": {
+        "column": {
+            "id": true,
+            "orderid": true,
+            "transactionid": true,
+            "paymentid": true,
+            "transactiondata": true,
+            "parametersdata": true,
+            "created_at": true
+        },
+        "index": {
+            "SDM_ALTAPAY_ORDERID": true,
+            "SDM_ALTAPAY_TRANSACTIONID": true
+        },
+        "constraint": {
+            "PRIMARY": true
+        }
+    },
+    "sales_order": {
+        "column": {
+            "altapay_payment_form_url": true,
+            "altapay_price_includes_tax": true,
+            "altapay_order_hash": true
+        }
+    },
+    "altapay_token": {
+        "column": {
+            "id": true,
+            "customer_id": true,
+            "token": true,
+            "masked_pan": true,
+            "currency_code": true,
+            "primary": true,
+            "timestamp": true,
+            "expires": true,
+            "card_type": true
+        },
+        "constraint": {
+            "PRIMARY": true
+        }
+    }
+}

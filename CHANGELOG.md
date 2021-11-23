@@ -1,8 +1,13 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
-## [Unreleased]
+## [3.2.6]
+
+**Fixes**
 - Fix: Saved credit cards grid styling for mobile view
+
+**Improvements**
+- Migrate install/upgrade scripts to declarative schema
 
 ## [3.2.5]
 

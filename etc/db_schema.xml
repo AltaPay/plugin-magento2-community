@@ -1,0 +1,50 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Altapay Module for Magento 2.x.
+ *
+ * Copyright © 2018 Altapay. All rights reserved.
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+-->
+
+<schema xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Setup/Declaration/Schema/etc/schema.xsd">
+  <table name="sdm_altapay" resource="default" engine="innodb" comment="Altapay transaction data">
+    <column xsi:type="int" name="id" padding="10" unsigned="true" nullable="false" identity="true" comment="id"/>
+    <column xsi:type="varchar" name="orderid" nullable="true" length="255" comment="Order ID"/>
+    <column xsi:type="varchar" name="transactionid" nullable="true" length="255" comment="Transaction ID"/>
+    <column xsi:type="varchar" name="paymentid" nullable="true" length="255" comment="Payment ID"/>
+    <column xsi:type="text" name="transactiondata" nullable="true" comment="Transaction data"/>
+    <column xsi:type="text" name="parametersdata" nullable="true" comment="Parameters data"/>
+    <column xsi:type="timestamp" name="created_at" on_update="false" nullable="false" default="CURRENT_TIMESTAMP" comment="Created date"/>
+    <constraint xsi:type="primary" referenceId="PRIMARY">
+      <column name="id"/>
+    </constraint>
+    <index referenceId="SDM_ALTAPAY_ORDERID" indexType="btree">
+      <column name="orderid"/>
+    </index>
+    <index referenceId="SDM_ALTAPAY_TRANSACTIONID" indexType="btree">
+      <column name="transactionid"/>
+    </index>
+  </table>
+  <table name="sales_order" resource="default">
+    <column xsi:type="text" name="altapay_payment_form_url" nullable="true" comment="Altapay Payment Form Url"/>
+    <column xsi:type="boolean" name="altapay_price_includes_tax" nullable="true" comment="Whether catalog prices entered from Magento Admin include tax."/>
+    <column xsi:type="text" name="altapay_order_hash" nullable="true" comment="Alapay Order Hash"/>
+  </table>
+  <table name="altapay_token" resource="default" engine="innodb" comment="Altapay Tokens">
+    <column xsi:type="int" name="id" padding="10" unsigned="true" nullable="false" identity="true" comment="Id"/>
+    <column xsi:type="int" name="customer_id" padding="11" unsigned="false" nullable="false" identity="false" comment="Customer Id"/>
+    <column xsi:type="text" name="token" nullable="false" comment="Token"/>
+    <column xsi:type="text" name="masked_pan" nullable="false" comment="Masked Pan"/>
+    <column xsi:type="text" name="currency_code" nullable="false" comment="Currency Code"/>
+    <column xsi:type="boolean" name="primary" nullable="false" comment="Primary Token"/>
+    <column xsi:type="timestamp" name="timestamp" on_update="true" nullable="true" default="CURRENT_TIMESTAMP" comment="Timestamp"/>
+    <column xsi:type="text" name="expires" nullable="false" comment="Card Expiry Date"/>
+    <column xsi:type="text" name="card_type" nullable="false" comment="Card Type"/>
+    <constraint xsi:type="primary" referenceId="PRIMARY">
+      <column name="id"/>
+    </constraint>
+  </table>
+</schema>

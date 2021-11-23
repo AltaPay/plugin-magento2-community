@@ -22,20 +22,20 @@
             <config_path>payment/terminal4/title</config_path>
         </field>
         <field id="terminalname" translate="label comment" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
-            <label>Terminal name</label>
+            <label>Terminal Name</label>
             <comment>Select terminal - Remember to save configuration after you have added your API login and password, to get your terminals</comment>
             <config_path>payment/terminal4/terminalname</config_path>
             <source_model>SDM\Altapay\Model\Config\Source\Terminals</source_model>
             <frontend_class>altapay-terminal-name</frontend_class>
         </field>
         <field id="language" translate="label comment" type="select" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
-            <label>Force language</label>
+            <label>Force Language</label>
             <comment>Force the language of the payment page</comment>
             <source_model>SDM\Altapay\Model\Config\Source\Languages</source_model>
             <config_path>payment/terminal4/language</config_path>
         </field>
         <field id="capture" translate="label comment" type="select" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
-            <label>Auto capture</label>
+            <label>Auto Capture</label>
             <comment>If you only sell download products, which are delivered immediately you can turn this on</comment>
             <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
             <config_path>payment/terminal4/capture</config_path>
@@ -47,7 +47,7 @@
             <source_model>SDM\Altapay\Model\Config\Source\TerminalLogo</source_model>
         </field>
         <field id="showlogoandtitle" translate="label comment" type="select" sortOrder="50" showInDefault="1" showInWebsite="1" showInStore="1">
-            <label>Show both logo and title</label>
+            <label>Show both Logo and Title</label>
             <comment>If you want to show both terminal logo and title</comment>
             <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
             <config_path>payment/terminal4/showlogoandtitle</config_path>
@@ -72,7 +72,7 @@
             <config_path>payment/terminal4/enforceavs</config_path>
         </field>
         <field id="avs_acceptance" translate="label" type="text" sortOrder="90" showInDefault="1" showInWebsite="1" showInStore="1">
-            <label>AVS accepted codes</label>
+            <label>AVS Accepted Codes</label>
             <comment>All codes upercase, comma separated</comment>
             <config_path>payment/terminal4/avs_acceptance</config_path>
         </field>

@@ -14,7 +14,7 @@
         <section id="payment">
 
             <group id="sdm_altapay_config" translate="label comment" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
-                <label>Altapay</label>
+                <label>AltaPay</label>
                 <comment><![CDATA[]]></comment>
                 <attribute type="expanded">1</attribute>
 
@@ -22,7 +22,7 @@
                     <attribute type="expanded">0</attribute>
 
                     <label>API login</label>
-                     <comment><![CDATA[For enabling capture/cancel in backend, you need to provide your API username and password.<br>You can find your Api Keys in your <a href="https://testgateway.altapaysecure.com/merchant.php" title="Mollie Profiles">Altapay Merchnat Account</a>]]></comment>
+                     <comment><![CDATA[For enabling capture/cancel in backend, you need to provide your API username and password.<br>You can find your Api Keys in your <a href="https://testgateway.altapaysecure.com/merchant.php" title="Mollie Profiles">AltaPay Merchnat Account</a>]]></comment>
                     <field id="version" translate="label" type="text" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
                         <label>Version</label>
                         <frontend_model>SDM\Altapay\Block\Adminhtml\Render\Version</frontend_model>
@@ -41,19 +41,19 @@
 
                     <field id="productionurl" translate="label comment" type="text" sortOrder="25" showInDefault="1" showInWebsite="1" showInStore="1">
                         <label>Production URL</label>
-                        <comment><![CDATA[Your production url fx (https://YourShopName.altapaysecure.com)]]></comment>
+                        <comment><![CDATA[Your production url e.g (https://YourShopName.altapaysecure.com)]]></comment>
                         <config_path>payment/altapay_config/productionurl</config_path>
                     </field>
 
                     <field id="api_test_connection" translate="label comment" type="select" sortOrder="30" showInDefault="1" showInWebsite="0" showInStore="0">
-                        <label>Test connection</label>
-                        <comment>Can we connect to Altapay</comment>
+                        <label>Test Connection</label>
+                        <comment>Can we connect to AltaPay</comment>
                         <source_model>SDM\Altapay\Model\Config\Source\Connection</source_model>
                     </field>
 
                     <field id="api_test_auth" translate="label comment" type="select" sortOrder="40" showInDefault="1" showInWebsite="0" showInStore="0">
-                        <label>Test authentication</label>
-                        <comment>Can we authenticate to Altapay - Remember to save after you have typed your API login and password</comment>
+                        <label>Test Authentication</label>
+                        <comment>Can we authenticate to AltaPay - Remember to save after you have typed your API login and password</comment>
                         <source_model>SDM\Altapay\Model\Config\Source\Authentication</source_model>
                     </field>
 
