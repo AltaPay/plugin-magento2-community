@@ -71,7 +71,8 @@ be provided by AltaPay.
     command line
 
     > `composer requires altapay/magento2-community`  
-    > `php bin/magento setup:upgrade`  
+    > `php bin/magento setup:upgrade` 
+    > `php bin/magento setup:di:compile` 
     > `php bin/magento setup:static-content:deploy`
 >
 > _Note: If asked for authentication, use your Public Key as the
