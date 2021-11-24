@@ -51,7 +51,7 @@ Distributed under the MIT License. See [LICENSE](LICENSE) for more information.
 
 ## Documentation
 
-For more details please see [AltaPay docs](https://documentation.altapay.com/)
+For more details please see [AltaPay docs](https://github.com/AltaPay/plugin-magento2-community/wiki/Documentation)
 
 ## Contact
 Feel free to contact our support team (support@altapay.com) if you need any assistance.
