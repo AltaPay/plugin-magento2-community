@@ -153,7 +153,7 @@ here._
 <https://packagist.org/packages/altapay/magento2-payment>
 
 
-## FAQ on the Magento 2 Plugin
+## FAQs
 
 **PHP Warning: Input variables exceeded 1000. To increase the limit change max_input_vars in php.ini.**
 
