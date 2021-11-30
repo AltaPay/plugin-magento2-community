@@ -4,16 +4,13 @@
         'prototype'
     ], function ($) {
 
-        $('#btn_id').click(function () {
+        $('#sync_button').click(function () {
             
             var params = { storeid: "<?php echo $block->getUrlInterfaceData(); ?>"};
             new Ajax.Request('<?php echo $block->getCustomUrl() ?>', {
                 parameters: params,
                 loaderArea: false,
                 asynchronous: true,
-                onCreate: function () {
-                    $('#btn_id_response_message').text('');
-                },
                 onSuccess: function (transport) {
                     if (transport.status > 200) {
                         resultText = transport.statusText;

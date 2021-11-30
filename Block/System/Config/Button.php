@@ -58,7 +58,7 @@ class Button extends Field
             'Magento\Backend\Block\Widget\Button'
         )->setData(
             [
-                'id' => 'btn_id',
+                'id' => 'sync_button',
                 'label' => __('Synchronize Terminals')
             ]
         );
