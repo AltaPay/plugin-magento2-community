@@ -79,8 +79,8 @@ class Button extends Action
         $this->_response         = $response;
         $this->cacheTypeList     = $cacheTypeList;
         $this->storeManager      = $storeManager;
-        $this->_state = $state;
-        $this->_resource = $resource;
+        $this->_state            = $state;
+        $this->_resource         = $resource;
         parent::__construct($context);
     }
 
@@ -89,9 +89,9 @@ class Button extends Action
      */
     public function execute()
     {
-        
-        $currentStoreID = (int) $this->getRequest()->getParam('storeid');
-        if($currentStoreID == 0) {
+
+        $currentStoreID = (int)$this->getRequest()->getParam('storeid');
+        if ($currentStoreID == 0) {
             $scopeCode = ScopeConfigInterface::SCOPE_TYPE_DEFAULT;
         } else {
             $scopeCode = ScopeInterface::SCOPE_STORES;
@@ -103,9 +103,9 @@ class Button extends Action
         );
 
         try {
-            $call      = new Terminals($this->systemConfig->getAuth());
+            $call = new Terminals($this->systemConfig->getAuth());
             /** @var TerminalsResponse $response */
-            $response = $call->call();
+            $response     = $call->call();
             $terminalList = $this->getTerminal($response, $currentCurrency);
 
             if (count($terminalList) <= 5) {
@@ -134,27 +134,30 @@ class Button extends Action
     }
 
     /**
-     * @param $response array
+     * @param $response        array
      * @param $currentCurrency string
      *
      * @return array
      */
-    public function getTerminal($response, $currentCurrency) {
+    public function getTerminal($response, $currentCurrency)
+    {
         $terminals = [];
         foreach ($response->Terminals as $terminal) {
             if ($terminal->Country == $currentCurrency) {
                 $terminals[] = $terminal->Title;
             }
         }
+
         return $terminals;
     }
 
     /**
-     * @param $terminals array
+     * @param $terminals      array
      * @param $currentStoreID int
-     * @param $scopeCode string
+     * @param $scopeCode      string
      */
-    public function saveTerminalConfig($terminals, $currentStoreID, $scopeCode) {
+    public function saveTerminalConfig($terminals, $currentStoreID, $scopeCode)
+    {
         $i = 1;
         foreach ($terminals as $terminal) {
             $this->resourceConfig->saveConfig(
@@ -247,22 +250,24 @@ class Button extends Action
 
     /**
      * @param $terminalList array
-     * @param $scopeCode string
+     * @param $scopeCode    string
      *
      * @return bool
      */
     public function checkConfigAlreadyExist($terminalList, $scopeCode)
     {
-        $i = 1;
+        $i                       = 1;
         $checkTerminalConfigured = false;
         foreach ($terminalList as $terminal) {
-        $connection = $this->_resource->getConnection();
-        $configExist = $connection->fetchAll('SELECT * from core_config_data WHERE path = "payment/terminal' . $i . '/active" AND scope = "'.$scopeCode.'"');   
-            if($configExist) {
+            $connection  = $this->_resource->getConnection();
+            $configExist = $connection->fetchAll('SELECT * from core_config_data WHERE path = "payment/terminal' . $i
+                                                 . '/active" AND scope = "' . $scopeCode . '"');
+            if ($configExist) {
                 $checkTerminalConfigured = true;
             }
             $i++;
         }
+
         return $checkTerminalConfigured;
     }
 }

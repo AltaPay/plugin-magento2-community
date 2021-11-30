@@ -22,7 +22,9 @@
                         resultText = response.message
                     }
                     alert(resultText);
-                    location.reload();
+                    if(resultText === 'Terminals successfully configured!'){
+                        location.reload();
+                    }
                 }
             });
         });
