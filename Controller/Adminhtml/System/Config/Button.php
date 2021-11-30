@@ -11,8 +11,12 @@ namespace SDM\Altapay\Controller\Adminhtml\System\Config;
 
 use Magento\Backend\App\Action;
 use Magento\Backend\App\Action\Context;
+use Magento\Framework\App\ResourceConnection;
+use Magento\Framework\App\State;
 use Magento\Framework\Controller\Result\Json;
 use Magento\Framework\Controller\Result\JsonFactory;
+use Magento\Store\Model\StoreManagerInterface;
+use SDM\Altapay\Api\Others\Terminals;
 use SDM\Altapay\Model\SystemConfig;
 use Magento\Config\Model\ResourceModel\Config;
 use Magento\Framework\App\Config\ScopeConfigInterface;
@@ -20,6 +24,7 @@ use Magento\Store\Model\ScopeInterface;
 use Magento\Framework\App\Response\Http as ResponseHttp;
 use Magento\Framework\App\Cache\TypeListInterface;
 use Magento\Framework\App\Cache\Type\Config as cacheConfig;
+use Magento\Framework\App\Area;
 
 class Button extends Action
 {
@@ -38,15 +43,22 @@ class Button extends Action
      * @var Config
      */
     private $resourceConfig;
+    /**
+     * @var ScopeConfigInterface
+     */
+    private $storeConfig;
 
     /**
-     * @param Context              $context
-     * @param SystemConfig         $systemConfig
-     * @param Config               $resourceConfig
-     * @param ScopeConfigInterface $storeConfig
-     * @param ResponseHttp         $response
-     * @param TypeListInterface    $cacheTypeList
-     * @param JsonFactory          $resultJsonFactory
+     * @param Context               $context
+     * @param SystemConfig          $systemConfig
+     * @param Config                $resourceConfig
+     * @param ScopeConfigInterface  $storeConfig
+     * @param ResponseHttp          $response
+     * @param TypeListInterface     $cacheTypeList
+     * @param JsonFactory           $resultJsonFactory
+     * @param State                 $state
+     * @param StoreManagerInterface $storeManager
+     * @param ResourceConnection    $resource
      */
     public function __construct(
         Context $context,
@@ -55,7 +67,10 @@ class Button extends Action
         ScopeConfigInterface $storeConfig,
         ResponseHttp $response,
         TypeListInterface $cacheTypeList,
-        JsonFactory $resultJsonFactory
+        JsonFactory $resultJsonFactory,
+        State $state,
+        StoreManagerInterface $storeManager,
+        ResourceConnection $resource
     ) {
         $this->resultJsonFactory = $resultJsonFactory;
         $this->systemConfig      = $systemConfig;
@@ -63,6 +78,9 @@ class Button extends Action
         $this->storeConfig       = $storeConfig;
         $this->_response         = $response;
         $this->cacheTypeList     = $cacheTypeList;
+        $this->storeManager      = $storeManager;
+        $this->_state = $state;
+        $this->_resource = $resource;
         parent::__construct($context);
     }
 
@@ -71,117 +89,36 @@ class Button extends Action
      */
     public function execute()
     {
+        
+        $currentStoreID = (int) $this->getRequest()->getParam('storeid');
+        if($currentStoreID == 0) {
+            $scopeCode = ScopeConfigInterface::SCOPE_TYPE_DEFAULT;
+        } else {
+            $scopeCode = ScopeInterface::SCOPE_STORES;
+        }
         $currentCurrency = $this->storeConfig->getValue(
             self::COUNTRY_CODE_PATH,
-            ScopeInterface::SCOPE_STORE,
-            $this->getRequest()->getParam('storeid')
+            $scopeCode,
+            $currentStoreID
         );
+
         try {
-            $terminals = [];
-            $call      = new \SDM\Altapay\Api\Others\Terminals($this->systemConfig->getAuth());
+            $call      = new Terminals($this->systemConfig->getAuth());
             /** @var TerminalsResponse $response */
             $response = $call->call();
-            foreach ($response->Terminals as $terminal) {
-                if ($terminal->Country == $currentCurrency) {
-                    $terminals[] = $terminal->Title;
+            $terminalList = $this->getTerminal($response, $currentCurrency);
+
+            if (count($terminalList) <= 5) {
+
+                if ($this->checkConfigAlreadyExist($terminalList, $scopeCode)) {
+                    $message = 'Terminals already configured, please check the dropdown manually';
+                } else {
+                    $this->saveTerminalConfig($terminalList, $currentStoreID, $scopeCode);
+                    $this->cacheTypeList->cleanType(cacheConfig::TYPE_IDENTIFIER);
+                    $message = 'Terminals successfully configured!';
                 }
-            }
-            if (count($terminals) <= 5) {
-                $i = 1;
-                foreach ($terminals as $terminal) {
-                    $this->resourceConfig->saveConfig(
-                        'payment/terminal' . $i . '/active',
-                        1,
-                        'default',
-                        0
-                    );
-
-                    $this->resourceConfig->saveConfig(
-                        'payment/terminal' . $i . '/title',
-                        $terminal,
-                        'default',
-                        0
-                    );
-
-                    $this->resourceConfig->saveConfig(
-                        'payment/terminal' . $i . '/language',
-                        null,
-                        'default',
-                        0
-                    );
-
-                    $this->resourceConfig->saveConfig(
-                        'payment/terminal' . $i . '/capture',
-                        0,
-                        'default',
-                        0
-                    );
-
-                    $this->resourceConfig->saveConfig(
-                        'payment/terminal' . $i . '/terminallogo',
-                        '',
-                        'default',
-                        0
-                    );
-
-                    $this->resourceConfig->saveConfig(
-                        'payment/terminal' . $i . '/showlogoandtitle',
-                        0,
-                        'default',
-                        0
-                    );
-
-                    $this->resourceConfig->saveConfig(
-                        'payment/terminal' . $i . '/savecardtoken',
-                        0,
-                        'default',
-                        0
-                    );
-
-                    $this->resourceConfig->saveConfig(
-                        'payment/terminal' . $i . '/avscontrol',
-                        0,
-                        'default',
-                        0
-                    );
-
-                    $this->resourceConfig->saveConfig(
-                        'payment/terminal' . $i . '/enforceavs',
-                        0,
-                        'default',
-                        0
-                    );
-
-                    $this->resourceConfig->saveConfig(
-                        'payment/terminal' . $i . '/avs_acceptance',
-                        0,
-                        'default',
-                        0
-                    );
-
-                    $this->resourceConfig->saveConfig(
-                        'payment/terminal' . $i . '/sort_order',
-                        0,
-                        'default',
-                        0
-                    );
-
-                    $this->resourceConfig->saveConfig(
-                        'payment/terminal' . $i . '/terminalname',
-                        $terminal,
-                        'default',
-                        0
-                    );
-
-                    $i++;
-                }
-                // Clean cache
-                $this->cacheTypeList->cleanType(cacheConfig::TYPE_IDENTIFIER);
-
-                return $this->_response;
             } else {
-                $message
-                    = 'We could not match terminals to this store. Too many terminals exists, please check the dropdown manually';
+                $message = 'We could not match terminals to this store. Too many terminals exists, please check the dropdown manually';
             }
 
         } catch (ClientException $e) {
@@ -196,4 +133,136 @@ class Button extends Action
         return $result->setData(['message' => $message]);
     }
 
+    /**
+     * @param $response array
+     * @param $currentCurrency string
+     *
+     * @return array
+     */
+    public function getTerminal($response, $currentCurrency) {
+        $terminals = [];
+        foreach ($response->Terminals as $terminal) {
+            if ($terminal->Country == $currentCurrency) {
+                $terminals[] = $terminal->Title;
+            }
+        }
+        return $terminals;
+    }
+
+    /**
+     * @param $terminals array
+     * @param $currentStoreID int
+     * @param $scopeCode string
+     */
+    public function saveTerminalConfig($terminals, $currentStoreID, $scopeCode) {
+        $i = 1;
+        foreach ($terminals as $terminal) {
+            $this->resourceConfig->saveConfig(
+                'payment/terminal' . $i . '/active',
+                1,
+                $scopeCode,
+                $currentStoreID
+            );
+
+            $this->resourceConfig->saveConfig(
+                'payment/terminal' . $i . '/title',
+                $terminal,
+                $scopeCode,
+                $currentStoreID
+            );
+
+            $this->resourceConfig->saveConfig(
+                'payment/terminal' . $i . '/language',
+                null,
+                $scopeCode,
+                $currentStoreID
+            );
+
+            $this->resourceConfig->saveConfig(
+                'payment/terminal' . $i . '/capture',
+                0,
+                $scopeCode,
+                $currentStoreID
+            );
+
+            $this->resourceConfig->saveConfig(
+                'payment/terminal' . $i . '/terminallogo',
+                '',
+                $scopeCode,
+                $currentStoreID
+            );
+
+            $this->resourceConfig->saveConfig(
+                'payment/terminal' . $i . '/showlogoandtitle',
+                0,
+                $scopeCode,
+                $currentStoreID
+            );
+
+            $this->resourceConfig->saveConfig(
+                'payment/terminal' . $i . '/savecardtoken',
+                0,
+                $scopeCode,
+                $currentStoreID
+            );
+
+            $this->resourceConfig->saveConfig(
+                'payment/terminal' . $i . '/avscontrol',
+                0,
+                $scopeCode,
+                $currentStoreID
+            );
+
+            $this->resourceConfig->saveConfig(
+                'payment/terminal' . $i . '/enforceavs',
+                0,
+                $scopeCode,
+                $currentStoreID
+            );
+
+            $this->resourceConfig->saveConfig(
+                'payment/terminal' . $i . '/avs_acceptance',
+                0,
+                $scopeCode,
+                $currentStoreID
+            );
+
+            $this->resourceConfig->saveConfig(
+                'payment/terminal' . $i . '/sort_order',
+                0,
+                $scopeCode,
+                $currentStoreID
+            );
+
+            $this->resourceConfig->saveConfig(
+                'payment/terminal' . $i . '/terminalname',
+                $terminal,
+                $scopeCode,
+                $currentStoreID
+            );
+
+            $i++;
+        }
+    }
+
+    /**
+     * @param $terminalList array
+     * @param $scopeCode string
+     *
+     * @return bool
+     */
+    public function checkConfigAlreadyExist($terminalList, $scopeCode)
+    {
+        $i = 1;
+        $checkTerminalConfigured = false;
+        foreach ($terminalList as $terminal) {
+        $connection = $this->_resource->getConnection();
+        $configExist = $connection->fetchAll('SELECT * from core_config_data WHERE path = "payment/terminal' . $i . '/active" AND scope = "'.$scopeCode.'"');   
+            if($configExist) {
+                $checkTerminalConfigured = true;
+            }
+            $i++;
+        }
+        return $checkTerminalConfigured;
+    }
 }

@@ -105,7 +105,6 @@
                     <comment><![CDATA[]]></comment>
                     <field id="sync_terminal" translate="label" type="button" sortOrder="7" showInDefault="1" showInWebsite="1" showInStore="1">
                         <label>Synchronize payment methods</label>
-                        <comment>Please refresh the page after clicking on the sync button</comment>
                         <frontend_model>SDM\Altapay\Block\System\Config\Button</frontend_model>
                     </field>
                 </group>  

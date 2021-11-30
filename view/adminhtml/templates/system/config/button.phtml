@@ -5,6 +5,7 @@
     ], function ($) {
 
         $('#btn_id').click(function () {
+            
             var params = { storeid: "<?php echo $block->getUrlInterfaceData(); ?>"};
             new Ajax.Request('<?php echo $block->getCustomUrl() ?>', {
                 parameters: params,
@@ -14,22 +15,17 @@
                     $('#btn_id_response_message').text('');
                 },
                 onSuccess: function (transport) {
-                    var resultText = '';
                     if (transport.status > 200) {
                         resultText = transport.statusText;
                     } else {
                         var response = JSON.parse(transport.responseText);
                         resultText = response.message
                     }
-                    $('#btn_id_response_message').text(resultText);
-
+                    alert(resultText);
+                    location.reload();
                 }
             });
         });
     });
 </script>
-
 <?= $block->getButtonHtml(); ?>
-<div style="color: red; padding: 10px 0px 0px;">
-    <span id="btn_id_response_message"></span>
-</div>
