@@ -5,8 +5,8 @@
     ], function ($) {
 
         $('#sync_button').click(function () {
-            
-            var params = { storeid: "<?php echo $block->getUrlInterfaceData(); ?>"};
+
+            var params = {storeid: "<?php echo $block->getUrlInterfaceData(); ?>"};
             new Ajax.Request('<?php echo $block->getCustomUrl() ?>', {
                 parameters: params,
                 loaderArea: false,
@@ -19,7 +19,7 @@
                         resultText = response.message
                     }
                     alert(resultText);
-                    if(resultText === 'Terminals successfully configured!'){
+                    if (resultText === 'Terminals successfully configured!') {
                         location.reload();
                     }
                 }
