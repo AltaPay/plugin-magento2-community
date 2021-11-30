@@ -5,7 +5,7 @@
     ], function ($) {
 
         $('#btn_id').click(function () {
-            var params = { storeid: "<?php echo $block->getUrlInterfaceData(); ?>", field2 : "hello2"};
+            var params = { storeid: "<?php echo $block->getUrlInterfaceData(); ?>"};
             new Ajax.Request('<?php echo $block->getCustomUrl() ?>', {
                 parameters: params,
                 loaderArea: false,
@@ -21,7 +21,6 @@
                         var response = JSON.parse(transport.responseText);
                         resultText = response.message
                     }
-                        location.reload();
                     $('#btn_id_response_message').text(resultText);
 
                 }
@@ -30,8 +29,7 @@
     });
 </script>
 
-<?php 
-echo $block->getButtonHtml(); ?>
-<div>
+<?= $block->getButtonHtml(); ?>
+<div style="color: red; padding: 10px 0px 0px;">
     <span id="btn_id_response_message"></span>
 </div>
