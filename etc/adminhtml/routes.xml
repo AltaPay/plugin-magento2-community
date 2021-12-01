@@ -1,10 +1,14 @@
 <?xml version="1.0"?>
 <!--
 /**
- * Copyright © 2016 MageWorx. All rights reserved.
- * See LICENSE.txt for license details.
+ * Altapay Module for Magento 2.x.
+ *
+ * Copyright © 2018 Altapay. All rights reserved.
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
  */
- -->
+-->
+
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:App/etc/routes.xsd">
     <router id="admin">
         <route id="sdmaltapay" frontName="sdmaltapay">
