@@ -33,16 +33,21 @@ class Button extends Action
      */
     const COUNTRY_CODE_PATH = 'general/country/default';
 
+    /**
+     * @var JsonFactory
+     */
     protected $resultJsonFactory;
 
     /**
      * @var SystemConfig
      */
     private $systemConfig;
+
     /**
      * @var Config
      */
     private $resourceConfig;
+
     /**
      * @var ScopeConfigInterface
      */
@@ -110,7 +115,7 @@ class Button extends Action
 
             if (count($terminalList) <= 5) {
 
-                if ($this->checkConfigAlreadyExist($terminalList, $scopeCode)) {
+                if ($this->checkConfigAlreadyExist($terminalList, $scopeCode, $currentStoreID)) {
                     $message = 'Terminals already configured, please check the dropdown manually';
                 } else {
                     $this->saveTerminalConfig($terminalList, $currentStoreID, $scopeCode);
@@ -254,14 +259,16 @@ class Button extends Action
      *
      * @return bool
      */
-    public function checkConfigAlreadyExist($terminalList, $scopeCode)
+    public function checkConfigAlreadyExist($terminalList, $scopeCode, $scopeID)
     {
         $i                       = 1;
         $checkTerminalConfigured = false;
         foreach ($terminalList as $terminal) {
             $connection  = $this->_resource->getConnection();
             $configExist = $connection->fetchAll('SELECT * from core_config_data WHERE path = "payment/terminal' . $i
-                                                 . '/active" AND scope = "' . $scopeCode . '"');
+                                                 . '/active" AND scope = "' . $scopeCode . '" AND scope_id ='
+                                                 . $scopeID);
+
             if ($configExist) {
                 $checkTerminalConfigured = true;
             }
