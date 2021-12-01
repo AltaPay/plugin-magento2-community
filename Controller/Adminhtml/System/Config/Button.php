@@ -116,14 +116,14 @@ class Button extends Action
             if (count($terminalList) <= 5) {
 
                 if ($this->checkConfigAlreadyExist($terminalList, $scopeCode, $currentStoreID)) {
-                    $message = __('Terminals already configured, please check the dropdown manually');
+                    $message = __('Terminals are already configured, please check the dropdown manually.');
                 } else {
                     $this->saveTerminalConfig($terminalList, $currentStoreID, $scopeCode);
                     $this->cacheTypeList->cleanType(cacheConfig::TYPE_IDENTIFIER);
                     $message = __('Terminals successfully configured!');
                 }
             } else {
-                $message = __('We could not match terminals to this store. Too many terminals exists, please check the dropdown manually');
+                $message = __('We could not match terminals to this store. Too many terminals exist, please check the dropdown manually.');
             }
 
         } catch (ClientException $e) {
