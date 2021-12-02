@@ -168,3 +168,26 @@ For orders that contain too many products, this PHP warning may be issued. You w
 
 **Parameters: description/unitPrice/quantity are required for each orderline, but was not set for line: xxxx**
 > The same problem as above. The request is being truncated because the number of variables are exceeding the max_input_vars limit.
+
+
+## Providing error logs to support team
+
+You are always welcome to contact AltaPay support (support@altapay.com) if you are experiencing difficulties.
+
+It is recommended to provide as much information as possible to support team.
+
+**You can find the logs from the below path:**
+
+**For CMS logs** You can find it on **<install_directory>/var/log/debug.log**
+
+**For Plugin logs** You can find it on **<install_directory>/var/log/altapay.log**
+    
+**For Exception logs** You can find it on **<install_directory>/var/log/exception.log**
+
+**Web server error logs**
+
+**For Apache server** You can find it on **/var/log/apache2/error.log**
+
+**For Nginx** it would be **/var/log/nginx/error.log**
+
+**_Note: Your path may vary from the mentioned above._**
