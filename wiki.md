@@ -125,9 +125,9 @@ Methods
 
 ![order_status_configuration](docs/order_status_configuration.png)
 
-## Syncronize terminal
+## Synchronize terminal
 
-To sync the terminal with the payment gateway, click on the synch terminal button. This will fetch the latest terminal from the gateway and will automatically configure  based on the country which is set in Stores \> General \> General
+To synchronize the terminals with the gateway, click on the **Synchronize Terminals** button. This will fetch the latest terminals from the gateway and will automatically configure based on the store country.
 
 ![terminal_sync](docs/terminal_sync.jpg)
 
