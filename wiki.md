@@ -148,7 +148,7 @@ To configure terminals automatically, click on the Sync terminal button and this
 
 6.  Save changes by clicking 'Save Config'
 
-![gateway_terminal_configuration](https://github.com/AltaPay/plugin-magento2-community/blob/main/docs/gateway_terminal_configuration.png)
+![gateway_terminal_configuration](https://github.com/AltaPay/plugin-magento2-community/blob/update-documentation-link/docs/gateway_terminal_configuration.png)
 
 
 # Supported versions
