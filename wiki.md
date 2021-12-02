@@ -129,7 +129,7 @@ Methods
 
 To configure terminals automatically, click on the Sync terminal button and this will configure the terminal based on the country which is set in Stores \> General \> General
 
-![terminal_sync](https://github.com/AltaPay/plugin-magento2-community/blob/main/docs/terminal_sync.png)
+![terminal_sync](https://github.com/AltaPay/plugin-magento2-community/blob/update-documentation-link/docs/terminal_sync.jpg)
 
 ## Configure terminals - (Manually)
 
