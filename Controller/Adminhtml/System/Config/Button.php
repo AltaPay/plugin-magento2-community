@@ -286,6 +286,7 @@ class Button extends Action
 
             if ($connection->fetchOne($select, $bind)) {
                 $terminalConfigured = true;
+                break;
             }
             $i++;
         }
