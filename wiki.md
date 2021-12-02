@@ -178,11 +178,11 @@ It is recommended to provide as much information as possible to support team.
 
 **You can find the logs from the below path:**
 
-**For CMS logs** You can find it on **<install_directory>/var/log/debug.log**
-
-**For Plugin logs** You can find it on **<install_directory>/var/log/altapay.log**
+**Debug logs:** ```<install_directory>/var/log/debug.log```
     
-**For Exception logs** You can find it on **<install_directory>/var/log/exception.log**
+**Exception logs:** ```<install_directory>/var/log/exception.log```
+
+**AltaPay plugin logs:** ```<install_directory>/var/log/altapay.log```
 
 **Web server error logs**
 
