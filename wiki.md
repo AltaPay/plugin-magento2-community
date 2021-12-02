@@ -4,8 +4,6 @@ AltaPay, headquartered in Denmark, is an internationally focused fintech company
 
 AltaPay’s platform automizes, simplifies, and protects the transaction flow for shop owners and global retail and e-commerce companies, supporting and integrating smoothly into the major ERP systems. AltaPay performs as a Payment Service Provider operating under The Payment Card Industry Data Security Standard (PCI DSS).
 
-
-
 # Magento2 Payment plugin installation guide
 
 
@@ -27,6 +25,8 @@ We highly recommend gathering all the below information, before starting the ins
 [Configure terminals](#configure-terminals)
 
 [Supported versions](#supported-versions)
+
+[Troubleshooting](#troubleshooting)
 
 # Prerequisites
 
@@ -58,28 +58,33 @@ be provided by AltaPay.
 -   Search for "AltaPay Payment Gateway"
 
 -   Download extension from Marketplace and place inside your project
-    > `root/app/code`
+
+     `root/app/code`
 
 -   In Magento root directory run the following commands using the command line
-    > `php bin/magento setup:upgrade`
 
-    > `php bin/magento setup:static-content:deploy`
+     `php bin/magento setup:upgrade`
+
+     `php bin/magento setup:static-content:deploy`
 
 ## Install via composer (Recommended)
 
 -   In Magento root directory run the following commands using the
     command line
 
-    > `composer requires altapay/magento2-community`  
-    > `php bin/magento setup:upgrade` 
-    > `php bin/magento setup:di:compile` 
-    > `php bin/magento setup:static-content:deploy`
+     `composer requires altapay/magento2-community`  
+
+     `php bin/magento setup:upgrade` 
+
+     `php bin/magento setup:di:compile` 
+
+     `php bin/magento setup:static-content:deploy`
 >
 > _Note: If asked for authentication, use your Public Key as the
 > username, and the Private Key as the password. This information can be
 > found in the Secure Keys section of your Magento account:_
 
-![marketplace_account](docs/marketplace_account.png)
+![marketplace_account](https://github.com/AltaPay/plugin-magento2-community/blob/main/docs/marketplace_account.png)
 
 ## Additional Steps
 
@@ -103,7 +108,7 @@ payment methods and configuring payments.
 
 3.  Complete the 'API Login', 'API Password' and 'Production URL' fields with the gateway information for your environment (provided by AltaPay)
 
-![gateway_configuration](docs/gateway_configuration.jpg)
+![gateway_configuration](https://github.com/AltaPay/plugin-magento2-community/blob/main/docs/gateway_configuration.jpg)
 
 4.  Click: 'Save Config' button
 
@@ -113,14 +118,12 @@ payment methods and configuring payments.
 >
 > Once the API details are validated the terminals will be appeared in
 > the terminal's dropdown in each terminal.
-
 ## Configure order status
 
 Navigate to: Admin \> Stores \> Configuration \> Sales (Tab) \> Payment
 Methods
 
-![order_status_configuration](docs/order_status_configuration.png)
-
+![order_status_configuration](https://github.com/AltaPay/plugin-magento2-community/blob/main/docs/order_status_configuration.png)
 
 ## Configure terminals
 
@@ -139,10 +142,10 @@ Methods
 
 6.  Save changes by clicking 'Save Config'
 
-![gateway_terminal_configuration](docs/gateway_terminal_configuration.png)
+![gateway_terminal_configuration](https://github.com/AltaPay/plugin-magento2-community/blob/main/docs/gateway_terminal_configuration.png)
 
 
-## Supported versions
+# Supported versions
 
 | 7.4.0         | Magento 2.4 |
 |---------------|-------------|
@@ -153,7 +156,7 @@ here._
 <https://packagist.org/packages/altapay/magento2-payment>
 
 
-## FAQs
+# Troubleshooting
 
 **PHP Warning: Input variables exceeded 1000. To increase the limit change max_input_vars in php.ini.**
 
@@ -164,9 +167,4 @@ For orders that contain too many products, this PHP warning may be issued. You w
 - Restart your server.
 
 **Parameters: description/unitPrice/quantity are required for each orderline, but was not set for line: xxxx**
-
-For orders that contain too many products, this PHP warning may be issued. You will need to:
-
-- Open your php.ini file
-- Edit the max_input_vars variable. This specifies the maximum number of variables that can be sent in a request. The default is 1000. Increase it to, say, 3000.
-- Restart your server.
+> The same problem as above. The request is being truncated because the number of variables are exceeding the max_input_vars limit.
