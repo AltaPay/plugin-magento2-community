@@ -125,7 +125,13 @@ Methods
 
 ![order_status_configuration](https://github.com/AltaPay/plugin-magento2-community/blob/main/docs/order_status_configuration.png)
 
-## Configure terminals
+## Confiugure terminal - (Automatically)
+
+To configure terminals automatically, click on the Sync terminal button and this will configure the terminal based on the country which is set in Stores \> General \> General
+
+![terminal_sync](https://github.com/AltaPay/plugin-magento2-community/blob/main/docs/terminal_sync.png)
+
+## Configure terminals - (Manually)
 
 1.  Navigate to: Admin \> Stores \> Configuration \> Sales (Tab) \>
     Payment Methods
