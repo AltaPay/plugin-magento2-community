@@ -261,20 +261,35 @@ class Button extends Action
      */
     public function checkConfigAlreadyExist($terminalList, $scopeCode, $scopeID)
     {
-        $i                       = 1;
-        $checkTerminalConfigured = false;
+        $i                  = 1;
+        $terminalConfigured = false;
+        $tableName          = $this->_resource->getTableName('core_config_data');
         foreach ($terminalList as $terminal) {
-            $connection  = $this->_resource->getConnection();
-            $configExist = $connection->fetchAll('SELECT * from core_config_data WHERE path = "payment/terminal' . $i
-                                                 . '/active" AND scope = "' . $scopeCode . '" AND scope_id ='
-                                                 . $scopeID);
+            //Initiate Connection
+            $connection = $this->_resource->getConnection();
+            $path       = 'payment/terminal' . $i . '/active';
+            $scope      = $scopeCode;
+            $scopeId    = $scopeID;
+            $select     = $connection->select()
+                                     ->from(
+                                        ['c' => $tableName],
+                                        ['config_id']
+                                     )
+                                     ->where(
+                                        "c.path = :path"
+                                     )->where(
+                                        "c.scope = :scope"
+                                    )->where(
+                                        "c.scope_id = :scope_id"
+                                    );
+            $bind       = ['path' => $path, 'scope' => $scope, 'scope_id' => $scopeId];
 
-            if ($configExist) {
-                $checkTerminalConfigured = true;
+            if ($connection->fetchOne($select, $bind)) {
+                $terminalConfigured = true;
             }
             $i++;
         }
 
-        return $checkTerminalConfigured;
+        return $terminalConfigured;
     }
 }
