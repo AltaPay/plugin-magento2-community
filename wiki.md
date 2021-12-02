@@ -108,7 +108,7 @@ payment methods and configuring payments.
 
 3.  Complete the 'API Login', 'API Password' and 'Production URL' fields with the gateway information for your environment (provided by AltaPay)
 
-![gateway_configuration](https://github.com/AltaPay/plugin-magento2-community/blob/main/docs/gateway_configuration.jpg)
+![gateway_configuration](https://github.com/AltaPay/plugin-magento2-community/blob/update-documentation-link/docs/gateway_configuration.jpg)
 
 4.  Click: 'Save Config' button
 
