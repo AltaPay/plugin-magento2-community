@@ -84,7 +84,7 @@ be provided by AltaPay.
 > username, and the Private Key as the password. This information can be
 > found in the Secure Keys section of your Magento account:_
 
-![marketplace_account](https://github.com/AltaPay/plugin-magento2-community/blob/main/docs/marketplace_account.png)
+![marketplace_account](docs/marketplace_account.png)
 
 ## Additional Steps
 
@@ -108,7 +108,7 @@ payment methods and configuring payments.
 
 3.  Complete the 'API Login', 'API Password' and 'Production URL' fields with the gateway information for your environment (provided by AltaPay)
 
-![gateway_configuration](https://github.com/AltaPay/plugin-magento2-community/blob/update-documentation-link/docs/gateway_configuration.jpg)
+![gateway_configuration](docs/gateway_configuration.jpg)
 
 4.  Click: 'Save Config' button
 
@@ -123,15 +123,15 @@ payment methods and configuring payments.
 Navigate to: Admin \> Stores \> Configuration \> Sales (Tab) \> Payment
 Methods
 
-![order_status_configuration](https://github.com/AltaPay/plugin-magento2-community/blob/main/docs/order_status_configuration.png)
+![order_status_configuration](docs/order_status_configuration.png)
 
-## Confiugure terminal - (Automatically)
+## Syncronize terminal
 
-To configure terminals automatically, click on the Sync terminal button and this will configure the terminal based on the country which is set in Stores \> General \> General
+To sync the terminal with the payment gateway, click on the synch terminal button. This will fetch the latest terminal from the gateway and will automatically configure  based on the country which is set in Stores \> General \> General
 
-![terminal_sync](https://github.com/AltaPay/plugin-magento2-community/blob/update-documentation-link/docs/terminal_sync.jpg)
+![terminal_sync](docs/terminal_sync.jpg)
 
-## Configure terminals - (Manually)
+## Configure terminals
 
 1.  Navigate to: Admin \> Stores \> Configuration \> Sales (Tab) \>
     Payment Methods
@@ -148,7 +148,7 @@ To configure terminals automatically, click on the Sync terminal button and this
 
 6.  Save changes by clicking 'Save Config'
 
-![gateway_terminal_configuration](https://github.com/AltaPay/plugin-magento2-community/blob/update-documentation-link/docs/gateway_terminal_configuration.png)
+![gateway_terminal_configuration](docs/gateway_terminal_configuration.png)
 
 
 # Supported versions
