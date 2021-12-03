@@ -1,6 +1,11 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [3.2.7]
+
+**Improvements**
+- Add a button to trigger the sync of the terminals with the gateway
+
 ## [3.2.6]
 
 **Fixes**

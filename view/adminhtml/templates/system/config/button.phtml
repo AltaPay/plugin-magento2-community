@@ -1,0 +1,35 @@
+<script>
+    require([
+        'jquery',
+        'prototype'
+    ], function ($) {
+
+        $('#sync_button').click(function () {
+
+            var params = {storeid: "<?php echo $block->getUrlInterfaceData(); ?>"};
+            new Ajax.Request('<?php echo $block->getCustomUrl() ?>', {
+                parameters: params,
+                loaderArea: false,
+                asynchronous: true,
+                onSuccess: function (transport) {
+                    if (transport.status > 200) {
+                        resultText = transport.statusText;
+                    } else {
+                        var response = JSON.parse(transport.responseText);
+                        resultText = response.message
+                    }
+                    alert(resultText);
+                    if (resultText === 'Terminals successfully configured!') {
+                        location.reload();
+                    }
+                }
+            });
+        });
+    });
+</script>
+<style>
+    #row_payment_other_sdm_altapay_config_altapay_config_terminalsync_sync_terminal .use-default {
+    display: none;
+}
+</style>
+<?= $block->getButtonHtml(); ?>
