@@ -178,9 +178,7 @@ For orders that contain too many products, this PHP warning may be issued. You w
 
 ## Providing error logs to support team
 
-It is recommended to provide as much information as possible to support team.
-
-**You can find the logs from the below path:**
+You can find the logs from the below path:
 
 **Debug logs:** ```<install_directory>/var/log/debug.log```
     
