@@ -178,8 +178,6 @@ For orders that contain too many products, this PHP warning may be issued. You w
 
 ## Providing error logs to support team
 
-You are always welcome to contact AltaPay support (support@altapay.com) if you are experiencing difficulties.
-
 It is recommended to provide as much information as possible to support team.
 
 **You can find the logs from the below path:**
