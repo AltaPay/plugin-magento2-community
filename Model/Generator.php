@@ -398,8 +398,16 @@ class Generator
     {
         $callback       = new Callback($request->getPostValue());
         $response       = $callback->call();
-        $paymentStatus  = $response->type;
+        $paymentType    = $response->type;
         $requireCapture = $response->requireCapture;
+        $paymentStatus  = strtolower($response->paymentStatus);
+        $responseStatus = $response->status;
+        
+        if ($paymentStatus === 'released') {
+            $this->handleCancelStatusAction($request, $responseStatus);
+            return;
+        }
+
         if ($response) {
             $order      = $this->orderLoader->getOrderByOrderIncrementId($response->shopOrderId);
             $storeScope = \Magento\Store\Model\ScopeInterface::SCOPE_STORE;
@@ -424,7 +432,7 @@ class Generator
                 $payment->setAdditionalInformation('masked_credit_card', $response->maskedCreditCard);
                 $payment->setAdditionalInformation('expires', $expires);
                 $payment->setAdditionalInformation('card_type', $cardType);
-                $payment->setAdditionalInformation('payment_type', $paymentStatus);
+                $payment->setAdditionalInformation('payment_type', $paymentType);
                 $payment->save();
                 //send order confirmation email
                 $this->sendOrderConfirmationEmail($comment, $order);
@@ -472,7 +480,7 @@ class Generator
                 $this->updateStockQty($order);
                 $order->getResource()->save($order);
 
-                if (strtolower($paymentStatus) === 'paymentandcapture' || strtolower($paymentStatus) === 'subscriptionandcharge') {
+                if (strtolower($paymentType) === 'paymentandcapture' || strtolower($paymentType) === 'subscriptionandcharge') {
                     $this->createInvoice($order, $requireCapture);
                 }
             }
