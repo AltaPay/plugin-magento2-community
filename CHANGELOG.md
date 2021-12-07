@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 ## [3.2.8]
 
 **Fixes**
-- Fix: Cancel order if payment_type is "released" in notification callback
+- Fix: Cancel order if payment_status is "released" in notification callback
 
 ## [3.2.7]
 
