@@ -1,10 +1,8 @@
 # AltaPay Magento 2 Plugin
 
-AltaPay supports major acquiring banks, global payment methods and over 50 preferred local schemes like Dankort in Denmark, Vipps and Bank Axept in Norway, Swish in Sweden etc., across multiple sales channels (in-store and terminals & eCommerce), geographies and currencies.
+AltaPay, headquartered in Denmark, is an internationally focused fintech company within payments with the mission to make payments less complicated. We help our merchants grow and expand their business across payment channels by offering a fully integrated seamless omni-channel experience for online, mobile and instore payments, creating transparency and reducing the need for manual tasks with one centralized payment platform.
 
-This includes credit and debit card acquiring, bank transfer networks, direct debit, wallets, mobile payment types, online invoicing, prepaid and gift card networks. With offices in Denmark, Iceland and UK, AltaPay serves Pan European and Global customers including JD Sports, Sports Direct, Paul Smith, Laura Ashley, DFDS Seaways, ZARA, ECCO and Stokke.
-
-
+AltaPay’s platform automizes, simplifies, and protects the transaction flow for shop owners and global retail and e-commerce companies, supporting and integrating smoothly into the major ERP systems. AltaPay performs as a Payment Service Provider operating under The Payment Card Industry Data Security Standard (PCI DSS).
 
 # Magento2 Payment plugin installation guide
 
@@ -27,6 +25,8 @@ We highly recommend gathering all the below information, before starting the ins
 [Configure terminals](#configure-terminals)
 
 [Supported versions](#supported-versions)
+
+[Troubleshooting](#troubleshooting)
 
 # Prerequisites
 
@@ -58,22 +58,27 @@ be provided by AltaPay.
 -   Search for "AltaPay Payment Gateway"
 
 -   Download extension from Marketplace and place inside your project
-    > `root/app/code`
+
+     `root/app/code`
 
 -   In Magento root directory run the following commands using the command line
-    > `php bin/magento setup:upgrade`
 
-    > `php bin/magento setup:static-content:deploy`
+     `php bin/magento setup:upgrade`
+
+     `php bin/magento setup:static-content:deploy`
 
 ## Install via composer (Recommended)
 
 -   In Magento root directory run the following commands using the
     command line
 
-    > `composer requires altapay/magento2-community`  
-    > `php bin/magento setup:upgrade` 
-    > `php bin/magento setup:di:compile` 
-    > `php bin/magento setup:static-content:deploy`
+     `composer requires altapay/magento2-community`  
+
+     `php bin/magento setup:upgrade` 
+
+     `php bin/magento setup:di:compile` 
+
+     `php bin/magento setup:static-content:deploy`
 >
 > _Note: If asked for authentication, use your Public Key as the
 > username, and the Private Key as the password. This information can be
@@ -113,7 +118,6 @@ payment methods and configuring payments.
 >
 > Once the API details are validated the terminals will be appeared in
 > the terminal's dropdown in each terminal.
-
 ## Configure order status
 
 Navigate to: Admin \> Stores \> Configuration \> Sales (Tab) \> Payment
@@ -121,6 +125,11 @@ Methods
 
 ![order_status_configuration](docs/order_status_configuration.png)
 
+## Synchronize terminal
+
+To synchronize the terminals with the gateway, click on the **Synchronize Terminals** button. This will fetch the latest terminals from the gateway and will automatically configure based on the store country.
+
+![terminal_sync](docs/terminal_sync.jpg)
 
 ## Configure terminals
 
@@ -142,7 +151,7 @@ Methods
 ![gateway_terminal_configuration](docs/gateway_terminal_configuration.png)
 
 
-## Supported versions
+# Supported versions
 
 | 7.4.0         | Magento 2.4 |
 |---------------|-------------|
@@ -153,7 +162,7 @@ here._
 <https://packagist.org/packages/altapay/magento2-payment>
 
 
-## FAQ on the Magento 2 Plugin
+# Troubleshooting
 
 **PHP Warning: Input variables exceeded 1000. To increase the limit change max_input_vars in php.ini.**
 
@@ -164,9 +173,23 @@ For orders that contain too many products, this PHP warning may be issued. You w
 - Restart your server.
 
 **Parameters: description/unitPrice/quantity are required for each orderline, but was not set for line: xxxx**
+> The same problem as above. The request is being truncated because the number of variables are exceeding the max_input_vars limit.
 
-For orders that contain too many products, this PHP warning may be issued. You will need to:
 
-- Open your php.ini file
-- Edit the max_input_vars variable. This specifies the maximum number of variables that can be sent in a request. The default is 1000. Increase it to, say, 3000.
-- Restart your server.
+## Providing error logs to support team
+
+You can find the logs from the below path:
+
+**Debug logs:** ```<install_directory>/var/log/debug.log```
+    
+**Exception logs:** ```<install_directory>/var/log/exception.log```
+
+**AltaPay plugin logs:** ```<install_directory>/var/log/altapay.log```
+
+**Web server error logs**
+
+**For Apache server** You can find it on **/var/log/apache2/error.log**
+
+**For Nginx** it would be **/var/log/nginx/error.log**
+
+**_Note: Your path may vary from the mentioned above._**
