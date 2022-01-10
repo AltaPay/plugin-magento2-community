@@ -113,7 +113,7 @@ class Button extends Action
             $response     = $call->call();
             $terminalList = $this->getTerminal($response, $currentCurrency);
 
-            if (count($terminalList) <= 5) {
+            if (!empty($terminalList) && count($terminalList) <= 5) {
 
                 if ($this->checkConfigAlreadyExist($terminalList, $scopeCode, $currentStoreID)) {
                     $message = __('Terminals are already configured, please check the dropdown manually.');

@@ -1,6 +1,11 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [3.2.9]
+
+**Fixes**
+- Fix: Handle empty synch button response
+
 ## [3.2.8]
 
 **Fixes**
