@@ -302,7 +302,7 @@ it('Klarna partial refund', function () {
         ord.visit()
         cy.get('body').then(($body) => {
 
-            if ($body.text().includes('DKK')) {
+            if ($body.text().includes('€') === false) {
                 ord.admin()
                 ord.change_currency_to_EUR_for_iDEAL()
             } 
