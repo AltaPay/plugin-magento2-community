@@ -1,5 +1,5 @@
 import Order from '../PageObjects/objects'
-
+if(Cypress.env('runDiscountsTests')){
 describe('Discounts', function () {
 
     it('Create cart percentage discount', function () {
@@ -416,3 +416,4 @@ describe('Discounts', function () {
     })
 
 })
+}
