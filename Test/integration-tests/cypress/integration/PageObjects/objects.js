@@ -40,11 +40,7 @@ class Order {
         cy.get('#cvcInput').type('123')
         cy.get('#cardholderNameInput').type('testname')
         cy.get('#pensioCreditCardPaymentSubmitButton').click().wait(3000)
-<<<<<<< HEAD
-
-=======
->>>>>>> 7696b004d2814028e123fd9c6bc5ae048964d4b5
-    }
+}
 
     klarna_payment(KLARNA_DKK_TERMINAL_NAME) {
         cy.contains(KLARNA_DKK_TERMINAL_NAME).click({ force: true })
