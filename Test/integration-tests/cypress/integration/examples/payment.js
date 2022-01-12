@@ -1,6 +1,6 @@
 import Order from '../PageObjects/objects'
 
-describe('Magento2', function () {
+describe('Payments', function () {
 
     it('CC full capture and refund', function () {
         const ord = new Order()
