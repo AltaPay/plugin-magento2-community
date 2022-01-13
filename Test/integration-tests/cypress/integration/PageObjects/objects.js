@@ -191,7 +191,7 @@ class Order {
         cy.wait(2000)
         cy.get('.even > :nth-child(1) > .col-refund > .input-text').clear().type('0')
         cy.get('.col-refund > span').click()
-        cy.contains("Update Qty's").click().wait(2000)
+        cy.contains("Update Qty's").click().wait(5000)
         cy.xpath('/html/body/div[3]/main/div[2]/div/div/form/div[2]/section[2]/div[2]/div[2]/div[3]/div[3]/button[2]').click()
         cy.wait(3000)
         cy.get(':nth-child(1) > .note-list-comment').should('include.text', 'We refunded')
