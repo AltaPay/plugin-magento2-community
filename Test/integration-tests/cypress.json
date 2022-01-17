@@ -1,8 +1,16 @@
-{ "chromeWebSecurity": false,
-"retries": {
+{
+	"chromeWebSecurity": false,
+	"videoCompression": false,
+	"retries": {
 
-    "runMode": 2,
-    "openMode": 2
-} 
-
+		"runMode": 2,
+		"openMode": 3
+	},
+	"env": {
+		"runDiscountsTests": false,
+		"videoCompression": false,
+		"videoUploadOnPasses": false,
+		"NODE_TLS_REJECT_UNAUTHORIZED": 0
+	}
+	
 }
