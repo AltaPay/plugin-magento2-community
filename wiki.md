@@ -26,6 +26,8 @@ We highly recommend gathering all the below information, before starting the ins
 
 [Supported versions](#supported-versions)
 
+[Styling](#styling)
+
 [Troubleshooting](#troubleshooting)
 
 # Prerequisites
@@ -161,6 +163,21 @@ _For Magneto 2.2 and below version please install the extension from
 here._  
 <https://packagist.org/packages/altapay/magento2-payment>
 
+# Styling
+
+- You can change/update the **Payment Form Page** by navigating to the below path:
+
+    <https://github.com/AltaPay/plugin-magento2-community/blob/main/view/frontend/templates/ordersummary.phtml>
+
+- Use the below link to apply the **CSS** to the form page:
+
+    <https://github.com/AltaPay/plugin-magento2-community/blob/main/view/frontend/web/css/ordersummary.css>
+
+>**Note:** It is recommended to extend the layout file instead of making changes in the plugin file directly. If you want to extend the layout file, use the below path in your custom module/theme:
+>
+><https://github.com/AltaPay/plugin-magento2-community/blob/main/view/frontend/layout/sdmaltapay_index_callbackform.xml>
+>
+>Please visit Magento's official documentation to know more about how to [Override a layout](https://devdocs.magento.com/guides/v2.4/frontend-dev-guide/layouts/layout-override.html).
 
 # Troubleshooting
 
