@@ -26,6 +26,8 @@ We highly recommend gathering all the below information, before starting the ins
 
 [Supported versions](#supported-versions)
 
+[Styling](#styling)
+
 [Troubleshooting](#troubleshooting)
 
 # Prerequisites
@@ -171,7 +173,7 @@ here._
 
     <https://github.com/AltaPay/plugin-magento2-community/blob/main/view/frontend/web/css/ordersummary.css>
 
->Note: It is recommended to extend the layout file instead of making a changes in the plugin file directly. If you want to extend the layout file, use the below path in your custom module/theme:
+>Note: It is recommended to extend the layout file instead of making changes in the plugin file directly. If you want to extend the layout file, use the below path in your custom module/theme:
 >
 ><https://github.com/AltaPay/plugin-magento2-community/blob/main/view/frontend/layout/sdmaltapay_index_callbackform.xml>
 >
