@@ -171,13 +171,11 @@ here._
 
     <https://github.com/AltaPay/plugin-magento2-community/blob/main/view/frontend/web/css/ordersummary.css>
 
-- If you want to extend our layout file, use the below file in your custom module/theme:
-
-    <https://github.com/AltaPay/plugin-magento2-community/blob/main/view/frontend/layout/sdmaltapay_index_callbackform.xml>
-
-- To know more about how to override the layout files, please follow the Magento official documentation:
-
-    <https://devdocs.magento.com/guides/v2.4/frontend-dev-guide/layouts/layout-override.html>
+>Note: It is recommended to extend the layout file instead of making a changes in the plugin file directly. If you want to extend the layout file, use the below path in your custom module/theme:
+>
+><https://github.com/AltaPay/plugin-magento2-community/blob/main/view/frontend/layout/sdmaltapay_index_callbackform.xml>
+>
+>Please visit Magento's official documentation to know more about how to [Override a layout](https://devdocs.magento.com/guides/v2.4/frontend-dev-guide/layouts/layout-override.html).
 
 # Troubleshooting
 
