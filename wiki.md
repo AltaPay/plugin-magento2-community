@@ -163,21 +163,21 @@ here._
 
 # Styling
 
->You can change/update the **Payment Form Page** by navigating to the below path:
+- You can change/update the **Payment Form Page** by navigating to the below path:
 
-<https://github.com/AltaPay/plugin-magento2-community/blob/main/view/frontend/templates/ordersummary.phtml>
+    <https://github.com/AltaPay/plugin-magento2-community/blob/main/view/frontend/templates/ordersummary.phtml>
 
->Use the below link to apply the css to the form page:
+- Use the below link to apply the css to the form page:
 
-<https://github.com/AltaPay/plugin-magento2-community/blob/main/view/frontend/web/css/ordersummary.css>
+    <https://github.com/AltaPay/plugin-magento2-community/blob/main/view/frontend/web/css/ordersummary.css>
 
->If you want to extend our layout file, use the below file in your custom module/theme:
+- If you want to extend our layout file, use the below file in your custom module/theme:
 
-<https://github.com/AltaPay/plugin-magento2-community/blob/main/view/frontend/layout/sdmaltapay_index_callbackform.xml>
+    <https://github.com/AltaPay/plugin-magento2-community/blob/main/view/frontend/layout/sdmaltapay_index_callbackform.xml>
 
->To know more about how to override the layout files, please follow the Magento official documentation:
+- To know more about how to override the layout files, please follow the Magento official documentation:
 
-<https://devdocs.magento.com/guides/v2.4/frontend-dev-guide/layouts/layout-override.html>
+    <https://devdocs.magento.com/guides/v2.4/frontend-dev-guide/layouts/layout-override.html>
 
 # Troubleshooting
 
