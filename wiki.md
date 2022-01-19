@@ -161,6 +161,15 @@ _For Magneto 2.2 and below version please install the extension from
 here._  
 <https://packagist.org/packages/altapay/magento2-payment>
 
+# Styling
+
+You can change/update the **Payment Form Page** by navigating to the below path:
+
+<https://github.com/AltaPay/plugin-magento2-community/blob/main/view/frontend/templates/ordersummary.phtml>
+
+Use the below link to apply the css to the form page:
+
+<https://github.com/AltaPay/plugin-magento2-community/blob/main/view/frontend/web/css/ordersummary.css>
 
 # Troubleshooting
 
