@@ -107,11 +107,10 @@ use Magento\Framework\App\Config\Value;
                     self::CRON_MODEL_PATH
                 )->save();
              }
-
          }
          catch (\Exception $e)
          {
-             throw new \Exception(__('Some thing went wrong , We can\'t save the cron expression.'));
+             throw new \Exception(__('Something went wrong, Can\'t save the cron expression.'));
          }
          return parent::afterSave();
      }

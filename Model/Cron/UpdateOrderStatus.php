@@ -1,44 +1,65 @@
 <?php
+/**
+ * Altapay Module for Magento 2.x.
+ *
+ * Copyright © 2018 Altapay. All rights reserved.
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace SDM\Altapay\Model\Cron;
 
-use \Psr\Log\LoggerInterface;
+use Magento\Sales\Api\OrderRepositoryInterface;
+use Psr\Log\LoggerInterface;
+use Magento\Framework\Api\SearchCriteriaBuilder;
+use Magento\Framework\App\Config\ScopeConfigInterface;
+use Magento\Sales\Model\ResourceModel\Order\CollectionFactory;
 
 class UpdateOrderStatus {
 
     const CRON_ENABLED = 'payment/sdm_altapay_config/cronScheduled/enabled';
 
     /**
-     * @var \Psr\Log\LoggerInterface
+     * @var LoggerInterface
      */
     protected $logger;
-    
+
     /**
-     * @var \Magento\Sales\Api\OrderRepositoryInterface
+     * @var OrderRepositoryInterface
      */
     protected $orderRepository;
 
     /**
-     * @var \Magento\Framework\Api\SearchCriteriaBuilder
+     * @var SearchCriteriaBuilder
      */
     protected $searchCriteriaBuilder;
 
     /**
-     * @var \Magento\Sales\Model\ResourceModel\Order\CollectionFactory
+     * @var CollectionFactory
      */
     protected $orderCollection;
 
     /**
-     * @param \Magento\Sales\Api\OrderRepositoryInterface $orderRepository
-     * @param \Magento\Framework\Api\SearchCriteriaBuilder $searchCriteriaBuilder
-     * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
-     * @param \Magento\Sales\Model\ResourceModel\Order\CollectionFactory $orderCollection
+     * @var ScopeConfigInterface
      */
+    protected $scopeConfig;
+
+    /**
+     * UpdateOrderStatus constructor.
+     *
+     * @param LoggerInterface          $logger
+     * @param OrderRepositoryInterface $orderRepository
+     * @param SearchCriteriaBuilder    $searchCriteriaBuilder
+     * @param ScopeConfigInterface     $scopeConfig
+     * @param CollectionFactory        $orderCollection
+     */
+
     public function __construct(
         LoggerInterface $logger,
-        \Magento\Sales\Api\OrderRepositoryInterface $orderRepository,
-        \Magento\Framework\Api\SearchCriteriaBuilder $searchCriteriaBuilder,
-        \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
-        \Magento\Sales\Model\ResourceModel\Order\CollectionFactory $orderCollection
+        OrderRepositoryInterface $orderRepository,
+        SearchCriteriaBuilder $searchCriteriaBuilder,
+        ScopeConfigInterface $scopeConfig,
+        CollectionFactory $orderCollection
     ) {
         $this->logger = $logger;
         $this->orderRepository = $orderRepository;
@@ -74,12 +95,12 @@ class UpdateOrderStatus {
                 $this->logger->info('Order status has been changed from pending to canceled');
             } else {
 
-                $this->logger->info('No order exist with pendng orders');
+                $this->logger->info('No order exist with pending status');
             }
         }
         catch (\Exception $e)
         {
-            throw new \Exception(__('Some Thing Want Wrong , '.$e->getMessage()));
+            throw new \Exception(__('Something went wrong , '.$e->getMessage()));
         }
     }
 

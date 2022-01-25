@@ -80,6 +80,7 @@ class ChangeOrderStatusButton extends Action
         $this->orderCollection = $orderCollection;
         parent::__construct($context);
     }
+
     /**
      * @return Json
      */
@@ -94,18 +95,16 @@ class ChangeOrderStatusButton extends Action
             
             if (array_filter($orderCollection->getData())) {
                 foreach ($orderCollection as $order) {
-
                     $order = $this->orderRepository->get($order->getEntityId());
                     $order->setStatus($completeStatus)->setState($completeStatus);
 
                     $this->orderRepository->save($order); 
                 }
-
+                
                 $message = __('Order status has been changed from pending to canceled');
 
             } else {
-
-                $message = __('No order exist with pendng orders');
+                $message = __('No order exist with pendng status');
             }
         } catch (\Exception $e)
         {
