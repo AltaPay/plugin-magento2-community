@@ -71,7 +71,7 @@ class UpdateOrderStatus {
                     $this->orderRepository->save($order); 
                 }
 
-                $this->logger->info('Order status has beem changed from pending to canceled');
+                $this->logger->info('Order status has been changed from pending to canceled');
             } else {
 
                 $this->logger->info('No order exist with pendng orders');

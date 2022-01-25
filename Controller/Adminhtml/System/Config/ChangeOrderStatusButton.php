@@ -83,7 +83,7 @@ class ChangeOrderStatusButton extends Action
                     $this->orderRepository->save($order); 
                 }
 
-                $message = __('Order status has beem changed from pending to canceled');
+                $message = __('Order status has been changed from pending to canceled');
 
             } else {
 
