@@ -123,7 +123,7 @@
                     <attribute type="expanded">0</attribute>
                     <label>Terminal Sync</label>
                     <comment><![CDATA[]]></comment>
-                    <field id="sync_terminal" translate="l abel" type="button" sortOrder="7" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <field id="sync_terminal" translate="label" type="button" sortOrder="7" showInDefault="1" showInWebsite="1" showInStore="1">
                         <label>Synchronize payment methods</label>
                         <frontend_model>SDM\Altapay\Block\System\Config\Button</frontend_model>
                     </field>
