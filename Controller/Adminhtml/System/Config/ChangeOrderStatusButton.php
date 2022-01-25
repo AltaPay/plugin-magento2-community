@@ -11,47 +11,66 @@ namespace SDM\Altapay\Controller\Adminhtml\System\Config;
 
 use Magento\Backend\App\Action;
 use Magento\Backend\App\Action\Context;
-use \Psr\Log\LoggerInterface;
+use Psr\Log\LoggerInterface;
 use Magento\Framework\Controller\Result\Json;
 use Magento\Framework\Controller\Result\JsonFactory;
+use Magento\Sales\Api\OrderRepositoryInterface;
+use Magento\Framework\Api\SearchCriteriaBuilder;
+use Magento\Framework\App\Config\ScopeConfigInterface;
+use Magento\Sales\Model\ResourceModel\Order\CollectionFactory;
 
 class ChangeOrderStatusButton extends Action
 {
     /**
-     * @var \Psr\Log\LoggerInterface
+     * @var LoggerInterface
      */
     protected $logger;
-    
+
     /**
-     * @var \Magento\Sales\Api\OrderRepositoryInterface
+     * @var OrderRepositoryInterface
      */
     protected $orderRepository;
 
     /**
-     * @var \Magento\Framework\Api\SearchCriteriaBuilder
+     * @var SearchCriteriaBuilder
      */
     protected $searchCriteriaBuilder;
 
     /**
-     * @var \Magento\Sales\Model\ResourceModel\Order\CollectionFactory
+     * @var CollectionFactory
      */
     protected $orderCollection;
 
     /**
-     * @param \Magento\Sales\Api\OrderRepositoryInterface $orderRepository
-     * @param \Magento\Framework\Api\SearchCriteriaBuilder $searchCriteriaBuilder
-     * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
-     * @param \Magento\Sales\Model\ResourceModel\Order\CollectionFactory $orderCollection
+     * @var JsonFactory
+     */
+    protected $resultJsonFactory;
+
+    /**
+     * @var ScopeConfigInterface
+     */
+    protected $scopeConfig;
+
+    /**
+     * ChangeOrderStatusButton constructor.
+     *
+     * @param Context                  $context
+     * @param LoggerInterface          $logger
+     * @param OrderRepositoryInterface $orderRepository
+     * @param SearchCriteriaBuilder    $searchCriteriaBuilder
+     * @param ScopeConfigInterface     $scopeConfig
+     * @param JsonFactory              $resultJsonFactory
+     * @param CollectionFactory        $orderCollection
      */
 
     public function __construct(
         Context $context,
         LoggerInterface $logger,
-        \Magento\Sales\Api\OrderRepositoryInterface $orderRepository,
-        \Magento\Framework\Api\SearchCriteriaBuilder $searchCriteriaBuilder,
-        \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
+        OrderRepositoryInterface $orderRepository,
+        SearchCriteriaBuilder $searchCriteriaBuilder,
+        ScopeConfigInterface $scopeConfig,
         JsonFactory $resultJsonFactory,
-        \Magento\Sales\Model\ResourceModel\Order\CollectionFactory $orderCollection
+        CollectionFactory $orderCollection
     ) {
         $this->logger = $logger;
         $this->resultJsonFactory = $resultJsonFactory;
@@ -67,7 +86,6 @@ class ChangeOrderStatusButton extends Action
     public function execute()
     {
         $completeStatus = 'canceled';
-        $storeScope = \Magento\Store\Model\ScopeInterface::SCOPE_STORE;
         try
         {
             $orderCollection = $this->orderCollection->create();

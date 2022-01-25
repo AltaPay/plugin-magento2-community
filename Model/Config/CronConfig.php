@@ -1,63 +1,77 @@
 <?php
- 
- namespace SDM\Altapay\Model\Config;
-  
- class CronConfig extends \Magento\Framework\App\Config\Value
+/**
+ * Altapay Module for Magento 2.x.
+ *
+ * Copyright © 2018 Altapay. All rights reserved.
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+namespace SDM\Altapay\Model\Config;
+
+use Magento\Framework\Model\Context;
+use Magento\Framework\Registry;
+use Magento\Framework\App\Config\ScopeConfigInterface;
+use Magento\Framework\App\Cache\TypeListInterface;
+use Magento\Framework\App\Config\ValueFactory;
+use Magento\Framework\Model\ResourceModel\AbstractResource;
+use Magento\Framework\Data\Collection\AbstractDb;
+use Magento\Framework\App\Config\Value;
+
+ class CronConfig extends Value
  {
     const CRON_STRING_PATH = 'crontab/default/jobs/sdm_altapay_cron_job/schedule/cron_expr';
- 
     const CRON_MODEL_PATH = 'crontab/default/jobs/sdm_altapay_cron_job/run/model';
-
     const CRON_ENABLED = 'payment/sdm_altapay_config/cronScheduled/enabled';
-     
-      /**
-      * @var \Magento\Framework\App\Config\ValueFactory
+
+     /**
+      * @var ValueFactory
       */
-  
      protected $_configValueFactory;
-  
+
      /**
       * @var mixed|string
       */
-  
      protected $_runModelPath = '';
-  
+
      /**
-      * CronConfig1 constructor.
-      * @param \Magento\Framework\Model\Context $context
-      * @param \Magento\Framework\Registry $registry
-      * @param \Magento\Framework\App\Config\ScopeConfigInterface $config
-      * @param \Magento\Framework\App\Cache\TypeListInterface $cacheTypeList
-      * @param \Magento\Framework\App\Config\ValueFactory $configValueFactory
-      * @param \Magento\Framework\Model\ResourceModel\AbstractResource|null $resource
-      * @param \Magento\Framework\Data\Collection\AbstractDb|null $resourceCollection
-      * @param string $runModelPath
-      * @param array $data
+      * @var ScopeConfigInterface
       */
-  
+     protected $scopeConfig;
+
+     /**
+      * CronConfig constructor.
+      *
+      * @param Context               $context
+      * @param Registry              $registry
+      * @param TypeListInterface     $cacheTypeList
+      * @param ValueFactory          $configValueFactory
+      * @param AbstractResource|null $resource
+      * @param AbstractDb|null       $resourceCollection
+      * @param ScopeConfigInterface  $scopeConfig
+      * @param string                $runModelPath
+      * @param array                 $data
+      */
      public function __construct(
-         \Magento\Framework\Model\Context $context,
-         \Magento\Framework\Registry $registry,
-         \Magento\Framework\App\Config\ScopeConfigInterface $config,
-         \Magento\Framework\App\Cache\TypeListInterface $cacheTypeList,
-         \Magento\Framework\App\Config\ValueFactory $configValueFactory,
-         \Magento\Framework\Model\ResourceModel\AbstractResource $resource = null,
-         \Magento\Framework\Data\Collection\AbstractDb $resourceCollection = null,
-         \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
+         Context $context,
+         Registry $registry,
+         TypeListInterface $cacheTypeList,
+         ValueFactory $configValueFactory,
+         AbstractResource $resource = null,
+         AbstractDb $resourceCollection = null,
+         ScopeConfigInterface $scopeConfig,
          $runModelPath = '',
          array $data = [])
      {
          $this->_runModelPath = $runModelPath;
          $this->_configValueFactory = $configValueFactory;
          $this->scopeConfig = $scopeConfig;
-         parent::__construct($context, $registry, $config, $cacheTypeList, $resource, $resourceCollection, $data);
+         parent::__construct($context, $registry, $scopeConfig, $cacheTypeList, $resource, $resourceCollection, $data);
      }
-  
+
      /**
-      * @return CronConfig1
+      * @return mixed
       * @throws \Exception
       */
-  
      public function afterSave()
      {
         $time = $this->getData('groups/sdm_altapay_config/groups/cronScheduled/fields/time/value');
@@ -97,7 +111,7 @@
          }
          catch (\Exception $e)
          {
-             throw new \Exception(__('Some Thing Want Wrong , We can\'t save the cron expression.'));
+             throw new \Exception(__('Some thing went wrong , We can\'t save the cron expression.'));
          }
          return parent::afterSave();
      }
