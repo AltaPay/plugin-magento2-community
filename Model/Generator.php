@@ -477,7 +477,9 @@ class Generator
                 $order->addStatusHistoryComment($this->getTransactionInfoFromResponse($response));
                 $order->setIsNotified(false);
                 //Update stock quantity
-                $this->updateStockQty($order);
+                if($order->getState() == 'canceled') {
+                    $this->updateStockQty($order);
+                }
                 $order->getResource()->save($order);
 
                 if (strtolower($paymentType) === 'paymentandcapture' || strtolower($paymentType) === 'subscriptionandcharge') {
@@ -687,7 +689,7 @@ class Generator
         $quoteItems = $this->checkoutSession->getQuote()->getItemsCollection();
         foreach ($order->getAllItems() as $item) {
             $stockQty  = $this->stockItem->getStockQty($item->getProductId(), $item->getStore()->getWebsiteId());
-            $qty       = $stockQty - $item->getQtyOrdered();                   
+            $qty       = $stockQty - $item->getQtyOrdered();                 
             $stockItem = $this->stockRegistry->getStockItemBySku($item['sku']);         
             $stockItem->setQty($qty);
             $stockItem->setIsInStock((bool)$qty); 

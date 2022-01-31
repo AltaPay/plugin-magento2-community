@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Altapay Module for Magento 2.x.
+ *
+ * Copyright © 2018 Altapay. All rights reserved.
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+-->
+
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Cron:etc/crontab.xsd">
+    <group id="default">
+        <job name="sdm_altapay_cron_job" instance="SDM\Altapay\Model\Cron\UpdateOrderStatus" method="execute">
+            <config_path>crontab/default/jobs/sdm_altapay_cron_job/schedule/cron_expr</config_path>
+        </job>
+    </group>
+</config>

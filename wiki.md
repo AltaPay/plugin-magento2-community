@@ -20,6 +20,8 @@ We highly recommend gathering all the below information, before starting the ins
 
 [Configuration](#configuration)
 
+[Configure cron scheduler](#configure-cron-scheduler)
+
 [Configure order status](#configure-order-status)
 
 [Configure terminals](#configure-terminals)
@@ -120,6 +122,18 @@ payment methods and configuring payments.
 >
 > Once the API details are validated the terminals will be appeared in
 > the terminal's dropdown in each terminal.
+
+## Configure cron scheduler
+
+1. Navigate to: Admin > Stores > Configuration > Sales (Tab) > Payment Methods
+2. To enable "Cancel orders with pending payments", choose Yes  
+3. Select the frequency for a scheduler
+4. Set a start time when the scheduler should run
+
+To update all the orders without a scheduler you can click on the "Change status now".
+
+![configure-cron-scheduler](docs/cron_schedule.png)
+
 ## Configure order status
 
 Navigate to: Admin \> Stores \> Configuration \> Sales (Tab) \> Payment
