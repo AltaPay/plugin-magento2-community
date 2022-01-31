@@ -7,7 +7,7 @@ All notable changes to this project will be documented in this file.
 - Fix: Stock quantity calculation issue
 
 **Improvements**
-- Add cron scheduler to change the status of the pending order to cancel
+- Add configurations section to setup cron scheduler to change the status of the pending order to cancel
 
 ## [3.2.9]
 
