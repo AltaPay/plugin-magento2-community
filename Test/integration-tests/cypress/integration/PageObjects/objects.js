@@ -459,8 +459,8 @@ class Order {
         cy.get('#flush_magento').click()
     }
 
-    ideal_payment(iDEAl_EUR_TERMINAL) {
-        cy.contains(iDEAl_EUR_TERMINAL).click({ force: true })
+    ideal_payment(iDEAL_EUR_TERMINAL) {
+        cy.contains(iDEAL_EUR_TERMINAL).click({ force: true })
         cy.get('._active > .payment-method-content > :nth-child(5) > div.primary > .action').click().wait(2000)
         cy.get('#idealIssuer').select('AltaPay test issuer 1')
         cy.get('#pensioPaymentIdealSubmitButton').click()

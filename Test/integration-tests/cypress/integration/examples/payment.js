@@ -309,21 +309,21 @@ it('Klarna partial refund', function () {
             ord.visit()
             ord.addproduct()
             cy.fixture('config').then((admin) => {
-                if (admin.iDEAl_EUR_TERMINAL != "") {
+                if (admin.iDEAL_EUR_TERMINAL != "") {
                     cy.get('body').wait(3000).then(($a) => {
-                        if ($a.find("label:contains('" + admin.iDEAl_EUR_TERMINAL + "')").length) {
-                            ord.ideal_payment(admin.iDEAl_EUR_TERMINAL)
+                        if ($a.find("label:contains('" + admin.iDEAL_EUR_TERMINAL + "')").length) {
+                            ord.ideal_payment(admin.iDEAL_EUR_TERMINAL)
                             ord.admin()
                             ord.ideal_refund()
                         } else {
-                            cy.log(admin.iDEAl_EUR_TERMINAL + ' not found in page')
+                            cy.log(admin.iDEAL_EUR_TERMINAL + ' not found in page')
                             this.skip()
                         }
 
                     })
                 }
                 else {
-                    cy.log('iDEAl_EUR_TERMINAL skipped')
+                    cy.log('iDEAL_EUR_TERMINAL skipped')
                     this.skip()
                 }
             })
