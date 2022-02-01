@@ -1,6 +1,14 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [3.3.0]
+
+**Fixes**
+- Fix: Stock quantity calculation issue
+
+**Improvements**
+- Add configurations section to setup cron scheduler to change the status of the pending order to cancel
+
 ## [3.2.9]
 
 **Fixes**
