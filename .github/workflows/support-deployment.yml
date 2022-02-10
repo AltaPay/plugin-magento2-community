@@ -1,0 +1,75 @@
+name: 'Support Deployment'
+# Only trigger, when the code analysis workflow succeeded
+on:
+  workflow_run:
+    workflows: ["PHP Code Analysis"]
+    types:
+      - completed
+
+jobs:
+  terraform:
+    name: 'Terraform'
+    runs-on: ubuntu-latest
+
+    steps:
+    
+    # Configure AWS credentials
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: eu-west-1
+          
+    # Checkout the repository to the GitHub Actions runner      
+    - uses: actions/checkout@v1  
+      with:
+        repository: AltaPay/plugin-infrastructure
+        token: ${{ secrets.ACCESS_TOKEN }}
+        ref: 'origin/variable_host_param'
+
+    # Install version 1.0.8 of Terraform CLI
+    - name: Setup Terraform
+      uses: hashicorp/setup-terraform@v1
+      with:
+        terraform_version: 1.0.8
+
+    # Initialize a new or existing Terraform working directory by creating initial files, loading any remote state, downloading modules, etc.
+    - name: Terraform Init
+      run: terraform init 
+      working-directory: ../plugin-infrastructure/provision/plugins
+
+
+    # Select a Terraform workspace
+    - name: Terraform workspace
+      run: terraform workspace select magento24x-support
+      working-directory: ../plugin-infrastructure/provision/plugins
+      
+      
+    # Generates an execution plan for Terraform
+    - name: Terraform Plan
+      run: terraform plan -var ec2_type=t3.medium
+      working-directory: ../plugin-infrastructure/provision/plugins
+
+    # Run Terraform Apply      
+    - name: Terraform Apply
+      run: terraform apply -var ec2_type=t3.medium -auto-approve
+      working-directory: ../plugin-infrastructure/provision/plugins
+   
+   # Add a sleep of 20 seconds, in case instance needs to warm up  
+    - name: Sleep for 20 seconds
+      uses: jakejarvis/wait-action@master
+      with:
+        time: '20s'
+   
+    # Run Ansible playbook
+    - name: Run playbook
+      uses: dawidd6/action-ansible-playbook@v2
+      with:
+        playbook: magento2-4-x.yml
+        directory: ../plugin-infrastructure/deploy/plugins
+        key: ${{secrets.SSHKEY}}
+        options: |
+          -u ubuntu
+          -i inventory
+          --extra-vars "variable_host=magento24x-support branch_name=main gatewayURL=${{ secrets.GATEWAYURL }} gatewayUser=${{ secrets.GATEWAYUSER }} gatewayPass=${{ secrets.GATEWAYPASS }} mg2_admin_email=${{secrets.CMS_ADMIN_EMAIL}} mg2_admin_user=${{secrets.CMS_ADMIN_USER}} mg2_admin_password=${{secrets.CMS_ADMIN_PASS}}"   
