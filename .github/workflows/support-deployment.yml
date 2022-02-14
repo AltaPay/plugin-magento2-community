@@ -3,6 +3,7 @@ name: 'Support Deployment'
 on:
   workflow_run:
     workflows: ["PHP Code Analysis"]
+    branches: [main]
     types:
       - completed
 
