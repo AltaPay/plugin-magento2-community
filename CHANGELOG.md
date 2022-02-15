@@ -1,6 +1,11 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [3.3.1]
+
+**Fixes**
+- Fix: Canceled order qty from item grid is missing
+
 ## [3.3.0]
 
 **Fixes**
