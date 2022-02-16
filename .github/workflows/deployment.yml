@@ -42,7 +42,7 @@ jobs:
       working-directory: ../plugin-infrastructure/provision/plugins
 
 
-    # Select a terraofrm workspace
+    # Select a Terraform workspace
     - name: Terraform workspace
       run: terraform workspace select magento24x
       working-directory: ../plugin-infrastructure/provision/plugins
