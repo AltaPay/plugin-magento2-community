@@ -76,7 +76,7 @@ be provided by AltaPay.
 -   In Magento root directory run the following commands using the
     command line
 
-     `composer requires altapay/magento2-community`  
+     `composer require altapay/magento2-community`  
 
      `php bin/magento setup:upgrade` 
 
