@@ -27,7 +27,7 @@ jobs:
       with:
         repository: AltaPay/plugin-infrastructure
         token: ${{ secrets.ACCESS_TOKEN }}
-        ref: 'origin/variable_host_param'
+        ref: 'origin/main'
 
     # Install version 1.0.8 of Terraform CLI
     - name: Setup Terraform
@@ -74,3 +74,12 @@ jobs:
           -u ubuntu
           -i inventory
           --extra-vars "variable_host=magento24x-support branch_name=main gatewayURL=${{ secrets.GATEWAYURL }} gatewayUser=${{ secrets.GATEWAYUSER }} gatewayPass=${{ secrets.GATEWAYPASS }} mg2_admin_email=${{secrets.CMS_ADMIN_EMAIL}} mg2_admin_user=${{secrets.CMS_ADMIN_USER}} mg2_admin_password=${{secrets.CMS_ADMIN_PASS}}"   
+
+    # Export URL
+    - name: Export URL
+      run: |
+        testvar=$(sed '4!d' inventory)
+        echo $testvar
+        echo "IP=$testvar">> $GITHUB_ENV
+        echo "http://$IP/magento"
+      working-directory: ../plugin-infrastructure/deploy/plugins          
