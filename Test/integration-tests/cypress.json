@@ -4,7 +4,7 @@
 	"retries": {
 
 		"runMode": 2,
-		"openMode": 3
+		"openMode": 2
 	},
 	"env": {
 		"runDiscountsTests": false,

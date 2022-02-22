@@ -27,8 +27,12 @@ class Order {
         cy.get('input[name=postcode]').type('6800')
         cy.get('input[name=telephone]').type('20123456')
         cy.wait(5000)
+        cy.get('body').then(($p) => {
+            if ($p.find('.radio').length) {
+                cy.get('.radio').click({ multiple: true }).wait(2000)
+            }
+        })
         cy.get('.button').click().wait(5000)
-
     }
 
     cc_payment(CC_TERMINAL_NAME) {
@@ -40,7 +44,7 @@ class Order {
         cy.get('#cvcInput').type('123')
         cy.get('#cardholderNameInput').type('testname')
         cy.get('#pensioCreditCardPaymentSubmitButton').click().wait(3000)
-}
+    }
 
     klarna_payment(KLARNA_DKK_TERMINAL_NAME) {
         cy.contains(KLARNA_DKK_TERMINAL_NAME).click({ force: true })
@@ -191,7 +195,7 @@ class Order {
         cy.wait(2000)
         cy.get('.even > :nth-child(1) > .col-refund > .input-text').clear().type('0')
         cy.get('.col-refund > span').click()
-        cy.contains("Update Qty's").click().wait(5000)
+        cy.contains("Update Qty's").click().wait(2000)
         cy.xpath('/html/body/div[3]/main/div[2]/div/div/form/div[2]/section[2]/div[2]/div[2]/div[3]/div[3]/button[2]').click()
         cy.wait(3000)
         cy.get(':nth-child(1) > .note-list-comment').should('include.text', 'We refunded')
@@ -444,11 +448,10 @@ class Order {
         cy.get('#save').click()
     }
 
-    change_currency_to_EUR_for_iDEAL(){
+    change_currency_to_EUR_for_iDEAL() {
         cy.get('#menu-magento-backend-stores > [onclick="return false;"]').click()
         cy.get('.item-system-config > a').click()
         cy.contains('Currency Setup').click()
-        cy.get('#currency_options-head').click()
         cy.get('#currency_options_base').select('Euro')
         cy.get('#currency_options_default').select('Euro')
         cy.get('#currency_options_allow').select('Euro')
@@ -459,8 +462,8 @@ class Order {
         cy.get('#flush_magento').click()
     }
 
-    ideal_payment(iDEAL_EUR_TERMINAL) {
-        cy.contains(iDEAL_EUR_TERMINAL).click({ force: true })
+    ideal_payment(iDEAl_EUR_TERMINAL) {
+        cy.contains(iDEAl_EUR_TERMINAL).click({ force: true })
         cy.get('._active > .payment-method-content > :nth-child(5) > div.primary > .action').click().wait(2000)
         cy.get('#idealIssuer').select('AltaPay test issuer 1')
         cy.get('#pensioPaymentIdealSubmitButton').click()
@@ -471,7 +474,7 @@ class Order {
 
     }
 
-    ideal_refund(){
+    ideal_refund() {
         cy.get('#menu-magento-sales-sales > [onclick="return false;"]').click()
         cy.get('.item-sales-order > a').click().wait(9000)
         cy.xpath('//*[@id="container"]/div/div[4]/table/tbody/tr[1]/td[2]/div').click()
@@ -481,7 +484,7 @@ class Order {
         cy.get(':nth-child(1) > .note-list-comment').should('include.text', 'We refunded')
     }
 
-    change_currency_to_DKK(){
+    change_currency_to_DKK() {
         cy.get('#menu-magento-backend-stores > [onclick="return false;"]').click()
         cy.get('.item-system-config > a').click()
         cy.get('#save').click()
