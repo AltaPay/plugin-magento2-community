@@ -166,6 +166,8 @@ To synchronize the terminals with the gateway, click on the **Synchronize Termin
 
 ![gateway_terminal_configuration](docs/gateway_terminal_configuration.png)
 
+**_Note: Remember to follow Magento2 guidelines [Manage the cache](https://docs.magento.com/user-guide/system/cache-management.html) when updating the configuration._**
+
 
 # Supported versions
 
