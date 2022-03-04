@@ -470,6 +470,8 @@ class Order {
         cy.get('#menu-magento-backend-system > [onclick="return false;"]').scrollIntoView().click()
         cy.get('.item-system-cache > a').click()
         cy.get('#flush_magento').click()
+        cy.get('#flush_system > span').click()
+        cy.get('.action-primary > span').click().wait(60000)
     }
 
     ideal_payment(iDEAl_EUR_TERMINAL) {
@@ -518,6 +520,8 @@ class Order {
         cy.get('#menu-magento-backend-system > [onclick="return false;"]').scrollIntoView().click()
         cy.get('.item-system-cache > a').click()
         cy.get('#flush_magento').click()
+        cy.get('#flush_system > span').click()
+        cy.get('.action-primary > span').click().wait(60000)
     }
 }
 
