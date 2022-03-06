@@ -452,14 +452,26 @@ class Order {
         cy.get('#menu-magento-backend-stores > [onclick="return false;"]').click()
         cy.get('.item-system-config > a').click()
         cy.contains('Currency Setup').click()
-        cy.get('#currency_options_base').select('Euro')
-        cy.get('#currency_options_default').select('Euro')
-        cy.get('#currency_options_allow').select('Euro')
-        cy.get('#save').click().wait(2000)
+        cy.get('#currency_options-head').then(($cr) => {
+            if ($cr.hasClass('open')) {
+                cy.get('#currency_options_base').wait(2000).select('Euro')
+                cy.get('#currency_options_default').wait(2000).select('Euro')
+                cy.get('#currency_options_allow').wait(2000).select('Euro')
+                cy.get('#save').click().wait(2000)
+            } else {
+                cy.get('#currency_options-head').click()
+                cy.get('#currency_options_base').wait(2000).select('Euro')
+                cy.get('#currency_options_default').wait(2000).select('Euro')
+                cy.get('#currency_options_allow').wait(2000).select('Euro')
+                cy.get('#save').click().wait(2000)
+            }
+        })
         //Flush cache
         cy.get('#menu-magento-backend-system > [onclick="return false;"]').scrollIntoView().click()
         cy.get('.item-system-cache > a').click()
         cy.get('#flush_magento').click()
+        cy.get('#flush_system > span').click()
+        cy.get('.action-primary > span').click().wait(60000)
     }
 
     ideal_payment(iDEAl_EUR_TERMINAL) {
@@ -489,14 +501,27 @@ class Order {
         cy.get('.item-system-config > a').click()
         cy.get('#save').click()
         cy.contains('Currency Setup').click()
-        cy.get('#currency_options_base').select('Danish Krone')
-        cy.get('#currency_options_default').select('Danish Krone')
-        cy.get('#currency_options_allow').select('Danish Krone')
-        cy.get('#save').click().wait(2000)
+        cy.get('#currency_options-head').then(($cr) => {
+            if ($cr.hasClass('open')) {
+                cy.get('#currency_options_base').select('Danish Krone')
+                cy.get('#currency_options_default').select('Danish Krone')
+                cy.get('#currency_options_allow').select('Danish Krone')
+                cy.get('#save').click().wait(2000)
+            } else {
+                cy.get('#currency_options-head').click()
+                cy.get('#currency_options_base').select('Danish Krone')
+                cy.get('#currency_options_default').select('Danish Krone')
+                cy.get('#currency_options_allow').select('Danish Krone')
+                cy.get('#save').click().wait(2000)
+            }
+        })
+      
         //Flush cache
         cy.get('#menu-magento-backend-system > [onclick="return false;"]').scrollIntoView().click()
         cy.get('.item-system-cache > a').click()
         cy.get('#flush_magento').click()
+        cy.get('#flush_system > span').click()
+        cy.get('.action-primary > span').click().wait(60000)
     }
 }
 
