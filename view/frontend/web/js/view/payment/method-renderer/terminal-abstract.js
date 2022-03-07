@@ -56,10 +56,12 @@ define(
                             terminalname = "";
                         } else {
                             if (paymentMethod[obj].terminalname != " ") {
-                                if (paymentMethod[obj].label != null) {
-                                    terminalname = paymentMethod[obj].label
-                                } else {
-                                    terminalname = paymentMethod[obj].terminalname;
+                                if (paymentMethod[obj].isapplepay != 1) {
+                                    if (paymentMethod[obj].label != null) {
+                                        terminalname = paymentMethod[obj].label
+                                    } else {
+                                        terminalname = paymentMethod[obj].terminalname;
+                                    }
                                 }
                             }
                         }
