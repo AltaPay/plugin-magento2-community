@@ -415,12 +415,6 @@ class Generator
             if ($order->getId()) {
                 $cardType = '';
                 $expires  = '';
-                foreach ($order->getAllItems() as $item) {
-                    if ($item->getQtyCanceled > 0) {
-                            $item->setQtyCanceled($item->getQtyToCancel());
-                            $item->save();
-                    }
-                }
                 if (isset($response->Transactions[0])) {
                     $transaction = $response->Transactions[0];
                     if (isset($transaction->CreditCardExpiry->Month) && isset($transaction->CreditCardExpiry->Year)) {
@@ -486,6 +480,7 @@ class Generator
                 if($order->getState() == 'canceled') {
                     $this->updateStockQty($order);
                 }
+                $this->resetCanceledQty($order);
                 $order->getResource()->save($order);
 
                 if (strtolower($paymentType) === 'paymentandcapture' || strtolower($paymentType) === 'subscriptionandcharge') {
@@ -704,6 +699,20 @@ class Generator
         foreach($quoteItems as $item)
         {
             $cart->removeItem($item->getId())->save(); 
+        }
+    }
+
+    /**
+     * @param $order
+     * 
+     * @return void
+     */
+    public function resetCanceledQty($order) {
+        foreach ($order->getAllItems() as $item) {
+            if ($item->getQtyCanceled > 0) {
+                    $item->setQtyCanceled($item->getQtyToCancel());
+                    $item->save();
+            }
         }
     }
 }
