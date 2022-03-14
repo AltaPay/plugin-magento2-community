@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 ## [3.3.2]
 
 **Fixes**
-- Fixed - Order status set to "closed" despite the orders being in a pre-auth state.
+- Fix: Order status set to "closed" despite the orders being in a pre-auth state.
 
 ## [3.3.1]
 
