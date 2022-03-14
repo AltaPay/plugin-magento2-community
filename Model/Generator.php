@@ -410,6 +410,10 @@ class Generator
 
         if ($response) {
             $order      = $this->orderLoader->getOrderByOrderIncrementId($response->shopOrderId);
+            foreach ($order->getAllItems() as $item) {
+                $item->setQtyCanceled(0);
+                $item->save();
+            }
             $storeScope = \Magento\Store\Model\ScopeInterface::SCOPE_STORE;
             $storeCode  = $order->getStore()->getCode();
             if ($order->getId()) {

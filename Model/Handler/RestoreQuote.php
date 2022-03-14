@@ -251,6 +251,8 @@ class RestoreQuote
     public function revertOrderQty($order)
     {
         foreach ($order->getAllItems() as $item) {
+            $item->setQtyCanceled($item['qty_ordered']);
+            $item->save();
             $qty = $item->getQtyOrdered() - max($item->getQtyShipped(), $item->getQtyInvoiced()) - $item->getQtyCanceled();
             if ($item->getId() && $item->getProductId() && empty($item->getChildrenItems()) && $qty) {
                 $this->stockManagement->backItemQty($item->getProductId(), $qty);
