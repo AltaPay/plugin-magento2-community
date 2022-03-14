@@ -22,6 +22,7 @@ use Magento\CatalogInventory\Api\StockManagementInterface;
 use SDM\Altapay\Model\SystemConfig;
 use Magento\Framework\App\ResourceConnection;
 use SDM\Altapay\Logger\Logger;
+use Magento\Catalog\Model\Indexer\Product\Price\Processor;
 
 class RestoreQuote
 {
@@ -109,7 +110,8 @@ class RestoreQuote
         StockManagementInterface $stockManagement,
         SystemConfig $systemConfig,
         ResourceConnection $modelResource,
-        Logger $altapayLogger
+        Logger $altapayLogger,
+        Processor $priceIndexer
     ) {
         $this->checkoutSession = $checkoutSession;
         $this->orderFactory    = $orderFactory;
@@ -122,6 +124,7 @@ class RestoreQuote
         $this->systemConfig    = $systemConfig;
         $this->modelResource   = $modelResource;
         $this->altapayLogger   = $altapayLogger;
+        $this->priceIndexer = $priceIndexer;
     }
 
     /**
@@ -248,12 +251,14 @@ class RestoreQuote
     public function revertOrderQty($order)
     {
         foreach ($order->getAllItems() as $item) {
-            $item->setQtyCanceled($item['qty_ordered']);
-            $item->save();  
-            $qty = $item->getQtyOrdered() - max($item->getQtyShipped(), $item->getQtyInvoiced());
-            if ($item->getId() && $item->getProductId() && empty($item->getChildrenItems()) && $qty) {
-                $this->stockManagement->backItemQty($item->getProductId(), $qty, $item->getStore()->getWebsiteId());
+            $children = $item->getChildrenItems();
+            $qty = $item->getQtyOrdered() - max($item->getQtyShipped(), $item->getQtyInvoiced()) - $item->getQtyCanceled();
+            if ($item->getId() && $item->getProductId() && empty($children) && $qty) {
+                $this->stockManagement->backItemQty($item->getProductId(), $qty);
             }
+            $this->priceIndexer->reindexRow($item->getProductId());
+            return $this;
+
         }
     }
 }
