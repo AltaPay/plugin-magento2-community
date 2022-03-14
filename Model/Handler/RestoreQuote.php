@@ -247,6 +247,8 @@ class RestoreQuote
 
     /**
      * @param $order
+     *
+     * @return void
      */
     public function revertOrderQty($order)
     {
