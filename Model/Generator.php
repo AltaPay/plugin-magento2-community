@@ -410,15 +410,17 @@ class Generator
 
         if ($response) {
             $order      = $this->orderLoader->getOrderByOrderIncrementId($response->shopOrderId);
-            foreach ($order->getAllItems() as $item) {
-                $item->setQtyCanceled(0);
-                $item->save();
-            }
             $storeScope = \Magento\Store\Model\ScopeInterface::SCOPE_STORE;
             $storeCode  = $order->getStore()->getCode();
             if ($order->getId()) {
                 $cardType = '';
                 $expires  = '';
+                foreach ($order->getAllItems() as $item) {
+                    if ($item->getQtyCanceled > 0) {
+                            $item->setQtyCanceled($item->getQtyToCancel());
+                            $item->save();
+                    }
+                }
                 if (isset($response->Transactions[0])) {
                     $transaction = $response->Transactions[0];
                     if (isset($transaction->CreditCardExpiry->Month) && isset($transaction->CreditCardExpiry->Year)) {
