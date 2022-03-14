@@ -258,8 +258,8 @@ class RestoreQuote
                 $this->stockManagement->backItemQty($item->getProductId(), $qty);
             }
             $this->priceIndexer->reindexRow($item->getProductId());
+            
             return $this;
-
         }
     }
 }
