@@ -124,7 +124,7 @@ class RestoreQuote
         $this->systemConfig    = $systemConfig;
         $this->modelResource   = $modelResource;
         $this->altapayLogger   = $altapayLogger;
-        $this->priceIndexer = $priceIndexer;
+        $this->priceIndexer    = $priceIndexer;
     }
 
     /**
@@ -251,9 +251,8 @@ class RestoreQuote
     public function revertOrderQty($order)
     {
         foreach ($order->getAllItems() as $item) {
-            $children = $item->getChildrenItems();
             $qty = $item->getQtyOrdered() - max($item->getQtyShipped(), $item->getQtyInvoiced()) - $item->getQtyCanceled();
-            if ($item->getId() && $item->getProductId() && empty($children) && $qty) {
+            if ($item->getId() && $item->getProductId() && empty($item->getChildrenItems()) && $qty) {
                 $this->stockManagement->backItemQty($item->getProductId(), $qty);
             }
             $this->priceIndexer->reindexRow($item->getProductId());
