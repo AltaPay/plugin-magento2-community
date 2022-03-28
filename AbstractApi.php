@@ -216,6 +216,8 @@ abstract class AbstractApi
         $this->setOrderLinesResolver($resolver);
         $this->setAmountResolver($resolver);
         $this->setTerminalResolver($resolver);
+        $this->setValidationUrlResolver($resolver);
+        $this->setAppleDomainResolver($resolver);
         $this->setCurrencyResolver($resolver);
         $this->setShopOrderIdResolver($resolver);
         $this->setTransactionInfoResolver($resolver);
@@ -421,7 +423,27 @@ abstract class AbstractApi
     protected function setTerminalResolver(OptionsResolver $resolver)
     {
     }
-
+    
+    /**
+     * Resolve validationUrl option
+     *
+     * @param OptionsResolver $resolver
+     *
+     * @return void
+     */
+    protected function setValidationUrlResolver(OptionsResolver $resolver)
+    {
+    }
+    /**
+     * Resolve applepaydomain option
+     *
+     * @param OptionsResolver $resolver
+     *
+     * @return void
+     */
+    protected function setAppleDomainResolver(OptionsResolver $resolver)
+    {
+    }
     /**
      * Resolve currency option
      *

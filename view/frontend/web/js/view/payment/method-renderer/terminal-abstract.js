@@ -14,9 +14,10 @@ define(
         'jquery',
         'Magento_Checkout/js/view/payment/default',
         'Magento_Customer/js/customer-data',
-        'SDM_Altapay/js/action/set-payment'
+        'SDM_Altapay/js/action/set-payment',
+        'Magento_Checkout/js/action/redirect-on-success'
     ],
-    function ($, Component, storage, Action) {
+    function ($, Component, storage, Action, redirectOnSuccessAction) {
         'use strict';
 
         return Component.extend({
@@ -28,6 +29,15 @@ define(
             redirectAfterPlaceOrder: false,
 
             placeOrder: function () {
+                var self = this;
+                var paymentMethod = window.checkoutConfig.payment['sdm_altapay'].terminaldata;
+                for (var obj in paymentMethod) {
+                    if (obj === self.getCode()) {
+                        if(paymentMethod[obj].isapplepay === '1' ) {
+                            this.onApplePayButtonClicked();
+                        }
+                    }
+                }
                 $('#altapay-error-message').text('');
                 var auth = window.checkoutConfig.payment[this.getDefaultCode()].auth;
                 var connection = window.checkoutConfig.payment[this.getDefaultCode()].connection;
@@ -56,13 +66,11 @@ define(
                             terminalname = "";
                         } else {
                             if (paymentMethod[obj].terminalname != " ") {
-                                if (paymentMethod[obj].isapplepay != 1) {
                                     if (paymentMethod[obj].label != null) {
                                         terminalname = paymentMethod[obj].label
                                     } else {
                                         terminalname = paymentMethod[obj].terminalname;
                                     }
-                                }
                             }
                         }
                     }
@@ -82,6 +90,109 @@ define(
                     }
                 }
 
+            },
+            onApplePayButtonClicked: function() {
+                congigData = window.checkoutConfig;
+                var baseurl = congigData.url;
+
+                if (!ApplePaySession) {
+                    return;
+                }
+
+                // Define ApplePayPaymentRequest
+                const request = {
+                    "countryCode": congigData.countryCode,
+                    "currencyCode": congigData.currencyCode,
+                    "merchantCapabilities": [
+                        "supports3DS"
+                    ],
+                    "supportedNetworks": [
+                        "visa",
+                        "masterCard",
+                        "amex",
+                        "discover"
+                    ],
+                    "total": {
+                        "label": "Demo (Card is not charged)",
+                        "type": "final",
+                        "amount": congigData.grandTotalAmount
+                    }
+                };
+                
+                // Create ApplePaySession
+                const session = new ApplePaySession(3, request);
+
+                session.onvalidatemerchant = async event => {
+                    var url = baseurl+"sdmaltapay/index/applepay";
+                    // Call your own server to request a new merchant session.            
+                    $.ajax({
+                        url: url,
+                        data: {
+                            validationUrl: event.validationURL
+                        },
+                        type: 'post',
+                        dataType: 'JSON',
+                        success: function(response) {
+                                var responsedata = jQuery.parseJSON(response);
+                                session.completeMerchantValidation(responsedata);
+                        }
+                    });
+                };
+                
+                session.onpaymentmethodselected = event => {
+                    let total = {
+                        "label": "AltaPay Apple Charge",
+                        "type": "final",
+                        "amount": congigData.grandTotalAmount
+                    }
+            
+                    const update = { "newTotal": total };
+                    session.completePaymentMethodSelection(update);
+            
+                };
+                
+                session.onshippingmethodselected = event => {
+                    // Define ApplePayShippingMethodUpdate based on the selected shipping method.
+                    // No updates or errors are needed, pass an empty object. 
+                    const update = {};
+                    session.completeShippingMethodSelection(update);
+                };
+                
+                session.onshippingcontactselected = event => {
+                    // Define ApplePayShippingContactUpdate based on the selected shipping contact.
+                    const update = {};
+                    session.completeShippingContactSelection(update);
+                };
+                
+                session.onpaymentauthorized = event => {
+                    var url = baseurl+"sdmaltapay/index/applepayresponse";    
+                    $.ajax({
+                        url: url,
+                        data: {
+                            providerData: JSON.stringify(event.payment.token),
+                            paytype: 1
+                        },
+                        type: 'post',
+                        dataType: 'JSON',
+                        complete: function(response) {
+                            var status;
+                            var responsestatus = response.responseJSON.Result.toLowerCase();
+                            if (responsestatus === 'success') {
+                                status = ApplePaySession.STATUS_SUCCESS;
+                                session.completePayment(status);
+                                redirectOnSuccessAction.execute();
+                            } else {
+                                status = ApplePaySession.STATUS_FAILURE;
+                                session.completePayment(status);
+                            }
+                        }
+                    });        
+                };
+                session.oncancel = event => {
+                    console.log("oncancel");
+                };
+                
+                session.begin();
             },
             getDefaultCode: function () {
                 return 'sdm_altapay';
