@@ -36,6 +36,7 @@ use Magento\Framework\App\Request\Http;
 use Magento\Framework\App\RequestInterface;
 use Magento\Quote\Model\Quote\Item\AbstractItem;
 use Magento\Framework\DataObject;
+use SDM\Altapay\Api\Payments\ApplepayWalletAuthorize;
 
 /**
  * Class Gateway
@@ -465,6 +466,7 @@ class Gateway implements GatewayInterface
             //set orderlines to the request
             $request->setOrderLines($orderLines);
 
+        }
         return $request;
     }
 
