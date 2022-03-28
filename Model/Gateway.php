@@ -34,6 +34,7 @@ use SDM\Altapay\Model\Handler\CreatePaymentHandler;
 use SDM\Altapay\Model\TokenFactory;
 use Magento\Quote\Model\Quote\Item\AbstractItem;
 use Magento\Framework\DataObject;
+use SDM\Altapay\Api\Payments\ApplepayWalletAuthorize;
 
 /**
  * Class Gateway
@@ -196,9 +197,53 @@ class Gateway implements GatewayInterface
             if(!empty($this->fixedProductTax($order))){
                 $orderLines[] = $this->orderLines->fixedProductTaxOrderLine($this->fixedProductTax($order));
             }
-            $request = $this->preparePaymentRequest($order, $orderLines, $orderId, $terminalId);
+            $request = $this->preparePaymentRequest($order, $orderLines, $orderId, $terminalId, null);
             if ($request) {
                 return $this->sendPaymentRequest($order, $request);
+            }
+        }
+
+        return $this->restoreOrderAndReturnError($order);
+    }
+
+    /**
+     * @param $terminalId
+     * @param $orderId
+     * @param $providerData
+     *
+     * @return mixed
+     */
+    public function createRequestApplepay($terminalId, $orderId, $providerData)
+    {
+        $order = $this->order->load($orderId);
+        if ($order->getId()) {
+            $couponCode       = $order->getDiscountDescription();
+            $couponCodeAmount = $order->getDiscountAmount();
+            $discountAllItems = $this->discountHandler->allItemsHaveDiscount($order->getAllItems());
+            $orderLines       = $this->itemOrderLines($couponCodeAmount, $order, $discountAllItems);
+            if ($this->orderLines->sendShipment($order) && !empty($order->getShippingMethod(true))) {
+                $orderLines[] = $this->orderLines->handleShipping($order, $discountAllItems, true);
+                //Shipping Discount Tax Compensation Amount
+                $compAmount = $this->discountHandler->hiddenTaxDiscountCompensation($order, $discountAllItems, true);
+                if ($compAmount > 0 && $discountAllItems == false) {
+                    $orderLines[] = $this->orderLines->compensationOrderLine(
+                        "Shipping compensation",
+                        "comp-ship",
+                        $compAmount
+                    );
+                }
+            }
+            if ($discountAllItems && abs($couponCodeAmount) > 0) {
+                $orderLines[] = $this->orderLines->discountOrderLine($couponCodeAmount, $couponCode);
+            }
+            if(!empty($this->fixedProductTax($order))){
+                $orderLines[] = $this->orderLines->fixedProductTaxOrderLine($this->fixedProductTax($order));
+            }
+            $request = $this->preparePaymentRequest($order, $orderLines, $orderId, $terminalId, $providerData);
+            if ($request) {
+                $response                 = $request->call();
+                
+                return $response;
             }
         }
 
@@ -336,10 +381,11 @@ class Gateway implements GatewayInterface
      * @param $orderLines
      * @param $orderId
      * @param $terminalId
+     * @param $providerData
      *
-     * @return mixed
+     * @return bool|PaymentRequest|ApplepayWalletAuthorize
      */
-    private function preparePaymentRequest($order, $orderLines, $orderId, $terminalId)
+    private function preparePaymentRequest($order, $orderLines, $orderId, $terminalId, $providerData)
     {
         $storeScope = $this->storeConfig->getStoreScope();
         $storeCode  = $order->getStore()->getCode();
@@ -353,54 +399,63 @@ class Gateway implements GatewayInterface
         $terminalName = $this->systemConfig->getTerminalConfig($terminalId, 'terminalname', $storeScope, $storeCode);
         //Transaction Info
         $transactionDetail = $this->helper->transactionDetail($orderId);
-        $request           = new PaymentRequest($auth);
-        $request->setTerminal($terminalName)
-                ->setShopOrderId($order->getIncrementId())
-                ->setAmount((float)number_format($order->getGrandTotal(), 2, '.', ''))
-                ->setCurrency($order->getOrderCurrencyCode())
-                ->setCustomerInfo($this->customerHandler->setCustomer($order))
-                ->setConfig($this->setConfig())
-                ->setTransactionInfo($transactionDetail)
-                ->setSalesTax((float)number_format($order->getTaxAmount(), 2, '.', ''))
-                ->setCookie($this->request->getServer('HTTP_COOKIE'));
+        if ($providerData) {
+            $request = new ApplepayWalletAuthorize($auth);
+            $request->setProviderData($providerData)
+                    ->setTerminal($terminalName)
+                    ->setShopOrderId($order->getIncrementId())
+                    ->setAmount((float)number_format($order->getGrandTotal(), 2, '.', ''))
+                    ->setCurrency($order->getOrderCurrencyCode());
+        } else {
+            $request           = new PaymentRequest($auth);
+            $request->setTerminal($terminalName)
+                    ->setShopOrderId($order->getIncrementId())
+                    ->setAmount((float)number_format($order->getGrandTotal(), 2, '.', ''))
+                    ->setCurrency($order->getOrderCurrencyCode())
+                    ->setCustomerInfo($this->customerHandler->setCustomer($order))
+                    ->setConfig($this->setConfig())
+                    ->setTransactionInfo($transactionDetail)
+                    ->setSalesTax((float)number_format($order->getTaxAmount(), 2, '.', ''))
+                    ->setCookie($this->request->getServer('HTTP_COOKIE'));
 
-        $post = $this->request->getPostValue();
+            $post = $this->request->getPostValue();
 
-        if (isset($post['tokenid'])) {
-            $model      = $this->dataToken->create();
-            $collection = $model->getCollection()->addFieldToFilter('id', $post['tokenid'])->getFirstItem();
-            $data       = $collection->getData();
-            if (!empty($data)) {
-                $token = $data['token'];
-                $request->setCcToken($token);
+            if (isset($post['tokenid'])) {
+                $model      = $this->dataToken->create();
+                $collection = $model->getCollection()->addFieldToFilter('id', $post['tokenid'])->getFirstItem();
+                $data       = $collection->getData();
+                if (!empty($data)) {
+                    $token = $data['token'];
+                    $request->setCcToken($token);
+                }
             }
-        }
 
-        if ($fraud = $this->systemConfig->getTerminalConfig($terminalId, 'fraud', $storeScope, $storeCode)) {
-            $request->setFraudService($fraud);
-        }
-
-        if ($lang = $this->systemConfig->getTerminalConfig($terminalId, 'language', $storeScope, $storeCode)) {
-            $langArr = explode('_', $lang, 2);
-            if (isset($langArr[0])) {
-                $request->setLanguage($langArr[0]);
+            if ($fraud = $this->systemConfig->getTerminalConfig($terminalId, 'fraud', $storeScope, $storeCode)) {
+                $request->setFraudService($fraud);
             }
-        }
-        $quote = $this->quote->loadByIdWithoutStore($order->getQuoteId());
-        if ($this->validateQuote($quote)) {
-            if ($this->systemConfig->getTerminalConfig($terminalId, 'capture', $storeScope, $storeCode)) {
-                $request->setType('subscriptionAndCharge');
-            } else {
-                $request->setType('subscription');
-            }
-        }
-        // check if auto capture enabled
-        if (!$this->validateQuote($quote) && $this->systemConfig->getTerminalConfig($terminalId, 'capture', $storeScope, $storeCode)) {
-            $request->setType('paymentAndCapture');
-        }
-        //set orderlines to the request
-        $request->setOrderLines($orderLines);
 
+            if ($lang = $this->systemConfig->getTerminalConfig($terminalId, 'language', $storeScope, $storeCode)) {
+                $langArr = explode('_', $lang, 2);
+                if (isset($langArr[0])) {
+                    $request->setLanguage($langArr[0]);
+                }
+            }
+            $quote = $this->quote->loadByIdWithoutStore($order->getQuoteId());
+            if ($this->validateQuote($quote)) {
+                if ($this->systemConfig->getTerminalConfig($terminalId, 'capture', $storeScope, $storeCode)) {
+                    $request->setType('subscriptionAndCharge');
+                } else {
+                    $request->setType('subscription');
+                }
+            }
+            // check if auto capture enabled
+            if (!$this->validateQuote($quote) && $this->systemConfig->getTerminalConfig($terminalId, 'capture', $storeScope, $storeCode)) {
+                $request->setType('paymentAndCapture');
+            }
+            //set orderlines to the request
+            $request->setOrderLines($orderLines);
+
+        }
         return $request;
     }
 
