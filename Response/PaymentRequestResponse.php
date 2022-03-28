@@ -41,4 +41,11 @@ class PaymentRequestResponse extends AbstractResponse
 
     /** @var string */
     public $DynamicJavascriptUrl;
+    
+    /** @var string */
+    public $Transactions;
+    
+    /** @var string */
+    public $ApplePaySession;
+    
 }
