@@ -92,8 +92,8 @@ define(
 
             },
             onApplePayButtonClicked: function() {
-                congigData = window.checkoutConfig;
-                var baseurl = congigData.url;
+                configData = window.checkoutConfig;
+                var baseurl = configData.url;
 
                 if (!ApplePaySession) {
                     return;
@@ -101,8 +101,8 @@ define(
 
                 // Define ApplePayPaymentRequest
                 const request = {
-                    "countryCode": congigData.countryCode,
-                    "currencyCode": congigData.currencyCode,
+                    "countryCode": configData.countryCode,
+                    "currencyCode": configData.currencyCode,
                     "merchantCapabilities": [
                         "supports3DS"
                     ],
@@ -115,7 +115,7 @@ define(
                     "total": {
                         "label": "Demo (Card is not charged)",
                         "type": "final",
-                        "amount": congigData.grandTotalAmount
+                        "amount": configData.grandTotalAmount
                     }
                 };
                 
@@ -128,7 +128,8 @@ define(
                     $.ajax({
                         url: url,
                         data: {
-                            validationUrl: event.validationURL
+                            validationUrl: event.validationURL,
+                            termminalid: this.terminalName()
                         },
                         type: 'post',
                         dataType: 'JSON',
@@ -143,7 +144,7 @@ define(
                     let total = {
                         "label": "AltaPay Apple Charge",
                         "type": "final",
-                        "amount": congigData.grandTotalAmount
+                        "amount": configData.grandTotalAmount
                     }
             
                     const update = { "newTotal": total };
