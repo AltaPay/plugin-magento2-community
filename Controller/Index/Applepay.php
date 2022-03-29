@@ -84,6 +84,7 @@ class Applepay extends Action implements CsrfAwareActionInterface
     {
         $storeCode     = $this->getStoreCode();
         $validationUrl = $this->getRequest()->getParam('validationUrl');
+        $terminalName = $this->getRequest()->getParam('termminalid');
         //Test the conn with the Payment Gateway
         $auth     = $this->systemConfig->getAuth($storeCode);
         $api      = new TestAuthentication($auth);
@@ -91,8 +92,9 @@ class Applepay extends Action implements CsrfAwareActionInterface
         if (!$response) {
             return false;
         }
+       
         $request = new ApplepayWalletSession($auth);
-        $request->setTerminal("EmbraceIT ApplePay Test Terminal")
+        $request->setTerminal($terminalName)
                 ->setValidationUrl($validationUrl)
                 ->setDomain('creativeminors.com');
 
