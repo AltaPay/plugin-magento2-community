@@ -397,15 +397,17 @@ class Gateway implements GatewayInterface
             return false;
         }
         $terminalName = $this->systemConfig->getTerminalConfig($terminalId, 'terminalname', $storeScope, $storeCode);
+
+        $isApplePay = $this->systemConfig->getTerminalConfig($terminalId, 'isapplepay', $storeScope, $storeCode);
         //Transaction Info
         $transactionDetail = $this->helper->transactionDetail($orderId);
-        if ($providerData) {
-            $request = new ApplepayWalletAuthorize($auth);
-            $request->setProviderData($providerData)
-                    ->setTerminal($terminalName)
-                    ->setShopOrderId($order->getIncrementId())
-                    ->setAmount((float)number_format($order->getGrandTotal(), 2, '.', ''))
-                    ->setCurrency($order->getOrderCurrencyCode());
+        if ($isApplePay) {
+                $request = new ApplepayWalletAuthorize($auth);
+                $request->setProviderData($providerData)
+                        ->setTerminal($terminalName)
+                        ->setShopOrderId($order->getIncrementId())
+                        ->setAmount((float)number_format($order->getGrandTotal(), 2, '.', ''))
+                        ->setCurrency($order->getOrderCurrencyCode());
         } else {
             $request           = new PaymentRequest($auth);
             $request->setTerminal($terminalName)

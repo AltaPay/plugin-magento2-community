@@ -9,6 +9,7 @@
 
 namespace SDM\Altapay\Controller\Index;
 
+use Magento\Checkout\Model\Session;
 use Magento\Framework\App\ResponseInterface;
 use Magento\Framework\Controller\ResultFactory;
 use Magento\Framework\App\Action\Action;
@@ -18,7 +19,6 @@ use SDM\Altapay\Model\Gateway;
 use Magento\Framework\App\Request\InvalidRequestException;
 use Magento\Framework\App\Action\Context;
 use Magento\Sales\Model\Order;
-use SDM\Altapay\Api\Payments\ApplepayWalletAuthorize;
 use Magento\Framework\Controller\Result\RedirectFactory;
 use Magento\Framework\Math\Random;
 
@@ -29,23 +29,32 @@ class ApplepayResponse extends Action implements CsrfAwareActionInterface
      */
     protected $order;
 
+    /**
+     * ApplepayResponse constructor.
+     *
+     * @param Context         $context
+     * @param Session         $checkoutSession
+     * @param Order           $orderRepository
+     * @param Gateway         $gateway
+     * @param RedirectFactory $redirectFactory
+     * @param Order           $order
+     * @param Random          $random
+     */
     public function __construct(
         Context $context,
-        \Magento\Checkout\Model\Session $checkoutSession,
-        \Magento\Sales\Model\Order $orderRepository,
+        Session $checkoutSession,
+        Order $orderRepository,
         Gateway $gateway,
         RedirectFactory $redirectFactory,
         Order $order,
-        Random $random,
-        \Magento\Framework\Controller\Result\JsonFactory $resultJsonFactory
+        Random $random
     ) {
         parent::__construct($context);
         $this->_checkoutSession = $checkoutSession;
-        $this->resultJsonFactory = $resultJsonFactory;
-        $this->gateway         = $gateway;
-        $this->redirectFactory = $redirectFactory;
-        $this->order           = $order;
-        $this->random          = $random;
+        $this->gateway          = $gateway;
+        $this->redirectFactory  = $redirectFactory;
+        $this->order            = $order;
+        $this->random           = $random;
         $this->_orderRepository = $orderRepository;
     }
 
@@ -82,9 +91,10 @@ class ApplepayResponse extends Action implements CsrfAwareActionInterface
                 $this->getRequest()->getParam('providerData')
             );
 
-                echo json_encode($params);
+            echo json_encode($params);
         }
     }
+
     /**
      * @return mixed
      */
@@ -100,25 +110,17 @@ class ApplepayResponse extends Action implements CsrfAwareActionInterface
      */
     protected function setSuccessPath($orderId)
     {
-        $writer = new \Laminas\Log\Writer\Stream(BP . '/var/log/logging.log');
-$logger = new \Laminas\Log\Logger();
-$logger->addWriter($writer);
-$logger->info(print_r("orderId ".$orderId." orderId",true));
-
         $resultRedirect = $this->redirectFactory->create();
         if ($orderId) {
-            $order = $this->order->loadByIncrementId($orderId);
+            $order      = $this->order->loadByIncrementId($orderId);
             $uniqueHash = $this->random->getUniqueHash();
             $order->setAltapayOrderHash($uniqueHash);
             $order->getResource()->save($order);
-            $resultRedirect->setPath('checkout/onepage/success',['success_token' => $uniqueHash]);
+            $resultRedirect->setPath('checkout/onepage/success', ['success_token' => $uniqueHash]);
         } else {
             $resultRedirect->setPath('checkout/onepage/success');
         }
 
-        $logger->info(print_r("resultRedirect",true));
-
         return $resultRedirect;
     }
-
 }
