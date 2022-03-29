@@ -89,12 +89,10 @@ class ApplepayWalletSession extends AbstractApi
      */
     protected function handleResponse(Request $request, ResponseInterface $response)
     {
-        {
-            $body = (string)$response->getBody();
-            $xml  = new \SimpleXMLElement($body);
-    
-            return ResponseSerializer::serialize(PaymentRequestResponse::class, $xml->Body, $xml->Header);
-        }
+        $body = (string)$response->getBody();
+        $xml  = new \SimpleXMLElement($body);
+
+        return ResponseSerializer::serialize(PaymentRequestResponse::class, $xml->Body, $xml->Header);
     }
 
     /**
