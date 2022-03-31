@@ -1,6 +1,11 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [3.3.3]
+
+**Fixes**
+- Fix: Order status set to "closed" for "Vipps" payment method
+
 ## [3.3.2]
 
 **Fixes**
