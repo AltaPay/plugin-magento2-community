@@ -92,8 +92,8 @@ define(
 
             },
             onApplePayButtonClicked: function() {
-                configData = window.checkoutConfig;
-                var baseurl = configData.url;
+               var configData = window.checkoutConfig.payment[this.getDefaultCode()];
+                var baseurl = configData.baseUrl;
 
                 if (!ApplePaySession) {
                     return;
@@ -149,7 +149,6 @@ define(
             
                     const update = { "newTotal": total };
                     session.completePaymentMethodSelection(update);
-            
                 };
                 
                 session.onshippingmethodselected = event => {
@@ -166,7 +165,7 @@ define(
                 };
                 
                 session.onpaymentauthorized = event => {
-                    var url = baseurl+"sdmaltapay/index/applepayresponse";    
+                    var url = baseurl + "sdmaltapay/index/applepayresponse";    
                     $.ajax({
                         url: url,
                         data: {
