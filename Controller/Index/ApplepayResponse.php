@@ -103,24 +103,4 @@ class ApplepayResponse extends Action implements CsrfAwareActionInterface
         return $this->getRequest()->isPost();
     }
 
-    /**
-     * @param string $orderId
-     *
-     * @return mixed
-     */
-    protected function setSuccessPath($orderId)
-    {
-        $resultRedirect = $this->redirectFactory->create();
-        if ($orderId) {
-            $order      = $this->order->loadByIncrementId($orderId);
-            $uniqueHash = $this->random->getUniqueHash();
-            $order->setAltapayOrderHash($uniqueHash);
-            $order->getResource()->save($order);
-            $resultRedirect->setPath('checkout/onepage/success', ['success_token' => $uniqueHash]);
-        } else {
-            $resultRedirect->setPath('checkout/onepage/success');
-        }
-
-        return $resultRedirect;
-    }
 }

@@ -215,7 +215,10 @@ class Gateway implements GatewayInterface
      */
     public function createRequestApplepay($terminalId, $orderId, $providerData)
     {
+
+        $storeScope = $this->storeConfig->getStoreScope();
         $order = $this->order->load($orderId);
+        $storeCode  = $order->getStore()->getCode();
         if ($order->getId()) {
             $couponCode       = $order->getDiscountDescription();
             $couponCodeAmount = $order->getDiscountAmount();
@@ -242,7 +245,13 @@ class Gateway implements GatewayInterface
             $request = $this->preparePaymentRequest($order, $orderLines, $orderId, $terminalId, $providerData);
             if ($request) {
                 $response                 = $request->call();
-                
+                if ($response->Result === 'Success' && $this->systemConfig->getStatusConfig('process', $storeScope, $storeCode)) {
+                    $this->paymentHandler->setCustomOrderStatus($order, Order::STATE_PROCESSING, 'process');
+                    $order->addStatusHistoryComment("ApplePay Status: ". $response->Result);
+                    $order->setIsNotified(false);
+                    $order->getResource()->save($order);
+                }
+
                 return $response;
             }
         }
