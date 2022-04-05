@@ -709,7 +709,7 @@ class Generator
      */
     public function resetCanceledQty($order) {
         foreach ($order->getAllItems() as $item) {
-            if ($item->getQtyCanceled > 0) {
+            if ($item->getQtyCanceled() > 0) {
                     $item->setQtyCanceled($item->getQtyToCancel());
                     $item->save();
             }
