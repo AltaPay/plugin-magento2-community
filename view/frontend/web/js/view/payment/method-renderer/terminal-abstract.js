@@ -60,9 +60,10 @@ define(
                 var self = this;
                 var terminalname;
                 var paymentMethod = window.checkoutConfig.payment[this.getDefaultCode()].terminaldata;
+                var isSafari = (/^((?!chrome|android).)*safari/i.test(navigator.userAgent));
                 for (var obj in paymentMethod) {
                     if (obj === self.getCode()) {
-                        if (paymentMethod[obj].terminallogo != "" && paymentMethod[obj].showlogoandtitle == false) {
+                        if ((paymentMethod[obj].terminallogo != "" && paymentMethod[obj].showlogoandtitle == false) || (paymentMethod[obj].isapplepay ==1 && isSafari === false)) {
                             terminalname = "";
                         } else {
                             if (paymentMethod[obj].terminalname != " ") {

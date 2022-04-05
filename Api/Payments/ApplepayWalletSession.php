@@ -25,18 +25,15 @@ namespace SDM\Altapay\Api\Payments;
 
 use SDM\Altapay\AbstractApi;
 use SDM\Altapay\Serializer\ResponseSerializer;
-use SDM\Altapay\Traits\AmountTrait;
 use SDM\Altapay\Traits\TerminalTrait;
-use SDM\Altapay\Traits\ShopOrderIdTrait;
 use SDM\Altapay\Response\PaymentRequestResponse;
-use SDM\Altapay\Traits\CurrencyTrait;
 use GuzzleHttp\Exception\ClientException as GuzzleHttpClientException;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
 use Psr\Http\Message\ResponseInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class ApplepayWalletSession extends AbstractApi
+class ApplePayWalletSession extends AbstractApi
 {
     use TerminalTrait;
 
@@ -85,7 +82,7 @@ class ApplepayWalletSession extends AbstractApi
      * @param Request           $request
      * @param ResponseInterface $response
      *
-     * @return CaptureReservationResponse
+     * @return PaymentRequestResponse
      */
     protected function handleResponse(Request $request, ResponseInterface $response)
     {

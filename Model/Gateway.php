@@ -34,7 +34,7 @@ use SDM\Altapay\Model\Handler\CreatePaymentHandler;
 use SDM\Altapay\Model\TokenFactory;
 use Magento\Quote\Model\Quote\Item\AbstractItem;
 use Magento\Framework\DataObject;
-use SDM\Altapay\Api\Payments\ApplepayWalletAuthorize;
+use SDM\Altapay\Api\Payments\ApplePayWalletAuthorize;
 
 /**
  * Class Gateway
@@ -392,7 +392,7 @@ class Gateway implements GatewayInterface
      * @param $terminalId
      * @param $providerData
      *
-     * @return bool|PaymentRequest|ApplepayWalletAuthorize
+     * @return bool|PaymentRequest|ApplePayWalletAuthorize
      */
     private function preparePaymentRequest($order, $orderLines, $orderId, $terminalId, $providerData)
     {
@@ -411,7 +411,7 @@ class Gateway implements GatewayInterface
         //Transaction Info
         $transactionDetail = $this->helper->transactionDetail($orderId);
         if ($isApplePay) {
-                $request = new ApplepayWalletAuthorize($auth);
+                $request = new ApplePayWalletAuthorize($auth);
                 $request->setProviderData($providerData)
                         ->setTerminal($terminalName)
                         ->setShopOrderId($order->getIncrementId())

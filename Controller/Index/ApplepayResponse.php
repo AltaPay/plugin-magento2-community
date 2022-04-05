@@ -22,7 +22,7 @@ use Magento\Sales\Model\Order;
 use Magento\Framework\Controller\Result\RedirectFactory;
 use Magento\Framework\Math\Random;
 
-class ApplepayResponse extends Action implements CsrfAwareActionInterface
+class ApplePayResponse extends Action implements CsrfAwareActionInterface
 {
     /**
      * @var Order
@@ -30,7 +30,7 @@ class ApplepayResponse extends Action implements CsrfAwareActionInterface
     protected $order;
 
     /**
-     * ApplepayResponse constructor.
+     * ApplePayResponse constructor.
      *
      * @param Context         $context
      * @param Session         $checkoutSession
