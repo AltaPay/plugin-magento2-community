@@ -16,13 +16,13 @@ use Magento\Framework\App\CsrfAwareActionInterface;
 use Magento\Framework\App\RequestInterface;
 use Magento\Framework\App\Request\InvalidRequestException;
 use SDM\Altapay\Api\Test\TestAuthentication;
-use SDM\Altapay\Api\Payments\ApplepayWalletSession;
+use SDM\Altapay\Api\Payments\ApplePayWalletSession;
 use SDM\Altapay\Helper\Config as storeConfig;
 use Magento\Store\Model\StoreManagerInterface;
 use Magento\Framework\App\Action\Context;
 use SDM\Altapay\Model\SystemConfig;
 
-class Applepay extends Action implements CsrfAwareActionInterface
+class ApplePay extends Action implements CsrfAwareActionInterface
 {
     /**
      * @var Helper Config
@@ -38,7 +38,7 @@ class Applepay extends Action implements CsrfAwareActionInterface
     private $_storeManager;
 
     /**
-     * Applepay constructor.
+     * ApplePay constructor.
      *
      * @param Context               $context
      * @param storeConfig           $storeConfig
@@ -93,7 +93,7 @@ class Applepay extends Action implements CsrfAwareActionInterface
             return false;
         }
        
-        $request = new ApplepayWalletSession($auth);
+        $request = new ApplePayWalletSession($auth);
         $request->setTerminal($terminalName)
                 ->setValidationUrl($validationUrl)
                 ->setDomain('creativeminors.com');
