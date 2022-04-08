@@ -62,16 +62,15 @@ class PriceHandler
         } else {
             $price = $item->getPrice();
         }
-        if ($originalPrice > $price && !(float)$couponAmount) {
-            $data["catalogDiscount"] = true;
-            $data["discount"]        = $this->discountHandler->catalogDiscount($originalPrice, $price);
-        } 
-        elseif ($originalPrice > $price && abs((float)$couponAmount) > 0 && !$discountAllItems) {
+        if ($originalPrice > $price && abs((float)$couponAmount) > 0 && !$discountAllItems) {
             $originalPrice = $originalPrice * $quantity;
             $data["catalogDiscount"] = true;
             $data["discount"]        = $this->discountHandler->combinationDiscount($originalPrice, $rowTotal);
+        } else if ($originalPrice > $price && !(float)$couponAmount) {
+            $data["catalogDiscount"] = true;
+            $data["discount"]        = $this->discountHandler->catalogDiscount($originalPrice, $price);
         } else {
-            $data["discount"] = $itemDiscount;
+           $data["discount"] = $itemDiscount;
         }
 
         return $data;
@@ -141,7 +140,7 @@ class PriceHandler
         $gatewaySubTotal = ($unitPrice * $quantity) + $taxAmount;
         $gatewaySubTotal = $gatewaySubTotal - ($gatewaySubTotal * ($discountedAmount / 100));
         // Magento calculation pattern
-        if (abs((float)$couponCodeAmount) > 0 && $storePriceIncTax && !$catalogDiscountCheck && $discountAllItems) {
+        if ((abs((float)$couponCodeAmount) > 0 && $storePriceIncTax && !$catalogDiscountCheck && $discountAllItems) || (abs((float)$couponCodeAmount) > 0 && $catalogDiscountCheck)) {
             $cmsPriceCal  = $unitPriceWithoutTax * $quantity;
             $cmsTaxCal    = $cmsPriceCal * ($taxPercent / 100);
             $cmsSubTotal  = $cmsPriceCal + $cmsTaxCal;
