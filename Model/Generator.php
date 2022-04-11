@@ -415,6 +415,11 @@ class Generator
             if ($order->getId()) {
                 $cardType = '';
                 $expires  = '';
+                //Update stock quantity
+                if($order->getState() == 'canceled') {
+                    $this->updateStockQty($order);
+                }
+                $this->resetCanceledQty($order);
                 if (isset($response->Transactions[0])) {
                     $transaction = $response->Transactions[0];
                     if (isset($transaction->CreditCardExpiry->Month) && isset($transaction->CreditCardExpiry->Year)) {
@@ -476,11 +481,6 @@ class Generator
                 $order->addStatusHistoryComment($comment);
                 $order->addStatusHistoryComment($this->getTransactionInfoFromResponse($response));
                 $order->setIsNotified(false);
-                //Update stock quantity
-                if($order->getState() == 'canceled') {
-                    $this->updateStockQty($order);
-                }
-                $this->resetCanceledQty($order);
                 $order->getResource()->save($order);
 
                 if (strtolower($paymentType) === 'paymentandcapture' || strtolower($paymentType) === 'subscriptionandcharge') {
