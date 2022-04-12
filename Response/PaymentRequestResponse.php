@@ -23,8 +23,20 @@
 
 namespace SDM\Altapay\Response;
 
+use SDM\Altapay\Response\Embeds\Transaction;
 class PaymentRequestResponse extends AbstractResponse
 {
+    /**
+     * Childs of the response
+     *
+     * @var array<string, array<string, mixed>>
+     */
+    protected $childs = [
+        'Transactions' => [
+            'class' => Transaction::class,
+            'array' => 'Transaction'
+        ],
+    ];
 
     /**
      * The result
