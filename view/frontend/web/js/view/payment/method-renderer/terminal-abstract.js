@@ -143,7 +143,7 @@ define(
                 
                 session.onpaymentmethodselected = event => {
                     let total = {
-                        "label": "AltaPay Apple Charge",
+                        "label": "AltaPay ApplePay Charge",
                         "type": "final",
                         "amount": configData.grandTotalAmount
                     }
@@ -166,12 +166,13 @@ define(
                 };
                 
                 session.onpaymentauthorized = event => {
+                    var method = this.terminal.substr(this.terminal.indexOf(" ") + 1);
                     var url = baseurl + "sdmaltapay/index/applepayresponse";    
                     $.ajax({
                         url: url,
                         data: {
                             providerData: JSON.stringify(event.payment.token),
-                            paytype: 1
+                            paytype: method
                         },
                         type: 'post',
                         dataType: 'JSON',
