@@ -35,6 +35,7 @@ use SDM\Altapay\Model\TokenFactory;
 use Magento\Quote\Model\Quote\Item\AbstractItem;
 use Magento\Framework\DataObject;
 use SDM\Altapay\Api\Payments\ApplePayWalletAuthorize;
+use SDM\Altapay\Model\ApplePayOrder;
 
 /**
  * Class Gateway
@@ -106,7 +107,10 @@ class Gateway implements GatewayInterface
      * @var TokenFactory
      */
     private $dataToken;
-
+    /**
+     * @var ApplePayOrder
+     */
+    private $applePayOrder;
     /**
      * Gateway constructor.
      *
@@ -126,6 +130,7 @@ class Gateway implements GatewayInterface
      * @param DiscountHandler      $discountHandler
      * @param CreatePaymentHandler $paymentHandler
      * @param TokenFactory         $dataToken
+     * @param ApplePayOrder        $applePayOrder
      */
     public function __construct(
         Session $checkoutSession,
@@ -143,7 +148,8 @@ class Gateway implements GatewayInterface
         PriceHandler $priceHandler,
         DiscountHandler $discountHandler,
         CreatePaymentHandler $paymentHandler,
-        TokenFactory $dataToken
+        TokenFactory $dataToken,
+        ApplePayOrder $applePayOrder
     ) {
         $this->checkoutSession = $checkoutSession;
         $this->urlInterface    = $urlInterface;
@@ -161,6 +167,7 @@ class Gateway implements GatewayInterface
         $this->discountHandler = $discountHandler;
         $this->paymentHandler  = $paymentHandler;
         $this->dataToken       = $dataToken;
+        $this->applePayOrder   = $applePayOrder;
     }
 
     /**
@@ -244,13 +251,8 @@ class Gateway implements GatewayInterface
             }
             $request = $this->preparePaymentRequest($order, $orderLines, $orderId, $terminalId, $providerData);
             if ($request) {
-                $response                 = $request->call();
-                if ($response->Result === 'Success' && $this->systemConfig->getStatusConfig('process', $storeScope, $storeCode)) {
-                    $this->paymentHandler->setCustomOrderStatus($order, Order::STATE_PROCESSING, 'process');
-                    $order->addStatusHistoryComment("ApplePay Status: ". $response->Result);
-                    $order->setIsNotified(false);
-                    $order->getResource()->save($order);
-                }
+                $response = $request->call();
+                $this->applePayOrder->handleCardWalletPayment($response, $order);
 
                 return $response;
             }
@@ -416,24 +418,21 @@ class Gateway implements GatewayInterface
         $isApplePay = $this->systemConfig->getTerminalConfig($terminalId, 'isapplepay', $storeScope, $storeCode);
         //Transaction Info
         $transactionDetail = $this->helper->transactionDetail($orderId);
+
+        $request           = new PaymentRequest($auth);
         if ($isApplePay) {
                 $request = new ApplePayWalletAuthorize($auth);
-                $request->setProviderData($providerData)
-                        ->setTerminal($terminalName)
-                        ->setShopOrderId($order->getIncrementId())
-                        ->setAmount((float)number_format($order->getGrandTotal(), 2, '.', ''))
-                        ->setCurrency($order->getOrderCurrencyCode());
-        } else {
-            $request           = new PaymentRequest($auth);
-            $request->setTerminal($terminalName)
-                    ->setShopOrderId($order->getIncrementId())
-                    ->setAmount((float)number_format($order->getGrandTotal(), 2, '.', ''))
-                    ->setCurrency($order->getOrderCurrencyCode())
-                    ->setCustomerInfo($this->customerHandler->setCustomer($order))
-                    ->setConfig($this->setConfig())
-                    ->setTransactionInfo($transactionDetail)
-                    ->setSalesTax((float)number_format($order->getTaxAmount(), 2, '.', ''))
-                    ->setCookie($this->request->getServer('HTTP_COOKIE'));
+                $request->setProviderData($providerData);
+        }
+        $request->setTerminal($terminalName)
+                ->setShopOrderId($order->getIncrementId())
+                ->setAmount((float)number_format($order->getGrandTotal(), 2, '.', ''))
+                ->setCurrency($order->getOrderCurrencyCode())
+                ->setCustomerInfo($this->customerHandler->setCustomer($order))
+                ->setConfig($this->setConfig())
+                ->setTransactionInfo($transactionDetail)
+                ->setSalesTax((float)number_format($order->getTaxAmount(), 2, '.', ''))
+                ->setCookie($this->request->getServer('HTTP_COOKIE'));
 
             $post = $this->request->getPostValue();
 
@@ -472,7 +471,6 @@ class Gateway implements GatewayInterface
             //set orderlines to the request
             $request->setOrderLines($orderLines);
 
-        }
         return $request;
     }
 
