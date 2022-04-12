@@ -401,11 +401,7 @@ class Gateway implements GatewayInterface
      * @param $terminalId
      * @param $providerData
      *
-<<<<<<< HEAD
      * @return bool|PaymentRequest|CardWalletAuthorize
-=======
-     * @return bool|PaymentRequest|ApplePayWalletAuthorize
->>>>>>> 0748f02 (Hide Apple Pay terminal on browsers other than Safari)
      */
     private function preparePaymentRequest($order, $orderLines, $orderId, $terminalId, $providerData)
     {
@@ -426,7 +422,6 @@ class Gateway implements GatewayInterface
 
         $request           = new PaymentRequest($auth);
         if ($isApplePay) {
-<<<<<<< HEAD
                 $request = new CardWalletAuthorize($auth);
                 $request->setProviderData($providerData);
         }
@@ -439,25 +434,6 @@ class Gateway implements GatewayInterface
                 ->setTransactionInfo($transactionDetail)
                 ->setSalesTax((float)number_format($order->getTaxAmount(), 2, '.', ''))
                 ->setCookie($this->request->getServer('HTTP_COOKIE'));
-=======
-                $request = new ApplePayWalletAuthorize($auth);
-                $request->setProviderData($providerData)
-                        ->setTerminal($terminalName)
-                        ->setShopOrderId($order->getIncrementId())
-                        ->setAmount((float)number_format($order->getGrandTotal(), 2, '.', ''))
-                        ->setCurrency($order->getOrderCurrencyCode());
-        } else {
-            $request           = new PaymentRequest($auth);
-            $request->setTerminal($terminalName)
-                    ->setShopOrderId($order->getIncrementId())
-                    ->setAmount((float)number_format($order->getGrandTotal(), 2, '.', ''))
-                    ->setCurrency($order->getOrderCurrencyCode())
-                    ->setCustomerInfo($this->customerHandler->setCustomer($order))
-                    ->setConfig($this->setConfig())
-                    ->setTransactionInfo($transactionDetail)
-                    ->setSalesTax((float)number_format($order->getTaxAmount(), 2, '.', ''))
-                    ->setCookie($this->request->getServer('HTTP_COOKIE'));
->>>>>>> 0748f02 (Hide Apple Pay terminal on browsers other than Safari)
 
             $post = $this->request->getPostValue();
 
