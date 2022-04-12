@@ -143,7 +143,7 @@ define(
                 
                 session.onpaymentmethodselected = event => {
                     let total = {
-                        "label": "AltaPay Apple Charge",
+                        "label": "AltaPay ApplePay Charge",
                         "type": "final",
                         "amount": configData.grandTotalAmount
                     }
