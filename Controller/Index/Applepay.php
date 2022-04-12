@@ -21,6 +21,7 @@ use SDM\Altapay\Helper\Config as storeConfig;
 use Magento\Store\Model\StoreManagerInterface;
 use Magento\Framework\App\Action\Context;
 use SDM\Altapay\Model\SystemConfig;
+use Magento\Framework\UrlInterface;
 
 class ApplePay extends Action implements CsrfAwareActionInterface
 {
@@ -49,12 +50,14 @@ class ApplePay extends Action implements CsrfAwareActionInterface
         Context $context,
         storeConfig $storeConfig,
         SystemConfig $systemConfig,
-        StoreManagerInterface $storeManager
+        StoreManagerInterface $storeManager,
+        UrlInterface $urlInterface
     ) {
         parent::__construct($context);
         $this->storeConfig   = $storeConfig;
         $this->systemConfig  = $systemConfig;
         $this->_storeManager = $storeManager;
+        $this->_urlInterface = $urlInterface;
     }
 
     /**
@@ -85,6 +88,8 @@ class ApplePay extends Action implements CsrfAwareActionInterface
         $storeCode     = $this->getStoreCode();
         $validationUrl = $this->getRequest()->getParam('validationUrl');
         $terminalName = $this->getRequest()->getParam('termminalid');
+        $currentUrl = $this->_urlInterface->getBaseUrl();
+        $domain = parse_url($currentUrl, PHP_URL_HOST);
         //Test the conn with the Payment Gateway
         $auth     = $this->systemConfig->getAuth($storeCode);
         $api      = new TestAuthentication($auth);
@@ -96,7 +101,7 @@ class ApplePay extends Action implements CsrfAwareActionInterface
         $request = new ApplePayWalletSession($auth);
         $request->setTerminal($terminalName)
                 ->setValidationUrl($validationUrl)
-                ->setDomain('creativeminors.com');
+                ->setDomain($domain);
 
         $response = $request->call();
         if ($response->Result === 'Success') {
