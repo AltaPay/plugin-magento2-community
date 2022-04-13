@@ -25,14 +25,10 @@ namespace SDM\Altapay\Api\Payments;
 
 use SDM\Altapay\AbstractApi;
 use SDM\Altapay\Serializer\ResponseSerializer;
-use SDM\Altapay\Traits\AmountTrait;
-use SDM\Altapay\Traits\TerminalTrait;
-use SDM\Altapay\Traits\ShopOrderIdTrait;
 use SDM\Altapay\Request\Config;
 use SDM\Altapay\Traits;
 use SDM\Altapay\Types;
 use SDM\Altapay\Response\PaymentRequestResponse;
-use SDM\Altapay\Traits\CurrencyTrait;
 use GuzzleHttp\Exception\ClientException as GuzzleHttpClientException;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
