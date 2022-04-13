@@ -97,77 +97,80 @@ class ApplePayOrder {
      */
     public function handleCardWalletPayment($response, $order)
     {
-        if ($response) {
-            if (isset($response->Transactions[0])) {
-                $transaction = $response->Transactions[0];
-                $paymentType    = $transaction->AuthType;
-                $responseStatus = $transaction->TransactionStatus;
-                $storeScope = \Magento\Store\Model\ScopeInterface::SCOPE_STORE;
-                $storeCode  = $order->getStore()->getCode();
-                if ($order->getId()) {
-                    $cardType = '';
-                    $expires  = '';
-                    //Update stock quantity
-                    if($order->getState() == 'canceled') {
-                        $this->updateStockQty($order);
-                    }
-                    $this->resetCanceledQty($order);
-                    if (isset($transaction->CreditCardExpiry->Month) && isset($transaction->CreditCardExpiry->Year)) {
-                        $expires = $transaction->CreditCardExpiry->Month . '/' . $transaction->CreditCardExpiry->Year;
-                    }
-                    if (isset($transaction->PaymentSchemeName)) {
-                        $cardType = $transaction->PaymentSchemeName;
-                    }
-                    $payment = $order->getPayment();
-                    $payment->setPaymentId($transaction->PaymentId);
-                    $payment->setLastTransId($transaction->TransactionId);
-                    $payment->setCcTransId($transaction->CreditCardToken);
-                    $payment->setAdditionalInformation('cc_token', $transaction->CreditCardToken);
-                    $payment->setAdditionalInformation('expires', $expires);
-                    $payment->setAdditionalInformation('card_type', $cardType);
-                    $payment->setAdditionalInformation('payment_type', $paymentType);
-                    $payment->save();
-                    //save transaction data
-                    $parametersData  = null;
-                    $transactionData = json_encode($response);
-                    $this->transactionRepository->addTransactionData(
-                        $order->getIncrementId(),
-                        $transaction->TransactionId,
-                        $transaction->PaymentId,
-                        $transactionData,
-                        $parametersData
-                    );
-                    $orderStatusAfterPayment = $this->systemConfig->getStatusConfig('process', $storeScope, $storeCode);
-                    $orderStatusCapture      = $this->systemConfig->getStatusConfig('autocapture', $storeScope, $storeCode);
-                    $setOrderStatus          = true;
-                    $orderState              = Order::STATE_PROCESSING;
-                    $statusKey               = 'process';
-
-                    if ($this->isCaptured($response, $storeCode, $storeScope)) {
-                        if ($orderStatusCapture == "complete") {
-                            if ($this->orderLines->sendShipment($order)) {
-                                $orderState = Order::STATE_COMPLETE;
-                                $statusKey  = 'autocapture';
-                                $order->addStatusHistoryComment(__(ConstantConfig::PAYMENT_COMPLETE));
-                            } else {
-                                $setOrderStatus = false;
-                                $order->addStatusToHistory($orderStatusCapture, ConstantConfig::PAYMENT_COMPLETE, false);
-                            }
-                        }
-                    } else {
-                        if ($orderStatusAfterPayment) {
-                            $orderState = $orderStatusAfterPayment;
-                        }
-                    }
-                    if ($setOrderStatus) {
-                        $this->paymentHandler->setCustomOrderStatus($order, $orderState, $statusKey);
-                    }
-                    $order->addStatusHistoryComment("ApplePay Status: ". $response->Result);
-                    $order->setIsNotified(false);
-                    $order->getResource()->save($order);
-
+        if ($response && $response->Result === 'Success' && isset($response->Transactions[0])) {
+            $transaction = $response->Transactions[0];
+            $paymentType    = $transaction->AuthType;
+            $responseStatus = $transaction->TransactionStatus;
+            $storeScope = \Magento\Store\Model\ScopeInterface::SCOPE_STORE;
+            $storeCode  = $order->getStore()->getCode();
+            if ($order->getId()) {
+                $cardType = '';
+                $expires  = '';
+                //Update stock quantity
+                if($order->getState() == 'canceled') {
+                    $this->updateStockQty($order);
                 }
+                $this->resetCanceledQty($order);
+                if (isset($transaction->CreditCardExpiry->Month) && isset($transaction->CreditCardExpiry->Year)) {
+                    $expires = $transaction->CreditCardExpiry->Month . '/' . $transaction->CreditCardExpiry->Year;
+                }
+                if (isset($transaction->PaymentSchemeName)) {
+                    $cardType = $transaction->PaymentSchemeName;
+                }
+                $payment = $order->getPayment();
+                $payment->setPaymentId($transaction->PaymentId);
+                $payment->setLastTransId($transaction->TransactionId);
+                $payment->setCcTransId($transaction->CreditCardToken);
+                $payment->setAdditionalInformation('cc_token', $transaction->CreditCardToken);
+                $payment->setAdditionalInformation('expires', $expires);
+                $payment->setAdditionalInformation('card_type', $cardType);
+                $payment->setAdditionalInformation('payment_type', $paymentType);
+                $payment->save();
+                //save transaction data
+                $parametersData  = null;
+                $transactionData = json_encode($response);
+                $this->transactionRepository->addTransactionData(
+                    $order->getIncrementId(),
+                    $transaction->TransactionId,
+                    $transaction->PaymentId,
+                    $transactionData,
+                    $parametersData
+                );
+                $orderStatusAfterPayment = $this->systemConfig->getStatusConfig('process', $storeScope, $storeCode);
+                $orderStatusCapture      = $this->systemConfig->getStatusConfig('autocapture', $storeScope, $storeCode);
+                $setOrderStatus          = true;
+                $orderState              = Order::STATE_PROCESSING;
+                $statusKey               = 'process';
+
+                if ($this->isCaptured($response, $storeCode, $storeScope)) {
+                    if ($orderStatusCapture == "complete") {
+                        if ($this->orderLines->sendShipment($order)) {
+                            $orderState = Order::STATE_COMPLETE;
+                            $statusKey  = 'autocapture';
+                            $order->addStatusHistoryComment(__(ConstantConfig::PAYMENT_COMPLETE));
+                        } else {
+                            $setOrderStatus = false;
+                            $order->addStatusToHistory($orderStatusCapture, ConstantConfig::PAYMENT_COMPLETE, false);
+                        }
+                    }
+                } else {
+                    if ($orderStatusAfterPayment) {
+                        $orderState = $orderStatusAfterPayment;
+                    }
+                }
+                if ($setOrderStatus) {
+                    $this->paymentHandler->setCustomOrderStatus($order, $orderState, $statusKey);
+                }
+                $order->addStatusHistoryComment("ApplePay Status: ". $response->Result);
+                $order->setIsNotified(false);
+                $order->getResource()->save($order);
+
             }
+        } else {
+                $this->paymentHandler->setCustomOrderStatus($order, Order::STATE_CANCELED, 'cancel');
+                $order->addStatusHistoryComment("Order status: ". $response->Result);
+                $order->setIsNotified(false);
+                $order->getResource()->save($order);
         }
     }
 
