@@ -11,12 +11,8 @@ namespace SDM\Altapay\Model;
 
 use SDM\Altapay\Api\GatewayInterface;
 use SDM\Altapay\Api\OrderLoaderInterface;
-use Magento\Sales\Model\Order;
-use Magento\Checkout\Model\Session;
-use Magento\Quote\Model\Quote;
-use Magento\Framework\UrlInterface;
-use Magento\Framework\App\Request\Http;
-use Magento\Framework\App\RequestInterface;
+use SDM\Altapay\Api\Payments\CardWalletAuthorize;
+use SDM\Altapay\Model\ApplePayOrder;
 use SDM\Altapay\Request\Config;
 use SDM\Altapay\Api\Ecommerce\PaymentRequest;
 use SDM\Altapay\Api\Test\TestAuthentication;
@@ -32,10 +28,14 @@ use SDM\Altapay\Model\Handler\PriceHandler;
 use SDM\Altapay\Model\Handler\DiscountHandler;
 use SDM\Altapay\Model\Handler\CreatePaymentHandler;
 use SDM\Altapay\Model\TokenFactory;
+use Magento\Sales\Model\Order;
+use Magento\Checkout\Model\Session;
+use Magento\Quote\Model\Quote;
+use Magento\Framework\UrlInterface;
+use Magento\Framework\App\Request\Http;
+use Magento\Framework\App\RequestInterface;
 use Magento\Quote\Model\Quote\Item\AbstractItem;
 use Magento\Framework\DataObject;
-use SDM\Altapay\Api\Payments\ApplePayWalletAuthorize;
-use SDM\Altapay\Model\ApplePayOrder;
 
 /**
  * Class Gateway
@@ -400,7 +400,7 @@ class Gateway implements GatewayInterface
      * @param $terminalId
      * @param $providerData
      *
-     * @return bool|PaymentRequest|ApplePayWalletAuthorize
+     * @return bool|PaymentRequest|CardWalletAuthorize
      */
     private function preparePaymentRequest($order, $orderLines, $orderId, $terminalId, $providerData)
     {
@@ -421,7 +421,7 @@ class Gateway implements GatewayInterface
 
         $request           = new PaymentRequest($auth);
         if ($isApplePay) {
-                $request = new ApplePayWalletAuthorize($auth);
+                $request = new CardWalletAuthorize($auth);
                 $request->setProviderData($providerData);
         }
         $request->setTerminal($terminalName)
