@@ -36,7 +36,7 @@ use Psr\Http\Message\ResponseInterface;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class ApplePayWalletAuthorize extends AbstractApi
+class CardWalletAuthorize extends AbstractApi
 {
     use Traits\TerminalTrait;
     use Traits\AmountTrait;
