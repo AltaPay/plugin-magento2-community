@@ -9,13 +9,13 @@
 
 namespace SDM\Altapay\Controller\Index;
 
+use SDM\Altapay\Model\Gateway;
 use Magento\Checkout\Model\Session;
 use Magento\Framework\App\ResponseInterface;
 use Magento\Framework\Controller\ResultFactory;
 use Magento\Framework\App\Action\Action;
 use Magento\Framework\App\CsrfAwareActionInterface;
 use Magento\Framework\App\RequestInterface;
-use SDM\Altapay\Model\Gateway;
 use Magento\Framework\App\Request\InvalidRequestException;
 use Magento\Framework\App\Action\Context;
 use Magento\Sales\Model\Order;

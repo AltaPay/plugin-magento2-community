@@ -9,18 +9,18 @@
 
 namespace SDM\Altapay\Controller\Index;
 
+use SDM\Altapay\Model\SystemConfig;
+use SDM\Altapay\Api\Test\TestAuthentication;
+use SDM\Altapay\Api\Payments\CardWalletSession;
+use SDM\Altapay\Helper\Config as storeConfig;
 use Magento\Framework\App\ResponseInterface;
 use Magento\Framework\Controller\ResultFactory;
 use Magento\Framework\App\Action\Action;
 use Magento\Framework\App\CsrfAwareActionInterface;
 use Magento\Framework\App\RequestInterface;
 use Magento\Framework\App\Request\InvalidRequestException;
-use SDM\Altapay\Api\Test\TestAuthentication;
-use SDM\Altapay\Api\Payments\ApplePayWalletSession;
-use SDM\Altapay\Helper\Config as storeConfig;
 use Magento\Store\Model\StoreManagerInterface;
 use Magento\Framework\App\Action\Context;
-use SDM\Altapay\Model\SystemConfig;
 use Magento\Framework\UrlInterface;
 
 class ApplePay extends Action implements CsrfAwareActionInterface
@@ -83,6 +83,9 @@ class ApplePay extends Action implements CsrfAwareActionInterface
         return true;
     }
 
+    /**
+     * @return void
+     */
     public function execute()
     {
         $storeCode     = $this->getStoreCode();
@@ -90,15 +93,13 @@ class ApplePay extends Action implements CsrfAwareActionInterface
         $terminalName = $this->getRequest()->getParam('termminalid');
         $currentUrl = $this->_urlInterface->getBaseUrl();
         $domain = parse_url($currentUrl, PHP_URL_HOST);
-        //Test the conn with the Payment Gateway
         $auth     = $this->systemConfig->getAuth($storeCode);
         $api      = new TestAuthentication($auth);
         $response = $api->call();
         if (!$response) {
             return false;
         }
-       
-        $request = new ApplePayWalletSession($auth);
+        $request = new CardWalletSession($auth);
         $request->setTerminal($terminalName)
                 ->setValidationUrl($validationUrl)
                 ->setDomain($domain);

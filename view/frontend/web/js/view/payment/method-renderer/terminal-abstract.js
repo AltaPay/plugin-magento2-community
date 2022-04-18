@@ -191,7 +191,15 @@ define(
                     });        
                 };
                 session.oncancel = event => {
-                    console.log("oncancel");
+                    var url = baseurl + "sdmaltapay/index/cancel";
+                    $.ajax({
+                        url: url,
+                        type: 'post',
+                        success: function(data, status, xhr) {
+                            window.location.reload();
+                        }
+                    });
+
                 };
                 
                 session.begin();
