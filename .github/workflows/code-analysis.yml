@@ -3,9 +3,9 @@ name: PHP Code Analysis
 
 on:
   pull_request:
-    branches: [ applepay-feature ]
+    branches: [ main ]
   push:
-    branches: [ applepay-feature ]
+    branches: [ main ]
 
 jobs:
   php-l:
