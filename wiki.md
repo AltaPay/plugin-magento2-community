@@ -161,8 +161,9 @@ To synchronize the terminals with the gateway, click on the **Synchronize Termin
 5.  Optional fields: 'Force language', 'Fraud detection', 'Auto
     capture', 'Terminal Logo', 'Enable Customer Token Control', 'AVS','
     AVS accepted codes'.
+6.  If Apple Pay terminal is selected from the Terminal dropdown, make sure to enable isapplepay option.
 
-6.  Save changes by clicking 'Save Config'
+7.  Save changes by clicking 'Save Config'
 
 ![gateway_terminal_configuration](docs/gateway_terminal_configuration.png)
 
