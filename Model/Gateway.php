@@ -422,57 +422,56 @@ class Gateway implements GatewayInterface
 
         $request           = new PaymentRequest($auth);
         if ($isApplePay) {
-                $request = new CardWalletAuthorize($auth);
-                $request->setProviderData($providerData);
+            $request = new CardWalletAuthorize($auth);
+            $request->setProviderData($providerData);
         }
         $request->setTerminal($terminalName)
-                ->setShopOrderId($order->getIncrementId())
-                ->setAmount((float)number_format($order->getGrandTotal(), 2, '.', ''))
-                ->setCurrency($order->getOrderCurrencyCode())
-                ->setCustomerInfo($this->customerHandler->setCustomer($order))
-                ->setConfig($this->setConfig())
-                ->setTransactionInfo($transactionDetail)
-                ->setSalesTax((float)number_format($order->getTaxAmount(), 2, '.', ''))
-                ->setCookie($this->request->getServer('HTTP_COOKIE'));
+            ->setShopOrderId($order->getIncrementId())
+            ->setAmount((float)number_format($order->getGrandTotal(), 2, '.', ''))
+            ->setCurrency($order->getOrderCurrencyCode())
+            ->setCustomerInfo($this->customerHandler->setCustomer($order))
+            ->setConfig($this->setConfig())
+            ->setTransactionInfo($transactionDetail)
+            ->setSalesTax((float)number_format($order->getTaxAmount(), 2, '.', ''))
+            ->setCookie($this->request->getServer('HTTP_COOKIE'));
 
-            $post = $this->request->getPostValue();
+        $post = $this->request->getPostValue();
 
-            if (isset($post['tokenid'])) {
-                $model      = $this->dataToken->create();
-                $collection = $model->getCollection()->addFieldToFilter('id', $post['tokenid'])->getFirstItem();
-                $data       = $collection->getData();
-                if (!empty($data)) {
-                    $token = $data['token'];
-                    $request->setCcToken($token);
-                }
+        if (isset($post['tokenid'])) {
+            $model      = $this->dataToken->create();
+            $collection = $model->getCollection()->addFieldToFilter('id', $post['tokenid'])->getFirstItem();
+            $data       = $collection->getData();
+            if (!empty($data)) {
+                $token = $data['token'];
+                $request->setCcToken($token);
             }
-
-            if ($fraud = $this->systemConfig->getTerminalConfig($terminalId, 'fraud', $storeScope, $storeCode)) {
-                $request->setFraudService($fraud);
-            }
-
-            if ($lang = $this->systemConfig->getTerminalConfig($terminalId, 'language', $storeScope, $storeCode)) {
-                $langArr = explode('_', $lang, 2);
-                if (isset($langArr[0])) {
-                    $request->setLanguage($langArr[0]);
-                }
-            }
-            $quote = $this->quote->loadByIdWithoutStore($order->getQuoteId());
-            if ($this->validateQuote($quote)) {
-                if ($this->systemConfig->getTerminalConfig($terminalId, 'capture', $storeScope, $storeCode)) {
-                    $request->setType('subscriptionAndCharge');
-                } else {
-                    $request->setType('subscription');
-                }
-            }
-            // check if auto capture enabled
-            if (!$this->validateQuote($quote) && $this->systemConfig->getTerminalConfig($terminalId, 'capture', $storeScope, $storeCode)) {
-                $request->setType('paymentAndCapture');
-            }
-            //set orderlines to the request
-            $request->setOrderLines($orderLines);
-
         }
+
+        if ($fraud = $this->systemConfig->getTerminalConfig($terminalId, 'fraud', $storeScope, $storeCode)) {
+            $request->setFraudService($fraud);
+        }
+
+        if ($lang = $this->systemConfig->getTerminalConfig($terminalId, 'language', $storeScope, $storeCode)) {
+            $langArr = explode('_', $lang, 2);
+            if (isset($langArr[0])) {
+                $request->setLanguage($langArr[0]);
+            }
+        }
+        $quote = $this->quote->loadByIdWithoutStore($order->getQuoteId());
+        if ($this->validateQuote($quote)) {
+            if ($this->systemConfig->getTerminalConfig($terminalId, 'capture', $storeScope, $storeCode)) {
+                $request->setType('subscriptionAndCharge');
+            } else {
+                $request->setType('subscription');
+            }
+        }
+        // check if auto capture enabled
+        if (!$this->validateQuote($quote) && $this->systemConfig->getTerminalConfig($terminalId, 'capture', $storeScope, $storeCode)) {
+            $request->setType('paymentAndCapture');
+        }
+        //set orderlines to the request
+        $request->setOrderLines($orderLines);
+
         return $request;
     }
 
