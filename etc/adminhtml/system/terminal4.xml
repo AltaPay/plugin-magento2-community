@@ -29,7 +29,7 @@
             <frontend_class>altapay-terminal-name</frontend_class>
         </field>
         <field id="isapplepay" translate="label comment" type="select" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
-            <label>Is Apple Pay??</label>
+            <label>Is Apple Pay?</label>
             <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
             <config_path>payment/terminal4/isapplepay</config_path>
         </field>
