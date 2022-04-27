@@ -142,16 +142,14 @@ class ApplePayOrder {
                 $orderState              = Order::STATE_PROCESSING;
                 $statusKey               = 'process';
 
-                if ($this->isCaptured($response, $storeCode, $storeScope)) {
-                    if ($orderStatusCapture == "complete") {
-                        if ($this->orderLines->sendShipment($order)) {
-                            $orderState = Order::STATE_COMPLETE;
-                            $statusKey  = 'autocapture';
-                            $order->addStatusHistoryComment(__(ConstantConfig::PAYMENT_COMPLETE));
-                        } else {
-                            $setOrderStatus = false;
-                            $order->addStatusToHistory($orderStatusCapture, ConstantConfig::PAYMENT_COMPLETE, false);
-                        }
+                if ($this->isCaptured($response, $storeCode, $storeScope) && $orderStatusCapture == "complete") {
+                    if ($this->orderLines->sendShipment($order)) {
+                        $orderState = Order::STATE_COMPLETE;
+                        $statusKey  = 'autocapture';
+                        $order->addStatusHistoryComment(__(ConstantConfig::PAYMENT_COMPLETE));
+                    } else {
+                        $setOrderStatus = false;
+                        $order->addStatusToHistory($orderStatusCapture, ConstantConfig::PAYMENT_COMPLETE, false);
                     }
                 } else {
                     if ($orderStatusAfterPayment) {
