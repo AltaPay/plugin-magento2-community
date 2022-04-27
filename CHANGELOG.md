@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 ## [3.3.5]
 
 **Improvement**
-- Fix: Add support for Apple Pay
+- Add support for Apple Pay
 
 ## [3.3.4]
 
