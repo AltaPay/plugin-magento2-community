@@ -24,9 +24,17 @@ class ResponseInfo extends Callback
     public function getRegisteredAddress()
     {
         $response          = $this->call();
+        $max_date = '';
+        $latestTransKey = '';
+        foreach ($response->Transactions as $key=>$value) {
+            if ($value->CreatedDate > $max_date) {
+                $max_date = $value->CreatedDate;
+                $latestTransKey = $key;
+            }
+        }
         $registeredAddress = null;
-        if (isset($response->Transactions[0]->CustomerInfo->RegisteredAddress)) {
-            $registeredAddress = $response->Transactions[0]->CustomerInfo->RegisteredAddress;
+        if (isset($response->Transactions[$latestTransKey]->CustomerInfo->RegisteredAddress)) {
+            $registeredAddress = $response->Transactions[$latestTransKey]->CustomerInfo->RegisteredAddress;
         }
 
         return $registeredAddress;

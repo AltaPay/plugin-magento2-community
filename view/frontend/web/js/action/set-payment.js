@@ -64,27 +64,33 @@ define(
                 if ($(".payment-method._active select[name='ccToken']").length == 1) {
                     tokenId = $(".payment-method._active select[name='ccToken']").val();
                 }
-
-                $.ajax({
-                    method: "POST",
-                    url: window.checkoutConfig.payment['sdm_altapay'].url,
-                    data: {
-                        paytype: method,
-                        cartid: quote.getQuoteId(),
-                        orderid: data,
-                        tokenid: tokenId
-                    },
-                    dataType: 'json'
-                }).done(function (jsonResponse) {
-                    if (jsonResponse.result == 'success') {
-                        window.location.href = jsonResponse.formurl;
-                    } else {
-                        fullScreenLoader.stopLoader();
-                        $(".payment-method._active").find('#altapay-error-message').css('display', 'block');
-                        $(".payment-method._active").find('#altapay-error-message').text(jsonResponse.message);
-                        return false;
+                var paymentMethod = window.checkoutConfig.payment['sdm_altapay'].terminaldata;
+                for (var obj in paymentMethod) {
+                    if (obj === paymentData.method) {
+                        if(paymentMethod[obj].isapplepay !== '1' ) {
+                            $.ajax({
+                                method: "POST",
+                                url: window.checkoutConfig.payment['sdm_altapay'].url,
+                                data: {
+                                    paytype: method,
+                                    cartid: quote.getQuoteId(),
+                                    orderid: data,
+                                    tokenid: tokenId
+                                },
+                                dataType: 'json'
+                            }).done(function (jsonResponse) {
+                                if (jsonResponse.result == 'success') {
+                                    window.location.href = jsonResponse.formurl;
+                                } else {
+                                    fullScreenLoader.stopLoader();
+                                    $(".payment-method._active").find('#altapay-error-message').css('display', 'block');
+                                    $(".payment-method._active").find('#altapay-error-message').text(jsonResponse.message);
+                                    return false;
+                                }
+                            });
+                        }
                     }
-                });
+                }
             }).fail(function (response) {
                 errorProcessor.process(response, messageContainer);
                 fullScreenLoader.stopLoader();

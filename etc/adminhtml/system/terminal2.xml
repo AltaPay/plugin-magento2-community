@@ -28,6 +28,11 @@
             <source_model>SDM\Altapay\Model\Config\Source\Terminals</source_model>
             <frontend_class>altapay-terminal-name</frontend_class>
         </field>
+        <field id="isapplepay" translate="label comment" type="select" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
+            <label>Is Apple Pay?</label>
+            <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+            <config_path>payment/terminal2/isapplepay</config_path>
+        </field>
         <field id="language" translate="label comment" type="select" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
             <label>Force Language</label>
             <comment>Force the language of the payment page</comment>

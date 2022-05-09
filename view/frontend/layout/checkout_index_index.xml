@@ -10,6 +10,9 @@
 -->
 
 <page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" layout="1column" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <head>
+        <script src="https://applepay.cdn-apple.com/jsapi/v1/apple-pay-sdk.js" src_type="url"></script>
+    </head>
     <body>
         <referenceBlock name="checkout.root">
             <arguments>

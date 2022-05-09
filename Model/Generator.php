@@ -402,6 +402,8 @@ class Generator
         $requireCapture = $response->requireCapture;
         $paymentStatus  = strtolower($response->paymentStatus);
         $responseStatus = $response->status;
+        $max_date = '';
+        $latestTransKey = '';
         
         if ($paymentStatus === 'released') {
             $this->handleCancelStatusAction($request, $responseStatus);
@@ -412,6 +414,12 @@ class Generator
             $order      = $this->orderLoader->getOrderByOrderIncrementId($response->shopOrderId);
             $storeScope = \Magento\Store\Model\ScopeInterface::SCOPE_STORE;
             $storeCode  = $order->getStore()->getCode();
+            foreach ($response->Transactions as $key=>$value) {
+                if ($value->CreatedDate > $max_date) {
+                    $max_date = $value->CreatedDate;
+                    $latestTransKey = $key;
+                }
+            }
             if ($order->getId()) {
                 $cardType = '';
                 $expires  = '';
@@ -420,8 +428,8 @@ class Generator
                     $this->updateStockQty($order);
                 }
                 $this->resetCanceledQty($order);
-                if (isset($response->Transactions[0])) {
-                    $transaction = $response->Transactions[0];
+                if (isset($response->Transactions[$latestTransKey])) {
+                    $transaction = $response->Transactions[$latestTransKey];
                     if (isset($transaction->CreditCardExpiry->Month) && isset($transaction->CreditCardExpiry->Year)) {
                         $expires = $transaction->CreditCardExpiry->Month . '/' . $transaction->CreditCardExpiry->Year;
                     }
@@ -459,7 +467,7 @@ class Generator
                 $orderState              = Order::STATE_PROCESSING;
                 $statusKey               = 'process';
 
-                if ($this->isCaptured($response, $storeCode, $storeScope)) {
+                if ($this->isCaptured($response, $storeCode, $storeScope, $latestTransKey)) {
                     if ($orderStatusCapture == "complete") {
                         if ($this->orderLines->sendShipment($order)) {
                             $orderState = Order::STATE_COMPLETE;
@@ -512,7 +520,7 @@ class Generator
      *
      * @return bool|\Magento\Payment\Model\MethodInterface
      */
-    private function isCaptured($response, $storeCode, $storeScope)
+    private function isCaptured($response, $storeCode, $storeScope, $latestTransKey)
     {
         $isCaptured = false;
         foreach (SystemConfig::getTerminalCodes() as $terminalName) {
@@ -522,7 +530,7 @@ class Generator
                 $storeScope,
                 $storeCode
             );
-            if ($terminalConfig === $response->Transactions[0]->Terminal) {
+            if ($terminalConfig === $response->Transactions[$latestTransKey]->Terminal) {
                 $isCaptured = $this->systemConfig->getTerminalConfigFromTerminalName(
                     $terminalName,
                     'capture',
@@ -623,7 +631,7 @@ class Generator
                 $storeScope,
                 $storeCode
             );
-            if ($terminalConfig === $response->Transactions[0]->Terminal) {
+            if ($terminalConfig === $response->Transactions[$this->getLatestTransaction($response)]->Terminal) {
                 $isEnabled = $this->systemConfig->getTerminalConfigFromTerminalName(
                     $terminalName,
                     $configField,
@@ -654,7 +662,7 @@ class Generator
                 $storeScope,
                 $storeCode
             );
-            if ($terminalConfig === $response->Transactions[0]->Terminal) {
+            if ($terminalConfig === $response->Transactions[$this->getLatestTransaction($response)]->Terminal) {
                 $acceptedAvsResults = $this->systemConfig->getTerminalConfigFromTerminalName(
                     $terminalName,
                     'avs_acceptance',
@@ -714,5 +722,17 @@ class Generator
                     $item->save();
             }
         }
+    }
+    
+    public function getLatestTransaction($response) {
+        $max_date = '';
+        $latestTransKey = '';
+        foreach ($response->Transactions as $key=>$value) {
+            if ($value->CreatedDate > $max_date) {
+                $max_date = $value->CreatedDate;
+                $latestTransKey = $key;
+            }
+        }
+        return $latestTransKey;
     }
 }

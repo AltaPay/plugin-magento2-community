@@ -23,11 +23,16 @@ use Magento\Payment\Model\Config\Source\Allmethods;
 use Magento\Framework\View\Asset\Repository;
 use SDM\Altapay\Model\TokenFactory;
 use Magento\Customer\Model\Session;
+use Magento\Checkout\Model\Session as CheckoutSession;
+use Magento\Store\Model\StoreManagerInterface;
 
 class ConfigProvider implements ConfigProviderInterface
 {
     const CODE = 'sdm_altapay';
 
+    protected $_checkoutSession;
+    
+    protected $_storeManager;
     /**
      * @var Data
      */
@@ -87,7 +92,9 @@ class ConfigProvider implements ConfigProviderInterface
         ScopeConfigInterface $scopeConfig,
         Repository $assetRepository,
         TokenFactory $dataToken,
-        Session $customerSession
+        Session $customerSession,
+        CheckoutSession $checkoutSession,
+        StoreManagerInterface $storeManager
     ) {
         $this->data             = $data;
         $this->escaper          = $escaper;
@@ -98,6 +105,8 @@ class ConfigProvider implements ConfigProviderInterface
         $this->assetRepository  = $assetRepository;
         $this->dataToken        = $dataToken;
         $this->customerSession  = $customerSession;
+        $this->_checkoutSession = $checkoutSession;
+        $this->_storeManager    = $storeManager;
     }
 
     /**
@@ -109,7 +118,12 @@ class ConfigProvider implements ConfigProviderInterface
     {
         $store               = null;
         $activePaymentMethod = $this->getActivePaymentMethod();
-
+        $getCurrentQuote     = $this->_checkoutSession->getQuote();
+        $config                     = [];
+        $baseUrl                    = $this->_storeManager->getStore()->getBaseUrl();
+        $grandTotal                 = $getCurrentQuote->getGrandTotal();
+        $countryCode                = $this->scopeConfig->getValue('general/country/default',
+        \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
         return [
             'payment' => [
                 self::CODE => [
@@ -118,7 +132,11 @@ class ConfigProvider implements ConfigProviderInterface
                     ),
                     'auth'         => $this->checkAuth(),
                     'connection'   => $this->checkConn(),
-                    'terminaldata' => $activePaymentMethod
+                    'terminaldata' => $activePaymentMethod,
+                    'grandTotalAmount' => $grandTotal,
+                    'countryCode' => $countryCode,
+                    'currencyCode' => $this->_storeManager->getStore()->getBaseCurrencyCode(),
+                    'baseUrl' => $baseUrl
                 ]
             ]
         ];
@@ -170,6 +188,8 @@ class ConfigProvider implements ConfigProviderInterface
             }
             $showBoth      = $this->scopeConfig->getValue($paymentCode . '/showlogoandtitle', $storeScope, $storeCode);
             $saveCardToken = $this->scopeConfig->getValue($paymentCode . '/savecardtoken', $storeScope, $storeCode);
+            $isApplePay    = $this->scopeConfig->getValue($paymentCode . '/isapplepay', $storeScope, $storeCode);
+            
             if ($terminalStatus == 1) {
                 $methods[$key] = [
                     'label'             => $label,
@@ -178,7 +198,8 @@ class ConfigProvider implements ConfigProviderInterface
                     'terminalstatus'    => $terminalStatus,
                     'terminallogo'      => $logoURL,
                     'showlogoandtitle'  => $showBoth,
-                    'enabledsavetokens' => $saveCardToken
+                    'enabledsavetokens' => $saveCardToken,
+                    'isapplepay'        => $isApplePay
                 ];
                 if ($saveCardToken == 1 && !empty($savedTokenList)) {
                     $methods[$key]['savedtokenlist']          = json_encode($savedTokenList);
