@@ -97,8 +97,16 @@ class ApplePayOrder {
      */
     public function handleCardWalletPayment($response, $order)
     {
-        if ($response && $response->Result === 'Success' && isset($response->Transactions[0])) {
-            $transaction = $response->Transactions[0];
+        $max_date = '';
+        $latestTransKey = '';
+        foreach ($response->Transactions as $key=>$value) {
+            if ($value->CreatedDate > $max_date) {
+                $max_date = $value->CreatedDate;
+                $latestTransKey = $key;
+            }
+        }
+        if ($response && $response->Result === 'Success' && isset($response->Transactions[$latestTransKey])) {
+            $transaction = $response->Transactions[$latestTransKey];
             $paymentType    = $transaction->AuthType;
             $responseStatus = $transaction->TransactionStatus;
             $storeScope = \Magento\Store\Model\ScopeInterface::SCOPE_STORE;
@@ -142,7 +150,7 @@ class ApplePayOrder {
                 $orderState              = Order::STATE_PROCESSING;
                 $statusKey               = 'process';
 
-                if ($this->isCaptured($response, $storeCode, $storeScope) && $orderStatusCapture == "complete") {
+                if ($this->isCaptured($response, $storeCode, $storeScope, $latestTransKey) && $orderStatusCapture == "complete") {
                     if ($this->orderLines->sendShipment($order)) {
                         $orderState = Order::STATE_COMPLETE;
                         $statusKey  = 'autocapture';
@@ -170,6 +178,10 @@ class ApplePayOrder {
                 $order->setIsNotified(false);
                 $order->getResource()->save($order);
         }
+    }
+
+    public function sortFunction($a, $b) {
+        return strtotime($b["date"]) - strtotime($a["date"]);
     }
 
     protected function updateStockQty($order)
@@ -210,7 +222,7 @@ class ApplePayOrder {
      *
      * @return bool|\Magento\Payment\Model\MethodInterface
      */
-    private function isCaptured($response, $storeCode, $storeScope)
+    private function isCaptured($response, $storeCode, $storeScope, $latestTransKey)
     {
         $isCaptured = false;
         foreach (SystemConfig::getTerminalCodes() as $terminalName) {
@@ -220,7 +232,7 @@ class ApplePayOrder {
                 $storeScope,
                 $storeCode
             );
-            if ($terminalConfig === $response->Transactions[0]->Terminal) {
+            if ($terminalConfig === $response->Transactions[$latestTransKey]->Terminal) {
                 $isCaptured = $this->systemConfig->getTerminalConfigFromTerminalName(
                     $terminalName,
                     'capture',
