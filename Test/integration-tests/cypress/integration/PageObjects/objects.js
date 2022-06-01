@@ -49,16 +49,22 @@ class Order {
     klarna_payment(KLARNA_DKK_TERMINAL_NAME) {
         cy.contains(KLARNA_DKK_TERMINAL_NAME).click({ force: true })
         cy.wait(3000)
-        cy.get('._active > .payment-method-content > :nth-child(5) > div.primary > .action').click().wait(7000)
+        cy.get('._active > .payment-method-content > :nth-child(5) > div.primary > .action').click().wait(5000)
         cy.get('[id=submitbutton]').click().wait(5000)
         cy.wait(5000)
         cy.get('[id=klarna-pay-later-fullscreen]').then(function ($iFrame) {
-            const mobileNum = $iFrame.contents().find('[id=invoice_kp-purchase-approval-form-phone-number]')
-            cy.wrap(mobileNum).type('(452) 012-3456')
-            const personalNum = $iFrame.contents().find('[id=invoice_kp-purchase-approval-form-national-identification-number]')
-            cy.wrap(personalNum).type('1012201234')
-            const submit = $iFrame.contents().find('[id=invoice_kp-purchase-approval-form-continue-button]')
-            cy.wrap(submit).click().wait(2000)
+            const mobileNum = $iFrame.contents().find('[id=email_or_phone]')
+            cy.wrap(mobileNum).type('20222222')
+            const continueBtn = $iFrame.contents().find('[id=onContinue]')
+            cy.wrap(continueBtn).click().wait(2000)
+        })
+        cy.get('[id=klarna-pay-later-fullscreen]').wait(4000).then(function($iFrame){
+            const otp = $iFrame.contents().find('[id=otp_field]')
+            cy.wrap(otp).type('123456').wait(2000)
+        })  
+        cy.get('[id=klarna-pay-later-fullscreen]').wait(2000).then(function($iFrame){
+            const contbtn = $iFrame.contents().find('[id=invoice_kp-purchase-review-continue-button]')
+            cy.wrap(contbtn).click().wait(2000)
         })
     }
 
