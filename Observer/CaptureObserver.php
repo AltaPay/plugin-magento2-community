@@ -190,7 +190,6 @@ class CaptureObserver implements ObserverInterface
                 } else {
                     $price           = $item->getPrice();
                     $unitPrice       = $originalPrice;
-                    $priceWithoutTax = $originalPrice;
                     $taxAmount       = $this->priceHandler->calculateTaxAmount($unitPrice, $taxPercent, $qty);
                 }
                 $itemDiscountInformation = $this->discountHandler->getItemDiscountInformation(
@@ -199,10 +198,10 @@ class CaptureObserver implements ObserverInterface
                     $discountAmount,
                     $qty,
                     $discountAllItems,
-                    $item
+                    $item,
+                    $taxAmount
                 );
                 $discountedAmount        = $itemDiscountInformation['discount'];
-                $catalogDiscountCheck    = $itemDiscountInformation['catalogDiscount'];
                 $orderLines[]            = $this->orderLines->itemOrderLine(
                     $item,
                     $unitPrice,
@@ -214,14 +213,9 @@ class CaptureObserver implements ObserverInterface
                 $roundingCompensation    = $this->priceHandler->compensationAmountCal(
                     $item,
                     $unitPrice,
-                    $priceWithoutTax,
                     $taxAmount,
                     $discountedAmount,
-                    $couponCodeAmount,
-                    $catalogDiscountCheck,
-                    $storePriceIncTax,
-                    false,
-                    $discountAllItems
+                    false
                 );
                 // check if rounding compensation amount, send in the separate orderline
                 if ($roundingCompensation > 0 || $roundingCompensation < 0) {
@@ -308,7 +302,7 @@ class CaptureObserver implements ObserverInterface
             $xml = simplexml_load_string($body);
             if ($xml->Body->Result == 'Error' || $xml->Body->Result == 'Failed') {
                 $orderObject->addStatusHistoryComment('Capture failed: ' . $xml->Body->MerchantErrorMessage)
-                            ->setIsCustomerNotified(false);
+                    ->setIsCustomerNotified(false);
                 $orderObject->getResource()->save($orderObject);
             }
 
@@ -332,9 +326,9 @@ class CaptureObserver implements ObserverInterface
 
         $weeTaxAmount = 0.0;
         foreach ($invoice->getAllItems() as $item) {
-           $weeTaxAmount +=  $item->getWeeeTaxAppliedRowAmount();
+            $weeTaxAmount +=  $item->getWeeeTaxAppliedRowAmount();
         }
 
-       return $weeTaxAmount;
+        return $weeTaxAmount;
     }
 }

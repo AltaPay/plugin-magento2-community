@@ -64,11 +64,18 @@ class PriceHandler
         }
         if ($originalPrice > $price && abs((float)$couponAmount) > 0 && !$discountAllItems) {
             $originalPrice = $originalPrice * $quantity;
+            $originalPriceWithTax = $originalPrice + $data["taxAmount"];
             $data["catalogDiscount"] = true;
-            $data["discount"]        = $this->discountHandler->combinationDiscount($originalPrice, $rowTotal);
+            if (!$this->storeConfig->storePriceIncTax()) {
+                $discountAmount = $originalPriceWithTax - $rowTotal;
+                $discountPercentage = ($discountAmount * 100) / $originalPriceWithTax;
+                $data["discount"] = $discountPercentage;
+            } else {
+                $data["discount"] = $this->discountHandler->combinationDiscount($originalPrice, $rowTotal);
+            }
         } else if ($originalPrice > $price && !(float)$couponAmount) {
             $data["catalogDiscount"] = true;
-            $data["discount"]        = $this->discountHandler->catalogDiscount($originalPrice, $price);
+            $data["discount"] = $this->discountHandler->catalogDiscount($originalPrice, $price);
         } else {
            $data["discount"] = $itemDiscount;
         }
@@ -118,38 +125,21 @@ class PriceHandler
     public function compensationAmountCal(
         $item,
         $unitPrice,
-        $unitPriceWithoutTax,
         $taxAmount,
         $discountedAmount,
-        $couponCodeAmount,
-        $catalogDiscountCheck,
-        $storePriceIncTax,
-        $newOrder,
-        $discountAllItems
-    ) {
+        $newOrder
+    )
+    {
         if ($newOrder) {
-            $quantity   = $item->getQtyOrdered();
-            $taxPercent = $item->getTaxPercent();
+            $quantity = $item->getQtyOrdered();
         } else {
-            $quantity   = $item->getQty();
-            $taxPercent = $item->getOrderItem()->getTaxPercent();
+            $quantity = $item->getQty();
         }
-
-        $compensation = 0;
         //Discount compensation calculation - Gateway calculation pattern
         $gatewaySubTotal = ($unitPrice * $quantity) + $taxAmount;
         $gatewaySubTotal = $gatewaySubTotal - ($gatewaySubTotal * ($discountedAmount / 100));
-        // Magento calculation pattern
-        if ((abs((float)$couponCodeAmount) > 0 && $storePriceIncTax && !$catalogDiscountCheck && $discountAllItems) || (abs((float)$couponCodeAmount) > 0 && $catalogDiscountCheck)) {
-            $cmsPriceCal  = $unitPriceWithoutTax * $quantity;
-            $cmsTaxCal    = $cmsPriceCal * ($taxPercent / 100);
-            $cmsSubTotal  = $cmsPriceCal + $cmsTaxCal;
-            $cmsSubTotal  = $cmsSubTotal - ($cmsSubTotal * ($discountedAmount / 100));
+        $cmsSubTotal = $item->getRowTotal() - $item->getDiscountAmount() + $item->getTaxAmount() + $item->getDiscountTaxCompensationAmount();
             $compensation = $cmsSubTotal - $gatewaySubTotal;
-        } else {
-            $cmsSubTotal  = $item->getRowTotal()-$item->getDiscountAmount()+$item->getTaxAmount()+$item->getDiscountTaxCompensationAmount();
-            $compensation = $cmsSubTotal - $gatewaySubTotal;
-        }
 
         return $compensation;
     }
