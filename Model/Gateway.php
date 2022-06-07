@@ -269,7 +269,6 @@ class Gateway implements GatewayInterface
                     $unitPrice           = bcdiv($unitPriceWithoutTax, 1, 2);
                 } else {
                     $unitPrice           = $originalPrice;
-                    $unitPriceWithoutTax = $originalPrice;
                 }
                 $dataForPrice         = $this->priceHandler->dataForPrice(
                     $item,
@@ -298,14 +297,9 @@ class Gateway implements GatewayInterface
                 $roundingCompensation = $this->priceHandler->compensationAmountCal(
                     $item,
                     $unitPrice,
-                    $unitPriceWithoutTax,
                     $taxAmount,
                     $discount,
-                    $couponCodeAmount,
-                    $catalogDiscount,
-                    $storePriceIncTax,
-                    true,
-                    $discountAllItems
+                    true
                 );
                 // check if rounding compensation amount, send in the separate orderline
                 if ($roundingCompensation > 0 || $roundingCompensation < 0) {

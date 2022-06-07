@@ -190,7 +190,6 @@ class CaptureObserver implements ObserverInterface
                 } else {
                     $price           = $item->getPrice();
                     $unitPrice       = $originalPrice;
-                    $priceWithoutTax = $originalPrice;
                     $taxAmount       = $this->priceHandler->calculateTaxAmount($unitPrice, $taxPercent, $qty);
                 }
                 $itemDiscountInformation = $this->discountHandler->getItemDiscountInformation(
@@ -199,10 +198,10 @@ class CaptureObserver implements ObserverInterface
                     $discountAmount,
                     $qty,
                     $discountAllItems,
-                    $item
+                    $item,
+                    $taxAmount
                 );
                 $discountedAmount        = $itemDiscountInformation['discount'];
-                $catalogDiscountCheck    = $itemDiscountInformation['catalogDiscount'];
                 $orderLines[]            = $this->orderLines->itemOrderLine(
                     $item,
                     $unitPrice,
@@ -214,14 +213,9 @@ class CaptureObserver implements ObserverInterface
                 $roundingCompensation    = $this->priceHandler->compensationAmountCal(
                     $item,
                     $unitPrice,
-                    $priceWithoutTax,
                     $taxAmount,
                     $discountedAmount,
-                    $couponCodeAmount,
-                    $catalogDiscountCheck,
-                    $storePriceIncTax,
-                    false,
-                    $discountAllItems
+                    false
                 );
                 // check if rounding compensation amount, send in the separate orderline
                 if ($roundingCompensation > 0 || $roundingCompensation < 0) {

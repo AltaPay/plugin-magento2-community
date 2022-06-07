@@ -191,7 +191,6 @@ class CreditmemoRefundObserver implements ObserverInterface
                 } else {
                     $price           = $item->getPrice();
                     $unitPrice       = $originalPrice;
-                    $priceWithoutTax = $originalPrice;
                     $taxAmount       = $this->priceHandler->calculateTaxAmount($unitPrice, $taxPercent, $qty);
                 }
                 $itemDiscountInformation = $this->discountHandler->getItemDiscountInformation(
@@ -200,7 +199,8 @@ class CreditmemoRefundObserver implements ObserverInterface
                     $discountAmount,
                     $qty,
                     $discountAllItems,
-                    $item
+                    $item,
+                    $taxAmount
                 );
                 if ($item->getPriceInclTax()) {
                     $discountedAmount = $itemDiscountInformation['discount'];
@@ -217,14 +217,9 @@ class CreditmemoRefundObserver implements ObserverInterface
                     $roundingCompensation = $this->priceHandler->compensationAmountCal(
                         $item,
                         $unitPrice,
-                        $priceWithoutTax,
                         $taxAmount,
                         $discountedAmount,
-                        $couponCodeAmount,
-                        $catalogDiscount,
-                        $storePriceIncTax,
-                        false,
-                        $discountAllItems
+                        false
                     );
                     //send the rounding mismatch value into separate orderline if any
                     if ($roundingCompensation > 0 || $roundingCompensation < 0) {
