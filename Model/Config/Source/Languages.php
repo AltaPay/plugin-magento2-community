@@ -11,7 +11,7 @@ namespace SDM\Altapay\Model\Config\Source;
 
 use Magento\Config\Model\Config\Source\Locale;
 use Magento\Framework\Option\ArrayInterface;
-use SDM\Altapay\Types\LanguageTypes;
+use Altapay\Types\LanguageTypes;
 
 class Languages extends Locale implements ArrayInterface
 {

@@ -9,7 +9,7 @@
 
 namespace SDM\Altapay\Model\Config\Source;
 
-use SDM\Altapay\Response\TerminalsResponse;
+use Altapay\Response\TerminalsResponse;
 use Magento\Framework\Option\ArrayInterface;
 use SDM\Altapay\Model\SystemConfig;
 use SDM\Altapay\Logger\Logger;

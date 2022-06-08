@@ -13,7 +13,7 @@ use Magento\Config\Block\System\Config\Form\Field;
 use Magento\Backend\Block\Template\Context;
 use Magento\Framework\Data\Form\Element\AbstractElement;
 use Magento\Framework\Module\ModuleListInterface;
-use SDM\Altapay\Response\TerminalsResponse;
+use Altapay\Response\TerminalsResponse;
 use SDM\Altapay\Model\SystemConfig;
 use SDM\Altapay\Logger\Logger;
 

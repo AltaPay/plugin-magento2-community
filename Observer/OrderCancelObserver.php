@@ -9,9 +9,9 @@
 
 namespace SDM\Altapay\Observer;
 
-use SDM\Altapay\Api\Payments\ReleaseReservation;
-use SDM\Altapay\Exceptions\ResponseHeaderException;
-use SDM\Altapay\Response\ReleaseReservationResponse;
+use Altapay\Api\Payments\ReleaseReservation;
+use Altapay\Exceptions\ResponseHeaderException;
+use Altapay\Response\ReleaseReservationResponse;
 use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
 use SDM\Altapay\Model\SystemConfig;

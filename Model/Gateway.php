@@ -11,14 +11,14 @@ namespace SDM\Altapay\Model;
 
 use SDM\Altapay\Api\GatewayInterface;
 use SDM\Altapay\Api\OrderLoaderInterface;
-use SDM\Altapay\Api\Payments\CardWalletAuthorize;
+use Altapay\Api\Payments\CardWalletAuthorize;
 use SDM\Altapay\Model\ApplePayOrder;
-use SDM\Altapay\Request\Config;
-use SDM\Altapay\Api\Ecommerce\PaymentRequest;
-use SDM\Altapay\Api\Test\TestAuthentication;
-use SDM\Altapay\Exceptions\ClientException;
-use SDM\Altapay\Exceptions\ResponseHeaderException;
-use SDM\Altapay\Exceptions\ResponseMessageException;
+use Altapay\Request\Config;
+use Altapay\Api\Ecommerce\PaymentRequest;
+use Altapay\Api\Test\TestAuthentication;
+use Altapay\Exceptions\ClientException;
+use Altapay\Exceptions\ResponseHeaderException;
+use Altapay\Exceptions\ResponseMessageException;
 use SDM\Altapay\Helper\Data;
 use SDM\Altapay\Helper\Config as storeConfig;
 use SDM\Altapay\Logger\Logger;
@@ -36,7 +36,7 @@ use Magento\Framework\App\Request\Http;
 use Magento\Framework\App\RequestInterface;
 use Magento\Quote\Model\Quote\Item\AbstractItem;
 use Magento\Framework\DataObject;
-use SDM\Altapay\Api\Payments\ApplePayWalletAuthorize;
+use Altapay\Api\Payments\ApplePayWalletAuthorize;
 
 /**
  * Class Gateway

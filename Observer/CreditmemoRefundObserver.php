@@ -10,8 +10,8 @@
 namespace SDM\Altapay\Observer;
 
 use Magento\Sales\Model\Order\Payment;
-use SDM\Altapay\Api\Payments\RefundCapturedReservation;
-use SDM\Altapay\Exceptions\ResponseHeaderException;
+use Altapay\Api\Payments\RefundCapturedReservation;
+use Altapay\Exceptions\ResponseHeaderException;
 use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
 use SDM\Altapay\Logger\Logger;
