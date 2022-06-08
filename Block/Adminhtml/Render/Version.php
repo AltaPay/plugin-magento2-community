@@ -66,7 +66,7 @@ class Version extends Field
         $html       = '';
         $moduleInfo = $this->moduleList->getOne(self::MODULE_CODE);
         try {
-            $call = new \SDM\Altapay\Api\Others\Terminals($this->systemConfig->getAuth());
+            $call = new \Altapay\Api\Others\Terminals($this->systemConfig->getAuth());
             /** @var TerminalsResponse $response */
             $response  = $call->call();
             $terminals = [];

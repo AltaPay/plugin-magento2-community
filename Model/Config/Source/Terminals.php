@@ -48,7 +48,7 @@ class Terminals implements ArrayInterface
     {
         $terminals = [];
         try {
-            $call = new \SDM\Altapay\Api\Others\Terminals($this->systemConfig->getAuth());
+            $call = new \Altapay\Api\Others\Terminals($this->systemConfig->getAuth());
             /** @var TerminalsResponse $response */
             $response    = $call->call();
             $terminals[] = ['value' => ' ', 'label' => '-- Please Select --'];
