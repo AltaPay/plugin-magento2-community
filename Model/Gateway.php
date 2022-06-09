@@ -326,7 +326,6 @@ class Gateway implements GatewayInterface
                     $unitPrice           = bcdiv($unitPriceWithoutTax, 1, 2);
                 } else {
                     $unitPrice           = $originalPrice;
-                    $unitPriceWithoutTax = $originalPrice;
                 }
                 $dataForPrice         = $this->priceHandler->dataForPrice(
                     $item,
@@ -355,14 +354,9 @@ class Gateway implements GatewayInterface
                 $roundingCompensation = $this->priceHandler->compensationAmountCal(
                     $item,
                     $unitPrice,
-                    $unitPriceWithoutTax,
                     $taxAmount,
                     $discount,
-                    $couponCodeAmount,
-                    $catalogDiscount,
-                    $storePriceIncTax,
-                    true,
-                    $discountAllItems
+                    true
                 );
                 // check if rounding compensation amount, send in the separate orderline
                 if ($roundingCompensation > 0 || $roundingCompensation < 0) {
@@ -528,7 +522,7 @@ class Gateway implements GatewayInterface
 
         return $requestParams;
     }
-     /**
+    /**
      * @param $order
      *
      * @return float|int
@@ -536,10 +530,10 @@ class Gateway implements GatewayInterface
     public function fixedProductTax($order){
         $weeTaxAmount = 0;
         foreach ($order->getAllItems() as $item) {
-           $weeTaxAmount +=  $item->getWeeeTaxAppliedRowAmount();
+            $weeTaxAmount +=  $item->getWeeeTaxAppliedRowAmount();
         }
 
-       return $weeTaxAmount;
+        return $weeTaxAmount;
     }
 
     /**
