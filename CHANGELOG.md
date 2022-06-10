@@ -4,7 +4,8 @@ All notable changes to this project will be documented in this file.
 ## [3.3.7]
 
 **Fixes**
-- Fix: Order set to "pending" on "incomplete" response
+- Fix: Order status set to "pending" on "incomplete" response
+- Fix: Cookies restriction notice is not functional
 
 ## [3.3.6]
 
