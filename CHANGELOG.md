@@ -1,6 +1,11 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [3.3.7]
+
+**Fixes**
+- Fix: Order set to "pending" on "incomplete" response
+
 ## [3.3.6]
 
 **Improvement**
