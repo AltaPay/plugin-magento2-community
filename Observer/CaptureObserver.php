@@ -300,7 +300,7 @@ class CaptureObserver implements ObserverInterface
             $this->altapayLogger->addInfo('Response body: ' . $body);
             //Update comments if capture fail
             $xml = simplexml_load_string($body);
-            if ($xml->Body->Result == 'Error' || $xml->Body->Result == 'Failed') {
+            if ($xml->Body->Result == 'Error' || $xml->Body->Result == 'Failed' || $xml->Body->Result == 'Incomplete') {
                 $orderObject->addStatusHistoryComment('Capture failed: ' . $xml->Body->MerchantErrorMessage)
                     ->setIsCustomerNotified(false);
                 $orderObject->getResource()->save($orderObject);

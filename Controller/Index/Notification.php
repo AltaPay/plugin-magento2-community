@@ -102,6 +102,7 @@ class Notification extends Index implements CsrfAwareActionInterface
                 break;
             case "error":
             case "failed":
+            case "incomplete":
                 $this->generator->handleFailedStatusAction($this->getRequest(), $msg, $merchantError, $status);
                 break;
             case "succeeded":
