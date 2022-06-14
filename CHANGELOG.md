@@ -6,6 +6,7 @@ All notable changes to this project will be documented in this file.
 **Fixes**
 - Fix: Order status set to "pending" on "incomplete" response
 - Fix: Cookies restriction notice is not functional
+- Fix: Added CardInformation parameters for Transaction class
 
 ## [3.3.6]
 
