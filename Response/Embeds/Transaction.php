@@ -58,6 +58,10 @@ class Transaction extends AbstractResponse
         'CreditCardExpiry'          => [
             'class' => CreditCard::class,
             'array' => false
+        ],
+        'CardInformation'          => [
+            'class' => CardInformation::class,
+            'array' => false
         ]
     ];
 
@@ -225,6 +229,11 @@ class Transaction extends AbstractResponse
      * @var PaymentNatureService
      */
     public $PaymentNatureService;
+
+    /**
+     * @var CardInformation
+     */
+    public $CardInformation;
 
     /**
      * @var float
