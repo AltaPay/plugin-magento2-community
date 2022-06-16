@@ -269,7 +269,7 @@ class CreditmemoRefundObserver implements ObserverInterface
 
         //Update comments if refund fail
         $xml = simplexml_load_string($body);
-        if ($xml->Body->Result == 'Error' || $xml->Body->Result == 'Failed') {
+        if ($xml->Body->Result == 'Error' || $xml->Body->Result == 'Failed' || $xml->Body->Result == 'Incomplete') {
             $orderObject->addStatusHistoryComment('Refund failed: ' . $xml->Body->MerchantErrorMessage)
                 ->setIsCustomerNotified(false);
             $orderObject->getResource()->save($orderObject);
