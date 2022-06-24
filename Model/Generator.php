@@ -366,6 +366,9 @@ class Generator
         $response = $callback->call();
         if ($response) {
             $order = $this->loadOrderFromCallback($response);
+            if ($orderStatus === 'canceled') {
+                $order->cancel();
+            }
             $order->setState($orderState);
             $order->setIsNotified(false);
             if ($transactionInfo !== null) {
