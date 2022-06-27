@@ -1,6 +1,11 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [3.3.8]
+
+**Fixes**
+- Fix: Release stock qty on order cancellation
+
 ## [3.3.7]
 
 **Fixes**
