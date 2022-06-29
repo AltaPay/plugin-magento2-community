@@ -17,7 +17,7 @@ use Magento\Quote\Model\QuoteFactory;
 use SDM\Altapay\Model\ConstantConfig;
 use Magento\SalesRule\Model\Coupon;
 use Magento\SalesRule\Model\ResourceModel\Coupon\Usage as CouponUsage;
-use SDM\Altapay\Api\OrderLoaderInterface;
+use Altapay\Api\OrderLoaderInterface;
 use Magento\CatalogInventory\Api\StockManagementInterface;
 use SDM\Altapay\Model\SystemConfig;
 use Magento\Framework\App\ResourceConnection;
