@@ -9,7 +9,7 @@
 
 namespace SDM\Altapay\Model\Config\Source;
 
-use SDM\Altapay\Api\Test\TestAuthentication;
+use Altapay\Api\Test\TestAuthentication;
 use Magento\Framework\Option\ArrayInterface;
 use SDM\Altapay\Model\SystemConfig;
 

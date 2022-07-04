@@ -12,7 +12,7 @@ namespace SDM\Altapay\Block\Callback;
 use Magento\Customer\Model\Context;
 use Magento\Sales\Model\Order;
 use SDM\Altapay\Api\OrderLoaderInterface;
-use \Magento\Framework\App\Config\ScopeConfigInterface;
+use Magento\Framework\App\Config\ScopeConfigInterface;
 
 class Ordersummary extends \Magento\Framework\View\Element\Template
 {

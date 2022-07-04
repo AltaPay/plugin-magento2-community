@@ -9,7 +9,7 @@
 
 namespace SDM\Altapay\Model;
 
-use SDM\Altapay\Authentication;
+use Altapay\Authentication;
 use Magento\Config\Model\Config\Backend\Encrypted;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Store\Model\StoreManagerInterface;

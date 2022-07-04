@@ -1,6 +1,12 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [3.3.9]
+
+**Fixes**
+- Fix: Remove internal classes and add php-api dependency
+- Fix: Add PHP support from 7.0 to 8.1
+
 ## [3.3.8]
 
 **Fixes**

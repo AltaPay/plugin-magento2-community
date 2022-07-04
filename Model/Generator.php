@@ -10,8 +10,8 @@
 namespace SDM\Altapay\Model;
 
 use Magento\Framework\Exception\AlreadyExistsException;
-use SDM\Altapay\Api\Ecommerce\Callback;
-use SDM\Altapay\Response\CallbackResponse;
+use Altapay\Api\Ecommerce\Callback;
+use Altapay\Response\CallbackResponse;
 use Magento\Checkout\Model\Session;
 use Magento\Framework\App\Request\Http;
 use Magento\Framework\App\RequestInterface;

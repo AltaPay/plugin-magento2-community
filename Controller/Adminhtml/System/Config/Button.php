@@ -16,7 +16,7 @@ use Magento\Framework\App\State;
 use Magento\Framework\Controller\Result\Json;
 use Magento\Framework\Controller\Result\JsonFactory;
 use Magento\Store\Model\StoreManagerInterface;
-use SDM\Altapay\Api\Others\Terminals;
+use Altapay\Api\Others\Terminals;
 use SDM\Altapay\Model\SystemConfig;
 use Magento\Config\Model\ResourceModel\Config;
 use Magento\Framework\App\Config\ScopeConfigInterface;

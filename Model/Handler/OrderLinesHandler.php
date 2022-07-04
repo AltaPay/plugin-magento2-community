@@ -11,7 +11,7 @@ namespace SDM\Altapay\Model\Handler;
 
 use SDM\Altapay\Helper\Data;
 use SDM\Altapay\Helper\Config as storeConfig;
-use SDM\Altapay\Request\OrderLine;
+use Altapay\Request\OrderLine;
 use Magento\Framework\Escaper;
 
 /**

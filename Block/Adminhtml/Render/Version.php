@@ -13,7 +13,7 @@ use Magento\Config\Block\System\Config\Form\Field;
 use Magento\Backend\Block\Template\Context;
 use Magento\Framework\Data\Form\Element\AbstractElement;
 use Magento\Framework\Module\ModuleListInterface;
-use SDM\Altapay\Response\TerminalsResponse;
+use Altapay\Response\TerminalsResponse;
 use SDM\Altapay\Model\SystemConfig;
 use SDM\Altapay\Logger\Logger;
 
@@ -66,7 +66,7 @@ class Version extends Field
         $html       = '';
         $moduleInfo = $this->moduleList->getOne(self::MODULE_CODE);
         try {
-            $call = new \SDM\Altapay\Api\Others\Terminals($this->systemConfig->getAuth());
+            $call = new \Altapay\Api\Others\Terminals($this->systemConfig->getAuth());
             /** @var TerminalsResponse $response */
             $response  = $call->call();
             $terminals = [];

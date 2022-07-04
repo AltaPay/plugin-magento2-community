@@ -11,9 +11,9 @@ namespace SDM\Altapay\Observer;
 
 use Magento\Sales\Model\Order\Invoice;
 use Magento\Sales\Model\Order\Payment;
-use SDM\Altapay\Api\Payments\CaptureReservation;
-use SDM\Altapay\Exceptions\ResponseHeaderException;
-use SDM\Altapay\Response\CaptureReservationResponse;
+use Altapay\Api\Payments\CaptureReservation;
+use Altapay\Exceptions\ResponseHeaderException;
+use Altapay\Response\CaptureReservationResponse;
 use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
 use SDM\Altapay\Logger\Logger;
@@ -24,7 +24,7 @@ use SDM\Altapay\Helper\Config as storeConfig;
 use SDM\Altapay\Model\Handler\OrderLinesHandler;
 use SDM\Altapay\Model\Handler\PriceHandler;
 use SDM\Altapay\Model\Handler\DiscountHandler;
-use SDM\Altapay\Api\Subscription\ChargeSubscription;
+use Altapay\Api\Subscription\ChargeSubscription;
 /**
  * Class CaptureObserver
  * Handle the invoice capture functionality.

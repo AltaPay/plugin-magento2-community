@@ -7,13 +7,13 @@ if (file_exists($bootstrap)) {
 }
 $bootstrap = \Magento\Framework\App\Bootstrap::create(BP, $_SERVER);
 
-use SDM\Altapay\Api\Others\Terminals;
-use SDM\Altapay\Api\Test\TestAuthentication;
+use Altapay\Api\Others\Terminals;
+use Altapay\Api\Test\TestAuthentication;
 use GuzzleHttp\Exception\ClientException;
-use SDM\Altapay\Authentication;
+use Altapay\Authentication;
 use Magento\Framework\App\Cache\Type\Config as cacheConfig;
-use \Magento\Framework\AppInterface as AppInterface;
-use \Magento\Framework\App\Http as Http;
+use Magento\Framework\AppInterface as AppInterface;
+use Magento\Framework\App\Http as Http;
 use Magento\Framework\ObjectManager\ConfigLoaderInterface;
 use Magento\Framework\App\Request\Http as RequestHttp;
 use Magento\Framework\App\Response\Http as ResponseHttp;

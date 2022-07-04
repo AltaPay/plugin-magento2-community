@@ -9,8 +9,8 @@
 
 namespace SDM\Altapay\Model\Handler;
 
-use SDM\Altapay\Request\Address;
-use SDM\Altapay\Request\Customer;
+use Altapay\Request\Address;
+use Altapay\Request\Customer;
 use Magento\Sales\Model\Order;
 use Magento\Customer\Api\CustomerRepositoryInterface;
 use Magento\Framework\App\Request\Http;

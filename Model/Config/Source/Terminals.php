@@ -9,7 +9,7 @@
 
 namespace SDM\Altapay\Model\Config\Source;
 
-use SDM\Altapay\Response\TerminalsResponse;
+use Altapay\Response\TerminalsResponse;
 use Magento\Framework\Option\ArrayInterface;
 use SDM\Altapay\Model\SystemConfig;
 use SDM\Altapay\Logger\Logger;
@@ -48,7 +48,7 @@ class Terminals implements ArrayInterface
     {
         $terminals = [];
         try {
-            $call = new \SDM\Altapay\Api\Others\Terminals($this->systemConfig->getAuth());
+            $call = new \Altapay\Api\Others\Terminals($this->systemConfig->getAuth());
             /** @var TerminalsResponse $response */
             $response    = $call->call();
             $terminals[] = ['value' => ' ', 'label' => '-- Please Select --'];
