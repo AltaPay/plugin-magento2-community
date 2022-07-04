@@ -1,6 +1,11 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [3.4.0]
+
+**Fixes**
+- Fix: Remove Transaction class due to compilation issue
+
 ## [3.3.9]
 
 **Fixes**
