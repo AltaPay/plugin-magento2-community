@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 ## [3.4.0]
 
 **Fixes**
-- Fix: Remove duplicate "Transaction" class due to compilation issue
+- Fix: Compilation failed due to duplicate "Transaction" class
 
 ## [3.3.9]
 
