@@ -11,8 +11,9 @@
 <script>
     require([
         'jquery',
+        'Magento_Ui/js/modal/alert',
         'prototype'
-    ], function ($) {
+    ], function ($,alert) {
         $('#pay-by-link').click(function () {
             var hasError = false;
             var emailReg = /^([\w-\.]+@([\w-]+\.)+[\w-]{2,4})?$/;
@@ -91,12 +92,26 @@
                             resultText = transport.statusText;
                         } else {
                             var response = JSON.parse(transport.responseText);
-                            resultText = response.message
+                            resultmessage = response.message
+                            orderId = response.orderId
+
                         }
-                        alert(resultText);
+                        alert({
+                            title: 'Order Created!',
+                            content: '<p> Order # is '+orderId+'</p><strong>Payment Link: </strong><textarea readonly name="paymentlink" style="width:100% margin-top:10px;" id="paymentlink" rows="3">'
+                            +resultmessage+'</textarea>',
+                            actions: {
+                                always: function(){}
+                            }
+                        });
                         $(customerEmail).val("");
                         $(customerFirstname).val("");
                         $(customerLastname).val("");
+                        $(street).val("");
+                        $(city).val("");
+                        $(postalcode).val("");
+                        $(phoneno).val("");
+                        $(countrycode).val("");
                     }
                 });
             }

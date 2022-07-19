@@ -194,7 +194,7 @@ class PayByLinkButton extends Action
                 $order->getId()
             );
             if($params['result'] === 'success') {
-                $message = __("Order has been created, orderId = " . $order->getRealOrderId() . " payment link = ".$params['formurl']);
+                $message = $params['formurl'];
             }
         }else{
             $message = __('Something went wrong');
@@ -202,6 +202,6 @@ class PayByLinkButton extends Action
         /** @var Json $result */
         $resultData = $this->resultJsonFactory->create();
 
-        return $resultData->setData(['message' => $message ]);
+        return $resultData->setData(['message' => $message ,'orderId' => $order->getRealOrderId() ]);
     }
 }
