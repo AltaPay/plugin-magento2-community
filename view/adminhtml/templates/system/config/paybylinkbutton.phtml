@@ -1,0 +1,107 @@
+<?php
+/**
+ * Altapay Module for Magento 2.x.
+ *
+ * Copyright © 2018 Altapay. All rights reserved.
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+?>
+
+<script>
+    require([
+        'jquery',
+        'prototype'
+    ], function ($) {
+        $('#pay-by-link').click(function () {
+            var hasError = false;
+            var emailReg = /^([\w-\.]+@([\w-]+\.)+[\w-]{2,4})?$/;
+            var formId =  "#payment_other_sdm_altapay_config_altapay_config_paybylink_";
+            var customerEmail = formId+"customer_email";
+            var customerFirstname = formId+"customer_firstname";
+            var customerLastname = formId+"customer_lastname";
+            var street = formId+"customer_street";
+            var city = formId+"customer_city";
+            var postalcode = formId+"customer_postalcode";
+            var phoneno = formId+"customer_phoneno";
+            var countrycode = formId+"customer_countrycode";
+
+            var emailaddressVal = $(customerEmail).val();
+            var firstnameVal = $(customerFirstname).val();
+            var lastnameVal = $(customerLastname).val();
+            var streetVal = $(street).val();
+            var cityVal = $(city).val();
+            var postalcodeVal = $(postalcode).val();
+            var phonenoVal = $(phoneno).val();
+            var countrycodeVal = $(countrycode).val();
+
+            $('.error').remove(); 
+
+            if(emailaddressVal == '' || !emailReg.test(emailaddressVal)) {
+                $(customerEmail).after('<span class="error" style="color:red">Enter a valid email address.</span>');
+                hasError = true;
+            }
+
+            if(firstnameVal == '') {
+                $(customerFirstname).after('<span class="error" style="color:red">Please enter customer firstname.</span>');
+                hasError = true;
+            }
+
+            if(lastnameVal == '') {
+                $(customerLastname).after('<span class="error" style="color:red">Please enter customer lastname.</span>');
+                hasError = true;
+            }
+
+            if(streetVal == '') {
+                $(street).after('<span class="error" style="color:red">Please enter street address.</span>');
+                hasError = true;
+            }
+            if(cityVal == '') {
+                $(city).after('<span class="error" style="color:red">Please enter city.</span>');
+                hasError = true;
+            }
+            if(postalcodeVal == '') {
+                $(postalcode).after('<span class="error" style="color:red">Please enter a postal code.</span>');
+                hasError = true;
+            }
+            if(phonenoVal == '') {
+                $(phoneno).after('<span class="error" style="color:red">Please enter phone no.</span>');
+            }
+            if(countrycodeVal == '') {
+                $(countrycode).after('<span class="error" style="color:red">Please enter country code.</span>');
+            }
+            if (!hasError)  {
+                var params = {
+                        storeid: "<?php echo $block->getUrlInterfaceData(); ?>",
+                        customerEmail: emailaddressVal,
+                        customerFirstname: firstnameVal,
+                        customerLastname: lastnameVal,
+                        street: streetVal,
+                        city: cityVal,
+                        postalcode: postalcodeVal,
+                        phoneno: phonenoVal,
+                        countrycode: countrycodeVal
+                };
+                new Ajax.Request('<?php echo $block->getCustomUrl() ?>', {
+                    parameters: params,
+                    loaderArea: false,
+                    asynchronous: true,
+                    onSuccess: function (transport) {
+                        if (transport.status > 200) {
+                            resultText = transport.statusText;
+                        } else {
+                            var response = JSON.parse(transport.responseText);
+                            resultText = response.message
+                        }
+                        alert(resultText);
+                        $(customerEmail).val("");
+                        $(customerFirstname).val("");
+                        $(customerLastname).val("");
+                    }
+                });
+            }
+
+        });
+    });
+</script>
+<?= $block->getButtonHtml(); ?>

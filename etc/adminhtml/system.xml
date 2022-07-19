@@ -128,6 +128,39 @@
                         <frontend_model>SDM\Altapay\Block\System\Config\Button</frontend_model>
                     </field>
                 </group>  
+                <group id="altapay_config_paybylink" translate="label comment" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <attribute type="expanded">0</attribute>
+                    <label>Pay by link</label>
+                    <comment><![CDATA[]]></comment>
+                    <field id="customer_email" translate="label comment" sortOrder="0" type="text" showInDefault="1" showInWebsite="0" showInStore="0">
+                        <label>Customer Email Id</label>
+                    </field>
+                    <field id="customer_firstname" translate="label comment" sortOrder="1" type="text" showInDefault="1" showInWebsite="0" showInStore="0">
+                        <label>Customer firstname</label>
+                    </field>
+                    <field id="customer_lastname" translate="label comment" sortOrder="2" type="text" showInDefault="1" showInWebsite="0" showInStore="0">
+                        <label>Customer lastname</label>
+                    </field>
+                    <field id="customer_countrycode" translate="label comment" sortOrder="2" type="text" showInDefault="1" showInWebsite="0" showInStore="0">
+                        <label>Country Code:</label>
+                    </field>
+                    <field id="customer_street" translate="label comment" sortOrder="2" type="text" showInDefault="1" showInWebsite="0" showInStore="0">
+                        <label>Street</label>
+                    </field>
+                    <field id="customer_city" translate="label comment" sortOrder="2" type="text" showInDefault="1" showInWebsite="0" showInStore="0">
+                        <label>City</label>
+                    </field>
+                    <field id="customer_postalcode" translate="label comment" sortOrder="2" type="text" showInDefault="1" showInWebsite="0" showInStore="0">
+                        <label>Postal code</label>
+                    </field>
+                    <field id="customer_phoneno" translate="label comment" sortOrder="2" type="text" showInDefault="1" showInWebsite="0" showInStore="0">
+                        <label>Phone no:</label>
+                    </field>
+                    <field id="pay_by_link" translate="label" type="button" sortOrder="3" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Click to pay by link</label>
+                        <frontend_model>SDM\Altapay\Block\System\Config\PayByLinkButton</frontend_model>
+                    </field>
+                </group>  
 
                 <include path="SDM_Altapay::system/terminal1.xml"/>
                 <include path="SDM_Altapay::system/terminal2.xml"/>
