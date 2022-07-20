@@ -122,8 +122,8 @@ class PayByLinkButton extends Action
      */
     public function execute()
     {
+        $terminalCode = $this->getRequest()->getParam('terminal');
         $orderData = [
-            'currency_id'  => 'DKK',
             'email'        => $this->getRequest()->getParam('customerEmail'),
             'guest_order'  => true,
             'shipping_address'      => [
@@ -143,7 +143,6 @@ class PayByLinkButton extends Action
 
         /** @var \Magento\Store\Model\Store $store */
         $store = $this->storeManager->getStore();
-        $websiteId = $this->storeManager->getStore()->getWebsiteId();
         
         // Initialise Cart
         $cartId = $this->cartManagementInterface->createEmptyCart();
@@ -175,9 +174,8 @@ class PayByLinkButton extends Action
             ->setShippingMethod('flatrate_flatrate');
 
         // Set payment method
-        $cart->setPaymentMethod('checkmo');
-        $cart->getPayment()->importData(['method' => 'checkmo']);
-        
+        $cart->setPaymentMethod($terminalCode);
+        $cart->getPayment()->importData(['method' => $terminalCode]);
         $cart->collectTotals();
         $cart->save();
  
@@ -185,12 +183,11 @@ class PayByLinkButton extends Action
         $cart = $this->cartRepositoryInterface->get($cart->getId());
         $orderId = $this->cartManagementInterface->placeOrder($cart->getId());
         $order = $this->order->load($orderId);
-       
         $order->setEmailSent(0);
 
         if($order->getEntityId()){
             $params = $this->gateway->createRequest(
-                3,
+                $terminalCode[strlen($terminalCode)-1],
                 $order->getId()
             );
             if($params['result'] === 'success') {

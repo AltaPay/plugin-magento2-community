@@ -26,6 +26,7 @@
             var postalcode = formId+"customer_postalcode";
             var phoneno = formId+"customer_phoneno";
             var countrycode = formId+"customer_countrycode";
+            var terminal = formId+"select_terminal";
 
             var emailaddressVal = $(customerEmail).val();
             var firstnameVal = $(customerFirstname).val();
@@ -35,24 +36,21 @@
             var postalcodeVal = $(postalcode).val();
             var phonenoVal = $(phoneno).val();
             var countrycodeVal = $(countrycode).val();
-
+            var terminalVal = $(terminal).val();
             $('.error').remove(); 
 
             if(emailaddressVal == '' || !emailReg.test(emailaddressVal)) {
                 $(customerEmail).after('<span class="error" style="color:red">Enter a valid email address.</span>');
                 hasError = true;
             }
-
             if(firstnameVal == '') {
                 $(customerFirstname).after('<span class="error" style="color:red">Please enter customer firstname.</span>');
                 hasError = true;
             }
-
             if(lastnameVal == '') {
                 $(customerLastname).after('<span class="error" style="color:red">Please enter customer lastname.</span>');
                 hasError = true;
             }
-
             if(streetVal == '') {
                 $(street).after('<span class="error" style="color:red">Please enter street address.</span>');
                 hasError = true;
@@ -71,6 +69,9 @@
             if(countrycodeVal == '') {
                 $(countrycode).after('<span class="error" style="color:red">Please enter country code.</span>');
             }
+            if(terminalVal == '') {
+                $(terminal).after('<span class="error" style="color:red">Please select terminal.</span>');
+            }
             if (!hasError)  {
                 var params = {
                         storeid: "<?php echo $block->getUrlInterfaceData(); ?>",
@@ -81,7 +82,8 @@
                         city: cityVal,
                         postalcode: postalcodeVal,
                         phoneno: phonenoVal,
-                        countrycode: countrycodeVal
+                        countrycode: countrycodeVal,
+                        terminal: terminalVal
                 };
                 new Ajax.Request('<?php echo $block->getCustomUrl() ?>', {
                     parameters: params,
@@ -98,7 +100,7 @@
                         }
                         alert({
                             title: 'Order Created!',
-                            content: '<p> Order # is '+orderId+'</p><strong>Payment Link: </strong><textarea readonly name="paymentlink" style="width:100% margin-top:10px;" id="paymentlink" rows="3">'
+                            content: '<p> Order # is '+orderId+'</p><strong>Payment Link: </strong><textarea readonly name="paymentlink" style="width:100%; margin-top:10px;" id="paymentlink" rows="3">'
                             +resultmessage+'</textarea>',
                             actions: {
                                 always: function(){}
@@ -112,6 +114,7 @@
                         $(postalcode).val("");
                         $(phoneno).val("");
                         $(countrycode).val("");
+                        $(terminal).val("");
                     }
                 });
             }
