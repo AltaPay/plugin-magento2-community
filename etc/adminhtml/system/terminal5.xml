@@ -45,7 +45,7 @@
             <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
             <config_path>payment/terminal5/capture</config_path>
         </field>
-        <field id="terminallogo" translate="label comment" type="select" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1">
+        <field id="terminallogo" translate="label comment" type="multiselect" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1">
             <label>Terminal Logo</label>
             <comment>Select terminal logo that will be displayed on the store with the terminal name.</comment>
             <config_path>payment/terminal5/terminallogo</config_path>

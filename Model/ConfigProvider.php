@@ -218,14 +218,16 @@ class ConfigProvider implements ConfigProviderInterface
      */
     public function getLogoFilePath($name)
     {
-        $fileId = 'SDM_Altapay::images/' . $name . '.png';
-        $params = ['area' => 'frontend'];
-        $asset  = $this->assetRepository->createAsset($fileId, $params);
-        try {
-            return $asset->getUrl();
-        } catch (\Exception $e) {
-            return null;
+        $logoPath = [];
+        $terminalLogo   = explode(",",$name);
+        foreach ($terminalLogo as $logoName) {
+            $fileId = 'SDM_Altapay::images/' . $logoName . '.png';
+            $params = ['area' => 'frontend'];
+            $asset  = $this->assetRepository->createAsset($fileId, $params);
+            $logoPath[] = $asset->getUrl();
         }
+
+        return $logoPath;
     }
 
     public function checkAuth()
