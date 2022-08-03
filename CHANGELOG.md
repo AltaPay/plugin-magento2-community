@@ -1,6 +1,11 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [3.4.1]
+
+**Improvement**
+- Support multiple logos/icons option for terminals.
+
 ## [3.4.0]
 
 **Fixes**

@@ -17,7 +17,9 @@
         <label data-bind="attr: {'for': getCode()}" class="label">
             <span data-bind="text: terminalName()"></span>&nbsp;
             <!-- ko if: terminalLogo() -->
-            <img style="vertical-align: middle;max-width: 100px;" data-bind="attr:{src: terminalLogo()}"/>
+            <!-- ko foreach: { data: terminalLogo(), as: 'item' } -->
+            <img style="vertical-align: middle;max-width: 100px;" data-bind="attr:{src: item}"/>
+            <!-- /ko -->
             <!-- /ko -->
         </label>
     </div>

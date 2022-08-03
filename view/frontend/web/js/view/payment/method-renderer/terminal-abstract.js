@@ -63,15 +63,15 @@ define(
                 var isSafari = (/^((?!chrome|android).)*safari/i.test(navigator.userAgent));
                 for (var obj in paymentMethod) {
                     if (obj === self.getCode()) {
-                        if ((paymentMethod[obj].terminallogo != "" && paymentMethod[obj].showlogoandtitle == false) || (paymentMethod[obj].isapplepay ==1 && isSafari === false)) {
+                        if (paymentMethod[obj].isapplepay == 1 && isSafari === false) {
                             terminalname = "";
                         } else {
                             if (paymentMethod[obj].terminalname != " ") {
-                                    if (paymentMethod[obj].label != null) {
-                                        terminalname = paymentMethod[obj].label
-                                    } else {
-                                        terminalname = paymentMethod[obj].terminalname;
-                                    }
+                                if (paymentMethod[obj].label != null) {
+                                    terminalname = paymentMethod[obj].label
+                                } else {
+                                    terminalname = paymentMethod[obj].terminalname;
+                                }
                             }
                         }
                     }
@@ -214,7 +214,7 @@ define(
 
                 for (var obj in paymentMethod) {
                     if (obj === self.getCode()) {
-                        if (paymentMethod[obj].terminallogo != " ") {
+                        if (paymentMethod[obj].terminallogo != " " && paymentMethod[obj].showlogoandtitle == true) {
                             if (paymentMethod[obj].terminallogo != null) {
                                 terminallogo = paymentMethod[obj].terminallogo
                             }
