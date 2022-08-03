@@ -34,7 +34,7 @@ class TerminalLogo
         $terminalsLogosWithLabel = [];
 
         $terminalLogos = [
-            ''                  => '-- Select one --',
+            ''                  => '-- Select --',
             'amex'              => 'Amex',
             'creditcard'        => 'Credit Card',
             'creditcard_wallet' => 'Credit Card Wallet',
