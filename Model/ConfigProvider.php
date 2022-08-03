@@ -182,7 +182,7 @@ class ConfigProvider implements ConfigProviderInterface
             $terminalStatus = $this->scopeConfig->getValue($paymentCode . '/active', $storeScope, $storeCode);
             $terminalLogo   = $this->scopeConfig->getValue($paymentCode . '/terminallogo', $storeScope, $storeCode);
             if (!empty($terminalLogo)) {
-                $logoURL = $this->getLogoFilePath($terminalLogo);
+                $logoURL = $this->getLogoPath($terminalLogo);
             } else {
                 $logoURL = '';
             }
@@ -212,22 +212,21 @@ class ConfigProvider implements ConfigProviderInterface
     }
 
     /**
-     * @param $name
-     *
-     * @return mixed|null
+     * @param string $name
+     * @return array
      */
-    public function getLogoFilePath($name)
+    public function getLogoPath($name)
     {
-        $logoPath = [];
+        $path = [];
         $terminalLogo   = explode(",",$name);
         foreach ($terminalLogo as $logoName) {
             $fileId = 'SDM_Altapay::images/' . $logoName . '.png';
             $params = ['area' => 'frontend'];
             $asset  = $this->assetRepository->createAsset($fileId, $params);
-            $logoPath[] = $asset->getUrl();
+            $path[] = $asset->getUrl();
         }
 
-        return $logoPath;
+        return $path;
     }
 
     public function checkAuth()
