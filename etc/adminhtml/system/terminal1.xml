@@ -33,6 +33,10 @@
             <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
             <config_path>payment/terminal1/isapplepay</config_path>
         </field>
+        <field id="applepaylabel" translate="label comment" type="text" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
+            <label>Apple Pay Form Label</label>
+            <config_path>payment/terminal1/applepaylabel</config_path>
+        </field>
         <field id="language" translate="label comment" type="select" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
             <label>Force Language</label>
             <comment>Force the language of the payment page</comment>

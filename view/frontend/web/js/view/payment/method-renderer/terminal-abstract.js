@@ -56,6 +56,27 @@ define(
                     );
                 }
             },
+            termnialId: function () {
+                var self = this;
+                var terminalname;
+                var terminalinfo = [];
+                var paymentMethod = window.checkoutConfig.payment[this.getDefaultCode()].terminaldata;
+                var isSafari = (/^((?!chrome|android).)*safari/i.test(navigator.userAgent));
+                for (var obj in paymentMethod) {
+                    if (obj === self.getCode()) {
+                        if (paymentMethod[obj].isapplepay == 1 && isSafari === false) {
+                            terminalname = "";
+                        } else {
+                            if (paymentMethod[obj].terminalname != " ") {
+                                terminalname = paymentMethod[obj].terminalname;
+                            }
+                        }
+                    }
+                }
+                terminalinfo.push(terminalname, paymentMethod[obj].applepaylabel);
+                
+                return terminalinfo;
+            },
             terminalName: function () {
                 var self = this;
                 var terminalname;
@@ -93,7 +114,8 @@ define(
 
             },
             onApplePayButtonClicked: function() {
-               var configData = window.checkoutConfig.payment[this.getDefaultCode()];
+                var terminalinfo = this.termnialId();
+                var configData = window.checkoutConfig.payment[this.getDefaultCode()];
                 var baseurl = configData.baseUrl;
 
                 if (!ApplePaySession) {
@@ -114,7 +136,7 @@ define(
                         "discover"
                     ],
                     "total": {
-                        "label": "Demo (Card is not charged)",
+                        "label": "Total amount to charge",
                         "type": "final",
                         "amount": configData.grandTotalAmount
                     }
@@ -130,7 +152,7 @@ define(
                         url: url,
                         data: {
                             validationUrl: event.validationURL,
-                            termminalid: this.terminalName()
+                            termminalid: terminalinfo[0]
                         },
                         type: 'post',
                         dataType: 'JSON',
@@ -142,8 +164,13 @@ define(
                 };
                 
                 session.onpaymentmethodselected = event => {
+                    var applePayLabel = 'AltaPay ApplePay Charge';
+
+                    if (terminalinfo[1] !== null) {
+                        applePayLabel = terminalinfo[1];
+                    }
                     let total = {
-                        "label": "AltaPay ApplePay Charge",
+                        "label": applePayLabel,
                         "type": "final",
                         "amount": configData.grandTotalAmount
                     }

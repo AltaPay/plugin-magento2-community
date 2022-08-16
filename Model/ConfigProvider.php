@@ -189,7 +189,7 @@ class ConfigProvider implements ConfigProviderInterface
             $showBoth      = $this->scopeConfig->getValue($paymentCode . '/showlogoandtitle', $storeScope, $storeCode);
             $saveCardToken = $this->scopeConfig->getValue($paymentCode . '/savecardtoken', $storeScope, $storeCode);
             $isApplePay    = $this->scopeConfig->getValue($paymentCode . '/isapplepay', $storeScope, $storeCode);
-            
+            $applePayLabel = $this->scopeConfig->getValue($paymentCode . '/applepaylabel', $storeScope, $storeCode);
             if ($terminalStatus == 1) {
                 $methods[$key] = [
                     'label'             => $label,
@@ -199,7 +199,8 @@ class ConfigProvider implements ConfigProviderInterface
                     'terminallogo'      => $logoURL,
                     'showlogoandtitle'  => $showBoth,
                     'enabledsavetokens' => $saveCardToken,
-                    'isapplepay'        => $isApplePay
+                    'isapplepay'        => $isApplePay,
+                    'applepaylabel'     => $applePayLabel
                 ];
                 if ($saveCardToken == 1 && !empty($savedTokenList)) {
                     $methods[$key]['savedtokenlist']          = json_encode($savedTokenList);
