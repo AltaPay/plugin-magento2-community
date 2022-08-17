@@ -165,10 +165,10 @@ define(
                 
                 session.onpaymentmethodselected = event => {
                     var applePayLabel = 'AltaPay ApplePay Charge';
-
                     if (terminalinfo[1] !== null) {
                         applePayLabel = terminalinfo[1];
                     }
+                    
                     let total = {
                         "label": applePayLabel,
                         "type": "final",
