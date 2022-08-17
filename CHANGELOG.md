@@ -1,6 +1,11 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [3.4.2]
+
+**Improvement**
+- Add configuration field for "ApplePay form label"
+
 ## [3.4.1]
 
 **Improvement**
