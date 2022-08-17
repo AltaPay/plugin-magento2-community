@@ -65,7 +65,7 @@ class Notification extends Index implements CsrfAwareActionInterface
                     }
                 }
 
-                if (isset($post['error_message']) && $aMessageMustBeShown == "true") {
+                if (isset($post['error_message']) && $cardHolderMessageMustBeShown == "true") {
                     $msg = $post['error_message'];
                 } else {
                     $msg = "Error with the Payment.";
