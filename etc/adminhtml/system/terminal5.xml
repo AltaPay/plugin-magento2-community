@@ -35,6 +35,7 @@
         </field>
         <field id="applepaylabel" translate="label comment" type="text" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
             <label>Apple Pay Form Label</label>
+            <comment>Add custom text for the Apple Pay popup label</comment>
             <config_path>payment/terminal5/applepaylabel</config_path>
         </field>
         <field id="language" translate="label comment" type="select" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
