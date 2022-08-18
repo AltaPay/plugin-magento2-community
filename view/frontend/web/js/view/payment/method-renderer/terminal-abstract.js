@@ -115,9 +115,12 @@ define(
             },
             onApplePayButtonClicked: function() {
                 var terminalinfo = this.termnialId();
+                var applePayLabel = 'AltaPay ApplePay Charge';
                 var configData = window.checkoutConfig.payment[this.getDefaultCode()];
                 var baseurl = configData.baseUrl;
-
+                if (terminalinfo[1] !== null) {
+                    applePayLabel = terminalinfo[1];
+                }
                 if (!ApplePaySession) {
                     return;
                 }
@@ -136,7 +139,7 @@ define(
                         "discover"
                     ],
                     "total": {
-                        "label": "Total amount to charge",
+                        "label": applePayLabel,
                         "type": "final",
                         "amount": configData.grandTotalAmount
                     }
@@ -164,11 +167,6 @@ define(
                 };
                 
                 session.onpaymentmethodselected = event => {
-                    var applePayLabel = 'AltaPay ApplePay Charge';
-                    if (terminalinfo[1] !== null) {
-                        applePayLabel = terminalinfo[1];
-                    }
-                    
                     let total = {
                         "label": applePayLabel,
                         "type": "final",
