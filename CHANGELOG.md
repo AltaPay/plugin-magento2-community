@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 ## [3.4.2]
 
 **Improvement**
-- Add configuration field for "ApplePay form label"
+- Add configuration field for "ApplePay popup label"
 
 ## [3.4.1]
 
