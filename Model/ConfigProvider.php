@@ -176,11 +176,12 @@ class ConfigProvider implements ConfigProviderInterface
         }
 
         foreach ($allPaymentMethod as $key => $paymentModel) {
-            $paymentCode    = 'payment/' . $key;
-            $label          = $this->scopeConfig->getValue($paymentCode . '/title', $storeScope, $storeCode);
-            $terminalName   = $this->scopeConfig->getValue($paymentCode . '/terminalname', $storeScope, $storeCode);
-            $terminalStatus = $this->scopeConfig->getValue($paymentCode . '/active', $storeScope, $storeCode);
-            $terminalLogo   = $this->scopeConfig->getValue($paymentCode . '/terminallogo', $storeScope, $storeCode);
+            $paymentCode        = 'payment/' . $key;
+            $label              = $this->scopeConfig->getValue($paymentCode . '/title', $storeScope, $storeCode);
+            $terminalName       = $this->scopeConfig->getValue($paymentCode . '/terminalname', $storeScope, $storeCode);
+            $terminalMessage    = $this->scopeConfig->getValue($paymentCode . '/terminalmessage', $storeScope, $storeCode);
+            $terminalStatus     = $this->scopeConfig->getValue($paymentCode . '/active', $storeScope, $storeCode);
+            $terminalLogo       = $this->scopeConfig->getValue($paymentCode . '/terminallogo', $storeScope, $storeCode);
             if (!empty($terminalLogo)) {
                 $logoURL = $this->getLogoPath($terminalLogo);
             } else {
@@ -195,6 +196,7 @@ class ConfigProvider implements ConfigProviderInterface
                     'label'             => $label,
                     'value'             => $paymentCode,
                     'terminalname'      => $terminalName,
+                    'terminalmessage'   => $terminalMessage,
                     'terminalstatus'    => $terminalStatus,
                     'terminallogo'      => $logoURL,
                     'showlogoandtitle'  => $showBoth,

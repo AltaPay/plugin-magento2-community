@@ -84,7 +84,8 @@ define(
                 var isSafari = (/^((?!chrome|android).)*safari/i.test(navigator.userAgent));
                 for (var obj in paymentMethod) {
                     if (obj === self.getCode()) {
-                        if (paymentMethod[obj].isapplepay == 1 && isSafari === false) {
+                        if ((paymentMethod[obj].terminallogo != "" && paymentMethod[obj].showlogoandtitle == false) ||
+                            (paymentMethod[obj].isapplepay == 1 && isSafari === false)) {
                             terminalname = "";
                         } else {
                             if (paymentMethod[obj].terminalname != " ") {
@@ -98,6 +99,20 @@ define(
                     }
                 }
                 return terminalname;
+            },
+            terminalMessage: function () {
+                var self = this;
+                var terminalmessage;
+                var paymentMethod = window.checkoutConfig.payment[this.getDefaultCode()].terminaldata;
+
+                for (var obj in paymentMethod) {
+                    if (obj === self.getCode()) {
+                        if (paymentMethod[obj].terminalmessage != "" && paymentMethod[obj].terminalmessage != null) {
+                            terminalmessage = paymentMethod[obj].terminalmessage
+                       }
+                    }
+                }
+                return terminalmessage;
             },
             terminalStatus: function () {
                 var self = this;
@@ -239,10 +254,9 @@ define(
 
                 for (var obj in paymentMethod) {
                     if (obj === self.getCode()) {
-                        if (paymentMethod[obj].terminallogo != " " && paymentMethod[obj].showlogoandtitle == true) {
-                            if (paymentMethod[obj].terminallogo != null) {
-                                terminallogo = paymentMethod[obj].terminallogo
-                            }
+
+                        if (paymentMethod[obj].terminallogo != " " && paymentMethod[obj].terminallogo != null) {
+                            terminallogo = paymentMethod[obj].terminallogo
                         }
                     }
                 }
