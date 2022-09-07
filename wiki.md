@@ -158,14 +158,14 @@ To synchronize the terminals with the gateway, click on the **Synchronize Termin
 
 4.  Select the terminal name in the drop-down list
 
-5.  Optional fields: 'Force language', 'Fraud detection', 'Auto
-    capture', 'Terminal Logo', 'Enable Customer Token Control', 'AVS','
-    AVS accepted codes'.
+5.  Optional fields: 'Custom Message', 'Force language', 'Is Apple Pay?', 'Apple Pay Form Label', 'Auto
+    capture', 'Terminal Logo', 'Show both Logo and Title', 'Enable Customer Token Control', 'AVS', 'Enforce AVS', 'AVS accepted codes', 'Sort Order'.
+
 6.  If Apple Pay terminal is selected from the Terminal dropdown, make sure to enable isapplepay option.
 
 7.  Save changes by clicking 'Save Config'
 
-![gateway_terminal_configuration](docs/gateway_terminal_configuration.png)
+![gateway_terminal_configuration](docs/gateway_terminal_configuration.jpg)
 
 _**Note:** Remember to follow Magento's [Cache Management](https://docs.magento.com/user-guide/system/cache-management.html) guidelines to clear the site cache when updating the configurations._
 
@@ -189,6 +189,10 @@ here._
 - Use the below link to apply the **CSS** to the form page:
 
     <https://github.com/AltaPay/plugin-magento2-community/blob/main/view/frontend/web/css/ordersummary.css>
+
+- You can update the styling for the Checkout/Terminals page from below file
+
+    <https://github.com/AltaPay/plugin-magento2-community/blob/add-custom-text-option-for-terminals/view/frontend/web/css/altapaycheckout.css>
 
 >**Note:** It is recommended to extend the layout file instead of making changes in the plugin file directly. If you want to extend the layout file, use the below path in your custom module/theme:
 >
