@@ -1,6 +1,11 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [3.4.3]
+
+**Improvement**
+- Add text field under terminal name for custom message
+
 ## [3.4.2]
 
 **Improvement**
