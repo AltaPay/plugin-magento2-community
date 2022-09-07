@@ -32,7 +32,25 @@ span.terminal-logos {
 .checkout-payment-method .payment-method-title {
     display: flex;
 }
+
 span.terminal-name {
     margin-bottom: 10px;
     display: inline-block;
+}
+
+.terminal-logos>img {
+    vertical-align: middle;
+    max-width: 50px;
+}
+
+@media (min-width: 769px) {
+    .terminal-logos>img {
+        max-width: 80px;
+    }
+}
+
+@media (min-width: 993px) {
+    .terminal-logos>img {
+        max-width: 100px;
+    }
 }
