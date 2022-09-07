@@ -20,7 +20,7 @@ span.terminal-logos {
 }
 
 .terminal-cnt .terminal-title {
-    padding-left: 22px;
+    padding-left: 10px;
 }
 
 .label.terminal-cnt {
@@ -41,6 +41,11 @@ span.terminal-name {
 .terminal-logos>img {
     vertical-align: middle;
     max-width: 50px;
+}
+
+.payment-method-title input.radio {
+    align-self: center;
+    display: flex;
 }
 
 @media (min-width: 769px) {
