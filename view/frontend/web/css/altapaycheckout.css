@@ -1,0 +1,56 @@
+/*
+ * Altapay Module for Magento 2.x.
+ *
+ * Copyright © 2018 Altapay. All rights reserved.
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+span.terminal-message,
+.terminal-message-logo {
+    display: block;
+    padding-left: 0;
+    color: #666666;
+    padding-top: 10px;
+}
+
+span.terminal-logos {
+    flex: 1 0 0;
+    text-align: right;
+}
+
+.terminal-cnt .terminal-title {
+    padding-left: 10px;
+}
+
+.label.terminal-cnt {
+    width: 100%;
+    display: flex;
+    align-items: center;
+}
+
+.checkout-payment-method .payment-method-title {
+    display: flex;
+}
+
+.terminal-logos>img {
+    vertical-align: middle;
+    max-width: 50px;
+}
+
+.payment-method-title input.radio {
+    align-self: center;
+    display: flex;
+}
+
+@media (min-width: 769px) {
+    .terminal-logos>img {
+        max-width: 80px;
+    }
+}
+
+@media (min-width: 993px) {
+    .terminal-logos>img {
+        max-width: 100px;
+    }
+}

@@ -1,6 +1,12 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [3.4.3]
+
+**Improvement**
+- Add text field under terminal name for custom message
+- Resize payment method logos to improve the page load time
+
 ## [3.4.2]
 
 **Improvement**

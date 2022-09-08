@@ -21,7 +21,12 @@
             <label>Title</label>
             <config_path>payment/terminal1/title</config_path>
         </field>
-        <field id="terminalname" translate="label comment" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+        <field id="terminalmessage" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+            <label>Custom Message</label>
+            <comment>Add custom text to show under terminal name</comment>
+            <config_path>payment/terminal1/terminalmessage</config_path>
+        </field>
+        <field id="terminalname" translate="label comment" type="select" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
             <label>Terminal Name</label>
             <comment>Select terminal - Remember to save configuration after you have added your API login and password, to get your terminals</comment>
             <config_path>payment/terminal1/terminalname</config_path>
