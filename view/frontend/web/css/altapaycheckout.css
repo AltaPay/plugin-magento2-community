@@ -11,7 +11,7 @@ span.terminal-message,
     display: block;
     padding-left: 0;
     color: #666666;
-    margin-top: 0;
+    padding-top: 10px;
 }
 
 span.terminal-logos {
@@ -31,11 +31,6 @@ span.terminal-logos {
 
 .checkout-payment-method .payment-method-title {
     display: flex;
-}
-
-span.terminal-name {
-    margin-bottom: 10px;
-    display: inline-block;
 }
 
 .terminal-logos>img {
