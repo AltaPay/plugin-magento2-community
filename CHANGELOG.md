@@ -1,6 +1,11 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [3.4.5]
+
+**Improvement**
+- Add support for pay by link
+
 ## [3.4.4]
 
 **Fixes**
