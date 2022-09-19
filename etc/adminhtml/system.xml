@@ -127,7 +127,7 @@
                         <label>Synchronize payment methods</label>
                         <frontend_model>SDM\Altapay\Block\System\Config\Button</frontend_model>
                     </field>
-                </group>    
+                </group>
 
                 <include path="SDM_Altapay::system/terminal1.xml"/>
                 <include path="SDM_Altapay::system/terminal2.xml"/>

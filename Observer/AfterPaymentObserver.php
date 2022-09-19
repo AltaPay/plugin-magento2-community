@@ -82,9 +82,6 @@ class AfterPaymentObserver implements ObserverInterface
                             ->getTransport();
             $transport->sendMessage();
             $this->inlineTranslation->resume();
-
-        } else {
-            
         }
     }
 }
