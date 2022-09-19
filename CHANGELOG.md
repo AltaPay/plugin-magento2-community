@@ -1,6 +1,11 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [3.4.4]
+
+**Fixes**
+- Fix: Refund callback does not trigger in case of IDEAL payment
+
 ## [3.4.3]
 
 **Improvement**
