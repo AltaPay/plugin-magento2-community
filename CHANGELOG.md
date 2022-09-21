@@ -1,188 +1,178 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
-## [3.4.4]
+## [3.4.5]
+### Added
+- Support for pay by link
 
-**Fixes**
-- Fix: Refund callback does not trigger in case of IDEAL payment
+## [3.4.4]
+### Fixed
+- Fix refund callback does not trigger in case of IDEAL payment
 
 ## [3.4.3]
-
-**Improvement**
+### Added
 - Add text field under terminal name for custom message
+
+### Changed
 - Resize payment method logos to improve the page load time
 
 ## [3.4.2]
-
-**Improvement**
+### Added
 - Add configuration field for "ApplePay popup label"
 
 ## [3.4.1]
-
-**Improvement**
+### Added
 - Support multiple logos/icons option for terminals.
 
 ## [3.4.0]
-
-**Fixes**
-- Fix: Compilation failed due to duplicate "Transaction" class
+### Fixed
+- Fix compilation failed due to duplicate "Transaction" class
 
 ## [3.3.9]
-
-**Fixes**
-- Fix: Remove internal classes and add php-api dependency
-- Fix: Add PHP support from 7.0 to 8.1
+### Fixed
+- Fix remove internal classes and add php-api dependency
+### Added
+- Add PHP support from 7.0 to 8.1
 
 ## [3.3.8]
-
-**Fixes**
-- Fix: Release stock qty on order cancellation
+### Fixed
+- Fix release stock qty on order cancellation
 
 ## [3.3.7]
-
-**Fixes**
-- Fix: Order status set to "pending" on "incomplete" response
-- Fix: Cookies restriction notice is not functional
-- Fix: Added CardInformation parameters for Transaction class
+### Fixed
+- Fix order status set to "pending" on "incomplete" response
+- Fix cookies restriction notice is not functional
+- Fix missing CardInformation parameters from the Transaction class
 
 ## [3.3.6]
-
-**Improvement**
+### Added
 - Support tax exclusive configurations.
 
 ## [3.3.5]
-
-**Improvement**
+### Added
 - Add support for Apple Pay
 
 ## [3.3.4]
-
-**Fixes**
-- Fix: Incorrect discount calculation 
+### Fixed
+- Fix incorrect discount calculation 
 
 ## [3.3.3]
-
-**Fixes**
-- Fix: Order status set to "closed" for "Vipps" payment method
+### Fixed
+- Fix order status set to "closed" for "Vipps" payment method
 
 ## [3.3.2]
-
-**Fixes**
-- Fix: Order status set to "closed" despite the orders being in a pre-auth state.
+### Fixed
+- Fix order status set to "closed" despite the orders being in a pre-auth state.
 
 ## [3.3.1]
-
-**Fixes**
-- Fix: Canceled order qty from item grid is missing
+### Fixed
+- Fix canceled order qty from item grid is missing
 
 ## [3.3.0]
+### Fixed
+- Fix stock quantity calculation issue
 
-**Fixes**
-- Fix: Stock quantity calculation issue
-
-**Improvements**
+### Added
 - Add configurations section to setup cron scheduler to change the status of the pending order to cancel
 
 ## [3.2.9]
-
-**Fixes**
-- Fix: Handle empty synch button response
+### Fixed
+- Fix handle empty synch button response
 
 ## [3.2.8]
-
-**Fixes**
-- Fix: Cancel order if payment_status is "released" in notification callback
+### Fixed
+- Fix cancel order if payment_status is "released" in notification callback
 
 ## [3.2.7]
-
-**Improvements**
+### Added
 - Add a button to trigger the sync of the terminals with the gateway
 
 ## [3.2.6]
-
-**Fixes**
+### Fixed
 - Fix: Saved credit cards grid styling for mobile view
 
-**Improvements**
+### Changed
 - Migrate install/upgrade scripts to declarative schema
 
 ## [3.2.5]
-
-**Fixes**
-- Fix: Success page rendering issue when placing an order in incognito mode with the MobilePay
+### Fixed
+- Fix success page rendering issue when placing an order in incognito mode with the MobilePay
 
 ## [3.2.4]
-
-**Fixes**
-- Fix: Product stock not updating when order status change from cancel to processing
+### Fixed
+- Fix product stock not updating when order status change from cancel to processing
 
 ## [3.2.3]
-**Fixes**
-- Fix: Cancel order issues when there is no transaction
+### Fixed
+- Fix cancel order issues when there is no transaction
 
 ## [3.2.2]
-**Fixes**
-- Fix: Order failing issue when applying a fixed discount on the cart
+### Fixed
+- Fix order failing issue when applying a fixed discount on the cart
 
 ## [3.2.1]
-**Fixes**
-- Fix: Compilation issue due to a missing file path
+### Fixed
+- Fix compilation issue due to a missing file path
 
 ## [3.2.0]
-**Improvements**
+### Added
 - Add support when cart and catalog rules are applied simultaneously
 - Make text "No saved credit cards" translatable
 
 ## [3.1.9]
-**Improvements**
+### Added
 - Support multi-language for order summary section in form rendering
 
 ## [3.1.8]
-**Improvements**
+### Added
 - Support AutoCapture functionality with subscription product
 
 ## [3.1.7]
-**Improvements**
+### Added
 - Support subscription product with Amasty plugin
 
 ## [3.1.6]
-**Improvements**
+### Added
 - Added version node in composer file
 
 ## [3.1.5]
-**Improvements**
+### Added
 - Added support for terminal sorting
 
 ## [3.1.4]
-**Fixes**
+### Changed
 - Remove deprecated validation file from the bash script
+### Fixed
 - Remove unnecessary files while creating zip package
 
 ## [3.1.3]
-**Fixes**
+### Fixed
 - Remove payment terminal shown upon editing order from backend
 - Fix "Could not load HTML" issue cause by X-Magento-Tags
       
 ## [3.1.2]
-**Improvements**
+### Added
 - Add a shell script that creates the zip folder
 - Redirect failed orders to cart details page
 
 ## [3.1.1]
-**Fixes**
+### Fixed
 - Updated shipping template with the minor bug fix
 
 ## [3.1.0]
-**Improvements**
-- Rebranding from Valitor to Altapay
+### Added
 - Supporting fixed product tax configurations
 
-**Fixes**
+### Changed
+- Rebranding from Valitor to Altapay
+
+### Fixed
+- Supporting fixed product tax configurations
 - Fixed order creation issue with free shipping
 - Fixed translation issue for status code
 
 ## [3.0.0]
-**Improvements**
+### Added
 - Added plugin disclaimer
 - Code refactored according to latest coding standards
 - Added support for Klarna Payments (Klarna reintegration) and credit card token
@@ -193,44 +183,56 @@ All notable changes to this project will be documented in this file.
 - Added support for AVS
 - Added support for fixed amount and Buy X get Y free discount type
 
-**Fixes**
+### Fixed
 - Discount applied to shipping not sent to the payment gateway accordingly
 - Order details dependent on the current tax configuration rather than the one at the time when order was placed
 
 ## [2.2.0]
-**Improvements**
+### Added
 - Added a fix in relation to a bug in Magento core source code
  - Completed the rebranding changes
 - Revamped orderlines for capture and refund calls
 - Added support for bundle product and multiple tax rules
 
-**Fixes**
+### Fixed
 - Failed order when coupon code applied only to shipping
 - Duplicated confirmation email sent when e-payments
 - Rounding mismatch issue in compensation amounts
 
 ## [2.1.0]
+### Added
 - A new batch of improvements and bug fixes
 
 ## [2.0.0]
+### Fixed
 - Major improvements and bug fixes
 
 ## [1.1.4]
+### Fixed
 - Fixed the symfony dependency: either one from the next list will be used, according to the Magento version: 2.6, 3.0 or 4.0+
 
 ## [1.1.3]
-- Fixed the authorization from the checkout section
+### Added
 - Added a check before a quote is restored
 
+### Fixed
+- Fixed the authorization from the checkout section
+
 ## [1.1.2]
+### Fixed
 - Internal reference updates
 
 ## [1.1.1]
+### Fixed
 - Replaced the pop up messages with regular ones
 
 ## [1.1.0]
+### Added
 - Added support for PHP 5.5 and 5.6
+
+### Changed
 - Updated the PHP client API
 
 ## [1.0.1]
+### Added
 - First release

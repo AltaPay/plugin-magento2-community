@@ -106,7 +106,11 @@ class ApplePay extends Action implements CsrfAwareActionInterface
 
         $response = $request->call();
         if ($response->Result === 'Success') {
-            echo json_encode($response->ApplePaySession);
+            $response = $this->resultFactory
+            ->create(\Magento\Framework\Controller\ResultFactory::TYPE_JSON)
+            ->setData($response->ApplePaySession);
+    
+            return $response;
         }
     }
 

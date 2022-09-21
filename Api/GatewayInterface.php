@@ -17,7 +17,7 @@ interface GatewayInterface
      * @param int    $terminalId
      * @param string $orderId
      *
-     * @return array
+     * @return string[]
      */
     public function createRequest($terminalId, $orderId);
 }

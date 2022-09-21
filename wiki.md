@@ -26,6 +26,8 @@ We highly recommend gathering all the below information, before starting the ins
 
 [Configure terminals](#configure-terminals)
 
+[Pay by link](#pay-by-link)
+
 [Supported versions](#supported-versions)
 
 [Styling](#styling)
@@ -169,6 +171,38 @@ To synchronize the terminals with the gateway, click on the **Synchronize Termin
 
 _**Note:** Remember to follow Magento's [Cache Management](https://docs.magento.com/user-guide/system/cache-management.html) guidelines to clear the site cache when updating the configurations._
 
+# Pay by link
+By performing the below steps a customer receives a payment link on the provided email.
+
+1. Navigate to Admin \> Sales \> Order 
+
+2. Click on the "Create new order" button
+
+![create_an_order](docs/create_an_order.png)
+
+3. Select an existing customer or create a new user
+
+![add_customer](docs/add_customer.png)
+
+4. Click on the "Add Product" button and choose any product from the list
+
+![add_product](docs/add_product.png)
+
+5. Then click on the "Add the selected product(s) to order" button
+
+![product_list](docs/product_list.png)
+
+6. Add Billing and Shipping Address 
+
+![add_billing_address](docs/add_billing_address.png)
+
+7. Choose a payment method
+
+![select_payment_method](docs/select_payment_method.png)
+
+8. Click on the "Submit Order" button
+
+![submit_order](docs/submit_order.png)
 
 # Supported versions
 

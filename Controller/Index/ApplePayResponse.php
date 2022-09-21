@@ -90,8 +90,11 @@ class ApplePayResponse extends Action implements CsrfAwareActionInterface
                 $orderId,
                 $this->getRequest()->getParam('providerData')
             );
-
-            echo json_encode($params);
+            $response = $this->resultFactory
+            ->create(\Magento\Framework\Controller\ResultFactory::TYPE_JSON)
+            ->setData($params);
+            
+            return $response;
         }
     }
 

@@ -14,6 +14,10 @@
         <observer name="SDM_Altapay_Order_Before_Payment" instance="SDM\Altapay\Observer\BeforePaymentObserver" />
     </event>
 
+    <event name="checkout_submit_all_after">
+        <observer name="admin_order_place_after" instance="SDM\Altapay\Observer\AfterPaymentObserver"/>
+    </event>
+
     <event name="order_cancel_after">
         <observer name="SDM_Altapay_OrderCancel" instance="SDM\Altapay\Observer\OrderCancelObserver" />
     </event>
