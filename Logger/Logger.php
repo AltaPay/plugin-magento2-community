@@ -23,11 +23,11 @@ class Logger extends \Monolog\Logger
     public function addInfoLog($type, $data)
     {
         if (is_array($data)) {
-            $this->addInfo($type . ': ' . json_encode($data));
+            $this->info($type . ': ' . json_encode($data));
         } elseif (is_object($data)) {
-            $this->addInfo($type . ': ' . json_encode($data));
+            $this->info($type . ': ' . json_encode($data));
         } else {
-            $this->addInfo($type . ': ' . $data);
+            $this->info($type . ': ' . $data);
         }
     }
 
@@ -68,11 +68,11 @@ class Logger extends \Monolog\Logger
     public function addDebugLog($type, $data)
     {
         if (is_array($data)) {
-            $this->critical($type . ': ' . json_encode($data));
+            $this->debug($type . ': ' . json_encode($data));
         } elseif (is_object($data)) {
-            $this->critical($type . ': ' . json_encode($data));
+            $this->debug($type . ': ' . json_encode($data));
         } else {
-            $this->critical($type . ': ' . $data);
+            $this->debug($type . ': ' . $data);
         }
     }
 }
