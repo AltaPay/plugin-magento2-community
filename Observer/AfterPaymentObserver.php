@@ -16,6 +16,7 @@ use SDM\Altapay\Model\SystemConfig;
 use SDM\Altapay\Model\Gateway;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Store\Model\ScopeInterface;
+use SDM\Altapay\Helper\Data;
 
 class AfterPaymentObserver implements ObserverInterface
 {
@@ -24,6 +25,10 @@ class AfterPaymentObserver implements ObserverInterface
      */
     protected $systemConfig;
 
+    /**
+     * @var Helper Data
+     */
+    private $helper;
     /**
      * BeforePaymentObserver constructor.
      *
@@ -35,6 +40,7 @@ class AfterPaymentObserver implements ObserverInterface
         \Magento\Framework\Mail\Template\TransportBuilder $transportBuilder,
         \Magento\Framework\Translate\Inline\StateInterface $inlineTranslation,
         ScopeConfigInterface $scopeConfig,
+        Data $helper,
         Gateway $gateway
         )
     {
@@ -43,6 +49,7 @@ class AfterPaymentObserver implements ObserverInterface
         $this->scopeConfig = $scopeConfig; 
         $this->transportBuilder = $transportBuilder;
         $this->inlineTranslation = $inlineTranslation;
+        $this->helper          = $helper;
         $this->gateway      = $gateway;
     }
 
@@ -59,29 +66,31 @@ class AfterPaymentObserver implements ObserverInterface
         $payment = $order->getPayment();
         $method = $payment->getMethodInstance();
         $terminalCode = $method->getCode();
-        $params = $this->gateway->createRequest(
-            $terminalCode[strlen($terminalCode)-1],
-            $order->getId()
-        );
+        if (in_array($terminalCode, $this->helper->getTerminalCodes())){
+            $params = $this->gateway->createRequest(
+                $terminalCode[strlen($terminalCode)-1],
+                $order->getId()
+            );
 
-        if($params['result'] === 'success') {
-            $templateOptions = array('area' => \Magento\Framework\App\Area::AREA_FRONTEND, 'store' => $this->storeManager->getStore()->getId());
-            $templateVars = array(
-                                'store' => $this->storeManager->getStore(),
-                                'customer_name' => $order->getCustomerName(),
-                                'message'    => $params['formurl']
-                            );
-            $from = array('email' => $email, 'name' => $name);
-            $this->inlineTranslation->suspend();
-            $to = array($order->getCustomerEmail());
-            $transport = $this->transportBuilder->setTemplateIdentifier('payment_template')
-                            ->setTemplateOptions($templateOptions)
-                            ->setTemplateVars($templateVars)
-                            ->setFrom($from)
-                            ->addTo($to)
-                            ->getTransport();
-            $transport->sendMessage();
-            $this->inlineTranslation->resume();
+            if($params['result'] === 'success') {
+                $templateOptions = array('area' => \Magento\Framework\App\Area::AREA_FRONTEND, 'store' => $this->storeManager->getStore()->getId());
+                $templateVars = array(
+                                    'store' => $this->storeManager->getStore(),
+                                    'customer_name' => $order->getCustomerName(),
+                                    'message'    => $params['formurl']
+                                );
+                $from = array('email' => $email, 'name' => $name);
+                $this->inlineTranslation->suspend();
+                $to = array($order->getCustomerEmail());
+                $transport = $this->transportBuilder->setTemplateIdentifier('payment_template')
+                                ->setTemplateOptions($templateOptions)
+                                ->setTemplateVars($templateVars)
+                                ->setFrom($from)
+                                ->addTo($to)
+                                ->getTransport();
+                $transport->sendMessage();
+                $this->inlineTranslation->resume();
+            }
         }
     }
 }
