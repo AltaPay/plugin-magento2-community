@@ -53,11 +53,11 @@ class Logger extends \Monolog\Logger
     public function addCriticalLog($type, $data)
     {
         if (is_array($data)) {
-            $this->addCritical($type . ': ' . json_encode($data));
+            $this->critical($type . ': ' . json_encode($data));
         } elseif (is_object($data)) {
-            $this->addCritical($type . ': ' . json_encode($data));
+            $this->critical($type . ': ' . json_encode($data));
         } else {
-            $this->addCritical($type . ': ' . $data);
+            $this->critical($type . ': ' . $data);
         }
     }
 
@@ -68,11 +68,11 @@ class Logger extends \Monolog\Logger
     public function addDebugLog($type, $data)
     {
         if (is_array($data)) {
-            $this->addCritical($type . ': ' . json_encode($data));
+            $this->critical($type . ': ' . json_encode($data));
         } elseif (is_object($data)) {
-            $this->addCritical($type . ': ' . json_encode($data));
+            $this->critical($type . ': ' . json_encode($data));
         } else {
-            $this->addCritical($type . ': ' . $data);
+            $this->critical($type . ': ' . $data);
         }
     }
 }
