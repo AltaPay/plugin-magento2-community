@@ -166,13 +166,16 @@ class CreditmemoRefundObserver implements ObserverInterface
     private function itemOrderLines($couponCodeAmount, $discountAllItems, $memo)
     {
         $orderLines       = [];
+        $discountAmount   = 0;
         $storePriceIncTax = $this->storeConfig->storePriceIncTax($memo->getOrder());
         foreach ($memo->getAllItems() as $item) {
             $qty         = $item->getQty();
             $taxPercent  = $item->getOrderItem()->getTaxPercent();
             $productType = $item->getOrderItem()->getProductType();
             if ($qty > 0 && $productType != 'bundle') {
-                $discountAmount = $item->getDiscountAmount();
+                if($item->getDiscountAmount()) {
+                    $discountAmount = $item->getDiscountAmount();
+                }
                 $originalPrice  = $item->getOrderItem()->getOriginalPrice();
                 $totalPrice     = $originalPrice * $qty;
 
@@ -253,16 +256,16 @@ class CreditmemoRefundObserver implements ObserverInterface
         try {
             $refund->call();
         } catch (ResponseHeaderException $e) {
-            $this->altapayLogger->addCritical('Response header exception: ' . $e->getMessage());
+            $this->altapayLogger->addCriticalLog('Exception' , $e->getMessage());
             throw $e;
         } catch (\Exception $e) {
-            $this->altapayLogger->addCritical('Exception: ' . $e->getMessage());
+            $this->altapayLogger->addCriticalLog('Exception: ' , $e->getMessage());
         }
 
         $rawResponse = $refund->getRawResponse();
         $body        = $rawResponse->getBody();
         //add information to the altapay log
-        $this->altapayLogger->addInfo('Response body: ' . $body);
+        $this->altapayLogger->addInfoLog('Info' , $body);
 
         //Update comments if refund fail
         $xml = simplexml_load_string($body);

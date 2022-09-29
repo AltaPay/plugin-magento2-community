@@ -25,6 +25,8 @@ use SDM\Altapay\Model\TokenFactory;
 use Magento\Customer\Model\Session;
 use Magento\Checkout\Model\Session as CheckoutSession;
 use Magento\Store\Model\StoreManagerInterface;
+use \Exception;
+use SDM\Altapay\Logger\Logger;
 
 class ConfigProvider implements ConfigProviderInterface
 {
@@ -94,6 +96,7 @@ class ConfigProvider implements ConfigProviderInterface
         TokenFactory $dataToken,
         Session $customerSession,
         CheckoutSession $checkoutSession,
+        Logger $altapayLogger,
         StoreManagerInterface $storeManager
     ) {
         $this->data             = $data;
@@ -107,6 +110,7 @@ class ConfigProvider implements ConfigProviderInterface
         $this->customerSession  = $customerSession;
         $this->_checkoutSession = $checkoutSession;
         $this->_storeManager    = $storeManager;
+        $this->altapayLogger   = $altapayLogger;
     }
 
     /**
@@ -236,15 +240,15 @@ class ConfigProvider implements ConfigProviderInterface
     {
         $auth     = 0;
         $response = new TestAuthentication($this->systemConfig->getAuth());
-        if (!$response) {
-            $result = false;
-        } else {
-            $result = $response->call();
-        }
-        if ($result) {
-            $auth = 1;
-        }
 
+        try {
+            $result = $response->call();
+            if($result){
+                $auth = 1;
+            }
+        } catch (\Exception $e){
+            return $this->altapayLogger->addCriticalLog('Exception', $e->getMessage());
+        }
         return $auth;
     }
 

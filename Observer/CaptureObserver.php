@@ -168,13 +168,16 @@ class CaptureObserver implements ObserverInterface
     private function itemOrderLines($couponCodeAmount, $invoice, $discountAllItems)
     {
         $orderLines       = [];
+        $discountAmount   = 0;
         $storePriceIncTax = $this->storeConfig->storePriceIncTax($invoice->getOrder());
         foreach ($invoice->getAllItems() as $item) {
             $qty         = $item->getQty();
             $taxPercent  = $item->getOrderItem()->getTaxPercent();
             $productType = $item->getOrderItem()->getProductType();
             if ($qty > 0 && $productType != 'bundle' && $item->getPriceInclTax()) {
-                $discountAmount = $item->getDiscountAmount();
+                if($item->getDiscountAmount()) {
+                    $discountAmount = $item->getDiscountAmount();
+                }
                 $originalPrice  = $item->getOrderItem()->getOriginalPrice();
                 $totalPrice     = $originalPrice * $qty;
 
@@ -288,7 +291,7 @@ class CaptureObserver implements ObserverInterface
             $response = $api->call();
         } catch (ResponseHeaderException $e) {
             $this->altapayLogger->addInfoLog('Info', $e->getHeader());
-            $this->altapayLogger->addCriticalLog('Response header exception', $e->getMessage());
+            $this->altapayLogger->addCriticalLog('Exception', $e->getMessage());
             throw $e;
         } catch (\Exception $e) {
             $this->altapayLogger->addCriticalLog('Exception', $e->getMessage());
@@ -297,7 +300,7 @@ class CaptureObserver implements ObserverInterface
         $rawResponse = $api->getRawResponse();
         if (!empty($rawResponse)) {
             $body = $rawResponse->getBody();
-            $this->altapayLogger->addInfo('Response body: ' . $body);
+            $this->altapayLogger->addInfoLog('Info' , $body);
             //Update comments if capture fail
             $xml = simplexml_load_string($body);
             if ($xml->Body->Result == 'Error' || $xml->Body->Result == 'Failed' || $xml->Body->Result == 'Incomplete') {
@@ -310,7 +313,7 @@ class CaptureObserver implements ObserverInterface
             foreach ($rawResponse->getHeaders() as $k => $v) {
                 $headData[] = $k . ': ' . json_encode($v);
             }
-            $this->altapayLogger->addInfoLog('Response headers', implode(", ", $headData));
+            $this->altapayLogger->addInfoLog('Info', implode(", ", $headData));
         }
         if (!isset($response->Result) || $response->Result != 'Success') {
             throw new \InvalidArgumentException('Could not capture reservation');

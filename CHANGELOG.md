@@ -1,6 +1,11 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [3.4.6]
+### Fixed
+- Fix blank checkout in case the plugin is not configured
+- Fix critical logs handling 
+
 ## [3.4.5]
 ### Added
 - Support for pay by link
