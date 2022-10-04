@@ -37,6 +37,7 @@ use Magento\Framework\App\RequestInterface;
 use Magento\Quote\Model\Quote\Item\AbstractItem;
 use Magento\Framework\DataObject;
 use Altapay\Api\Payments\ApplePayWalletAuthorize;
+use Magento\Store\Model\StoreManagerInterface;
 
 /**
  * Class Gateway
@@ -113,6 +114,11 @@ class Gateway implements GatewayInterface
      */
     private $applePayOrder;
     /**
+     * @var StoreManagerInterface
+     */
+    protected $storeManager;
+
+    /**
      * Gateway constructor.
      *
      * @param Session              $checkoutSession
@@ -150,7 +156,8 @@ class Gateway implements GatewayInterface
         DiscountHandler $discountHandler,
         CreatePaymentHandler $paymentHandler,
         TokenFactory $dataToken,
-        ApplePayOrder $applePayOrder
+        ApplePayOrder $applePayOrder,
+        StoreManagerInterface $storeManager
     ) {
         $this->checkoutSession = $checkoutSession;
         $this->urlInterface    = $urlInterface;
@@ -169,6 +176,7 @@ class Gateway implements GatewayInterface
         $this->paymentHandler  = $paymentHandler;
         $this->dataToken       = $dataToken;
         $this->applePayOrder   = $applePayOrder;
+        $this->storeManager    = $storeManager;
     }
 
     /**
@@ -400,6 +408,7 @@ class Gateway implements GatewayInterface
     private function preparePaymentRequest($order, $orderLines, $orderId, $terminalId, $providerData)
     {
         $storeScope = $this->storeConfig->getStoreScope();
+        $baseUrl = $this->storeManager->getStore()->getBaseUrl();
         $storeCode  = $order->getStore()->getCode();
         //Test the conn with the Payment Gateway
         $auth     = $this->systemConfig->getAuth($storeCode);
@@ -457,6 +466,17 @@ class Gateway implements GatewayInterface
                 $request->setType('subscriptionAndCharge');
             } else {
                 $request->setType('subscription');
+            }
+            $request->setAgreementType('recurring');
+            $request->setAgreementAdminUrl($baseUrl.'amasty_recurring/customer/subscriptions/');
+            $items = $quote->getAllItems();
+            /** @var Item $item */
+            foreach ($items as $item) {
+                $buyRequest = $this->getBuyRequestObject($item);
+                if($buyRequest->getData('am_subscription_end_type') === 'amrec-end-date') {
+                    $expiryDate = date("Ymd", strtotime($buyRequest->getData('am_rec_end_date')));  
+                    $request->setAgreementExpiry($expiryDate);
+                }
             }
         }
         // check if auto capture enabled
