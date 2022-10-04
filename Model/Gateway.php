@@ -467,17 +467,7 @@ class Gateway implements GatewayInterface
             } else {
                 $request->setType('subscription');
             }
-            $request->setAgreementType('recurring');
-            $request->setAgreementAdminUrl($baseUrl.'amasty_recurring/customer/subscriptions/');
-            $items = $quote->getAllItems();
-            /** @var Item $item */
-            foreach ($items as $item) {
-                $buyRequest = $this->getBuyRequestObject($item);
-                if($buyRequest->getData('am_subscription_end_type') === 'amrec-end-date') {
-                    $expiryDate = date("Ymd", strtotime($buyRequest->getData('am_rec_end_date')));  
-                    $request->setAgreementExpiry($expiryDate);
-                }
-            }
+            $request->setAgreement($this->agreementDetail($quote->getAllItems(), $baseUrl));
         }
         // check if auto capture enabled
         if (!$this->validateQuote($quote) && $this->systemConfig->getTerminalConfig($terminalId, 'capture', $storeScope, $storeCode)) {
@@ -607,5 +597,31 @@ class Gateway implements GatewayInterface
         }
 
         return $isRecurring;
+    }
+
+
+    /**
+     * @param $items
+     *
+     * @return array
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     */
+    public function agreementDetail($items, $baseUrl)
+    {
+        $agreementDetails  = [];
+        if($items) {
+            $agreementDetails['type'] = 'recurring';
+            $agreementDetails['adminUrl'] = $baseUrl.'amasty_recurring/customer/subscriptions/';
+            /** @var Item $item */
+            foreach ($items as $item) {
+                $buyRequest = $this->getBuyRequestObject($item);
+                if($buyRequest->getData('am_subscription_end_type') === 'amrec-end-date') {
+                    $expiryDate = date("Ymd", strtotime($buyRequest->getData('am_rec_end_date')));  
+                    $agreementDetails['expiry'] = $expiryDate;
+                }
+            }
+        }
+
+        return $agreementDetails;
     }
 }
