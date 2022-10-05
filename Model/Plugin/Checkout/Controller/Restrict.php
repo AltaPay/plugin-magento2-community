@@ -63,7 +63,7 @@ class Restrict
             }
         }
         if (!empty($request) && ($subscriptionProdCount > 1 || (int)$request->getData('qty') > 1 || $this->cart->getItemsCount() > 1)) {
-            $this->messageManager->addErrorMessage(__('You cannot add other products with a subscription product'));
+            $this->messageManager->addErrorMessage(__('You can purchase only one subscription product at a time'));
             $defaultUrl = $this->urlModel->getUrl('checkout/cart/', ['_secure' => true]);
             $resultRedirect = $this->resultRedirectFactory->create();
 
