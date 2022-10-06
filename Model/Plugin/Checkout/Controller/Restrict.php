@@ -44,6 +44,7 @@ class Restrict
         $itemsVisible = $this->cart->getQuote()->getAllVisibleItems();
         $this->urlModel = $this->urlModel->create();
         $subscriptionProdCount = 0;
+        $hasSubscription = false;
         foreach ($itemsVisible as $item) {
             /** @var DataObject $request */
             $request = $item->getBuyRequest();
@@ -60,14 +61,17 @@ class Restrict
 
             if ($request->getData('subscribe') === 'subscribe') {
                 $subscriptionProdCount++;
+                $hasSubscription = true;
             }
         }
-        if (!empty($request) && ($subscriptionProdCount > 1 || (int)$request->getData('qty') > 1 || $this->cart->getItemsCount() > 1)) {
-            $this->messageManager->addErrorMessage(__('You can purchase only one subscription product at a time'));
-            $defaultUrl = $this->urlModel->getUrl('checkout/cart/', ['_secure' => true]);
-            $resultRedirect = $this->resultRedirectFactory->create();
-
-            return $resultRedirect->setUrl($defaultUrl);
+        if($hasSubscription && !empty($request)) {
+            if ($subscriptionProdCount > 1 || (int)$request->getData('qty') > 1 || $this->cart->getItemsCount() > 1) {
+                $this->messageManager->addErrorMessage(__('You can purchase only one subscription product at a time'));
+                $defaultUrl = $this->urlModel->getUrl('checkout/cart/', ['_secure' => true]);
+                $resultRedirect = $this->resultRedirectFactory->create();
+    
+                return $resultRedirect->setUrl($defaultUrl);
+            }
         }
 
         return $proceed();
