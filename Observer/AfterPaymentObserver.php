@@ -66,7 +66,7 @@ class AfterPaymentObserver implements ObserverInterface
         $payment = $order->getPayment();
         $method = $payment->getMethodInstance();
         $terminalCode = $method->getCode();
-        if (in_array($terminalCode, $this->helper->getTerminalCodes())){
+        if (in_array($terminalCode, $this->helper->getTerminalCodes()) && !$order->getRemoteIp()){
             $params = $this->gateway->createRequest(
                 $terminalCode[strlen($terminalCode)-1],
                 $order->getId()

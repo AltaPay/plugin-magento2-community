@@ -1,6 +1,12 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [3.4.7]
+### Added
+- Add support for new 'Agreements Engine' parameters
+### Fixed
+- Fix duplicate callback being sent to the gateway
+
 ## [3.4.6]
 ### Fixed
 - Fix blank checkout in case the plugin is not configured
