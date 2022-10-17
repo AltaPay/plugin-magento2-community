@@ -103,16 +103,18 @@ class CreditmemoRefundObserver implements ObserverInterface
     public function execute(Observer $observer)
     {
         $memo = $observer['creditmemo'];
-        $orderIncrementId = $memo->getOrder()->getIncrementId();
-        $orderObject      = $this->order->loadByIncrementId($orderIncrementId);
-        $storeCode        = $memo->getStore()->getCode();
-        $payment          = $memo->getOrder()->getPayment();
-        //If payment method belongs to terminal codes
-        if (in_array($payment->getMethod(), SystemConfig::getTerminalCodes())) {
-            //Create orderlines from order items
-            $orderLines = $this->processRefundOrderItems($memo);
-            //Send request for payment refund
-            $this->sendRefundRequest($memo, $orderLines, $orderObject, $payment, $storeCode);
+        if ($memo->getDoTransaction()) {
+            $orderIncrementId = $memo->getOrder()->getIncrementId();
+            $orderObject      = $this->order->loadByIncrementId($orderIncrementId);
+            $storeCode        = $memo->getStore()->getCode();
+            $payment          = $memo->getOrder()->getPayment();
+            //If payment method belongs to terminal codes
+            if (in_array($payment->getMethod(), SystemConfig::getTerminalCodes())) {
+                //Create orderlines from order items
+                $orderLines = $this->processRefundOrderItems($memo);
+                //Send request for payment refund
+                $this->sendRefundRequest($memo, $orderLines, $orderObject, $payment, $storeCode);
+            }
         }
     }
 
@@ -248,7 +250,7 @@ class CreditmemoRefundObserver implements ObserverInterface
     private function sendRefundRequest($memo, $orderLines, $orderObject, $payment, $storeCode)
     {
         $refund = new RefundCapturedReservation($this->systemConfig->getAuth($storeCode));
-        if ($payment->getLastTransId()) {
+        if ($memo->getTransactionId()) {
             $refund->setTransaction($payment->getLastTransId());
         }
         $refund->setAmount((float)number_format($memo->getGrandTotal(), 2, '.', ''));
