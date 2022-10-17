@@ -1,6 +1,10 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [3.4.8]
+### Fixed
+- Fix the "refund offline" trigger a refund callback to the gateway
+
 ## [3.4.7]
 ### Added
 - Add support for new 'Agreements Engine' parameters
