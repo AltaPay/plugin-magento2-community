@@ -433,6 +433,8 @@ $logger->addWriter($writer);
             $ccToken    = $response->creditCardToken;
             $maskedPan  = $response->maskedCreditCard;
             $paymentId  = $response->paymentId;
+            $transactionId  = $response->transactionId;
+
             foreach ($response->Transactions as $key=>$value) {
                 if ($value->CreatedDate > $max_date) {
                     $max_date = $value->CreatedDate;
@@ -463,6 +465,7 @@ $logger->addWriter($writer);
                                     "customer_id"   => $order->getCustomerId(),
                                     "payment_id"    => $paymentId,
                                     "token"         => $ccToken,
+                                    "agreement_id"  => $transactionId,
                                     "masked_pan"    => $maskedPan,
                                     "currency_code" => $order->getOrderCurrencyCode(),
                                     "expires"       => $expires,
@@ -480,7 +483,7 @@ $logger->addWriter($writer);
                 }
                 $payment = $order->getPayment();
                 $payment->setPaymentId($paymentId);
-                $payment->setLastTransId($response->transactionId);
+                $payment->setLastTransId($transactionId);
                 $payment->setCcTransId($response->creditCardToken);
                 $payment->setAdditionalInformation('cc_token', $ccToken);
                 $payment->setAdditionalInformation('masked_credit_card', $maskedPan);
