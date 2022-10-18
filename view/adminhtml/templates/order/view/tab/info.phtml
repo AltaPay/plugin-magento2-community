@@ -37,7 +37,7 @@
                 </div>
                 <div class="order-payment-currency"><?= /* @escapeNotVerified */ __('The order was placed using %1.', $_order->getOrderCurrencyCode()) ?></div>
                 <?php if (!$_order->getRemoteIp() && isset($paymentFormUrl)): ?>
-                    <div class="payment_link"> </br><strong>Payment form url:</strong> <i><?= /* @escapeNotVerified */ $paymentFormUrl ?></i> </div>
+                    <div class="payment_link"> </br><strong>Payment form url:</strong> <code><?= /* @escapeNotVerified */ $paymentFormUrl ?></code> </div>
                 <?php endif; ?>
                 <div class="order-payment-additional">
                     <?= $block->getChildHtml('order_payment_additional') ?>
