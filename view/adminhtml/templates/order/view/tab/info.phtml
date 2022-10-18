@@ -12,6 +12,7 @@
 ?>
 <?php /** @var $block \Magento\Sales\Block\Adminhtml\Order\View\Tab\Info */ ?>
 <?php $_order = $block->getOrder() ?>
+<?php $paymentFormUrl = $_order->getAltapayPaymentFormUrl();?> 
 <?php $helper = $this->helper('SDM\Altapay\Helper\Data'); ?>
 <div id="order-messages">
     <?= $block->getChildHtml('order_messages') ?>
@@ -35,6 +36,9 @@
                 <?php echo $helper->getPaymentTitleTerminal($_order->getId());?>
                 </div>
                 <div class="order-payment-currency"><?= /* @escapeNotVerified */ __('The order was placed using %1.', $_order->getOrderCurrencyCode()) ?></div>
+                <?php if (isset($paymentFormUrl)): ?>
+                    <div class="payment_link"> <a href ="<?= /* @escapeNotVerified */ $paymentFormUrl ?>">Payment Form Url </a> </div>
+                <?php endif; ?>
                 <div class="order-payment-additional">
                     <?= $block->getChildHtml('order_payment_additional') ?>
                     <?= $block->getChildHtml('payment_additional_info') ?>
