@@ -28,6 +28,7 @@ use SDM\Altapay\Model\Handler\CreatePaymentHandler;
 use Magento\Checkout\Model\Cart;
 use Magento\CatalogInventory\Api\StockStateInterface;
 use Magento\CatalogInventory\Api\StockRegistryInterface;
+use SDM\Altapay\Model\TokenFactory;
 
 /**
  * Class Generator
@@ -110,6 +111,12 @@ class Generator
      * @var Cart
      */
     private  $modelCart;
+
+    /**
+     * @var TokenFactory
+     */
+    private $dataToken;
+
     /**
      * Generator constructor.
      *
@@ -146,7 +153,8 @@ class Generator
         CreatePaymentHandler $paymentHandler,
         StockStateInterface $stockItem,
         StockRegistryInterface $stockRegistry,
-        Cart $modelCart
+        Cart $modelCart,
+        TokenFactory $dataToken
     ) {
         $this->quote                 = $quote;
         $this->checkoutSession       = $checkoutSession;
@@ -164,6 +172,7 @@ class Generator
         $this->stockItem             = $stockItem;
         $this->stockRegistry         = $stockRegistry;
         $this->modelCart             = $modelCart;
+        $this->dataToken             = $dataToken;
     }
 
     /**
@@ -405,9 +414,13 @@ class Generator
         $requireCapture = $response->requireCapture;
         $paymentStatus  = strtolower($response->paymentStatus);
         $responseStatus = $response->status;
+
         $max_date = '';
         $latestTransKey = '';
-        
+        $writer = new \Laminas\Log\Writer\Stream(BP . '/var/log/logging.log');
+$logger = new \Laminas\Log\Logger();
+$logger->addWriter($writer);
+
         if ($paymentStatus === 'released') {
             $this->handleCancelStatusAction($request, $responseStatus);
             return;
@@ -417,6 +430,9 @@ class Generator
             $order      = $this->orderLoader->getOrderByOrderIncrementId($response->shopOrderId);
             $storeScope = \Magento\Store\Model\ScopeInterface::SCOPE_STORE;
             $storeCode  = $order->getStore()->getCode();
+            $ccToken    = $response->creditCardToken;
+            $maskedPan  = $response->maskedCreditCard;
+            $paymentId  = $response->paymentId;
             foreach ($response->Transactions as $key=>$value) {
                 if ($value->CreatedDate > $max_date) {
                     $max_date = $value->CreatedDate;
@@ -439,13 +455,35 @@ class Generator
                     if (isset($transaction->PaymentSchemeName)) {
                         $cardType = $transaction->PaymentSchemeName;
                     }
+                    if(isset($transaction->PaymentInfos)) {
+                        foreach($transaction->PaymentInfos as $payment) {
+                            if($payment->name === "savecreditcard" && $payment->PaymentInfo == 1) {
+                                $model = $this->dataToken->create();
+                                $model->addData([
+                                    "customer_id"   => $order->getCustomerId(),
+                                    "payment_id"    => $paymentId,
+                                    "token"         => $ccToken,
+                                    "masked_pan"    => $maskedPan,
+                                    "currency_code" => $order->getOrderCurrencyCode(),
+                                    "expires"       => $expires,
+                                    "card_type"     => $cardType
+                                ]);
+                                try { 
+                                    $model->save();
+                                }
+                                 catch(Exception $error) {
+                                    $this->altapayLogger->addCriticalLog('Exception', $e->getMessage());
+                                }
+                            }
+                        }
+                    }
                 }
                 $payment = $order->getPayment();
-                $payment->setPaymentId($response->paymentId);
+                $payment->setPaymentId($paymentId);
                 $payment->setLastTransId($response->transactionId);
                 $payment->setCcTransId($response->creditCardToken);
-                $payment->setAdditionalInformation('cc_token', $response->creditCardToken);
-                $payment->setAdditionalInformation('masked_credit_card', $response->maskedCreditCard);
+                $payment->setAdditionalInformation('cc_token', $ccToken);
+                $payment->setAdditionalInformation('masked_credit_card', $maskedPan);
                 $payment->setAdditionalInformation('expires', $expires);
                 $payment->setAdditionalInformation('card_type', $cardType);
                 $payment->setAdditionalInformation('payment_type', $paymentType);
