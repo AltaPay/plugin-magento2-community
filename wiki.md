@@ -28,6 +28,8 @@ We highly recommend gathering all the below information, before starting the ins
 
 [Pay by link](#pay-by-link)
 
+[Reconcile Orders](#reconcile-orders)
+
 [Supported versions](#supported-versions)
 
 [Styling](#styling)
@@ -203,6 +205,26 @@ By performing the below steps a customer receives a payment link on the provided
 8. Click on the "Submit Order" button
 
 ![submit_order](docs/submit_order.png)
+
+# Reconcile Orders
+In order to reconcile payments on Magento please follow the steps below:
+
+1. Navigate to the Magento **Admin** page.
+2. Select **Sales** > **Orders** in the left hand pane.
+3. Select the order you want to view.
+4. Copy the Reconciliation Identifier from the **Payment & Shipping Method** section.
+ 
+   ![magento_order_view](Docs/magento_order_view.png)
+ 
+8. Navigate to AltaPay Gateway dashboard
+9. Click on **FUNDING FILES** under **FINANCES** menu
+10. Download the CSV file
+11. Or you can find the payment in the transaction list, open the reconciliation file from there and download a csv file
+12. Open the downloaded CSV file and match the **Reconciliation Identifier** with Magento's **Reconciliation Identifier**.
+
+**Sample AltaPay Gateway CSV:**
+    
+![funding_list_csv](Docs/funding_list_csv.png)
 
 # Supported versions
 
