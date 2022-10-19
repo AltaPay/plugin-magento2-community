@@ -276,6 +276,7 @@ class CaptureObserver implements ObserverInterface
             $api = new ChargeSubscription($this->systemConfig->getAuth($storeCode));
             $api->setTransaction($payment->getLastTransId());
             $api->setAmount(round($grandTotal, 2));
+            $api->setReconciliationIdentifier($reconciliationIdentifier);
         } else {
             $api = new CaptureReservation($this->systemConfig->getAuth($storeCode));
             if ($invoice->getTransactionId()) {

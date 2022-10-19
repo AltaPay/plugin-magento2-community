@@ -6,3 +6,5 @@ Test/integration-tests/node_modules/
 Test/integration-tests/cypress/screenshots/
 Test/integration-tests/cypress/videos/
 .idea/
+.DS_Store
+.DS_Store
