@@ -38,6 +38,7 @@ use Magento\Quote\Model\Quote\Item\AbstractItem;
 use Magento\Framework\DataObject;
 use Altapay\Api\Payments\ApplePayWalletAuthorize;
 use Magento\Store\Model\StoreManagerInterface;
+use Magento\Framework\Math\Random;
 
 /**
  * Class Gateway
@@ -157,7 +158,8 @@ class Gateway implements GatewayInterface
         CreatePaymentHandler $paymentHandler,
         TokenFactory $dataToken,
         ApplePayOrder $applePayOrder,
-        StoreManagerInterface $storeManager
+        StoreManagerInterface $storeManager,
+        Random $random
     ) {
         $this->checkoutSession = $checkoutSession;
         $this->urlInterface    = $urlInterface;
@@ -177,6 +179,7 @@ class Gateway implements GatewayInterface
         $this->dataToken       = $dataToken;
         $this->applePayOrder   = $applePayOrder;
         $this->storeManager    = $storeManager;
+        $this->random          = $random;
     }
 
     /**
@@ -195,6 +198,9 @@ class Gateway implements GatewayInterface
             $couponCodeAmount = $order->getDiscountAmount();
             $discountAllItems = $this->discountHandler->allItemsHaveDiscount($order->getAllItems());
             $orderLines       = $this->itemOrderLines($couponCodeAmount, $order, $discountAllItems);
+            $payment          = $order->getPayment();
+            $payment->setAdditionalInformation('altapay_reconciliation', $this->random->getUniqueHash());
+            $payment->save();
             if ($this->orderLines->sendShipment($order) && !empty($order->getShippingMethod(true))) {
                 $orderLines[] = $this->orderLines->handleShipping($order, $discountAllItems, true);
                 //Shipping Discount Tax Compensation Amount
@@ -423,6 +429,9 @@ class Gateway implements GatewayInterface
         //Transaction Info
         $transactionDetail = $this->helper->transactionDetail($orderId);
 
+        $payment    = $order->getPayment();
+        $reconciliationIdentifier  = $payment->getAdditionalInformation('altapay_reconciliation');
+
         $request           = new PaymentRequest($auth);
         if ($isApplePay) {
             $request = new CardWalletAuthorize($auth);
@@ -436,7 +445,8 @@ class Gateway implements GatewayInterface
             ->setConfig($this->setConfig())
             ->setTransactionInfo($transactionDetail)
             ->setSalesTax((float)number_format($order->getTaxAmount(), 2, '.', ''))
-            ->setCookie($this->request->getServer('HTTP_COOKIE'));
+            ->setCookie($this->request->getServer('HTTP_COOKIE'))
+            ->setSaleReconciliationIdentifier($reconciliationIdentifier);
 
         $post = $this->request->getPostValue();
 

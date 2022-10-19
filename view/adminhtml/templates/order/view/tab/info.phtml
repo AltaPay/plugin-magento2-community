@@ -31,11 +31,17 @@
                 <span class="title"><?= /* @escapeNotVerified */ __('Payment Information') ?></span>
             </div>
             <div class="admin__page-section-item-content">
-                <div class="order-payment-method-title">
-                <?php echo $helper->getPaymentTitleTerminal($_order->getId());?>
+                <div class="order-payment-method-title" style="padding: 1rem;background: #f1f1f1;">
+                    <?php echo $helper->getPaymentTitleTerminal($_order->getId());?>
                 </div>
-                <div class="order-payment-currency"><?= /* @escapeNotVerified */ __('The order was placed using %1.', $_order->getOrderCurrencyCode()) ?></div>
-                <div class="order-payment-additional">
+                <div class="order-payment-currency" style="padding: 1rem;">
+                    <?= /* @escapeNotVerified */ __('The order was placed using %1.', $_order->getOrderCurrencyCode()) ?>
+                </div>
+                <div class="altapay-reconciliation-identifier" style="background: #f1f1f1;padding: 1rem;">
+                    <strong>Reconciliation Identifier: </strong>
+                    <span><?= $_order->getPayment()->getAdditionalInformation('altapay_reconciliation'); ?></span>
+                </div>
+                <div class="order-payment-additional" style="padding: 1rem;">
                     <?= $block->getChildHtml('order_payment_additional') ?>
                     <?= $block->getChildHtml('payment_additional_info') ?>
                 </div>
