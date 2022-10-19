@@ -4,6 +4,7 @@ All notable changes to this project will be documented in this file.
 ## [3.4.8]
 ### Added
 - Add a payment link in the order information grid
+- Add support for payment reconciliation
 ### Fixed
 - Fix the "refund offline" trigger a refund callback to the gateway
 
