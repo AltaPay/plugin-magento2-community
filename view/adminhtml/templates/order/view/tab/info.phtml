@@ -12,7 +12,7 @@
 ?>
 <?php /** @var $block \Magento\Sales\Block\Adminhtml\Order\View\Tab\Info */ ?>
 <?php $_order = $block->getOrder() ?>
-<?php $paymentFormUrl = $_order->getAltapayPaymentFormUrl();?> 
+<?php $paymentFormUrl = $_order->getAltapayPaymentFormUrl();?>
 <?php $helper = $this->helper('SDM\Altapay\Helper\Data'); ?>
 <div id="order-messages">
     <?= $block->getChildHtml('order_messages') ?>
@@ -32,19 +32,26 @@
                 <span class="title"><?= /* @escapeNotVerified */ __('Payment Information') ?></span>
             </div>
             <div class="admin__page-section-item-content">
-                <div class="order-payment-method-title">
-                <?php echo $helper->getPaymentTitleTerminal($_order->getId());?>
+                <div class="order-payment-method-title" style="padding: 1rem;background: #f1f1f1;">
+                    <?php echo $helper->getPaymentTitleTerminal($_order->getId());?>
                 </div>
-                <div class="order-payment-currency"><?= /* @escapeNotVerified */ __('The order was placed using %1.', $_order->getOrderCurrencyCode()) ?></div>
-                <?php if (!$_order->getRemoteIp() && isset($paymentFormUrl)): ?>
-                    <div class="payment_link"> </br><strong>Payment form url:</strong> 
-                    <code style="background: #f1f1f1; display: block; padding: 5px; margin-top: 0.5rem; word-break: break-all;"><?= /* @escapeNotVerified */ $paymentFormUrl ?></code> 
-                  </div>
-                <?php endif; ?>
-                <div class="order-payment-additional">
+                <div class="order-payment-currency" style="padding: 1rem;">
+                    <?= /* @escapeNotVerified */ __('The order was placed using %1.', $_order->getOrderCurrencyCode()) ?>
+                </div>
+                <div class="order-payment-additional" style="padding: 1rem;">
                     <?= $block->getChildHtml('order_payment_additional') ?>
                     <?= $block->getChildHtml('payment_additional_info') ?>
                 </div>
+                <div class="altapay-reconciliation-identifier" style="background: #f1f1f1;padding: 1rem;">
+                    <strong>Reconciliation Identifier: </strong>
+                    <span><?= $_order->getPayment()->getAdditionalInformation('altapay_reconciliation'); ?></span>
+                </div>
+                <?php if (!$_order->getRemoteIp() && isset($paymentFormUrl)): ?>
+                    <div class="payment_link"> </br><strong>Payment form url:</strong>
+                        <code style="background: #f1f1f1; display: block; padding: 5px; margin-top: 0.5rem; word-break: break-all;"><?= /* @escapeNotVerified */ $paymentFormUrl ?></code>
+                    </div>
+                <?php endif; ?>
+
             </div>
         </div>
         <?= $block->getChildHtml('order_shipping_view') ?>

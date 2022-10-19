@@ -270,10 +270,13 @@ class CaptureObserver implements ObserverInterface
     private function sendInvoiceRequest($paymentType, $invoice, $orderLines, $orderObject, $payment, $storeCode)
     {
         $grandTotal = (float)$invoice->getGrandTotal();
+        $payment    = $invoice->getOrder()->getPayment();
+        $reconciliationIdentifier  = $payment->getAdditionalInformation('altapay_reconciliation');
         if ($paymentType === 'subscription') {
             $api = new ChargeSubscription($this->systemConfig->getAuth($storeCode));
             $api->setTransaction($payment->getLastTransId());
             $api->setAmount(round($grandTotal, 2));
+            $api->setReconciliationIdentifier($reconciliationIdentifier);
         } else {
             $api = new CaptureReservation($this->systemConfig->getAuth($storeCode));
             if ($invoice->getTransactionId()) {
@@ -285,6 +288,7 @@ class CaptureObserver implements ObserverInterface
             // Send shipping tracking info
             $api->setTrackingInfo($shippingTrackingInfo);
             $api->setTransaction($payment->getLastTransId());
+            $api->setReconciliationIdentifier($reconciliationIdentifier);
         }
         /** @var CaptureReservationResponse $response */
         try {
