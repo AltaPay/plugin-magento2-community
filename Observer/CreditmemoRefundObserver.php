@@ -256,7 +256,10 @@ class CreditmemoRefundObserver implements ObserverInterface
         }
         $refund->setAmount((float)number_format($memo->getGrandTotal(), 2, '.', ''));
         $refund->setOrderLines($orderLines);
-        $refund->setReconciliationIdentifier($reconciliationIdentifier);
+
+        if(!empty($reconciliationIdentifier)){
+            $refund->setReconciliationIdentifier($reconciliationIdentifier);
+        }
         try {
             $refund->call();
         } catch (ResponseHeaderException $e) {
