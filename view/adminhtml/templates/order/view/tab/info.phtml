@@ -38,7 +38,7 @@
                     <?= /* @escapeNotVerified */ __('The order was placed using %1.', $_order->getOrderCurrencyCode()) ?>
                 </div>
                 <div class="altapay-reconciliation-identifier" style="background: #f1f1f1;padding: 1rem;">
-                    <strong>Reconciliation Identifier</strong>
+                    <strong>Reconciliation Identifier: </strong>
                     <span><?= $_order->getPayment()->getAdditionalInformation('altapay_reconciliation'); ?></span>
                 </div>
                 <div class="order-payment-additional" style="padding: 1rem;">
