@@ -216,11 +216,11 @@ In order to reconcile payments on Magento please follow the steps below:
  
    ![magento_order_view](Docs/magento_order_view.png)
  
-8. Navigate to AltaPay Gateway dashboard
-9. Click on **FUNDING FILES** under **FINANCES** menu
-10. Download the CSV file
-11. Or you can find the payment in the transaction list, open the reconciliation file from there and download a csv file
-12. Open the downloaded CSV file and match the **Reconciliation Identifier** with Magento's **Reconciliation Identifier**.
+5. Navigate to AltaPay Gateway dashboard
+6. Click on **FUNDING FILES** under **FINANCES** menu
+7. Download the CSV file
+8. Or you can find the payment in the transaction list, open the reconciliation file from there and download a csv file
+9. Open the downloaded CSV file and match the **Reconciliation Identifier** with Magento's **Reconciliation Identifier**.
 
 **Sample AltaPay Gateway CSV:**
     
