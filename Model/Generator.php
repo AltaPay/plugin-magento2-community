@@ -417,9 +417,6 @@ class Generator
 
         $max_date = '';
         $latestTransKey = '';
-        $writer = new \Laminas\Log\Writer\Stream(BP . '/var/log/logging.log');
-$logger = new \Laminas\Log\Logger();
-$logger->addWriter($writer);
 
         if ($paymentStatus === 'released') {
             $this->handleCancelStatusAction($request, $responseStatus);
@@ -474,7 +471,7 @@ $logger->addWriter($writer);
                                 try { 
                                     $model->save();
                                 }
-                                 catch(Exception $error) {
+                                 catch(Exception $e) {
                                     $this->altapayLogger->addCriticalLog('Exception', $e->getMessage());
                                 }
                             }
