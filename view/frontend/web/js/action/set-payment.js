@@ -61,8 +61,12 @@ define(
             return storage.post(serviceUrl, JSON.stringify(payload)).done(function (data) {
                 $('#altapay-error-message').text('');
                 var tokenId = '';
+                var saveCard = false;
                 if ($(".payment-method._active select[name='ccToken']").length == 1) {
                     tokenId = $(".payment-method._active select[name='ccToken']").val();
+                }
+                if ($(".payment-method._active input[name='savecard']").prop("checked") == true) {
+                    saveCard  = true;
                 }
                 var paymentMethod = window.checkoutConfig.payment['sdm_altapay'].terminaldata;
                 for (var obj in paymentMethod) {
@@ -75,7 +79,8 @@ define(
                                     paytype: method,
                                     cartid: quote.getQuoteId(),
                                     orderid: data,
-                                    tokenid: tokenId
+                                    tokenid: tokenId,
+                                    saveCard: saveCard
                                 },
                                 dataType: 'json'
                             }).done(function (jsonResponse) {
