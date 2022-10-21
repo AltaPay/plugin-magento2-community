@@ -250,11 +250,13 @@ class CreditmemoRefundObserver implements ObserverInterface
     private function sendRefundRequest($memo, $orderLines, $orderObject, $payment, $storeCode)
     {
         $refund = new RefundCapturedReservation($this->systemConfig->getAuth($storeCode));
+        $reconciliationIdentifier  = $payment->getAdditionalInformation('altapay_reconciliation');
         if ($memo->getTransactionId()) {
             $refund->setTransaction($payment->getLastTransId());
         }
         $refund->setAmount((float)number_format($memo->getGrandTotal(), 2, '.', ''));
         $refund->setOrderLines($orderLines);
+        $refund->setReconciliationIdentifier($reconciliationIdentifier);
         try {
             $refund->call();
         } catch (ResponseHeaderException $e) {
