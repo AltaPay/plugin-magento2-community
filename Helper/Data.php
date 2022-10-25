@@ -15,6 +15,8 @@ use Magento\Framework\App\Helper\AbstractHelper;
 use Magento\Sales\Model\Order;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Sales\Model\ResourceModel\Order\Tax\Item;
+use Magento\Quote\Model\Quote\Item\AbstractItem;
+use Magento\Framework\DataObject;
 
 /**
  * Class Data for helper functions
@@ -152,5 +154,59 @@ class Data extends AbstractHelper
             \SDM\Altapay\Model\Method\Terminal4::METHOD_CODE,
             \SDM\Altapay\Model\Method\Terminal5::METHOD_CODE,
         ];
+    }
+
+    /**
+     * @param AbstractItem $item
+     * @return DataObject
+     */
+
+    public function getBuyRequestObject(AbstractItem $item)
+    {
+        /** @var DataObject $request */
+        $request = $item->getBuyRequest();
+        if (!$request && $item->getQuoteItem()) {
+            $request = $item->getQuoteItem()->getBuyRequest();
+        }
+        if (!$request) {
+            $request = new DataObject();
+        }
+
+        if (is_array($request)) {
+            $request = new DataObject($request);
+        }
+
+        return $request;
+    }
+
+    /**
+     * @param AbstractItem $item
+     * @return bool
+     */
+    public function isSubscription(AbstractItem $item)
+    {
+        $buyRequest = $this->getBuyRequestObject($item);
+
+        return $buyRequest->getData('subscribe') === 'subscribe';
+    }
+
+    /**
+     * @param $quote
+     * @return bool
+     */
+    public function validateQuote($data): bool
+    {
+        $isRecurring = false;
+        $items = $data->getAllItems();
+
+        /** @var Item $item */
+        foreach ($items as $item) {
+            if ($this->isSubscription($item)) {
+                $isRecurring = true;
+                break;
+            }
+        }
+
+        return $isRecurring;
     }
 }
