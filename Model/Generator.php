@@ -676,7 +676,7 @@ class Generator
      *
      * @return bool
      */
-    public function checkAvsConfig($response, $storeCode, $storeScope, $configField)
+    private function checkAvsConfig($response, $storeCode, $storeScope, $configField)
     {
         $isEnabled = false;
         foreach (SystemConfig::getTerminalCodes() as $terminalName) {
@@ -707,7 +707,7 @@ class Generator
      *
      * @return |null
      */
-    public function getAcceptedAvsResults($response, $storeCode, $storeScope)
+    private function getAcceptedAvsResults($response, $storeCode, $storeScope)
     {
         $acceptedAvsResults = null;
         foreach (SystemConfig::getTerminalCodes() as $terminalName) {
@@ -735,7 +735,7 @@ class Generator
      * @param $response
      * @param $order
      */
-    public function savePaymentData($response, $order)
+    private function savePaymentData($response, $order)
     {
         $payment = $order->getPayment();
         $payment->setPaymentId($response->paymentId);
@@ -747,7 +747,7 @@ class Generator
      * @param $order
      * return void
      */
-    public function updateStockQty($order)
+    protected function updateStockQty($order)
     {
         $cart = $this->modelCart;
         $quoteItems = $this->checkoutSession->getQuote()->getItemsCollection();
@@ -770,7 +770,7 @@ class Generator
      *
      * @return void
      */
-    public function resetCanceledQty($order) {
+    private function resetCanceledQty($order) {
         foreach ($order->getAllItems() as $item) {
             if ($item->getQtyCanceled() > 0) {
                 $item->setQtyCanceled($item->getQtyToCancel());
@@ -778,8 +778,13 @@ class Generator
             }
         }
     }
-
-    public function getLatestTransaction($response) {
+    
+    /**
+     * @param $response
+     *
+     * @return int|string
+     */
+    private function getLatestTransaction($response) {
         $max_date = '';
         $latestTransKey = '';
         foreach ($response->Transactions as $key=>$value) {

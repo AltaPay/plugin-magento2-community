@@ -187,7 +187,7 @@ class Gateway implements GatewayInterface
      * @param int $terminalId
      * @param string $orderId
      *
-     * @return array
+     * @return array|mixed
      */
     public function createRequest($terminalId, $orderId)
     {
@@ -501,10 +501,14 @@ class Gateway implements GatewayInterface
         $storeCode = $order->getStore()->getCode();
 
         try {
-            /** @var \Altapay\Response\PaymentRequestResponse $response */
+            /** @var PaymentRequestResponse $response */
             $response = $request->call();
+            $responseUrl = $response->Url;
+            if(strtolower($response->Result) === "success" &&  $responseUrl == null) {
+                $responseUrl = 'onepage/success';
+            }
             $requestParams['result'] = ConstantConfig::SUCCESS;
-            $requestParams['formurl'] = $response->Url;
+            $requestParams['formurl'] = $responseUrl;
             // set before payment status
             if ($this->systemConfig->getStatusConfig('before', $storeScope, $storeCode)) {
                 $this->paymentHandler->setCustomOrderStatus($order, Order::STATE_NEW, 'before');
@@ -546,7 +550,7 @@ class Gateway implements GatewayInterface
      *
      * @return float|int
      */
-    public function fixedProductTax($order)
+    private function fixedProductTax($order)
     {
         $weeTaxAmount = 0;
         foreach ($order->getAllItems() as $item) {
@@ -555,14 +559,16 @@ class Gateway implements GatewayInterface
 
         return $weeTaxAmount;
     }
-
+    
     /**
      * @param $items
      * @param $baseUrl
      * @param $agreementType
+     * @param $agreementId
+     *
      * @return array
      */
-    public function agreementDetail($items, $baseUrl, $agreementType, $agreementId = null)
+    private function agreementDetail($items, $baseUrl, $agreementType, $agreementId = null)
     {
         $agreementDetails = [];
         if ($items) {
