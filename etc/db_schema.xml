@@ -36,6 +36,8 @@
   <table name="altapay_token" resource="default" engine="innodb" comment="Altapay Tokens">
     <column xsi:type="int" name="id" padding="10" unsigned="true" nullable="false" identity="true" comment="Id"/>
     <column xsi:type="int" name="customer_id" padding="11" unsigned="false" nullable="false" identity="false" comment="Customer Id"/>
+    <column xsi:type="int" name="agreement_id"  padding="10" unsigned="false" nullable="true" comment="Agreement ID"/>
+    <column xsi:type="varchar" name="agreement_type" nullable="true" length="255" comment="Agreement Type"/>
     <column xsi:type="text" name="token" nullable="false" comment="Token"/>
     <column xsi:type="text" name="masked_pan" nullable="false" comment="Masked Pan"/>
     <column xsi:type="text" name="currency_code" nullable="false" comment="Currency Code"/>
