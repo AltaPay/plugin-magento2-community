@@ -34,11 +34,10 @@ use Magento\Quote\Model\Quote;
 use Magento\Framework\UrlInterface;
 use Magento\Framework\App\Request\Http;
 use Magento\Framework\App\RequestInterface;
-use Magento\Quote\Model\Quote\Item\AbstractItem;
-use Magento\Framework\DataObject;
 use Altapay\Api\Payments\ApplePayWalletAuthorize;
 use Magento\Store\Model\StoreManagerInterface;
 use Magento\Framework\Math\Random;
+use Altapay\Api\Payments\ReservationOfFixedAmount;
 
 /**
  * Class Gateway
@@ -118,7 +117,7 @@ class Gateway implements GatewayInterface
      * @var StoreManagerInterface
      */
     protected $storeManager;
-
+    
     /**
      * Gateway constructor.
      *
@@ -185,7 +184,7 @@ class Gateway implements GatewayInterface
     /**
      * createRequest to altapay
      *
-     * @param int    $terminalId
+     * @param int $terminalId
      * @param string $orderId
      *
      * @return array
@@ -194,11 +193,11 @@ class Gateway implements GatewayInterface
     {
         $order = $this->order->load($orderId);
         if ($order->getId()) {
-            $couponCode       = $order->getDiscountDescription();
+            $couponCode = $order->getDiscountDescription();
             $couponCodeAmount = $order->getDiscountAmount();
             $discountAllItems = $this->discountHandler->allItemsHaveDiscount($order->getAllItems());
-            $orderLines       = $this->itemOrderLines($couponCodeAmount, $order, $discountAllItems);
-            $payment          = $order->getPayment();
+            $orderLines = $this->itemOrderLines($couponCodeAmount, $order, $discountAllItems);
+            $payment = $order->getPayment();
             $payment->setAdditionalInformation('altapay_reconciliation', $this->random->getUniqueHash());
             $payment->save();
             if ($this->orderLines->sendShipment($order) && !empty($order->getShippingMethod(true))) {
@@ -216,7 +215,7 @@ class Gateway implements GatewayInterface
             if ($discountAllItems && abs($couponCodeAmount) > 0) {
                 $orderLines[] = $this->orderLines->discountOrderLine($couponCodeAmount, $couponCode);
             }
-            if(!empty($this->fixedProductTax($order))){
+            if (!empty($this->fixedProductTax($order))) {
                 $orderLines[] = $this->orderLines->fixedProductTaxOrderLine($this->fixedProductTax($order));
             }
             $request = $this->preparePaymentRequest($order, $orderLines, $orderId, $terminalId, null);
@@ -240,12 +239,12 @@ class Gateway implements GatewayInterface
 
         $storeScope = $this->storeConfig->getStoreScope();
         $order = $this->order->load($orderId);
-        $storeCode  = $order->getStore()->getCode();
+        $storeCode = $order->getStore()->getCode();
         if ($order->getId()) {
-            $couponCode       = $order->getDiscountDescription();
+            $couponCode = $order->getDiscountDescription();
             $couponCodeAmount = $order->getDiscountAmount();
             $discountAllItems = $this->discountHandler->allItemsHaveDiscount($order->getAllItems());
-            $orderLines       = $this->itemOrderLines($couponCodeAmount, $order, $discountAllItems);
+            $orderLines = $this->itemOrderLines($couponCodeAmount, $order, $discountAllItems);
             if ($this->orderLines->sendShipment($order) && !empty($order->getShippingMethod(true))) {
                 $orderLines[] = $this->orderLines->handleShipping($order, $discountAllItems, true);
                 //Shipping Discount Tax Compensation Amount
@@ -261,7 +260,7 @@ class Gateway implements GatewayInterface
             if ($discountAllItems && abs($couponCodeAmount) > 0) {
                 $orderLines[] = $this->orderLines->discountOrderLine($couponCodeAmount, $couponCode);
             }
-            if(!empty($this->fixedProductTax($order))){
+            if (!empty($this->fixedProductTax($order))) {
                 $orderLines[] = $this->orderLines->fixedProductTaxOrderLine($this->fixedProductTax($order));
             }
             $request = $this->preparePaymentRequest($order, $orderLines, $orderId, $terminalId, $providerData);
@@ -317,13 +316,13 @@ class Gateway implements GatewayInterface
      */
     private function itemOrderLines($couponCodeAmount, $order, $discountAllItems)
     {
-        $orderLines       = [];
+        $orderLines = [];
         $storePriceIncTax = $this->storeConfig->storePriceIncTax();
 
         foreach ($order->getAllItems() as $item) {
-            $productType    = $item->getProductType();
-            $originalPrice  = $item->getBaseOriginalPrice();
-            $taxPercent     = $item->getTaxPercent();
+            $productType = $item->getProductType();
+            $originalPrice = $item->getBaseOriginalPrice();
+            $taxPercent = $item->getTaxPercent();
             $discountAmount = $item->getBaseDiscountAmount();
             $parentItemType = "";
             if ($item->getParentItem()) {
@@ -337,27 +336,27 @@ class Gateway implements GatewayInterface
 
                 if ($storePriceIncTax) {
                     $unitPriceWithoutTax = $this->priceHandler->getPriceWithoutTax($originalPrice, $taxPercent);
-                    $unitPrice           = bcdiv($unitPriceWithoutTax, 1, 2);
+                    $unitPrice = bcdiv($unitPriceWithoutTax, 1, 2);
                 } else {
-                    $unitPrice           = $originalPrice;
+                    $unitPrice = $originalPrice;
                 }
-                $dataForPrice         = $this->priceHandler->dataForPrice(
+                $dataForPrice = $this->priceHandler->dataForPrice(
                     $item,
                     $unitPrice,
                     $couponCodeAmount,
                     $this->discountHandler->getItemDiscount($discountAmount, $originalPrice, $item->getQtyOrdered()),
                     $discountAllItems
                 );
-                $taxAmount            = $dataForPrice["taxAmount"];
-                $catalogDiscount      = $dataForPrice["catalogDiscount"];
-                $discount             = $this->discountHandler->orderLineDiscount(
+                $taxAmount = $dataForPrice["taxAmount"];
+                $catalogDiscount = $dataForPrice["catalogDiscount"];
+                $discount = $this->discountHandler->orderLineDiscount(
                     $discountAllItems,
                     $dataForPrice["discount"],
                     $catalogDiscount
                 );
 
-                $itemTaxAmount        = $taxAmount;
-                $orderLines[]         = $this->orderLines->itemOrderLine(
+                $itemTaxAmount = $taxAmount;
+                $orderLines[] = $this->orderLines->itemOrderLine(
                     $item,
                     $unitPrice,
                     $discount,
@@ -394,7 +393,7 @@ class Gateway implements GatewayInterface
     private function restoreOrderAndReturnError($order)
     {
         $this->restoreOrderFromOrderId($order->getIncrementId());
-        $requestParams['result']  = ConstantConfig::ERROR;
+        $requestParams['result'] = ConstantConfig::ERROR;
         $requestParams['message'] = __(ConstantConfig::ERROR_MESSAGE);
 
         return $requestParams;
@@ -413,29 +412,43 @@ class Gateway implements GatewayInterface
      */
     private function preparePaymentRequest($order, $orderLines, $orderId, $terminalId, $providerData)
     {
+        $quote = $this->quote->loadByIdWithoutStore($order->getQuoteId());
         $storeScope = $this->storeConfig->getStoreScope();
         $baseUrl = $this->storeManager->getStore()->getBaseUrl();
-        $storeCode  = $order->getStore()->getCode();
+        $storeCode = $order->getStore()->getCode();
         //Test the conn with the Payment Gateway
-        $auth     = $this->systemConfig->getAuth($storeCode);
-        $api      = new TestAuthentication($auth);
+        $auth = $this->systemConfig->getAuth($storeCode);
+        $api = new TestAuthentication($auth);
         $response = $api->call();
         if (!$response) {
             return false;
         }
         $terminalName = $this->systemConfig->getTerminalConfig($terminalId, 'terminalname', $storeScope, $storeCode);
-
         $isApplePay = $this->systemConfig->getTerminalConfig($terminalId, 'isapplepay', $storeScope, $storeCode);
         //Transaction Info
         $transactionDetail = $this->helper->transactionDetail($orderId);
-
-        $payment    = $order->getPayment();
-        $reconciliationIdentifier  = $payment->getAdditionalInformation('altapay_reconciliation');
-
-        $request           = new PaymentRequest($auth);
+        $payment = $order->getPayment();
+        $reconciliationIdentifier = $payment->getAdditionalInformation('altapay_reconciliation');
+        $post = $this->request->getPostValue();
+        $request = new PaymentRequest($auth);
         if ($isApplePay) {
             $request = new CardWalletAuthorize($auth);
             $request->setProviderData($providerData);
+        }
+        if (!empty($post['savecard'])) {
+            $request->setType('verifyCard');
+        }
+        $request->setAgreement($this->agreementDetail($quote->getAllItems(), $baseUrl, "unscheduled"));
+        if (!empty($post['tokenid'])) {
+            $request = new ReservationOfFixedAmount($auth);
+            $model = $this->dataToken->create();
+            $collection = $model->getCollection()->addFieldToFilter('id', $post['tokenid'])->getFirstItem();
+            $data = $collection->getData();
+            if (!empty($data)) {
+                $token = $data['token'];
+                $request->setCreditCardToken($token);
+                $request->setAgreement($this->agreementDetail($quote->getAllItems(), $baseUrl, $data['agreement_type'], $data['agreement_id']));
+            }
         }
         $request->setTerminal($terminalName)
             ->setShopOrderId($order->getIncrementId())
@@ -447,40 +460,25 @@ class Gateway implements GatewayInterface
             ->setSalesTax((float)number_format($order->getTaxAmount(), 2, '.', ''))
             ->setCookie($this->request->getServer('HTTP_COOKIE'))
             ->setSaleReconciliationIdentifier($reconciliationIdentifier);
-
-        $post = $this->request->getPostValue();
-
-        if (isset($post['tokenid'])) {
-            $model      = $this->dataToken->create();
-            $collection = $model->getCollection()->addFieldToFilter('id', $post['tokenid'])->getFirstItem();
-            $data       = $collection->getData();
-            if (!empty($data)) {
-                $token = $data['token'];
-                $request->setCcToken($token);
-            }
-        }
-
         if ($fraud = $this->systemConfig->getTerminalConfig($terminalId, 'fraud', $storeScope, $storeCode)) {
             $request->setFraudService($fraud);
         }
-
         if ($lang = $this->systemConfig->getTerminalConfig($terminalId, 'language', $storeScope, $storeCode)) {
             $langArr = explode('_', $lang, 2);
             if (isset($langArr[0])) {
                 $request->setLanguage($langArr[0]);
             }
         }
-        $quote = $this->quote->loadByIdWithoutStore($order->getQuoteId());
-        if ($this->validateQuote($quote)) {
+        if ($this->helper->validateQuote($quote)) {
             if ($this->systemConfig->getTerminalConfig($terminalId, 'capture', $storeScope, $storeCode)) {
                 $request->setType('subscriptionAndCharge');
             } else {
                 $request->setType('subscription');
             }
-            $request->setAgreement($this->agreementDetail($quote->getAllItems(), $baseUrl));
+            $request->setAgreement($this->agreementDetail($quote->getAllItems(), $baseUrl, "recurring", null));
         }
         // check if auto capture enabled
-        if (!$this->validateQuote($quote) && $this->systemConfig->getTerminalConfig($terminalId, 'capture', $storeScope, $storeCode)) {
+        if (!$this->helper->validateQuote($quote) && $this->systemConfig->getTerminalConfig($terminalId, 'capture', $storeScope, $storeCode)) {
             $request->setType('paymentAndCapture');
         }
         //set orderlines to the request
@@ -500,12 +498,12 @@ class Gateway implements GatewayInterface
     private function sendPaymentRequest($order, $request)
     {
         $storeScope = $this->storeConfig->getStoreScope();
-        $storeCode  = $order->getStore()->getCode();
+        $storeCode = $order->getStore()->getCode();
 
         try {
             /** @var \Altapay\Response\PaymentRequestResponse $response */
-            $response                 = $request->call();
-            $requestParams['result']  = ConstantConfig::SUCCESS;
+            $response = $request->call();
+            $requestParams['result'] = ConstantConfig::SUCCESS;
             $requestParams['formurl'] = $response->Url;
             // set before payment status
             if ($this->systemConfig->getStatusConfig('before', $storeScope, $storeCode)) {
@@ -525,16 +523,16 @@ class Gateway implements GatewayInterface
 
             return $requestParams;
         } catch (ClientException $e) {
-            $requestParams['result']  = ConstantConfig::ERROR;
+            $requestParams['result'] = ConstantConfig::ERROR;
             $requestParams['message'] = $e->getResponse()->getBody();
         } catch (ResponseHeaderException $e) {
-            $requestParams['result']  = ConstantConfig::ERROR;
+            $requestParams['result'] = ConstantConfig::ERROR;
             $requestParams['message'] = $e->getHeader()->ErrorMessage;
         } catch (ResponseMessageException $e) {
-            $requestParams['result']  = ConstantConfig::ERROR;
+            $requestParams['result'] = ConstantConfig::ERROR;
             $requestParams['message'] = $e->getMessage();
         } catch (\Exception $e) {
-            $requestParams['result']  = ConstantConfig::ERROR;
+            $requestParams['result'] = ConstantConfig::ERROR;
             $requestParams['message'] = $e->getMessage();
         }
 
@@ -542,91 +540,45 @@ class Gateway implements GatewayInterface
 
         return $requestParams;
     }
+
     /**
      * @param $order
      *
      * @return float|int
      */
-    public function fixedProductTax($order){
+    public function fixedProductTax($order)
+    {
         $weeTaxAmount = 0;
         foreach ($order->getAllItems() as $item) {
-            $weeTaxAmount +=  $item->getWeeeTaxAppliedRowAmount();
+            $weeTaxAmount += $item->getWeeeTaxAppliedRowAmount();
         }
 
         return $weeTaxAmount;
     }
 
     /**
-     * @param AbstractItem $item
-     * @return DataObject
-     */
-    public function getBuyRequestObject(AbstractItem $item)
-    {
-        /** @var DataObject $request */
-        $request = $item->getBuyRequest();
-        if (!$request && $item->getQuoteItem()) {
-            $request = $item->getQuoteItem()->getBuyRequest();
-        }
-        if (!$request) {
-            $request = new DataObject();
-        }
-
-        if (is_array($request)) {
-            $request = new DataObject($request);
-        }
-
-        return $request;
-    }
-
-    /**
-     * @param AbstractItem $item
-     * @return bool
-     */
-    public function isSubscription(AbstractItem $item)
-    {
-        $buyRequest = $this->getBuyRequestObject($item);
-
-        return $buyRequest->getData('subscribe') === 'subscribe';
-    }
-    /**
-     * @param CartInterface $quote
-     *
-     * @return bool
-     */
-    public function validateQuote($quote)
-    {
-        $isRecurring = false;
-        $items = $quote->getAllItems();
-
-        /** @var Item $item */
-        foreach ($items as $item) {
-            if ($this->isSubscription($item)) {
-                $isRecurring = true;
-                break;
-            }
-        }
-
-        return $isRecurring;
-    }
-
-
-    /**
      * @param $items
-     *
+     * @param $baseUrl
+     * @param $agreementType
      * @return array
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
-    public function agreementDetail($items, $baseUrl)
+    public function agreementDetail($items, $baseUrl, $agreementType, $agreementId = null)
     {
-        $agreementDetails  = [];
-        if($items) {
-            $agreementDetails['type'] = 'recurring';
-            $agreementDetails['adminUrl'] = $baseUrl.'amasty_recurring/customer/subscriptions/';
+        $agreementDetails = [];
+        if ($items) {
+            if ($agreementId) {
+                $agreementDetails['id'] = $agreementId;
+            }
+            $agreementDetails['type'] = $agreementType;
+            if ($agreementType === "unscheduled") {
+                $agreementDetails['unscheduled_type'] = 'incremental';
+            }
+            $agreementDetails['adminUrl'] = $baseUrl . 'amasty_recurring/customer/subscriptions/';
             /** @var Item $item */
             foreach ($items as $item) {
-                $buyRequest = $this->getBuyRequestObject($item);
-                if($buyRequest->getData('am_subscription_end_type') === 'amrec-end-date') {
-                    $expiryDate = date("Ymd", strtotime($buyRequest->getData('am_rec_end_date')));  
+                $buyRequest = $this->helper->getBuyRequestObject($item);
+                if ($buyRequest->getData('am_subscription_end_type') === 'amrec-end-date') {
+                    $expiryDate = date("Ymd", strtotime($buyRequest->getData('am_rec_end_date')));
                     $agreementDetails['expiry'] = $expiryDate;
                 }
             }
