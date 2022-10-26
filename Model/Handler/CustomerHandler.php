@@ -60,13 +60,15 @@ class CustomerHandler
         $this->request                     = $request;
         $this->session                     = $session;
     }
-
+    
     /**
      * @param Order $order
+     * @param       $isReservation
      *
      * @return Customer
+     * @throws \Exception
      */
-    public function setCustomer(Order $order)
+    public function setCustomer(Order $order, $isReservation)
     {
         $address       = new Address();
         $customerEmail = '';
@@ -95,11 +97,12 @@ class CustomerHandler
 
         $customer->setEmail($customerEmail);
         $customer->setPhone(str_replace(' ', '', $customerPhone));
-        $customer->setClientIP($this->request->getServer('REMOTE_ADDR'));
-        $customer->setClientAcceptLanguage(substr($this->request->getServer('HTTP_ACCEPT_LANGUAGE'), 0, 2));
-        $customer->setHttpUserAgent($this->request->getServer('HTTP_USER_AGENT'));
-        $customer->setClientSessionID(crypt($this->session->getSessionId(),'$5$rounds=5000$customersessionid$'));
-
+        if(!$isReservation) {
+            $customer->setClientIP($this->request->getServer('REMOTE_ADDR'));
+            $customer->setClientAcceptLanguage(substr($this->request->getServer('HTTP_ACCEPT_LANGUAGE'), 0, 2));
+            $customer->setHttpUserAgent($this->request->getServer('HTTP_USER_AGENT'));
+            $customer->setClientSessionID(crypt($this->session->getSessionId(),'$5$rounds=5000$customersessionid$'));
+        }
         if (!$order->getCustomerIsGuest()) {
             $customer->setUsername($order->getCustomerId());
             $cst       = $this->customerRepositoryInterface->getById($order->getCustomerId());

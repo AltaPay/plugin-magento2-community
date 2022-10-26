@@ -433,6 +433,7 @@ class Gateway implements GatewayInterface
         $storeScope = $this->storeConfig->getStoreScope();
         $baseUrl = $this->storeManager->getStore()->getBaseUrl();
         $storeCode = $order->getStore()->getCode();
+        $isReservation = false;
         //Test the conn with the Payment Gateway
         $auth = $this->systemConfig->getAuth($storeCode);
         $api = new TestAuthentication($auth);
@@ -466,12 +467,13 @@ class Gateway implements GatewayInterface
                 $request->setCreditCardToken($token);
                 $request->setAgreement($this->agreementDetail($quote->getAllItems(), $baseUrl, $data['agreement_type'], $data['agreement_id']));
             }
+            $isReservation = true;
         }
         $request->setTerminal($terminalName)
             ->setShopOrderId($order->getIncrementId())
             ->setAmount((float)number_format($order->getGrandTotal(), 2, '.', ''))
             ->setCurrency($order->getOrderCurrencyCode())
-            ->setCustomerInfo($this->customerHandler->setCustomer($order))
+            ->setCustomerInfo($this->customerHandler->setCustomer($order, $isReservation))
             ->setConfig($this->setConfig())
             ->setTransactionInfo($transactionDetail)
             ->setSalesTax((float)number_format($order->getTaxAmount(), 2, '.', ''))
@@ -524,12 +526,15 @@ class Gateway implements GatewayInterface
             $paymentId = $response->PaymentRequestId;
             $max_date = '';
             $latestTransKey = '';
-            foreach ($response->Transactions as $key => $value) {
-                if ($value->CreatedDate > $max_date) {
-                    $max_date = $value->CreatedDate;
-                    $latestTransKey = $key;
+            if(isset($response->Transactions)) {
+                foreach ($response->Transactions as $key => $value) {
+                    if ($value->CreatedDate > $max_date) {
+                        $max_date = $value->CreatedDate;
+                        $latestTransKey = $key;
+                    }
                 }
             }
+
             if (strtolower($response->Result) === "success" && $responseUrl == null ) {
                 $this->handleReservation($order, $response, $request, $latestTransKey);
                 if (isset($response->Transactions[$latestTransKey])) {
