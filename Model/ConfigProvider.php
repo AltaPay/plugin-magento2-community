@@ -13,6 +13,7 @@ use Magento\Checkout\Model\ConfigProviderInterface;
 use Magento\Framework\Escaper;
 use Magento\Framework\UrlInterface;
 use Magento\Payment\Helper\Data;
+use SDM\Altapay\Helper\Data as Helper;
 use Altapay\Api\Test\TestAuthentication;
 use Altapay\Api\Test\TestConnection;
 use SDM\Altapay\Model\SystemConfig;
@@ -27,6 +28,7 @@ use Magento\Checkout\Model\Session as CheckoutSession;
 use Magento\Store\Model\StoreManagerInterface;
 use \Exception;
 use SDM\Altapay\Logger\Logger;
+use Magento\Checkout\Model\Cart;
 
 class ConfigProvider implements ConfigProviderInterface
 {
@@ -71,6 +73,15 @@ class ConfigProvider implements ConfigProviderInterface
      * @var Session
      */
     private $customerSession;
+    /**
+     * @var Helper
+     */
+    private $helper;
+    /**
+     * @var Cart
+     */
+    private $cart;
+
 
     /**
      * ConfigProvider constructor.
@@ -97,8 +108,11 @@ class ConfigProvider implements ConfigProviderInterface
         Session $customerSession,
         CheckoutSession $checkoutSession,
         Logger $altapayLogger,
-        StoreManagerInterface $storeManager
-    ) {
+        StoreManagerInterface $storeManager,
+        Helper $helper,
+        Cart $cart
+    )
+    {
         $this->data             = $data;
         $this->escaper          = $escaper;
         $this->urlInterface     = $urlInterface;
@@ -110,7 +124,9 @@ class ConfigProvider implements ConfigProviderInterface
         $this->customerSession  = $customerSession;
         $this->_checkoutSession = $checkoutSession;
         $this->_storeManager    = $storeManager;
-        $this->altapayLogger   = $altapayLogger;
+        $this->altapayLogger    = $altapayLogger;
+        $this->helper           = $helper;
+        $this->cart             = $cart;
     }
 
     /**
@@ -149,18 +165,24 @@ class ConfigProvider implements ConfigProviderInterface
     public function getActivePaymentMethod()
     {
         $storeScope        = \Magento\Store\Model\ScopeInterface::SCOPE_STORE;
+        $quote             = $this->cart->getQuote();
         $storeCode         = $this->systemConfig->resolveCurrentStoreCode();
         $methods           = [];
         $allPaymentMethod  = $this->data->getPaymentMethods();
         $model             = $this->dataToken->create();
         $savedTokenList    = [];
         $primary           = '';
+        $agreementType     = "unscheduled";
         $currentCustomerId = $this->customerSession->getCustomer()->getId();
 
         if (!empty($currentCustomerId)) {
+            if ($this->helper->validateQuote($quote)) {
+                $agreementType = "recurring";
+            }
             $collection = $model->getCollection()
                                 ->addFieldToSelect(['id', 'masked_pan', 'primary', 'expires'])
-                                ->addFieldToFilter('customer_id', $currentCustomerId);
+                                ->addFieldToFilter('customer_id', $currentCustomerId)
+                                ->addFieldToFilter('agreement_type', $agreementType);
             if (!empty($collection)) {
                 $primary          = $this->ccTokenPrimaryOption($collection);
                 $savedTokenList[] = [

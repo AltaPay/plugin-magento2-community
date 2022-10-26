@@ -416,6 +416,7 @@ class Generator
      */
     private function completeCheckout($comment, RequestInterface $request)
     {
+        
         $callback       = new Callback($request->getPostValue());
         $response       = $callback->call();
         $paymentType    = $response->type;
@@ -432,6 +433,7 @@ class Generator
 
         if ($response) {
             $order         = $this->orderLoader->getOrderByOrderIncrementId($response->shopOrderId);
+            $quote         = $this->quote->loadByIdWithoutStore($order->getQuoteId());
             $storeScope    = \Magento\Store\Model\ScopeInterface::SCOPE_STORE;
             $storeCode     = $order->getStore()->getCode();
             $ccToken       = $response->creditCardToken;
@@ -461,8 +463,7 @@ class Generator
                     if (isset($transaction->PaymentSchemeName)) {
                         $cardType = $transaction->PaymentSchemeName;
                     }
-                    $quoteItems = $this->checkoutSession->getQuote();
-                    if ($this->helper->validateQuote($quoteItems)) {
+                    if ($this->helper->validateQuote($quote)) {
                         $agreementType = "recurring";
                     }
                     if (isset($transaction->PaymentInfos)) {
