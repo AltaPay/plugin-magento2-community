@@ -329,4 +329,114 @@ describe('Payments', function () {
 
         })
     })
+
+    
+    it('CC Pay by link', function () {
+        const ord = new Order()
+        ord.clrcookies()
+    
+        cy.get('body').then(($body) => {
+            if ($body.text().includes('DKK') === false) {
+                ord.admin()
+                ord.change_currency_to_DKK()
+            } 
+            cy.fixture('config').then((admin) => {
+                if (admin.CC_TERMINAL_NAME != "") {
+                    cy.get('#menu-magento-sales-sales').click()
+                    cy.get('.item-sales-order > a').click()
+                    cy.get('#add').click()
+                    cy.get('#sales_order_create_customer_grid_table > tbody > tr:nth-child(1)').click().wait(3000)
+                    cy.reload()
+                    cy.get('#add_products').click()
+                    cy.get('#sales_order_create_search_grid_table > tbody > tr:nth-child(2)').click()
+                    cy.get('#order-search > div.admin__page-section-title > div').click().wait(2000)
+                    cy.get('#order-shipping-method-summary > a').click({ force: true }) 
+                    cy.get('.admin__order-shipment-methods-options-list > li:first').click().wait(3000)
+                    cy.contains('EmbraceIT Integration Test Terminal').click().wait(3000)   
+                    cy.get('#submit_order_top_button').click().wait(2000)            
+                    cy.get('.payment_link > code').then(($a) => {
+                        const payment_link = $a.text();
+                        cy.origin('https://pensio.com', { args: { payment_link } }, ({ payment_link }) => {
+                            cy.visit(payment_link)   
+                            cy.get('#creditCardNumberInput').type('4111111111111111')
+                            cy.get('#emonth').type('01')
+                            cy.get('#eyear').type('2023')
+                            cy.get('#cvcInput').type('123')
+                            cy.get('#cardholderNameInput').type('testname')
+                            cy.get('#pensioCreditCardPaymentSubmitButton').click().wait(3000)                     
+                        })
+                    
+                        cy.get('.page-title > span').should('have.text','Thank you for your purchase!')
+                    })
+                }
+                else {
+                    cy.log('CC_TERMINAL_NAME skipped')
+                    this.skip()
+                }
+            })
+        })
+    })
+
+    it('Klarna Pay by link', function () {
+
+        const ord = new Order()
+        ord.clrcookies()
+    
+        cy.get('body').then(($body) => {
+            if ($body.text().includes('DKK') === false) {
+                ord.admin()
+                ord.change_currency_to_DKK()
+            }            
+            cy.fixture('config').then((admin) => {
+                if (admin.KLARNA_DKK_TERMINAL_NAME != "") {
+                    cy.get('#menu-magento-sales-sales').click()
+                    cy.get('.item-sales-order > a').click()
+                    cy.get('#add').click()
+                    cy.get('#sales_order_create_customer_grid_table > tbody > tr:nth-child(1)').click().wait(4000)
+                    cy.reload()
+                    cy.get('#add_products').click().wait(2000)
+                    cy.get('#sales_order_create_search_grid_table > tbody > tr:nth-child(2)').click()
+                    cy.get('#order-search > div.admin__page-section-title > div').click().wait(2000)
+                    cy.get('#order-shipping-method-summary > a').click({ force: true }) 
+                    cy.get('.admin__order-shipment-methods-options-list > li:first').click().wait(3000)
+                    cy.contains('EmbraceIT Klarna Integration Test Terminal').click().wait(3000)   
+                    cy.get('#submit_order_top_button').click().wait(2000)
+                    cy.get('#menu-magento-sales-sales > ._active').click()
+                    cy.get('.item-sales-order > a').click().wait(2000)
+                    cy.get('#container > div > div.admin__data-grid-wrap > table > tbody > tr:nth-child(1) > td.data-grid-actions-cell > a').click().wait(2000)
+                    cy.get('.payment_link > code').then(($a) => {
+                        const payment_link = $a.text();
+                        cy.origin('https://pensio.com', { args: { payment_link } }, ({ payment_link }) => {                            
+                            cy.visit(payment_link)
+                            cy.get('[id=submitbutton]').click().wait(5000)
+                            cy.wait(5000)
+                            cy.get('[id=klarna-pay-later-fullscreen]').then(function ($iFrame) {
+                                const mobileNum = $iFrame.contents().find('[id=email_or_phone]')
+                                cy.wrap(mobileNum).type('20222222')
+                                const continueBtn = $iFrame.contents().find('[id=onContinue]')
+                                cy.wrap(continueBtn).click().wait(2000)
+                            })
+                            cy.get('[id=klarna-pay-later-fullscreen]').wait(4000).then(function($iFrame){
+                                const otp = $iFrame.contents().find('[id=otp_field]')
+                                cy.wrap(otp).type('123456').wait(2000)
+                            })  
+                            cy.get('[id=klarna-pay-later-fullscreen]').wait(2000).then(function($iFrame){
+                                const contbtn = $iFrame.contents().find('[id=invoice_kp-purchase-review-continue-button]')
+                                cy.wrap(contbtn).click().wait(2000)
+                            })
+                            
+                        })
+                    
+                    })
+                    cy.get('.page-title > span').should('have.text','Thank you for your purchase!')
+                }
+                else {
+                    cy.log('KLARNA_DKK_TERMINAL_NAME skipped')
+                    this.skip()
+                }
+            })
+
+        })
+    })
+
 })
