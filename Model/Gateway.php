@@ -38,6 +38,9 @@ use Altapay\Api\Payments\ApplePayWalletAuthorize;
 use Magento\Store\Model\StoreManagerInterface;
 use Magento\Framework\Math\Random;
 use Altapay\Api\Payments\ReservationOfFixedAmount;
+use SDM\Altapay\Api\TransactionRepositoryInterface;
+use Magento\Sales\Model\Order\Invoice;
+use Magento\Framework\DB\TransactionFactory;
 
 /**
  * Class Gateway
@@ -119,6 +122,16 @@ class Gateway implements GatewayInterface
     protected $storeManager;
     
     /**
+     * @var TransactionRepositoryInterface
+     */
+    private $transactionRepository;
+    
+    /**
+     * @var TransactionFactory
+     */
+    private $transactionFactory;
+    
+    /**
      * Gateway constructor.
      *
      * @param Session              $checkoutSession
@@ -158,7 +171,9 @@ class Gateway implements GatewayInterface
         TokenFactory $dataToken,
         ApplePayOrder $applePayOrder,
         StoreManagerInterface $storeManager,
-        Random $random
+        Random $random,
+        TransactionRepositoryInterface $transactionRepository,
+        TransactionFactory $transactionFactory
     ) {
         $this->checkoutSession = $checkoutSession;
         $this->urlInterface    = $urlInterface;
@@ -179,6 +194,8 @@ class Gateway implements GatewayInterface
         $this->applePayOrder   = $applePayOrder;
         $this->storeManager    = $storeManager;
         $this->random          = $random;
+        $this->transactionRepository = $transactionRepository;
+        $this->transactionFactory    = $transactionFactory;
     }
 
     /**
@@ -504,7 +521,20 @@ class Gateway implements GatewayInterface
             /** @var PaymentRequestResponse $response */
             $response = $request->call();
             $responseUrl = $response->Url;
-            if(strtolower($response->Result) === "success" &&  $responseUrl == null) {
+            $paymentId = $response->PaymentRequestId;
+            $max_date = '';
+            $latestTransKey = '';
+            foreach ($response->Transactions as $key => $value) {
+                if ($value->CreatedDate > $max_date) {
+                    $max_date = $value->CreatedDate;
+                    $latestTransKey = $key;
+                }
+            }
+            if (strtolower($response->Result) === "success" && $responseUrl == null ) {
+                $this->handleReservation($order, $response, $request, $latestTransKey);
+                if (isset($response->Transactions[$latestTransKey])) {
+                    $paymentId = $response->Transactions[$latestTransKey]->PaymentId;
+                }
                 $responseUrl = 'onepage/success';
             }
             $requestParams['result'] = ConstantConfig::SUCCESS;
@@ -514,7 +544,7 @@ class Gateway implements GatewayInterface
                 $this->paymentHandler->setCustomOrderStatus($order, Order::STATE_NEW, 'before');
             }
             // set notification
-            $order->addStatusHistoryComment(__(ConstantConfig::REDIRECT_TO_ALTAPAY) . $response->PaymentRequestId);
+            $order->addStatusHistoryComment(__(ConstantConfig::REDIRECT_TO_ALTAPAY) . $paymentId);
             $extensionAttribute = $order->getExtensionAttributes();
             if ($extensionAttribute && $extensionAttribute->getAltapayPaymentFormUrl()) {
                 $extensionAttribute->setAltapayPaymentFormUrl($response->Url);
@@ -591,5 +621,136 @@ class Gateway implements GatewayInterface
         }
 
         return $agreementDetails;
+    }
+    
+    /**
+     * @param $order
+     * @param $response
+     * @param $request
+     *
+     * @return void
+     */
+    private function handleReservation($order, $response, $request, $latestTransKey)
+    {
+        $storeScope     = \Magento\Store\Model\ScopeInterface::SCOPE_STORE;
+        $storeCode      = $order->getStore()->getCode();
+        $comment = 'Reservation callback from Altapay';
+        if (isset($response->Transactions[$latestTransKey])) {
+            $transaction = $response->Transactions[$latestTransKey];
+            $payment     = $order->getPayment();
+            $payment->setPaymentId($transaction->PaymentId);
+            $payment->setLastTransId($transaction->TransactionId);
+            $payment->setCcTransId($transaction->CreditCardToken);
+            $payment->setAdditionalInformation('payment_type', $transaction->AuthType);
+            $payment->save();
+            //save transaction data
+            $parametersData = json_encode($request);
+            $transactionData = json_encode($response);
+            $this->transactionRepository->addTransactionData(
+                $order->getIncrementId(),
+                $transaction->TransactionId,
+                $transaction->PaymentId,
+                $transactionData,
+                $parametersData
+            );
+        }
+        $orderStatusAfterPayment = $this->systemConfig->getStatusConfig('process', $storeScope, $storeCode);
+        $orderStatusCapture      = $this->systemConfig->getStatusConfig('autocapture', $storeScope, $storeCode);
+        $setOrderStatus          = true;
+        $orderState              = Order::STATE_PROCESSING;
+        $statusKey               = 'process';
+        
+        if ($this->isCaptured($response, $storeCode, $storeScope, $latestTransKey))
+        {
+            if ($orderStatusCapture == "complete") {
+                if ($this->orderLines->sendShipment($order)) {
+                    $orderState = Order::STATE_COMPLETE;
+                    $statusKey  = 'autocapture';
+                    $order->addStatusHistoryComment(__(ConstantConfig::PAYMENT_COMPLETE));
+                } else {
+                    $setOrderStatus = false;
+                    $order->addStatusToHistory($orderStatusCapture,
+                        ConstantConfig::PAYMENT_COMPLETE, false);
+                }
+            }
+        } else {
+            if ($orderStatusAfterPayment) {
+                $orderState = $orderStatusAfterPayment;
+            }
+        }
+        if ($setOrderStatus) {
+            $this->paymentHandler->setCustomOrderStatus($order, $orderState, $statusKey);
+        }
+        $order->addStatusHistoryComment($comment);
+        $order->setIsNotified(false);
+        $order->getResource()->save($order);
+        
+        if(isset($response->Transactions[$latestTransKey])) {
+            $paymentType = isset($response->Transactions[$latestTransKey]->AuthType);
+            $requireCapture = isset($response->Transactions[$latestTransKey]->RequireCapture);
+            if (strtolower($paymentType) === 'paymentandcapture'
+                || strtolower($paymentType) === 'subscriptionandcharge'
+            ) {
+                $this->createInvoice($order, $requireCapture);
+            }
+        }
+
+    }
+    
+    /**
+     * @param $response
+     * @param $storeCode
+     * @param $storeScope
+     * @param $latestTransKey
+     *
+     * @return bool
+     */
+    private function isCaptured($response, $storeCode, $storeScope, $latestTransKey)
+    {
+        $isCaptured = false;
+        foreach (SystemConfig::getTerminalCodes() as $terminalName) {
+            $terminalConfig = $this->systemConfig->getTerminalConfigFromTerminalName(
+                $terminalName,
+                'terminalname',
+                $storeScope,
+                $storeCode
+            );
+            if ($terminalConfig === $response->Transactions[$latestTransKey]->Terminal) {
+                $isCaptured = $this->systemConfig->getTerminalConfigFromTerminalName(
+                    $terminalName,
+                    'capture',
+                    $storeScope,
+                    $storeCode
+                );
+                break;
+            }
+        }
+        
+        return $isCaptured;
+    }
+    
+    /**
+     * @param Order $order
+     * @param bool  $requireCapture
+     *
+     * @return void
+     */
+    public function createInvoice(Order $order, bool $requireCapture = false)
+    {
+        if (filter_var($requireCapture, FILTER_VALIDATE_BOOLEAN) === true) {
+            $captureType = Invoice::CAPTURE_ONLINE;
+        } else {
+            $captureType = Invoice::CAPTURE_OFFLINE;
+        }
+        
+        if (!$order->getInvoiceCollection()->count()) {
+            $invoice = $this->invoiceService->prepareInvoice($order);
+            $invoice->setRequestedCaptureCase($captureType);
+            $invoice->register();
+            $invoice->getOrder()->setCustomerNoteNotify(false);
+            $invoice->getOrder()->setIsInProcess(true);
+            $transaction = $this->transactionFactory->create()->addObject($invoice)->addObject($invoice->getOrder());
+            $transaction->save();
+        }
     }
 }
