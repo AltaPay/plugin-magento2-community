@@ -450,9 +450,7 @@ class Gateway implements GatewayInterface
             $request = new CardWalletAuthorize($auth);
             $request->setProviderData($providerData);
         }
-        if (isset($post['savecard']) && $post['savecard'] != false) {
-            $request->setType('verifyCard');
-        }
+
         if (!empty($post['tokenid'])) {
             $data = $this->getToken($post['tokenid'], null, $order->getCustomerId());
         }
@@ -503,6 +501,9 @@ class Gateway implements GatewayInterface
                 $request->setType('subscription');
             }
             $request->setAgreement($this->agreementDetail($quote->getAllItems(), $baseUrl, "recurring", null));
+        }
+        if (isset($post['savecard']) && $post['savecard'] != false) {
+            $request->setType('verifyCard');
         }
         // check if auto capture enabled
         if (!$this->helper->validateQuote($quote) && $this->systemConfig->getTerminalConfig($terminalId, 'capture', $storeScope, $storeCode)) {

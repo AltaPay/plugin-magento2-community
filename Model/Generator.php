@@ -466,30 +466,24 @@ class Generator
                     if ($this->helper->validateQuote($quote)) {
                         $agreementType = "recurring";
                     }
-                    if (isset($transaction->PaymentInfos)) {
-                        foreach ($transaction->PaymentInfos as $payment) {
-                            if ($payment->name === "savecreditcard"
-                                && $payment->PaymentInfo == 1 )
-                            {
-                                $model = $this->dataToken->create();
-                                $model->addData([
-                                    "customer_id" => $order->getCustomerId(),
-                                    "payment_id" => $paymentId,
-                                    "token" => $ccToken,
-                                    "agreement_id" => $transactionId,
-                                    "agreement_type" => $agreementType,
-                                    "masked_pan" => $maskedPan,
-                                    "currency_code" => $order->getOrderCurrencyCode(),
-                                    "expires" => $expires,
-                                    "card_type" => $cardType
-                                ]);
-                                try {
-                                    $model->save();
-                                } catch (Exception $e) {
-                                    $this->altapayLogger->addCriticalLog('Exception',
-                                        $e->getMessage());
-                                }
-                            }
+                    if ($response->type === "verifyCard") {
+                        $model = $this->dataToken->create();
+                        $model->addData([
+                            "customer_id" => $order->getCustomerId(),
+                            "payment_id" => $paymentId,
+                            "token" => $ccToken,
+                            "agreement_id" => $transactionId,
+                            "agreement_type" => $agreementType,
+                            "masked_pan" => $maskedPan,
+                            "currency_code" => $order->getOrderCurrencyCode(),
+                            "expires" => $expires,
+                            "card_type" => $cardType
+                        ]);
+                        try {
+                            $model->save();
+                        } catch (Exception $e) {
+                            $this->altapayLogger->addCriticalLog('Exception',
+                                $e->getMessage());
                         }
                     }
                 }
