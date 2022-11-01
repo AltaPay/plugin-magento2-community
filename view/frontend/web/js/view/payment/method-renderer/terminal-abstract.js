@@ -291,6 +291,20 @@ define(
                     }
                 }
                 return savedtokenprimaryoption;
+            },
+            enableSaveCard: function () {
+                var self = this;
+                var enableSaveCard = 0;
+                var paymentMethod = window.checkoutConfig.payment[this.getDefaultCode()].terminaldata;
+                for (var obj in paymentMethod) {
+                    if (obj === self.getCode()) {
+                        if (paymentMethod[obj].enabledsavetokens != null) {
+                            enableSaveCard = paymentMethod[obj].enabledsavetokens;
+                        }
+                    }
+                }
+
+                return enableSaveCard;
             }
         });
     }
