@@ -36,6 +36,10 @@ select#eyear {
     padding-bottom: 24px;
 }
 
+div#savecreditcard {
+    display: none;
+}
+
 input#pensioCreditCardPaymentSubmitButton:disabled {
     opacity: 0.4;
 }
