@@ -450,13 +450,13 @@ class Gateway implements GatewayInterface
             $request = new CardWalletAuthorize($auth);
             $request->setProviderData($providerData);
         }
-        if (isset($post['savecard']) && $post['savecard'] != null) {
+        if (isset($post['savecard']) && $post['savecard'] != false) {
             $request->setType('verifyCard');
         }
         if (!empty($post['tokenid'])) {
             $data = $this->getToken($post['tokenid'], null, $order->getCustomerId());
         }
-        elseif (isset($post['transaction_id'])) {
+        elseif (isset($post['transaction_id']) && $post['type'] === "verifyCard") {
                 $data = $this->getToken(null, $post['transaction_id'], $order->getCustomerId());
         }
     
