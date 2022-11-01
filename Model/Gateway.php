@@ -621,14 +621,15 @@ class Gateway implements GatewayInterface
             $agreementDetails['type'] = $agreementType;
             if ($agreementType === "unscheduled") {
                 $agreementDetails['unscheduled_type'] = 'incremental';
-            }
-            $agreementDetails['adminUrl'] = $baseUrl . 'amasty_recurring/customer/subscriptions/';
-            /** @var Item $item */
-            foreach ($items as $item) {
-                $buyRequest = $this->helper->getBuyRequestObject($item);
-                if ($buyRequest->getData('am_subscription_end_type') === 'amrec-end-date') {
-                    $expiryDate = date("Ymd", strtotime($buyRequest->getData('am_rec_end_date')));
-                    $agreementDetails['expiry'] = $expiryDate;
+            } else {
+                $agreementDetails['adminUrl'] = $baseUrl . 'amasty_recurring/customer/subscriptions/';
+                /** @var Item $item */
+                foreach ($items as $item) {
+                    $buyRequest = $this->helper->getBuyRequestObject($item);
+                    if ($buyRequest->getData('am_subscription_end_type') === 'amrec-end-date') {
+                        $expiryDate = date("Ymd", strtotime($buyRequest->getData('am_rec_end_date')));
+                        $agreementDetails['expiry'] = $expiryDate;
+                    }
                 }
             }
         }
