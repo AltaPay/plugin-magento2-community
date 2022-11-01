@@ -45,23 +45,24 @@ class Request extends Index
     public function execute()
     {
         $this->writeLog();
-        $order       = $this->order->load($this->getRequest()->getParam('orderid'));
-        $payment     = $order->getPayment();
-        $paymentType = $this->getRequest()->getParam('paytype');
+        $order        = $this->order->load($this->getRequest()->getParam('orderid'));
+        $payment      = $order->getPayment();
+        $terminalCode = $payment->getMethod();
+        $paymentType  = $this->getRequest()->getParam('paytype');
         if (empty($paymentType)) {
-            $paymentType = $payment->getMethod();
+            $paymentType = $terminalCode[strlen($terminalCode) - 1];
         }
-        
+    
         if ($this->checkPost()) {
             $params = $this->gateway->createRequest(
                 $paymentType,
                 $this->getRequest()->getParam('orderid')
             );
-            
+        
             $result = new DataObject();
             $result->addData($params);
             $response = $this->getResponse();
-            
+        
             return $response->representJson($result->toJson());
         }
     }

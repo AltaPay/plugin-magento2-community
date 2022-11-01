@@ -25,7 +25,7 @@ class Ok extends Index implements CsrfAwareActionInterface
     ): ?InvalidRequestException {
         return null;
     }
-
+    
     /**
      * @inheritDoc
      */
@@ -33,19 +33,26 @@ class Ok extends Index implements CsrfAwareActionInterface
     {
         return true;
     }
-
+    
     /**
      * Dispatch request
      *
      * @return \Magento\Framework\Controller\ResultInterface|ResponseInterface
      * @throws \Exception
      */
+    /**
+     * @return void
+     */
     public function execute()
     {
         $this->writeLog();
-        $checkAvs = false;
-        $post     = $this->getRequest()->getPostValue();
-        $orderId  = $post['shop_orderid'];
+        $checkAvs     = false;
+        $post         = $this->getRequest()->getPostValue();
+        $orderId      = $post['shop_orderid'];
+        $order        = $this->order->loadByIncrementId($orderId);
+        $payment      = $order->getPayment();
+        $terminalCode = $payment->getMethod();
+        
         if (isset($post['avs_code']) && isset($post['avs_text'])) {
             $checkAvs = $this->generator->avsCheck(
                 $this->getRequest(),
@@ -53,15 +60,35 @@ class Ok extends Index implements CsrfAwareActionInterface
                 strtolower($post['avs_text'])
             );
         }
+    
         if ($this->checkPost() && $checkAvs == false) {
             $this->generator->handleOkAction($this->getRequest());
-
+            if (strtolower($post['type']) === "verifycard") {
+                $response = $this->gateway->createRequest(
+                    $terminalCode[strlen($terminalCode) - 1],
+                    $orderId
+                );
+                if ($response['result'] === 'success') {
+                    return $this->setSuccessPath($orderId);
+                } else {
+                    $this->redirectToCheckoutPage();
+                }
+            }
+        
             return $this->setSuccessPath($orderId);
         } else {
-            $this->_eventManager->dispatch('order_cancel_after', ['order' => $this->order]);
-            $this->generator->restoreOrderFromRequest($this->getRequest());
-
-            return $this->_redirect('checkout');
+            $this->redirectToCheckoutPage();
         }
+    }
+    
+    /**
+     * @return mixed
+     */
+    private function redirectToCheckoutPage()
+    {
+        $this->_eventManager->dispatch('order_cancel_after', ['order' => $this->order]);
+        $this->generator->restoreOrderFromRequest($this->getRequest());
+        
+        return $this->_redirect('checkout');
     }
 }
