@@ -240,19 +240,25 @@ class Generator
         $callback = new Callback($request->getPostValue());
         $response = $callback->call();
         if ($response) {
-            $order = $this->loadOrderFromCallback($response);
-            //check if order status set in configuration
-            $statusKey         = Order::STATE_CANCELED;
-            $storeCode         = $order->getStore()->getCode();
-            $storeScope        = \Magento\Store\Model\ScopeInterface::SCOPE_STORE;
-            $orderStatusCancel = $this->systemConfig->getStatusConfig('cancel', $storeScope, $storeCode);
-
-            if ($orderStatusCancel) {
-                $statusKey = $orderStatusCancel;
+            $order             = $this->loadOrderFromCallback($response);
+            $payment           = $order->getPayment();
+            $lastTransactionId = $payment->getLastTransId();
+            if (!empty($lastTransactionId) && $lastTransactionId != $response->transactionId ) {
+                if (strtolower($response->status) === "succeeded") {
+                    //check if order status set in configuration
+                    $statusKey         = Order::STATE_CANCELED;
+                    $storeCode         = $order->getStore()->getCode();
+                    $storeScope        = \Magento\Store\Model\ScopeInterface::SCOPE_STORE;
+                    $orderStatusCancel = $this->systemConfig->getStatusConfig('cancel', $storeScope, $storeCode);
+                
+                    if ($orderStatusCancel) {
+                        $statusKey = $orderStatusCancel;
+                    }
+                    $this->handleOrderStateAction($request,  Order::STATE_CANCELED, $statusKey, $historyComment);
+                    //save failed transaction data
+                    $this->saveTransactionData($request, $response, $order);
+                }
             }
-            $this->handleOrderStateAction($request, Order::STATE_CANCELED, $statusKey, $historyComment);
-            //save failed transaction data
-            $this->saveTransactionData($request, $response, $order);
         }
     }
 
@@ -308,30 +314,39 @@ class Generator
      *
      * @throws \Exception
      */
-    public function handleFailedStatusAction(RequestInterface $request, $msg, $merchantErrorMsg, $responseStatus)
-    {
+    public function handleFailedStatusAction(
+        RequestInterface $request,
+        $msg,
+        $merchantErrorMsg,
+        $responseStatus
+    ) {
         $historyComment = $responseStatus . '|' . $msg;
         if (!empty($merchantErrorMsg)) {
             $historyComment = $historyComment . '|' . $merchantErrorMsg;
         }
-        $transInfo = null;
-        $callback  = new Callback($request->getPostValue());
-        $response  = $callback->call();
+        $callback = new Callback($request->getPostValue());
+        $response = $callback->call();
         if ($response) {
-            $order     = $this->loadOrderFromCallback($response);
-            $transInfo = $this->getTransactionInfoFromResponse($response);
-            //check if order status set in configuration
-            $statusKey         = Order::STATE_CANCELED;
-            $storeCode         = $order->getStore()->getCode();
-            $storeScope        = \Magento\Store\Model\ScopeInterface::SCOPE_STORE;
-            $orderStatusCancel = $this->systemConfig->getStatusConfig('cancel', $storeScope, $storeCode);
-
-            if ($orderStatusCancel) {
-                $statusKey = $orderStatusCancel;
+            $order             = $this->loadOrderFromCallback($response);
+            $payment           = $order->getPayment();
+            $lastTransactionId = $payment->getLastTransId();
+            if (!empty($lastTransactionId) && $lastTransactionId != $response->transactionId ) {
+                if (strtolower($response->status) === "succeeded") {
+                    $transInfo = $this->getTransactionInfoFromResponse($response);
+                    //check if order status set in configuration
+                    $statusKey         = Order::STATE_CANCELED;
+                    $storeCode         = $order->getStore()->getCode();
+                    $storeScope        = \Magento\Store\Model\ScopeInterface::SCOPE_STORE;
+                    $orderStatusCancel = $this->systemConfig->getStatusConfig('cancel', $storeScope, $storeCode);
+                    
+                    if ($orderStatusCancel) {
+                        $statusKey = $orderStatusCancel;
+                    }
+                    $this->handleOrderStateAction($request, Order::STATE_CANCELED, $statusKey, $historyComment, $transInfo);
+                    //save failed transaction data
+                    $this->saveTransactionData($request, $response, $order);
+                }
             }
-            $this->handleOrderStateAction($request, Order::STATE_CANCELED, $statusKey, $historyComment, $transInfo);
-            //save failed transaction data
-            $this->saveTransactionData($request, $response, $order);
         }
     }
 
