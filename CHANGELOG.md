@@ -3,7 +3,7 @@ All notable changes to this project will be documented in this file.
 
 ## [3.4.9]
 ### Added
-- Add support for saving credit card for later use without CVV/CVC payments (Unscheduled Agreement)
+- Add support for saving credit card for later use without CVV/CVC
 ### Fixed
 - Handle multiple notification callback to avoid auto-release
 
