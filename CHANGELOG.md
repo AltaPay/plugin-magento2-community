@@ -1,6 +1,12 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [3.4.9]
+### Added
+- Add support for saving credit card for later use without CVV/CVC
+### Fixed
+- Handle multiple notification callback to avoid auto-release
+
 ## [3.4.8]
 ### Added
 - Add a payment link in the order information grid

@@ -15,6 +15,7 @@ use SDM\Altapay\Controller\Index;
 use Magento\Framework\App\CsrfAwareActionInterface;
 use Magento\Framework\App\RequestInterface;
 use Magento\Framework\App\Request\InvalidRequestException;
+use Magento\Sales\Model\Order;
 
 class Request extends Index
 {
@@ -26,7 +27,7 @@ class Request extends Index
     ): ?InvalidRequestException {
         return null;
     }
-
+    
     /**
      * @inheritDoc
      */
@@ -34,7 +35,7 @@ class Request extends Index
     {
         return true;
     }
-
+    
     /**
      * Dispatch request
      *
@@ -44,17 +45,24 @@ class Request extends Index
     public function execute()
     {
         $this->writeLog();
-
+        $order        = $this->order->load($this->getRequest()->getParam('orderid'));
+        $payment      = $order->getPayment();
+        $terminalCode = $payment->getMethod();
+        $paymentType  = $this->getRequest()->getParam('paytype');
+        if (empty($paymentType)) {
+            $paymentType = $terminalCode[strlen($terminalCode) - 1];
+        }
+    
         if ($this->checkPost()) {
             $params = $this->gateway->createRequest(
-                $this->getRequest()->getParam('paytype'),
+                $paymentType,
                 $this->getRequest()->getParam('orderid')
             );
-
-            $result   = new DataObject();
-            $response = $this->getResponse();
+        
+            $result = new DataObject();
             $result->addData($params);
-
+            $response = $this->getResponse();
+        
             return $response->representJson($result->toJson());
         }
     }

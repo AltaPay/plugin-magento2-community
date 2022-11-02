@@ -26,6 +26,8 @@ We highly recommend gathering all the below information, before starting the ins
 
 [Configure terminals](#configure-terminals)
 
+[Save credit cards](#save-credit-cards)
+
 [Pay by link](#pay-by-link)
 
 [Reconcile Orders](#reconcile-orders)
@@ -116,7 +118,7 @@ payment methods and configuring payments.
 
 3.  Complete the 'API Login', 'API Password' and 'Production URL' fields with the gateway information for your environment (provided by AltaPay)
 
-![gateway_configuration](docs/gateway_configuration.jpg)
+    ![gateway_configuration](docs/gateway_configuration.jpg)
 
 4.  Click: 'Save Config' button
 
@@ -169,9 +171,25 @@ To synchronize the terminals with the gateway, click on the **Synchronize Termin
 
 7.  Save changes by clicking 'Save Config'
 
-![gateway_terminal_configuration](docs/gateway_terminal_configuration.jpg)
+    ![gateway_terminal_configuration](docs/gateway_terminal_configuration.jpg)
 
 _**Note:** Remember to follow Magento's [Cache Management](https://docs.magento.com/user-guide/system/cache-management.html) guidelines to clear the site cache when updating the configurations._
+
+#Save credit cards
+1. To enable save credit cards option for customers follow the bellow steps
+    * Navigate to Admin \> Stores \> Configuration \> Sales \> Payment Methods > AltaPay
+    * Choose Terminal
+    * "Enable Customer Token Control" to Yes 
+
+    ![save_card_config](docs/save_card_config.png)
+
+2. A new field will be appeared on checkout page for saving the credit card for later use
+
+    ![choose_saved_card](docs/choose_saved_card.png)
+
+3. Customer can manage the `Saved Credit Cards` from customer dashboard
+
+    ![saved_card_list](docs/saved_card_list.png)
 
 # Pay by link
 By performing the below steps a customer receives a payment link on the provided email.
@@ -180,31 +198,31 @@ By performing the below steps a customer receives a payment link on the provided
 
 2. Click on the "Create new order" button
 
-![create_an_order](docs/create_an_order.png)
+    ![create_an_order](docs/create_an_order.png)
 
 3. Select an existing customer or create a new user
 
-![add_customer](docs/add_customer.png)
+    ![add_customer](docs/add_customer.png)
 
 4. Click on the "Add Product" button and choose any product from the list
 
-![add_product](docs/add_product.png)
+    ![add_product](docs/add_product.png)
 
 5. Then click on the "Add the selected product(s) to order" button
 
-![product_list](docs/product_list.png)
+    ![product_list](docs/product_list.png)
 
 6. Add Billing and Shipping Address 
 
-![add_billing_address](docs/add_billing_address.png)
+    ![add_billing_address](docs/add_billing_address.png)
 
 7. Choose a payment method
 
-![select_payment_method](docs/select_payment_method.png)
+    ![select_payment_method](docs/select_payment_method.png)
 
 8. Click on the "Submit Order" button
 
-![submit_order](docs/submit_order.png)
+    ![submit_order](docs/submit_order.png)
 
 # Reconcile Orders
 In order to reconcile payments on Magento please follow the steps below:

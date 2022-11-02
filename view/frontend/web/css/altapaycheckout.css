@@ -43,6 +43,10 @@ span.terminal-logos {
     display: flex;
 }
 
+.savecard-checkbox {
+    margin-bottom: 14px;
+}
+
 @media (min-width: 769px) {
     .terminal-logos>img {
         max-width: 80px;

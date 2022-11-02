@@ -34,11 +34,14 @@ use Magento\Quote\Model\Quote;
 use Magento\Framework\UrlInterface;
 use Magento\Framework\App\Request\Http;
 use Magento\Framework\App\RequestInterface;
-use Magento\Quote\Model\Quote\Item\AbstractItem;
-use Magento\Framework\DataObject;
 use Altapay\Api\Payments\ApplePayWalletAuthorize;
 use Magento\Store\Model\StoreManagerInterface;
 use Magento\Framework\Math\Random;
+use Altapay\Api\Payments\ReservationOfFixedAmount;
+use SDM\Altapay\Api\TransactionRepositoryInterface;
+use Magento\Sales\Model\Order\Invoice;
+use Magento\Framework\DB\TransactionFactory;
+use Magento\Sales\Model\Service\InvoiceService;
 
 /**
  * Class Gateway
@@ -118,7 +121,22 @@ class Gateway implements GatewayInterface
      * @var StoreManagerInterface
      */
     protected $storeManager;
-
+    
+    /**
+     * @var TransactionRepositoryInterface
+     */
+    private $transactionRepository;
+    
+    /**
+     * @var TransactionFactory
+     */
+    private $transactionFactory;
+    
+    /**
+     * @var InvoiceService
+     */
+    private $invoiceService;
+    
     /**
      * Gateway constructor.
      *
@@ -139,6 +157,7 @@ class Gateway implements GatewayInterface
      * @param CreatePaymentHandler $paymentHandler
      * @param TokenFactory         $dataToken
      * @param ApplePayOrder        $applePayOrder
+     * @param InvoiceService                 $invoiceService
      */
     public function __construct(
         Session $checkoutSession,
@@ -159,46 +178,53 @@ class Gateway implements GatewayInterface
         TokenFactory $dataToken,
         ApplePayOrder $applePayOrder,
         StoreManagerInterface $storeManager,
-        Random $random
-    ) {
-        $this->checkoutSession = $checkoutSession;
-        $this->urlInterface    = $urlInterface;
-        $this->request         = $request;
-        $this->order           = $order;
-        $this->systemConfig    = $systemConfig;
-        $this->orderLoader     = $orderLoader;
-        $this->quote           = $quote;
-        $this->helper          = $helper;
-        $this->storeConfig     = $storeConfig;
-        $this->altapayLogger   = $altapayLogger;
-        $this->customerHandler = $customerHandler;
-        $this->orderLines      = $orderLines;
-        $this->priceHandler    = $priceHandler;
-        $this->discountHandler = $discountHandler;
-        $this->paymentHandler  = $paymentHandler;
-        $this->dataToken       = $dataToken;
-        $this->applePayOrder   = $applePayOrder;
-        $this->storeManager    = $storeManager;
-        $this->random          = $random;
+        Random $random,
+        TransactionRepositoryInterface $transactionRepository,
+        TransactionFactory $transactionFactory,
+        InvoiceService $invoiceService
+    )
+    {
+        $this->checkoutSession       = $checkoutSession;
+        $this->urlInterface          = $urlInterface;
+        $this->request               = $request;
+        $this->order                 = $order;
+        $this->systemConfig          = $systemConfig;
+        $this->orderLoader           = $orderLoader;
+        $this->quote                 = $quote;
+        $this->helper                = $helper;
+        $this->storeConfig           = $storeConfig;
+        $this->altapayLogger         = $altapayLogger;
+        $this->customerHandler       = $customerHandler;
+        $this->orderLines            = $orderLines;
+        $this->priceHandler          = $priceHandler;
+        $this->discountHandler       = $discountHandler;
+        $this->paymentHandler        = $paymentHandler;
+        $this->dataToken             = $dataToken;
+        $this->applePayOrder         = $applePayOrder;
+        $this->storeManager          = $storeManager;
+        $this->random                = $random;
+        $this->transactionRepository = $transactionRepository;
+        $this->transactionFactory    = $transactionFactory;
+        $this->invoiceService        = $invoiceService;
     }
 
     /**
      * createRequest to altapay
      *
-     * @param int    $terminalId
+     * @param int $terminalId
      * @param string $orderId
      *
-     * @return array
+     * @return array|mixed
      */
     public function createRequest($terminalId, $orderId)
     {
         $order = $this->order->load($orderId);
         if ($order->getId()) {
-            $couponCode       = $order->getDiscountDescription();
+            $couponCode = $order->getDiscountDescription();
             $couponCodeAmount = $order->getDiscountAmount();
             $discountAllItems = $this->discountHandler->allItemsHaveDiscount($order->getAllItems());
-            $orderLines       = $this->itemOrderLines($couponCodeAmount, $order, $discountAllItems);
-            $payment          = $order->getPayment();
+            $orderLines = $this->itemOrderLines($couponCodeAmount, $order, $discountAllItems);
+            $payment = $order->getPayment();
             $payment->setAdditionalInformation('altapay_reconciliation', $this->random->getUniqueHash());
             $payment->save();
             if ($this->orderLines->sendShipment($order) && !empty($order->getShippingMethod(true))) {
@@ -216,7 +242,7 @@ class Gateway implements GatewayInterface
             if ($discountAllItems && abs($couponCodeAmount) > 0) {
                 $orderLines[] = $this->orderLines->discountOrderLine($couponCodeAmount, $couponCode);
             }
-            if(!empty($this->fixedProductTax($order))){
+            if (!empty($this->fixedProductTax($order))) {
                 $orderLines[] = $this->orderLines->fixedProductTaxOrderLine($this->fixedProductTax($order));
             }
             $request = $this->preparePaymentRequest($order, $orderLines, $orderId, $terminalId, null);
@@ -237,15 +263,12 @@ class Gateway implements GatewayInterface
      */
     public function createRequestApplepay($terminalId, $orderId, $providerData)
     {
-
-        $storeScope = $this->storeConfig->getStoreScope();
         $order = $this->order->load($orderId);
-        $storeCode  = $order->getStore()->getCode();
         if ($order->getId()) {
-            $couponCode       = $order->getDiscountDescription();
+            $couponCode = $order->getDiscountDescription();
             $couponCodeAmount = $order->getDiscountAmount();
             $discountAllItems = $this->discountHandler->allItemsHaveDiscount($order->getAllItems());
-            $orderLines       = $this->itemOrderLines($couponCodeAmount, $order, $discountAllItems);
+            $orderLines = $this->itemOrderLines($couponCodeAmount, $order, $discountAllItems);
             if ($this->orderLines->sendShipment($order) && !empty($order->getShippingMethod(true))) {
                 $orderLines[] = $this->orderLines->handleShipping($order, $discountAllItems, true);
                 //Shipping Discount Tax Compensation Amount
@@ -261,7 +284,7 @@ class Gateway implements GatewayInterface
             if ($discountAllItems && abs($couponCodeAmount) > 0) {
                 $orderLines[] = $this->orderLines->discountOrderLine($couponCodeAmount, $couponCode);
             }
-            if(!empty($this->fixedProductTax($order))){
+            if (!empty($this->fixedProductTax($order))) {
                 $orderLines[] = $this->orderLines->fixedProductTaxOrderLine($this->fixedProductTax($order));
             }
             $request = $this->preparePaymentRequest($order, $orderLines, $orderId, $terminalId, $providerData);
@@ -317,13 +340,13 @@ class Gateway implements GatewayInterface
      */
     private function itemOrderLines($couponCodeAmount, $order, $discountAllItems)
     {
-        $orderLines       = [];
+        $orderLines = [];
         $storePriceIncTax = $this->storeConfig->storePriceIncTax();
 
         foreach ($order->getAllItems() as $item) {
-            $productType    = $item->getProductType();
-            $originalPrice  = $item->getBaseOriginalPrice();
-            $taxPercent     = $item->getTaxPercent();
+            $productType = $item->getProductType();
+            $originalPrice = $item->getBaseOriginalPrice();
+            $taxPercent = $item->getTaxPercent();
             $discountAmount = $item->getBaseDiscountAmount();
             $parentItemType = "";
             if ($item->getParentItem()) {
@@ -337,27 +360,27 @@ class Gateway implements GatewayInterface
 
                 if ($storePriceIncTax) {
                     $unitPriceWithoutTax = $this->priceHandler->getPriceWithoutTax($originalPrice, $taxPercent);
-                    $unitPrice           = bcdiv($unitPriceWithoutTax, 1, 2);
+                    $unitPrice = bcdiv($unitPriceWithoutTax, 1, 2);
                 } else {
-                    $unitPrice           = $originalPrice;
+                    $unitPrice = $originalPrice;
                 }
-                $dataForPrice         = $this->priceHandler->dataForPrice(
+                $dataForPrice = $this->priceHandler->dataForPrice(
                     $item,
                     $unitPrice,
                     $couponCodeAmount,
                     $this->discountHandler->getItemDiscount($discountAmount, $originalPrice, $item->getQtyOrdered()),
                     $discountAllItems
                 );
-                $taxAmount            = $dataForPrice["taxAmount"];
-                $catalogDiscount      = $dataForPrice["catalogDiscount"];
-                $discount             = $this->discountHandler->orderLineDiscount(
+                $taxAmount = $dataForPrice["taxAmount"];
+                $catalogDiscount = $dataForPrice["catalogDiscount"];
+                $discount = $this->discountHandler->orderLineDiscount(
                     $discountAllItems,
                     $dataForPrice["discount"],
                     $catalogDiscount
                 );
 
-                $itemTaxAmount        = $taxAmount;
-                $orderLines[]         = $this->orderLines->itemOrderLine(
+                $itemTaxAmount = $taxAmount;
+                $orderLines[] = $this->orderLines->itemOrderLine(
                     $item,
                     $unitPrice,
                     $discount,
@@ -394,7 +417,7 @@ class Gateway implements GatewayInterface
     private function restoreOrderAndReturnError($order)
     {
         $this->restoreOrderFromOrderId($order->getIncrementId());
-        $requestParams['result']  = ConstantConfig::ERROR;
+        $requestParams['result'] = ConstantConfig::ERROR;
         $requestParams['message'] = __(ConstantConfig::ERROR_MESSAGE);
 
         return $requestParams;
@@ -413,75 +436,88 @@ class Gateway implements GatewayInterface
      */
     private function preparePaymentRequest($order, $orderLines, $orderId, $terminalId, $providerData)
     {
+        $quote = $this->quote->loadByIdWithoutStore($order->getQuoteId());
         $storeScope = $this->storeConfig->getStoreScope();
         $baseUrl = $this->storeManager->getStore()->getBaseUrl();
-        $storeCode  = $order->getStore()->getCode();
-        //Test the conn with the Payment Gateway
-        $auth     = $this->systemConfig->getAuth($storeCode);
-        $api      = new TestAuthentication($auth);
+        $storeCode = $order->getStore()->getCode();
+        $isReservation = false;
+        //Authenticate the connection with the Payment Gateway
+        $auth = $this->systemConfig->getAuth($storeCode);
+        $api = new TestAuthentication($auth);
         $response = $api->call();
         if (!$response) {
             return false;
         }
         $terminalName = $this->systemConfig->getTerminalConfig($terminalId, 'terminalname', $storeScope, $storeCode);
-
         $isApplePay = $this->systemConfig->getTerminalConfig($terminalId, 'isapplepay', $storeScope, $storeCode);
         //Transaction Info
         $transactionDetail = $this->helper->transactionDetail($orderId);
-
-        $payment    = $order->getPayment();
-        $reconciliationIdentifier  = $payment->getAdditionalInformation('altapay_reconciliation');
-
-        $request           = new PaymentRequest($auth);
+        $payment = $order->getPayment();
+        $reconciliationIdentifier = $payment->getAdditionalInformation('altapay_reconciliation');
+        $post = $this->request->getPostValue();
+        $request = new PaymentRequest($auth);
         if ($isApplePay) {
             $request = new CardWalletAuthorize($auth);
             $request->setProviderData($providerData);
         }
+
+        if (!empty($post['tokenid'])) {
+            $data = $this->getToken($post['tokenid'], null, $order->getCustomerId());
+        }
+        elseif (isset($post['transaction_id']) && $post['type'] === "verifyCard") {
+                $data = $this->getToken(null, $post['transaction_id'], $order->getCustomerId());
+        }
+    
+        if (!empty($data)) {
+            $request = new ReservationOfFixedAmount($auth);
+            $token   = $data['token'];
+            $request->setCreditCardToken($token);
+            $request->setAgreement(
+                $this->agreementDetail(
+                    $quote->getAllItems(),
+                    $baseUrl,
+                    $data['agreement_type'],
+                    $data['agreement_id']
+                )
+            );
+            $isReservation = true;
+        }
+
         $request->setTerminal($terminalName)
             ->setShopOrderId($order->getIncrementId())
             ->setAmount((float)number_format($order->getGrandTotal(), 2, '.', ''))
             ->setCurrency($order->getOrderCurrencyCode())
-            ->setCustomerInfo($this->customerHandler->setCustomer($order))
-            ->setConfig($this->setConfig())
+            ->setCustomerInfo($this->customerHandler->setCustomer($order, $isReservation))
             ->setTransactionInfo($transactionDetail)
-            ->setSalesTax((float)number_format($order->getTaxAmount(), 2, '.', ''))
             ->setCookie($this->request->getServer('HTTP_COOKIE'))
             ->setSaleReconciliationIdentifier($reconciliationIdentifier);
-
-        $post = $this->request->getPostValue();
-
-        if (isset($post['tokenid'])) {
-            $model      = $this->dataToken->create();
-            $collection = $model->getCollection()->addFieldToFilter('id', $post['tokenid'])->getFirstItem();
-            $data       = $collection->getData();
-            if (!empty($data)) {
-                $token = $data['token'];
-                $request->setCcToken($token);
-            }
+        
+        if(!$isReservation) {
+            $request->setConfig($this->setConfig())->setSalesTax((float)number_format($order->getTaxAmount(), 2, '.', ''));
         }
-
         if ($fraud = $this->systemConfig->getTerminalConfig($terminalId, 'fraud', $storeScope, $storeCode)) {
             $request->setFraudService($fraud);
         }
-
         if ($lang = $this->systemConfig->getTerminalConfig($terminalId, 'language', $storeScope, $storeCode)) {
             $langArr = explode('_', $lang, 2);
             if (isset($langArr[0])) {
                 $request->setLanguage($langArr[0]);
             }
         }
-        $quote = $this->quote->loadByIdWithoutStore($order->getQuoteId());
-        if ($this->validateQuote($quote)) {
+        if ($this->helper->validateQuote($quote)) {
             if ($this->systemConfig->getTerminalConfig($terminalId, 'capture', $storeScope, $storeCode)) {
                 $request->setType('subscriptionAndCharge');
             } else {
                 $request->setType('subscription');
             }
-            $request->setAgreement($this->agreementDetail($quote->getAllItems(), $baseUrl));
+            $request->setAgreement($this->agreementDetail($quote->getAllItems(), $baseUrl, "recurring", null));
         }
         // check if auto capture enabled
-        if (!$this->validateQuote($quote) && $this->systemConfig->getTerminalConfig($terminalId, 'capture', $storeScope, $storeCode)) {
+        if (!$this->helper->validateQuote($quote) && $this->systemConfig->getTerminalConfig($terminalId, 'capture', $storeScope, $storeCode)) {
             $request->setType('paymentAndCapture');
+        }
+        if (isset($post['savecard']) && $post['savecard'] != false) {
+            $request->setType('verifyCard');
         }
         //set orderlines to the request
         $request->setOrderLines($orderLines);
@@ -499,30 +535,50 @@ class Gateway implements GatewayInterface
      */
     private function sendPaymentRequest($order, $request)
     {
-        $storeScope = $this->storeConfig->getStoreScope();
-        $storeCode  = $order->getStore()->getCode();
-
+        $storeScope    = $this->storeConfig->getStoreScope();
+        $storeCode     = $order->getStore()->getCode();
+        $isReservation = false;
         try {
-            /** @var \Altapay\Response\PaymentRequestResponse $response */
-            $response                 = $request->call();
-            $requestParams['result']  = ConstantConfig::SUCCESS;
-            $requestParams['formurl'] = $response->Url;
-            // set before payment status
-            if ($this->systemConfig->getStatusConfig('before', $storeScope, $storeCode)) {
-                $this->paymentHandler->setCustomOrderStatus($order, Order::STATE_NEW, 'before');
+            /** @var PaymentRequestResponse $response */
+            $response       = $request->call();
+            $responseUrl    = $response->Url;
+            $paymentId      = $response->PaymentRequestId;
+            $max_date       = '';
+            $latestTransKey = '';
+            if (isset($response->Transactions)) {
+                foreach ($response->Transactions as $key => $value) {
+                    if ($value->CreatedDate > $max_date) {
+                        $max_date       = $value->CreatedDate;
+                        $latestTransKey = $key;
+                    }
+                }
             }
-            // set notification
-            $order->addStatusHistoryComment(__(ConstantConfig::REDIRECT_TO_ALTAPAY) . $response->PaymentRequestId);
+            
+            if (strtolower($response->Result) === "success" && $responseUrl == null) {
+                $this->handleReservation($order, $response, $request, $latestTransKey);
+                $isReservation = true;
+                if (isset($response->Transactions[$latestTransKey])) {
+                    $paymentId = $response->Transactions[$latestTransKey]->PaymentId;
+                }
+                $responseUrl = 'onepage/success';
+            }
+            $requestParams['result']  = ConstantConfig::SUCCESS;
+            $requestParams['formurl'] = $responseUrl;
+            // set before payment status
+            if (!$isReservation && $this->systemConfig->getStatusConfig('before', $storeScope, $storeCode)) {
+                $this->paymentHandler->setCustomOrderStatus($order, Order::STATE_NEW, 'before');
+                // set notification
+                $order->addStatusHistoryComment(__(ConstantConfig::REDIRECT_TO_ALTAPAY) . $paymentId);
+            }
             $extensionAttribute = $order->getExtensionAttributes();
             if ($extensionAttribute && $extensionAttribute->getAltapayPaymentFormUrl()) {
-                $extensionAttribute->setAltapayPaymentFormUrl($response->Url);
+                $extensionAttribute->setAltapayPaymentFormUrl($responseUrl);
             }
-            $order->setAltapayPaymentFormUrl($response->Url);
+            $order->setAltapayPaymentFormUrl($responseUrl);
             $order->setAltapayPriceIncludesTax($this->storeConfig->storePriceIncTax());
             $order->getResource()->save($order);
             //set flag if customer redirect to Altapay
             $this->checkoutSession->setAltapayCustomerRedirect(true);
-
             return $requestParams;
         } catch (ClientException $e) {
             $requestParams['result']  = ConstantConfig::ERROR;
@@ -537,101 +593,221 @@ class Gateway implements GatewayInterface
             $requestParams['result']  = ConstantConfig::ERROR;
             $requestParams['message'] = $e->getMessage();
         }
-
+        
         $this->restoreOrderFromOrderId($order->getIncrementId());
-
+        
         return $requestParams;
     }
+
     /**
      * @param $order
      *
      * @return float|int
      */
-    public function fixedProductTax($order){
+    private function fixedProductTax($order)
+    {
         $weeTaxAmount = 0;
         foreach ($order->getAllItems() as $item) {
-            $weeTaxAmount +=  $item->getWeeeTaxAppliedRowAmount();
+            $weeTaxAmount += $item->getWeeeTaxAppliedRowAmount();
         }
 
         return $weeTaxAmount;
     }
-
-    /**
-     * @param AbstractItem $item
-     * @return DataObject
-     */
-    public function getBuyRequestObject(AbstractItem $item)
-    {
-        /** @var DataObject $request */
-        $request = $item->getBuyRequest();
-        if (!$request && $item->getQuoteItem()) {
-            $request = $item->getQuoteItem()->getBuyRequest();
-        }
-        if (!$request) {
-            $request = new DataObject();
-        }
-
-        if (is_array($request)) {
-            $request = new DataObject($request);
-        }
-
-        return $request;
-    }
-
-    /**
-     * @param AbstractItem $item
-     * @return bool
-     */
-    public function isSubscription(AbstractItem $item)
-    {
-        $buyRequest = $this->getBuyRequestObject($item);
-
-        return $buyRequest->getData('subscribe') === 'subscribe';
-    }
-    /**
-     * @param CartInterface $quote
-     *
-     * @return bool
-     */
-    public function validateQuote($quote)
-    {
-        $isRecurring = false;
-        $items = $quote->getAllItems();
-
-        /** @var Item $item */
-        foreach ($items as $item) {
-            if ($this->isSubscription($item)) {
-                $isRecurring = true;
-                break;
-            }
-        }
-
-        return $isRecurring;
-    }
-
-
+    
     /**
      * @param $items
+     * @param $baseUrl
+     * @param $agreementType
+     * @param $agreementId
      *
      * @return array
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
-    public function agreementDetail($items, $baseUrl)
+    private function agreementDetail($items, $baseUrl, $agreementType, $agreementId = null)
     {
-        $agreementDetails  = [];
-        if($items) {
-            $agreementDetails['type'] = 'recurring';
-            $agreementDetails['adminUrl'] = $baseUrl.'amasty_recurring/customer/subscriptions/';
-            /** @var Item $item */
-            foreach ($items as $item) {
-                $buyRequest = $this->getBuyRequestObject($item);
-                if($buyRequest->getData('am_subscription_end_type') === 'amrec-end-date') {
-                    $expiryDate = date("Ymd", strtotime($buyRequest->getData('am_rec_end_date')));  
-                    $agreementDetails['expiry'] = $expiryDate;
+        $agreementDetails = [];
+        if ($items) {
+            if ($agreementId) {
+                $agreementDetails['id'] = $agreementId;
+            }
+            $agreementDetails['type'] = $agreementType;
+            if ($agreementType === "unscheduled") {
+                $agreementDetails['unscheduled_type'] = 'incremental';
+            } else {
+                $agreementDetails['adminUrl'] = $baseUrl . 'amasty_recurring/customer/subscriptions/';
+                /** @var Item $item */
+                foreach ($items as $item) {
+                    $buyRequest = $this->helper->getBuyRequestObject($item);
+                    if ($buyRequest->getData('am_subscription_end_type') === 'amrec-end-date') {
+                        $expiryDate = date("Ymd", strtotime($buyRequest->getData('am_rec_end_date')));
+                        $agreementDetails['expiry'] = $expiryDate;
+                    }
                 }
             }
         }
 
         return $agreementDetails;
+    }
+    
+    /**
+     * @param $order
+     * @param $response
+     * @param $request
+     * @param $latestTransKey
+     *
+     * @return void
+     */
+    private function handleReservation($order, $response, $request, $latestTransKey)
+    {
+        $storeScope = \Magento\Store\Model\ScopeInterface::SCOPE_STORE;
+        $storeCode  = $order->getStore()->getCode();
+        $comment    = 'Reservation callback from Altapay';
+        if (isset($response->Transactions[$latestTransKey])) {
+            $transaction = $response->Transactions[$latestTransKey];
+            $payment     = $order->getPayment();
+            $payment->setPaymentId($transaction->PaymentId);
+            $payment->setLastTransId($transaction->TransactionId);
+            $payment->setCcTransId($transaction->CreditCardToken);
+            $payment->setAdditionalInformation('payment_type', $transaction->AuthType);
+            $payment->save();
+            //save transaction data
+            $parametersData  = json_encode($request);
+            $transactionData = json_encode($response);
+            $this->transactionRepository->addTransactionData(
+                $order->getIncrementId(),
+                $transaction->TransactionId,
+                $transaction->PaymentId,
+                $transactionData,
+                $parametersData
+            );
+        }
+        $orderStatusAfterPayment = $this->systemConfig->getStatusConfig('process', $storeScope, $storeCode);
+        $orderStatusCapture      = $this->systemConfig->getStatusConfig('autocapture', $storeScope, $storeCode);
+        $setOrderStatus          = true;
+        $orderState              = Order::STATE_PROCESSING;
+        $statusKey               = 'process';
+        
+        if ($this->isCaptured($response, $storeCode, $storeScope, $latestTransKey))
+        {
+            if ($orderStatusCapture == "complete") {
+                if ($this->orderLines->sendShipment($order)) {
+                    $orderState = Order::STATE_COMPLETE;
+                    $statusKey  = 'autocapture';
+                    $order->addStatusHistoryComment(__(ConstantConfig::PAYMENT_COMPLETE));
+                } else {
+                    $setOrderStatus = false;
+                    $order->addStatusToHistory($orderStatusCapture,
+                        ConstantConfig::PAYMENT_COMPLETE, false);
+                }
+            }
+        } else {
+            if ($orderStatusAfterPayment) {
+                $orderState = $orderStatusAfterPayment;
+            }
+        }
+
+        if ($setOrderStatus) {
+            $this->paymentHandler->setCustomOrderStatus($order, $orderState, $statusKey);
+        }
+        $order->addStatusHistoryComment($comment);
+        $order->setIsNotified(false);
+        $order->getResource()->save($order);
+    
+        if (isset($response->Transactions[$latestTransKey])) {
+            $paymentType = $response->Transactions[$latestTransKey]->AuthType ?? '';
+            $requireCapture = $response->Transactions[$latestTransKey]->RequireCapture ?? '';
+        
+            if (strtolower($paymentType) === 'paymentandcapture'
+                || strtolower($paymentType) === 'subscriptionandcharge'
+            ) {
+                $this->createInvoice($order, $requireCapture);
+            }
+        }
+
+    }
+    
+    /**
+     * @param $response
+     * @param $storeCode
+     * @param $storeScope
+     * @param $latestTransKey
+     *
+     * @return bool
+     */
+    private function isCaptured(
+        $response,
+        $storeCode,
+        $storeScope,
+        $latestTransKey
+    ) {
+        $isCaptured = false;
+        foreach (SystemConfig::getTerminalCodes() as $terminalName) {
+            $terminalConfig =
+                $this->systemConfig->getTerminalConfigFromTerminalName(
+                    $terminalName,
+                    'terminalname',
+                    $storeScope,
+                    $storeCode
+                );
+            if ($terminalConfig === $response->Transactions[$latestTransKey]->Terminal) {
+                $isCaptured =
+                    $this->systemConfig->getTerminalConfigFromTerminalName(
+                        $terminalName,
+                        'capture',
+                        $storeScope,
+                        $storeCode
+                    );
+                break;
+            }
+        }
+        
+        return $isCaptured;
+    }
+    
+    /**
+     * @param Order $order
+     * @param bool  $requireCapture
+     *
+     * @return void
+     */
+    public function createInvoice(Order $order, bool $requireCapture = false)
+    {
+        if (filter_var($requireCapture, FILTER_VALIDATE_BOOLEAN) === true) {
+            $captureType = Invoice::CAPTURE_ONLINE;
+        } else {
+            $captureType = Invoice::CAPTURE_OFFLINE;
+        }
+
+        if (!$order->getInvoiceCollection()->count()) {
+            $invoice = $this->invoiceService->prepareInvoice($order);
+            $invoice->setRequestedCaptureCase($captureType);
+            $invoice->register();
+            $invoice->getOrder()->setCustomerNoteNotify(false);
+            $invoice->getOrder()->setIsInProcess(true);
+            $transaction = $this->transactionFactory->create()->addObject($invoice)
+                                ->addObject($invoice->getOrder());
+            $transaction->save();
+        }
+    }
+
+    /**
+     * @param string $tokenId
+     * @param int $transId
+     * @param int $customerId
+     *
+     * @return mixed
+     */
+    private function getToken($tokenId = null, $transId = null, $customerId)
+    {
+        $model      = $this->dataToken->create();
+        $collection = $model->getCollection()
+            ->addFieldToFilter('customer_id', $customerId);
+        
+        if ($transId == null) {
+            $collection->addFieldToFilter('id', $tokenId);
+        } else {
+            $collection->addFieldToFilter('agreement_id', $transId);
+        }
+        
+        return $collection->getFirstItem()->getData();
     }
 }

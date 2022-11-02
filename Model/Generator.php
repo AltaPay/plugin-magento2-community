@@ -28,6 +28,8 @@ use SDM\Altapay\Model\Handler\CreatePaymentHandler;
 use Magento\Checkout\Model\Cart;
 use Magento\CatalogInventory\Api\StockStateInterface;
 use Magento\CatalogInventory\Api\StockRegistryInterface;
+use SDM\Altapay\Model\TokenFactory;
+use SDM\Altapay\Helper\Data;
 
 /**
  * Class Generator
@@ -39,17 +41,17 @@ class Generator
      * @var Quote
      */
     private $quote;
-
+    
     /**
      * @var Session
      */
     private $checkoutSession;
-
+    
     /**
      * @var Http
      */
     private $request;
-
+    
     /**
      * @var Order
      */
@@ -62,27 +64,27 @@ class Generator
      * @var OrderSender
      */
     private $orderSender;
-
+    
     /**
      * @var SystemConfig
      */
     private $systemConfig;
-
+    
     /**
      * @var Logger
      */
     private $altapayLogger;
-
+    
     /**
      * @var TransactionRepositoryInterface
      */
     private $transactionRepository;
-
+    
     /**
      * @var OrderLoaderInterface
      */
     private $orderLoader;
-
+    
     /**
      * @var TransactionFactory
      */
@@ -95,21 +97,32 @@ class Generator
      * @var CreatePaymentHandler
      */
     private $paymentHandler;
-
+    
     /**
      * @var StockStateInterface
      */
     private $stockItem;
-
+    
     /**
      * @var StockRegistryInterface
      */
     private $stockRegistry;
-
+    
     /**
      * @var Cart
      */
-    private  $modelCart;
+    private $modelCart;
+    
+    /**
+     * @var TokenFactory
+     */
+    private $dataToken;
+    
+    /**
+     * @var Data
+     */
+    private $helper;
+    
     /**
      * Generator constructor.
      *
@@ -146,7 +159,9 @@ class Generator
         CreatePaymentHandler $paymentHandler,
         StockStateInterface $stockItem,
         StockRegistryInterface $stockRegistry,
-        Cart $modelCart
+        Cart $modelCart,
+        TokenFactory $dataToken,
+        Data $helper
     ) {
         $this->quote                 = $quote;
         $this->checkoutSession       = $checkoutSession;
@@ -164,6 +179,8 @@ class Generator
         $this->stockItem             = $stockItem;
         $this->stockRegistry         = $stockRegistry;
         $this->modelCart             = $modelCart;
+        $this->dataToken             = $dataToken;
+        $this->helper                = $helper;
     }
 
     /**
@@ -414,24 +431,31 @@ class Generator
      */
     private function completeCheckout($comment, RequestInterface $request)
     {
+        
         $callback       = new Callback($request->getPostValue());
         $response       = $callback->call();
         $paymentType    = $response->type;
         $requireCapture = $response->requireCapture;
         $paymentStatus  = strtolower($response->paymentStatus);
         $responseStatus = $response->status;
+        $agreementType  = "unscheduled";
         $max_date = '';
         $latestTransKey = '';
-        
         if ($paymentStatus === 'released') {
             $this->handleCancelStatusAction($request, $responseStatus);
             return;
         }
 
         if ($response) {
-            $order      = $this->orderLoader->getOrderByOrderIncrementId($response->shopOrderId);
-            $storeScope = \Magento\Store\Model\ScopeInterface::SCOPE_STORE;
-            $storeCode  = $order->getStore()->getCode();
+            $order         = $this->orderLoader->getOrderByOrderIncrementId($response->shopOrderId);
+            $quote         = $this->quote->loadByIdWithoutStore($order->getQuoteId());
+            $storeScope    = \Magento\Store\Model\ScopeInterface::SCOPE_STORE;
+            $storeCode     = $order->getStore()->getCode();
+            $ccToken       = $response->creditCardToken;
+            $maskedPan     = $response->maskedCreditCard;
+            $paymentId     = $response->paymentId;
+            $transactionId = $response->transactionId;
+
             foreach ($response->Transactions as $key=>$value) {
                 if ($value->CreatedDate > $max_date) {
                     $max_date = $value->CreatedDate;
@@ -454,13 +478,36 @@ class Generator
                     if (isset($transaction->PaymentSchemeName)) {
                         $cardType = $transaction->PaymentSchemeName;
                     }
+                    if ($this->helper->validateQuote($quote)) {
+                        $agreementType = "recurring";
+                    }
+                    if ($response->type === "verifyCard") {
+                        $model = $this->dataToken->create();
+                        $model->addData([
+                            "customer_id" => $order->getCustomerId(),
+                            "payment_id" => $paymentId,
+                            "token" => $ccToken,
+                            "agreement_id" => $transactionId,
+                            "agreement_type" => $agreementType,
+                            "masked_pan" => $maskedPan,
+                            "currency_code" => $order->getOrderCurrencyCode(),
+                            "expires" => $expires,
+                            "card_type" => $cardType
+                        ]);
+                        try {
+                            $model->save();
+                        } catch (Exception $e) {
+                            $this->altapayLogger->addCriticalLog('Exception',
+                                $e->getMessage());
+                        }
+                    }
                 }
                 $payment = $order->getPayment();
-                $payment->setPaymentId($response->paymentId);
-                $payment->setLastTransId($response->transactionId);
+                $payment->setPaymentId($paymentId);
+                $payment->setLastTransId($transactionId);
                 $payment->setCcTransId($response->creditCardToken);
-                $payment->setAdditionalInformation('cc_token', $response->creditCardToken);
-                $payment->setAdditionalInformation('masked_credit_card', $response->maskedCreditCard);
+                $payment->setAdditionalInformation('cc_token', $ccToken);
+                $payment->setAdditionalInformation('masked_credit_card', $maskedPan);
                 $payment->setAdditionalInformation('expires', $expires);
                 $payment->setAdditionalInformation('card_type', $cardType);
                 $payment->setAdditionalInformation('payment_type', $paymentType);
@@ -639,7 +686,7 @@ class Generator
      *
      * @return bool
      */
-    public function checkAvsConfig($response, $storeCode, $storeScope, $configField)
+    private function checkAvsConfig($response, $storeCode, $storeScope, $configField)
     {
         $isEnabled = false;
         foreach (SystemConfig::getTerminalCodes() as $terminalName) {
@@ -670,7 +717,7 @@ class Generator
      *
      * @return |null
      */
-    public function getAcceptedAvsResults($response, $storeCode, $storeScope)
+    private function getAcceptedAvsResults($response, $storeCode, $storeScope)
     {
         $acceptedAvsResults = null;
         foreach (SystemConfig::getTerminalCodes() as $terminalName) {
@@ -698,7 +745,7 @@ class Generator
      * @param $response
      * @param $order
      */
-    public function savePaymentData($response, $order)
+    private function savePaymentData($response, $order)
     {
         $payment = $order->getPayment();
         $payment->setPaymentId($response->paymentId);
@@ -710,39 +757,44 @@ class Generator
      * @param $order
      * return void
      */
-    public function updateStockQty($order)
+    protected function updateStockQty($order)
     {
         $cart = $this->modelCart;
         $quoteItems = $this->checkoutSession->getQuote()->getItemsCollection();
         foreach ($order->getAllItems() as $item) {
             $stockQty  = $this->stockItem->getStockQty($item->getProductId(), $item->getStore()->getWebsiteId());
-            $qty       = $stockQty - $item->getQtyOrdered();                 
-            $stockItem = $this->stockRegistry->getStockItemBySku($item['sku']);         
+            $qty       = $stockQty - $item->getQtyOrdered();
+            $stockItem = $this->stockRegistry->getStockItemBySku($item['sku']);
             $stockItem->setQty($qty);
-            $stockItem->setIsInStock((bool)$qty); 
+            $stockItem->setIsInStock((bool)$qty);
             $this->stockRegistry->updateStockItemBySku($item['sku'], $stockItem);
         }
         foreach($quoteItems as $item)
         {
-            $cart->removeItem($item->getId())->save(); 
+            $cart->removeItem($item->getId())->save();
         }
     }
 
     /**
      * @param $order
-     * 
+     *
      * @return void
      */
-    public function resetCanceledQty($order) {
+    private function resetCanceledQty($order) {
         foreach ($order->getAllItems() as $item) {
             if ($item->getQtyCanceled() > 0) {
-                    $item->setQtyCanceled($item->getQtyToCancel());
-                    $item->save();
+                $item->setQtyCanceled($item->getQtyToCancel());
+                $item->save();
             }
         }
     }
     
-    public function getLatestTransaction($response) {
+    /**
+     * @param $response
+     *
+     * @return int|string
+     */
+    private function getLatestTransaction($response) {
         $max_date = '';
         $latestTransKey = '';
         foreach ($response->Transactions as $key=>$value) {
