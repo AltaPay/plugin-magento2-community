@@ -41,6 +41,7 @@ use Altapay\Api\Payments\ReservationOfFixedAmount;
 use SDM\Altapay\Api\TransactionRepositoryInterface;
 use Magento\Sales\Model\Order\Invoice;
 use Magento\Framework\DB\TransactionFactory;
+use Magento\Sales\Model\Service\InvoiceService;
 
 /**
  * Class Gateway
@@ -132,6 +133,11 @@ class Gateway implements GatewayInterface
     private $transactionFactory;
     
     /**
+     * @var InvoiceService
+     */
+    private $invoiceService;
+    
+    /**
      * Gateway constructor.
      *
      * @param Session              $checkoutSession
@@ -151,6 +157,7 @@ class Gateway implements GatewayInterface
      * @param CreatePaymentHandler $paymentHandler
      * @param TokenFactory         $dataToken
      * @param ApplePayOrder        $applePayOrder
+     * @param InvoiceService                 $invoiceService
      */
     public function __construct(
         Session $checkoutSession,
@@ -173,29 +180,32 @@ class Gateway implements GatewayInterface
         StoreManagerInterface $storeManager,
         Random $random,
         TransactionRepositoryInterface $transactionRepository,
-        TransactionFactory $transactionFactory
-    ) {
-        $this->checkoutSession = $checkoutSession;
-        $this->urlInterface    = $urlInterface;
-        $this->request         = $request;
-        $this->order           = $order;
-        $this->systemConfig    = $systemConfig;
-        $this->orderLoader     = $orderLoader;
-        $this->quote           = $quote;
-        $this->helper          = $helper;
-        $this->storeConfig     = $storeConfig;
-        $this->altapayLogger   = $altapayLogger;
-        $this->customerHandler = $customerHandler;
-        $this->orderLines      = $orderLines;
-        $this->priceHandler    = $priceHandler;
-        $this->discountHandler = $discountHandler;
-        $this->paymentHandler  = $paymentHandler;
-        $this->dataToken       = $dataToken;
-        $this->applePayOrder   = $applePayOrder;
-        $this->storeManager    = $storeManager;
-        $this->random          = $random;
+        TransactionFactory $transactionFactory,
+        InvoiceService $invoiceService
+    )
+    {
+        $this->checkoutSession       = $checkoutSession;
+        $this->urlInterface          = $urlInterface;
+        $this->request               = $request;
+        $this->order                 = $order;
+        $this->systemConfig          = $systemConfig;
+        $this->orderLoader           = $orderLoader;
+        $this->quote                 = $quote;
+        $this->helper                = $helper;
+        $this->storeConfig           = $storeConfig;
+        $this->altapayLogger         = $altapayLogger;
+        $this->customerHandler       = $customerHandler;
+        $this->orderLines            = $orderLines;
+        $this->priceHandler          = $priceHandler;
+        $this->discountHandler       = $discountHandler;
+        $this->paymentHandler        = $paymentHandler;
+        $this->dataToken             = $dataToken;
+        $this->applePayOrder         = $applePayOrder;
+        $this->storeManager          = $storeManager;
+        $this->random                = $random;
         $this->transactionRepository = $transactionRepository;
         $this->transactionFactory    = $transactionFactory;
+        $this->invoiceService        = $invoiceService;
     }
 
     /**
@@ -502,12 +512,12 @@ class Gateway implements GatewayInterface
             }
             $request->setAgreement($this->agreementDetail($quote->getAllItems(), $baseUrl, "recurring", null));
         }
-        if (isset($post['savecard']) && $post['savecard'] != false) {
-            $request->setType('verifyCard');
-        }
         // check if auto capture enabled
         if (!$this->helper->validateQuote($quote) && $this->systemConfig->getTerminalConfig($terminalId, 'capture', $storeScope, $storeCode)) {
             $request->setType('paymentAndCapture');
+        }
+        if (isset($post['savecard']) && $post['savecard'] != false) {
+            $request->setType('verifyCard');
         }
         //set orderlines to the request
         $request->setOrderLines($orderLines);
@@ -648,9 +658,9 @@ class Gateway implements GatewayInterface
      */
     private function handleReservation($order, $response, $request, $latestTransKey)
     {
-        $storeScope     = \Magento\Store\Model\ScopeInterface::SCOPE_STORE;
-        $storeCode      = $order->getStore()->getCode();
-        $comment = 'Reservation callback from Altapay';
+        $storeScope = \Magento\Store\Model\ScopeInterface::SCOPE_STORE;
+        $storeCode  = $order->getStore()->getCode();
+        $comment    = 'Reservation callback from Altapay';
         if (isset($response->Transactions[$latestTransKey])) {
             $transaction = $response->Transactions[$latestTransKey];
             $payment     = $order->getPayment();
@@ -660,7 +670,7 @@ class Gateway implements GatewayInterface
             $payment->setAdditionalInformation('payment_type', $transaction->AuthType);
             $payment->save();
             //save transaction data
-            $parametersData = json_encode($request);
+            $parametersData  = json_encode($request);
             $transactionData = json_encode($response);
             $this->transactionRepository->addTransactionData(
                 $order->getIncrementId(),
@@ -701,10 +711,11 @@ class Gateway implements GatewayInterface
         $order->addStatusHistoryComment($comment);
         $order->setIsNotified(false);
         $order->getResource()->save($order);
+    
+        if (isset($response->Transactions[$latestTransKey])) {
+            $paymentType = $response->Transactions[$latestTransKey]->AuthType ?? '';
+            $requireCapture = $response->Transactions[$latestTransKey]->RequireCapture ?? '';
         
-        if(isset($response->Transactions[$latestTransKey])) {
-            $paymentType = isset($response->Transactions[$latestTransKey]->AuthType);
-            $requireCapture = isset($response->Transactions[$latestTransKey]->RequireCapture);
             if (strtolower($paymentType) === 'paymentandcapture'
                 || strtolower($paymentType) === 'subscriptionandcharge'
             ) {
@@ -765,14 +776,14 @@ class Gateway implements GatewayInterface
         } else {
             $captureType = Invoice::CAPTURE_OFFLINE;
         }
-        
+
         if (!$order->getInvoiceCollection()->count()) {
             $invoice = $this->invoiceService->prepareInvoice($order);
             $invoice->setRequestedCaptureCase($captureType);
             $invoice->register();
             $invoice->getOrder()->setCustomerNoteNotify(false);
             $invoice->getOrder()->setIsInProcess(true);
-            $transaction = $this->transaionFactory->create()->addObject($invoice)
+            $transaction = $this->transactionFactory->create()->addObject($invoice)
                                 ->addObject($invoice->getOrder());
             $transaction->save();
         }
