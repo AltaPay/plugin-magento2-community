@@ -272,7 +272,7 @@ class CaptureObserver implements ObserverInterface
         $grandTotal = (float)$invoice->getGrandTotal();
         $payment    = $invoice->getOrder()->getPayment();
         $reconciliationIdentifier  = $payment->getAdditionalInformation('altapay_reconciliation');
-        if ($paymentType === 'subscription') {
+        if ($paymentType === 'subscription' || $paymentType === 'subscriptionAndCharge') {
             $api = new ChargeSubscription($this->systemConfig->getAuth($storeCode));
             $api->setTransaction($payment->getLastTransId());
             $api->setAmount(round($grandTotal, 2));
