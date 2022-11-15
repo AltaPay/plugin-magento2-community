@@ -715,10 +715,9 @@ class Gateway implements GatewayInterface
         if (isset($response->Transactions[$latestTransKey])) {
             $paymentType = $response->Transactions[$latestTransKey]->AuthType ?? '';
             $requireCapture = $response->Transactions[$latestTransKey]->RequireCapture ?? '';
-        
-            if (strtolower($paymentType) === 'paymentandcapture'
-                || strtolower($paymentType) === 'subscriptionandcharge'
-            ) {
+            $transStatus = $response->Transactions[$latestTransKey]->TransactionStatus ?? '';
+
+            if ($paymentType === 'subscription_payment' && $transStatus === 'captured') {
                 $this->createInvoice($order, $requireCapture);
             }
         }

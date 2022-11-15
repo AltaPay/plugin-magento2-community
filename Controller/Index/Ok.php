@@ -63,11 +63,6 @@ class Ok extends Index implements CsrfAwareActionInterface
     
         if ($this->checkPost() && $checkAvs == false) {
             $isSuccessful = $this->generator->handleOkAction($this->getRequest());
-            if (isset($isSuccessful) && !$isSuccessful) {
-                $this->redirectToCheckoutPage();
-            } else {
-                return $this->setSuccessPath($orderId);
-            }
             if (strtolower($post['type']) === "verifycard") {
                 $response = $this->gateway->createRequest(
                     $terminalCode[strlen($terminalCode) - 1],
@@ -80,6 +75,11 @@ class Ok extends Index implements CsrfAwareActionInterface
                 }
             }
         
+            if (isset($isSuccessful) && !$isSuccessful) {
+                $this->redirectToCheckoutPage();
+            } else {
+                return $this->setSuccessPath($orderId);
+            }
         } else {
             $this->redirectToCheckoutPage();
         }
