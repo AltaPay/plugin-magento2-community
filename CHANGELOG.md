@@ -1,6 +1,11 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [3.5.0]
+### Added
+- Add support of AutoCapture functionality with the subscription 
+- Add support to allow upto 10 payment methods
+
 ## [3.4.9]
 ### Added
 - Add support for saving credit card for later use without CVV/CVC
