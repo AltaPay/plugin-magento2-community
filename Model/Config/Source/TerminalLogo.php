@@ -36,6 +36,7 @@ class TerminalLogo
         $terminalLogos = [
             ''                  => '-- Select --',
             'amex'              => 'Amex',
+            'apple_pay'         => 'Apple Pay',
             'creditcard'        => 'Credit Card',
             'creditcard_wallet' => 'Credit Card Wallet',
             'dankort'           => 'Dankort',
@@ -51,6 +52,7 @@ class TerminalLogo
             'mastercard'        => 'Mastercard',
             'mobilepay'         => 'Mobilepay',
             'seb'               => 'SEB',
+            'swish'             => 'Swish',
             'viabill'           => 'Viabill',
             'visa'              => 'Visa',
             'visa_electron'     => 'Visa Electron'
