@@ -3,9 +3,9 @@ All notable changes to this project will be documented in this file.
 
 ## [3.5.0]
 ### Added
-- Add support of AutoCapture functionality with the subscription 
-- Add support to allow upto 10 payment methods
-- Add logo for Apple Pay and Switch payment methods
+- Add support for auto-capture functionality with the subscriptions
+- Add support to allow up to 10 payment methods
+- Add logos for Apple Pay, Swish and Vipps payment methods
 
 ## [3.4.9]
 ### Added
