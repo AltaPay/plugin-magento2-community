@@ -54,6 +54,7 @@ class TerminalLogo
             'seb'               => 'SEB',
             'swish'             => 'Swish',
             'viabill'           => 'Viabill',
+            'vipps'             => 'Vipps',
             'visa'              => 'Visa',
             'visa_electron'     => 'Visa Electron'
         ];
