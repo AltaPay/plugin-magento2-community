@@ -38,7 +38,7 @@
     <div class="payment-method-content">
         <!-- ko if: enableSaveCard() == 1 -->
         <div class="savecard-checkbox">
-            <input type="checkbox" name="savecard"><span>Save this card for future transactions</span></input>
+            <label for="savecard"><input type="checkbox" name="savecard" id="savecard" />Save this card for future transactions</label><br />
         </div>
         <!--/ko-->
         <!-- ko if: savedTokenList() -->
