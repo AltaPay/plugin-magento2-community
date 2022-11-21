@@ -401,9 +401,6 @@ describe('Payments', function () {
                     cy.get('.admin__order-shipment-methods-options-list > li:first').click().wait(3000)
                     cy.contains('EmbraceIT Klarna Integration Test Terminal').click().wait(3000)   
                     cy.get('#submit_order_top_button').click().wait(2000)
-                    cy.get('#menu-magento-sales-sales > ._active').click()
-                    cy.get('.item-sales-order > a').click().wait(2000)
-                    cy.get('#container > div > div.admin__data-grid-wrap > table > tbody > tr:nth-child(1) > td.data-grid-actions-cell > a').click().wait(2000)
                     cy.get('.payment_link > code').then(($a) => {
                         const payment_link = $a.text();
                         cy.origin('https://pensio.com', { args: { payment_link } }, ({ payment_link }) => {                            
