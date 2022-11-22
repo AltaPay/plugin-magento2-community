@@ -431,42 +431,72 @@ class Generator
      */
     private function completeCheckout($comment, RequestInterface $request)
     {
-        
-        $callback       = new Callback($request->getPostValue());
-        $response       = $callback->call();
-        $paymentType    = $response->type;
-        $requireCapture = $response->requireCapture;
-        $paymentStatus  = strtolower($response->paymentStatus);
-        $responseStatus = $response->status;
-        $agreementType  = "unscheduled";
-        $max_date = '';
+        $max_date       = '';
         $latestTransKey = '';
-        if ($paymentStatus === 'released') {
-            $this->handleCancelStatusAction($request, $responseStatus);
-            return;
-        }
-
-        if ($response) {
-            $order         = $this->orderLoader->getOrderByOrderIncrementId($response->shopOrderId);
-            $quote         = $this->quote->loadByIdWithoutStore($order->getQuoteId());
-            $storeScope    = \Magento\Store\Model\ScopeInterface::SCOPE_STORE;
-            $storeCode     = $order->getStore()->getCode();
-            $ccToken       = $response->creditCardToken;
-            $maskedPan     = $response->maskedCreditCard;
-            $paymentId     = $response->paymentId;
-            $transactionId = $response->transactionId;
-
-            foreach ($response->Transactions as $key=>$value) {
-                if ($value->CreatedDate > $max_date) {
-                    $max_date = $value->CreatedDate;
+        $cardType       = '';
+        $expires        = '';
+        $setOrderStatus = true;
+        $agreementType  = "unscheduled";
+        $storeScope     = \Magento\Store\Model\ScopeInterface::SCOPE_STORE;
+        $callback       = new Callback($request->getPostValue());
+    
+        try {
+            $response                = $callback->call();
+            $paymentType             = $response->type;
+            $paymentStatus           = strtolower($response->paymentStatus);
+            $ccToken                 = $response->creditCardToken;
+            $maskedPan               = $response->maskedCreditCard;
+            $paymentId               = $response->paymentId;
+            $transactionId           = $response->transactionId;
+            $parametersData          = json_encode($request->getPostValue());
+            $transactionData         = json_encode($response);
+            $orderState              = Order::STATE_PROCESSING;
+            $statusKey               = 'process';
+            $status                  = $response->status;
+            $order                   = $this->orderLoader->getOrderByOrderIncrementId($response->shopOrderId);
+            $quote                   = $this->quote->loadByIdWithoutStore($order->getQuoteId());
+            $storeCode               = $order->getStore()->getCode();
+            $orderStatusAfterPayment = $this->systemConfig->getStatusConfig('process', $storeScope, $storeCode);
+            $orderStatusCapture      = $this->systemConfig->getStatusConfig('autocapture', $storeScope, $storeCode);
+            $responseComment         = __(ConstantConfig::CONSUMER_CANCEL_PAYMENT);
+            $historyComment          = __(ConstantConfig::CANCELLED) . '|' . $responseComment;
+            
+            foreach ($response->Transactions as $key => $transaction) {
+                if ($transaction->CreatedDate > $max_date) {
+                    $max_date       = $transaction->CreatedDate;
                     $latestTransKey = $key;
                 }
             }
+            
+            if ($paymentStatus === 'released') {
+                $this->handleCancelStatusAction($request, $response->status);
+                return false;
+            }
+    
+            if ($paymentType === 'subscriptionAndCharge' && $status === 'succeeded') {
+                $transaction = $response->Transactions[$latestTransKey];
+                $authType    = $transaction->AuthType;
+                $transStatus = $transaction->TransactionStatus;
+                
+                if (isset($transaction) && $authType === 'subscription_payment' && $transStatus !== 'captured') {
+                    //check if order status set in configuration
+                    $statusKey         = Order::STATE_CANCELED;
+                    $orderStatusCancel = $this->systemConfig->getStatusConfig('cancel', $storeScope, $storeCode);
+    
+                    if ($orderStatusCancel) {
+                        $statusKey = $orderStatusCancel;
+                    }
+                    $this->handleOrderStateAction($request,  Order::STATE_CANCELED, $statusKey, $historyComment);
+                    //save failed transaction data
+                    $this->saveTransactionData($request, $response, $order);
+    
+                    return false;
+                }
+            }
+
             if ($order->getId()) {
-                $cardType = '';
-                $expires  = '';
                 //Update stock quantity
-                if($order->getState() == 'canceled') {
+                if ($order->getState() == 'canceled') {
                     $this->updateStockQty($order);
                 }
                 $this->resetCanceledQty($order);
@@ -497,8 +527,7 @@ class Generator
                         try {
                             $model->save();
                         } catch (Exception $e) {
-                            $this->altapayLogger->addCriticalLog('Exception',
-                                $e->getMessage());
+                            $this->altapayLogger->addCriticalLog('Exception', $e->getMessage());
                         }
                     }
                 }
@@ -515,10 +544,8 @@ class Generator
                 //send order confirmation email
                 $this->sendOrderConfirmationEmail($comment, $order);
                 //unset redirect if success
-                $this->checkoutSession->unsAltapayCustomerRedirect();
+                $this->checkoutSession->unsAltapayCustomerRedirect(); 
                 //save transaction data
-                $parametersData  = json_encode($request->getPostValue());
-                $transactionData = json_encode($response);
                 $this->transactionRepository->addTransactionData(
                     $order->getIncrementId(),
                     $response->transactionId,
@@ -526,27 +553,19 @@ class Generator
                     $transactionData,
                     $parametersData
                 );
-                $orderStatusAfterPayment = $this->systemConfig->getStatusConfig('process', $storeScope, $storeCode);
-                $orderStatusCapture      = $this->systemConfig->getStatusConfig('autocapture', $storeScope, $storeCode);
-                $setOrderStatus          = true;
-                $orderState              = Order::STATE_PROCESSING;
-                $statusKey               = 'process';
 
-                if ($this->isCaptured($response, $storeCode, $storeScope, $latestTransKey)) {
-                    if ($orderStatusCapture == "complete") {
-                        if ($this->orderLines->sendShipment($order)) {
-                            $orderState = Order::STATE_COMPLETE;
-                            $statusKey  = 'autocapture';
-                            $order->addStatusHistoryComment(__(ConstantConfig::PAYMENT_COMPLETE));
-                        } else {
-                            $setOrderStatus = false;
-                            $order->addStatusToHistory($orderStatusCapture, ConstantConfig::PAYMENT_COMPLETE, false);
-                        }
+                if ($this->isCaptured($response, $storeCode, $storeScope, $latestTransKey) && $orderStatusCapture == "complete")
+                {
+                    if ($this->orderLines->sendShipment($order)) {
+                        $orderState = Order::STATE_COMPLETE;
+                        $statusKey  = 'autocapture';
+                        $order->addStatusHistoryComment(__(ConstantConfig::PAYMENT_COMPLETE));
+                    } else {
+                        $setOrderStatus = false;
+                        $order->addStatusToHistory($orderStatusCapture, ConstantConfig::PAYMENT_COMPLETE, false);
                     }
-                } else {
-                    if ($orderStatusAfterPayment) {
-                        $orderState = $orderStatusAfterPayment;
-                    }
+                } elseif ($orderStatusAfterPayment) {
+                    $orderState = $orderStatusAfterPayment;
                 }
                 if ($setOrderStatus) {
                     $this->paymentHandler->setCustomOrderStatus($order, $orderState, $statusKey);
@@ -557,9 +576,11 @@ class Generator
                 $order->getResource()->save($order);
 
                 if (strtolower($paymentType) === 'paymentandcapture' || strtolower($paymentType) === 'subscriptionandcharge') {
-                    $this->createInvoice($order, $requireCapture);
+                    $this->createInvoice($order, $response->requireCapture);
                 }
             }
+        } catch (\Exception $e) {
+            $this->altapayLogger->addCriticalLog('Exception', $e->getMessage());
         }
     }
 
