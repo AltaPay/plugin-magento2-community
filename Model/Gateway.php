@@ -547,7 +547,7 @@ class Gateway implements GatewayInterface
             $latestTransKey = '';
             if (isset($response->Transactions)) {
                 foreach ($response->Transactions as $key => $value) {
-                    if ($value->CreatedDate > $max_date) {
+                    if ($value->AuthType === "subscription_payment" && $value->CreatedDate > $max_date) {
                         $max_date       = $value->CreatedDate;
                         $latestTransKey = $key;
                     }
@@ -715,10 +715,9 @@ class Gateway implements GatewayInterface
         if (isset($response->Transactions[$latestTransKey])) {
             $paymentType = $response->Transactions[$latestTransKey]->AuthType ?? '';
             $requireCapture = $response->Transactions[$latestTransKey]->RequireCapture ?? '';
-        
-            if (strtolower($paymentType) === 'paymentandcapture'
-                || strtolower($paymentType) === 'subscriptionandcharge'
-            ) {
+            $transStatus = $response->Transactions[$latestTransKey]->TransactionStatus ?? '';
+
+            if ($paymentType === 'subscription_payment' && $transStatus === 'captured') {
                 $this->createInvoice($order, $requireCapture);
             }
         }

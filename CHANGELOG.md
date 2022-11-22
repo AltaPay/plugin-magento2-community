@@ -1,6 +1,12 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [3.5.0]
+### Added
+- Add support for auto-capture functionality with the subscriptions
+- Add support to allow up to 10 payment methods
+- Add logos for Apple Pay, Swish and Vipps payment methods
+
 ## [3.4.9]
 ### Added
 - Add support for saving credit card for later use without CVV/CVC
