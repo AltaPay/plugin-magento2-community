@@ -158,7 +158,6 @@ abstract class Index extends Action
 
     /**
      * @param $transactions
-     * @param $authType
      * @return int|string
      */
     protected function getLatestTransaction($transactions) {
