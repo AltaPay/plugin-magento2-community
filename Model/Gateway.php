@@ -136,28 +136,32 @@ class Gateway implements GatewayInterface
      * @var InvoiceService
      */
     private $invoiceService;
-    
+
     /**
      * Gateway constructor.
      *
-     * @param Session              $checkoutSession
-     * @param UrlInterface         $urlInterface
-     * @param Http                 $request
-     * @param Order                $order
-     * @param SystemConfig         $systemConfig
+     * @param Session $checkoutSession
+     * @param UrlInterface $urlInterface
+     * @param Http $request
+     * @param Order $order
+     * @param SystemConfig $systemConfig
      * @param OrderLoaderInterface $orderLoader
-     * @param Quote                $quote
-     * @param Data                 $helper
-     * @param storeConfig          $storeConfig
-     * @param Logger               $altapayLogger
-     * @param CustomerHandler      $customerHandler
-     * @param OrderLinesHandler    $orderLines
-     * @param PriceHandler         $priceHandler
-     * @param DiscountHandler      $discountHandler
+     * @param Quote $quote
+     * @param Data $helper
+     * @param storeConfig $storeConfig
+     * @param Logger $altapayLogger
+     * @param CustomerHandler $customerHandler
+     * @param OrderLinesHandler $orderLines
+     * @param PriceHandler $priceHandler
+     * @param DiscountHandler $discountHandler
      * @param CreatePaymentHandler $paymentHandler
-     * @param TokenFactory         $dataToken
-     * @param ApplePayOrder        $applePayOrder
-     * @param InvoiceService                 $invoiceService
+     * @param TokenFactory $dataToken
+     * @param ApplePayOrder $applePayOrder
+     * @param StoreManagerInterface $storeManager
+     * @param Random $random
+     * @param TransactionRepositoryInterface $transactionRepository
+     * @param TransactionFactory $transactionFactory
+     * @param InvoiceService $invoiceService
      */
     public function __construct(
         Session $checkoutSession,
@@ -224,9 +228,6 @@ class Gateway implements GatewayInterface
             $couponCodeAmount = $order->getDiscountAmount();
             $discountAllItems = $this->discountHandler->allItemsHaveDiscount($order->getAllItems());
             $orderLines = $this->itemOrderLines($couponCodeAmount, $order, $discountAllItems);
-            $payment = $order->getPayment();
-            $payment->setAdditionalInformation('altapay_reconciliation', $this->random->getUniqueHash());
-            $payment->save();
             if ($this->orderLines->sendShipment($order) && !empty($order->getShippingMethod(true))) {
                 $orderLines[] = $this->orderLines->handleShipping($order, $discountAllItems, true);
                 //Shipping Discount Tax Compensation Amount
@@ -453,7 +454,6 @@ class Gateway implements GatewayInterface
         //Transaction Info
         $transactionDetail = $this->helper->transactionDetail($orderId);
         $payment = $order->getPayment();
-        $reconciliationIdentifier = $payment->getAdditionalInformation('altapay_reconciliation');
         $post = $this->request->getPostValue();
         $request = new PaymentRequest($auth);
         if ($isApplePay) {
@@ -490,7 +490,7 @@ class Gateway implements GatewayInterface
             ->setCustomerInfo($this->customerHandler->setCustomer($order, $isReservation))
             ->setTransactionInfo($transactionDetail)
             ->setCookie($this->request->getServer('HTTP_COOKIE'))
-            ->setSaleReconciliationIdentifier($reconciliationIdentifier);
+            ->setSaleReconciliationIdentifier($this->random->getUniqueHash());
         
         if(!$isReservation) {
             $request->setConfig($this->setConfig())->setSalesTax((float)number_format($order->getTaxAmount(), 2, '.', ''));

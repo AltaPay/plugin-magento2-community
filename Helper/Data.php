@@ -17,6 +17,7 @@ use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Sales\Model\ResourceModel\Order\Tax\Item;
 use Magento\Quote\Model\Quote\Item\AbstractItem;
 use Magento\Framework\DataObject;
+use SDM\Altapay\Model\ReconciliationIdentifierFactory;
 
 /**
  * Class Data for helper functions
@@ -44,28 +45,35 @@ class Data extends AbstractHelper
      * @var taxItem
      */
     protected $taxItem;
+    /**
+     * @var ReconciliationIdentifierFactory
+     */
+    private $reconciliation;
 
     /**
      * Data constructor.
      *
-     * @param ModuleListInterface      $moduleList
+     * @param ModuleListInterface $moduleList
      * @param ProductMetadataInterface $productMetadata
-     * @param ScopeConfigInterface     $scopeConfig
-     * @param Order                    $order
-     * @param Item                     $taxItem
+     * @param ScopeConfigInterface $scopeConfig
+     * @param Order $order
+     * @param Item $taxItem
+     * @param ReconciliationIdentifierFactory $reconciliation
      */
     public function __construct(
         ModuleListInterface $moduleList,
         ProductMetadataInterface $productMetadata,
         ScopeConfigInterface $scopeConfig,
         Order $order,
-        Item $taxItem
+        Item $taxItem,
+        ReconciliationIdentifierFactory $reconciliation
     ) {
-        $this->moduleList      = $moduleList;
-        $this->productMetadata = $productMetadata;
-        $this->scopeConfig     = $scopeConfig;
-        $this->order           = $order;
-        $this->taxItem         = $taxItem;
+        $this->moduleList       = $moduleList;
+        $this->productMetadata  = $productMetadata;
+        $this->scopeConfig      = $scopeConfig;
+        $this->order            = $order;
+        $this->taxItem          = $taxItem;
+        $this->reconciliation   = $reconciliation;
     }
 
     //Method for adding transaction info
@@ -213,5 +221,13 @@ class Data extends AbstractHelper
         }
 
         return $isRecurring;
+    }
+
+    /**
+     * @param string $orderId
+     * @return mixed
+     */
+    public function getReconciliationData($orderId){
+         return $this->reconciliation->create()->getCollection()->addFieldToFilter('order_id', $orderId);
     }
 }

@@ -25,6 +25,8 @@ use SDM\Altapay\Model\Handler\OrderLinesHandler;
 use SDM\Altapay\Model\Handler\PriceHandler;
 use SDM\Altapay\Model\Handler\DiscountHandler;
 use Altapay\Api\Subscription\ChargeSubscription;
+use Magento\Framework\Math\Random;
+use SDM\Altapay\Model\ReconciliationIdentifierFactory;
 /**
  * Class CaptureObserver
  * Handle the invoice capture functionality.
@@ -64,18 +66,28 @@ class CaptureObserver implements ObserverInterface
      * @var DiscountHandler
      */
     private $discountHandler;
+    /**
+     * @var ReconciliationIdentifierFactory
+     */
+    private $reconciliation;
+    /**
+     * @var Random
+     */
+    private $random;
 
     /**
      * CaptureObserver constructor.
      *
-     * @param SystemConfig      $systemConfig
-     * @param Logger            $altapayLogger
-     * @param Order             $order
-     * @param Data              $helper
-     * @param storeConfig       $storeConfig
+     * @param SystemConfig $systemConfig
+     * @param Logger $altapayLogger
+     * @param Order $order
+     * @param Data $helper
+     * @param storeConfig $storeConfig
      * @param OrderLinesHandler $orderLines
-     * @param PriceHandler      $priceHandler
-     * @param DiscountHandler   $discountHandler
+     * @param PriceHandler $priceHandler
+     * @param DiscountHandler $discountHandler
+     * @param ReconciliationIdentifierFactory $reconciliation
+     * @param Random $random
      */
     public function __construct(
         SystemConfig $systemConfig,
@@ -85,16 +97,20 @@ class CaptureObserver implements ObserverInterface
         storeConfig $storeConfig,
         OrderLinesHandler $orderLines,
         PriceHandler $priceHandler,
-        DiscountHandler $discountHandler
+        DiscountHandler $discountHandler,
+        ReconciliationIdentifierFactory $reconciliation,
+        Random $random
     ) {
-        $this->systemConfig    = $systemConfig;
-        $this->altapayLogger   = $altapayLogger;
-        $this->order           = $order;
-        $this->helper          = $helper;
-        $this->storeConfig     = $storeConfig;
-        $this->orderLines      = $orderLines;
-        $this->priceHandler    = $priceHandler;
-        $this->discountHandler = $discountHandler;
+        $this->systemConfig     = $systemConfig;
+        $this->altapayLogger    = $altapayLogger;
+        $this->order            = $order;
+        $this->helper           = $helper;
+        $this->storeConfig      = $storeConfig;
+        $this->orderLines       = $orderLines;
+        $this->priceHandler     = $priceHandler;
+        $this->discountHandler  = $discountHandler;
+        $this->reconciliation   = $reconciliation;
+        $this->random           = $random;
     }
 
     /**
@@ -271,27 +287,23 @@ class CaptureObserver implements ObserverInterface
     {
         $grandTotal = (float)$invoice->getGrandTotal();
         $payment    = $invoice->getOrder()->getPayment();
-        $reconciliationIdentifier  = $payment->getAdditionalInformation('altapay_reconciliation');
+        $reconciliationIdentifier  = $this->random->getUniqueHash();
         if ($paymentType === 'subscription' || $paymentType === 'subscriptionAndCharge') {
             $api = new ChargeSubscription($this->systemConfig->getAuth($storeCode));
-            $api->setTransaction($payment->getLastTransId());
-            $api->setAmount(round($grandTotal, 2));
         } else {
             $api = new CaptureReservation($this->systemConfig->getAuth($storeCode));
             if ($invoice->getTransactionId()) {
                 $api->setInvoiceNumber($invoice->getTransactionId());
             }
-            $api->setAmount(round($grandTotal, 2));
             $api->setOrderLines($orderLines);
             $shippingTrackingInfo = $this->shippingTrackingInfo($invoice);
             // Send shipping tracking info
             $api->setTrackingInfo($shippingTrackingInfo);
-            $api->setTransaction($payment->getLastTransId());
         }
 
-        if(!empty($reconciliationIdentifier)){
-            $api->setReconciliationIdentifier($reconciliationIdentifier);
-        }
+        $api->setTransaction($payment->getLastTransId());
+        $api->setAmount(round($grandTotal, 2));
+        $api->setReconciliationIdentifier($reconciliationIdentifier);
 
         /** @var CaptureReservationResponse $response */
         try {
@@ -303,6 +315,14 @@ class CaptureObserver implements ObserverInterface
         } catch (\Exception $e) {
             $this->altapayLogger->addCriticalLog('Exception', $e->getMessage());
         }
+
+        $model = $this->reconciliation->create();
+        $model->addData([
+            "order_id"      => $invoice->getOrder()->getIncrementId(),
+            "identifier"    => $reconciliationIdentifier,
+            "type"          => 'captured'
+        ]);
+        $model->save();
 
         $rawResponse = $api->getRawResponse();
         if (!empty($rawResponse)) {

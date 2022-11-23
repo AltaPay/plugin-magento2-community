@@ -21,6 +21,7 @@ use SDM\Altapay\Model\Gateway;
 use Magento\Framework\Controller\Result\RedirectFactory;
 use Magento\Framework\Encryption\EncryptorInterface;
 use Magento\Framework\Math\Random;
+use SDM\Altapay\Model\ReconciliationIdentifierFactory;
 /**
  * Class Index
  */
@@ -63,16 +64,25 @@ abstract class Index extends Action
     protected $pageFactory;
 
     /**
+     * @var ReconciliationIdentifierFactory
+     */
+    protected $reconciliation;
+
+    /**
      * Index constructor.
      *
-     * @param Context     $context
+     * @param Context $context
      * @param PageFactory $pageFactory
-     * @param Order       $order
-     * @param Quote       $quote
-     * @param Session     $checkoutSession
-     * @param Generator   $generator
-     * @param Gateway     $gateway
-     * @param Logger      $altapayLogger
+     * @param Order $order
+     * @param Quote $quote
+     * @param Session $checkoutSession
+     * @param Generator $generator
+     * @param Gateway $gateway
+     * @param Logger $altapayLogger
+     * @param EncryptorInterface $encryptor
+     * @param Random $random
+     * @param RedirectFactory $redirectFactory
+     * @param ReconciliationIdentifierFactory $reconciliation
      */
     public function __construct(
         Context $context,
@@ -85,20 +95,22 @@ abstract class Index extends Action
         Logger $altapayLogger,
         EncryptorInterface $encryptor,
         Random $random,
-        RedirectFactory $redirectFactory
+        RedirectFactory $redirectFactory,
+        ReconciliationIdentifierFactory $reconciliation
         
     ) {
         parent::__construct($context);
-        $this->order           = $order;
-        $this->quote           = $quote;
-        $this->checkoutSession = $checkoutSession;
-        $this->generator       = $generator;
-        $this->gateway         = $gateway;
-        $this->altapayLogger   = $altapayLogger;
-        $this->pageFactory     = $pageFactory;
-        $this->encryptor       = $encryptor;
-        $this->random          = $random;
-        $this->redirectFactory = $redirectFactory;
+        $this->order            = $order;
+        $this->quote            = $quote;
+        $this->checkoutSession  = $checkoutSession;
+        $this->generator        = $generator;
+        $this->gateway          = $gateway;
+        $this->altapayLogger    = $altapayLogger;
+        $this->pageFactory      = $pageFactory;
+        $this->encryptor        = $encryptor;
+        $this->random           = $random;
+        $this->redirectFactory  = $redirectFactory;
+        $this->reconciliation   = $reconciliation;
     }
 
     /**

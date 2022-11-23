@@ -61,6 +61,19 @@ class Ok extends Index implements CsrfAwareActionInterface
             );
         }
     
+        $xml = simplexml_load_string($post['xml']);
+        $reconciliationData = $xml->Body->Transactions->Transaction->ReconciliationIdentifiers->ReconciliationIdentifier;
+        
+        if($reconciliationData){
+             $model = $this->reconciliation->create();
+             $model->addData([
+                 "order_id"      => $orderId,
+                 "identifier"    => $reconciliationData->Id,
+                 "type"          => $reconciliationData->Type
+             ]);
+             $model->save();
+         }
+
         if ($this->checkPost() && $checkAvs == false) {
             $isSuccessful = $this->generator->handleOkAction($this->getRequest());
             if (strtolower($post['type']) === "verifycard") {
