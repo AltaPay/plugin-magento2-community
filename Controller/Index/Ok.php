@@ -62,14 +62,19 @@ class Ok extends Index implements CsrfAwareActionInterface
         }
     
         $xml = simplexml_load_string($post['xml']);
-        $reconciliationData = $xml->Body->Transactions->Transaction->ReconciliationIdentifiers->ReconciliationIdentifier;
+
+        $transactions = json_decode( json_encode( $xml->Body->Transactions ), true );
+
+        $latestTransactionKey = $this->getLatestTransaction($transactions['Transaction']);
+  
+        $reconciliationData = $transactions['Transaction'][$latestTransactionKey]['ReconciliationIdentifiers']['ReconciliationIdentifier'];
         
         if($reconciliationData){
              $model = $this->reconciliation->create();
              $model->addData([
                  "order_id"      => $orderId,
-                 "identifier"    => $reconciliationData->Id,
-                 "type"          => $reconciliationData->Type
+                 "identifier"    => $reconciliationData['Id'],
+                 "type"          => $reconciliationData['Type']
              ]);
              $model->save();
          }

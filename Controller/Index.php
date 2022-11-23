@@ -155,4 +155,21 @@ abstract class Index extends Action
 
         return $resultRedirect;
     }
+
+    /**
+     * @param $transactions
+     * @param $authType
+     * @return int|string
+     */
+    protected function getLatestTransaction($transactions) {
+        $max_date = '';
+        $latestTransKey = '';
+        foreach ($transactions as $key=>$transaction) {
+            if ($transaction['CreatedDate'] > $max_date) {
+                $max_date = $transaction['CreatedDate'];
+                $latestTransKey = $key;
+            }
+        }
+        return $latestTransKey;
+    }
 }
