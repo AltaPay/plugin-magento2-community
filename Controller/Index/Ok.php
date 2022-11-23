@@ -65,7 +65,7 @@ class Ok extends Index implements CsrfAwareActionInterface
 
         $transactions = json_decode( json_encode( $xml->Body->Transactions ), true );
 
-        if (strtolower($post['type']) === "subscription" || strtolower($post['type']) === "subscriptionandcharge") {
+        if (strtolower($post['type']) === "subscriptionandcharge") {
             $latestTransactionKey = $this->getLatestTransaction($transactions['Transaction']);
             $reconciliationData = $transactions['Transaction'][$latestTransactionKey]['ReconciliationIdentifiers'];
         }else{
