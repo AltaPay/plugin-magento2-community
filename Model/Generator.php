@@ -128,49 +128,49 @@ class Generator
      * @var ReconciliationIdentifierFactory
      */
     protected $reconciliation;
-
+    
     /**
      * Generator constructor.
      *
-     * @param Quote $quote
-     * @param Session $checkoutSession
-     * @param Http $request
-     * @param Order $order
-     * @param OrderSender $orderSender
-     * @param SystemConfig $systemConfig
-     * @param Logger $altapayLogger
-     * @param TransactionRepositoryInterface $transactionRepository
-     * @param OrderLoaderInterface $orderLoader
-     * @param TransactionFactory $transactionFactory
-     * @param InvoiceService $invoiceService
-     * @param OrderLinesHandler $orderLines
-     * @param CreatePaymentHandler $paymentHandler
-     * @param StockStateInterface $stockItem
-     * @param StockRegistryInterface $stockRegistry
-     * @param Cart $modelCart
-     * @param TokenFactory $dataToken
-     * @param Data $helper
+     * @param Quote                           $quote
+     * @param Session                         $checkoutSession
+     * @param Http                            $request
+     * @param Order                           $order
+     * @param OrderSender                     $orderSender
+     * @param SystemConfig                    $systemConfig
+     * @param Logger                          $altapayLogger
+     * @param TransactionRepositoryInterface  $transactionRepository
+     * @param OrderLoaderInterface            $orderLoader
+     * @param TransactionFactory              $transactionFactory
+     * @param InvoiceService                  $invoiceService
+     * @param OrderLinesHandler               $orderLines
+     * @param CreatePaymentHandler            $paymentHandler
+     * @param StockStateInterface             $stockItem
+     * @param StockRegistryInterface          $stockRegistry
+     * @param Cart                            $modelCart
+     * @param TokenFactory                    $dataToken
+     * @param Data                            $helper
      * @param ReconciliationIdentifierFactory $reconciliation
      */
     public function __construct(
-        Quote                           $quote,
-        Session                         $checkoutSession,
-        Http                            $request,
-        Order                           $order,
-        OrderSender                     $orderSender,
-        SystemConfig                    $systemConfig,
-        Logger                          $altapayLogger,
-        TransactionRepositoryInterface  $transactionRepository,
-        OrderLoaderInterface            $orderLoader,
-        TransactionFactory              $transactionFactory,
-        InvoiceService                  $invoiceService,
-        OrderLinesHandler               $orderLines,
-        CreatePaymentHandler            $paymentHandler,
-        StockStateInterface             $stockItem,
-        StockRegistryInterface          $stockRegistry,
-        Cart                            $modelCart,
-        TokenFactory                    $dataToken,
-        Data                            $helper,
+        Quote $quote,
+        Session $checkoutSession,
+        Http $request,
+        Order $order,
+        OrderSender $orderSender,
+        SystemConfig $systemConfig,
+        Logger $altapayLogger,
+        TransactionRepositoryInterface $transactionRepository,
+        OrderLoaderInterface $orderLoader,
+        TransactionFactory $transactionFactory,
+        InvoiceService $invoiceService,
+        OrderLinesHandler $orderLines,
+        CreatePaymentHandler $paymentHandler,
+        StockStateInterface $stockItem,
+        StockRegistryInterface $stockRegistry,
+        Cart $modelCart,
+        TokenFactory $dataToken,
+        Data $helper,
         ReconciliationIdentifierFactory $reconciliation
     ) {
         $this->quote                 = $quote;
