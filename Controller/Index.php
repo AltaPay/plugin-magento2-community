@@ -21,7 +21,6 @@ use SDM\Altapay\Model\Gateway;
 use Magento\Framework\Controller\Result\RedirectFactory;
 use Magento\Framework\Encryption\EncryptorInterface;
 use Magento\Framework\Math\Random;
-use SDM\Altapay\Model\ReconciliationIdentifierFactory;
 /**
  * Class Index
  */
@@ -64,11 +63,6 @@ abstract class Index extends Action
     protected $pageFactory;
 
     /**
-     * @var ReconciliationIdentifierFactory
-     */
-    protected $reconciliation;
-
-    /**
      * Index constructor.
      *
      * @param Context $context
@@ -95,22 +89,20 @@ abstract class Index extends Action
         Logger $altapayLogger,
         EncryptorInterface $encryptor,
         Random $random,
-        RedirectFactory $redirectFactory,
-        ReconciliationIdentifierFactory $reconciliation
+        RedirectFactory $redirectFactory
         
     ) {
         parent::__construct($context);
-        $this->order            = $order;
-        $this->quote            = $quote;
-        $this->checkoutSession  = $checkoutSession;
-        $this->generator        = $generator;
-        $this->gateway          = $gateway;
-        $this->altapayLogger    = $altapayLogger;
-        $this->pageFactory      = $pageFactory;
-        $this->encryptor        = $encryptor;
-        $this->random           = $random;
-        $this->redirectFactory  = $redirectFactory;
-        $this->reconciliation   = $reconciliation;
+        $this->order           = $order;
+        $this->quote           = $quote;
+        $this->checkoutSession = $checkoutSession;
+        $this->generator       = $generator;
+        $this->gateway         = $gateway;
+        $this->altapayLogger   = $altapayLogger;
+        $this->pageFactory     = $pageFactory;
+        $this->encryptor       = $encryptor;
+        $this->random          = $random;
+        $this->redirectFactory = $redirectFactory;
     }
 
     /**
@@ -156,19 +148,4 @@ abstract class Index extends Action
         return $resultRedirect;
     }
 
-    /**
-     * @param $transactions
-     * @return int|string
-     */
-    protected function getLatestTransaction($transactions) {
-        $max_date = '';
-        $latestTransKey = '';
-        foreach ($transactions as $key=>$transaction) {
-            if ($transaction['CreatedDate'] > $max_date) {
-                $max_date = $transaction['CreatedDate'];
-                $latestTransKey = $key;
-            }
-        }
-        return $latestTransKey;
-    }
 }

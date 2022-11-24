@@ -60,7 +60,7 @@ class Ok extends Index implements CsrfAwareActionInterface
                 strtolower($post['avs_text'])
             );
         }
-
+    
         if ($this->checkPost() && $checkAvs == false) {
             $isSuccessful = $this->generator->handleOkAction($this->getRequest());
             if (strtolower($post['type']) === "verifycard") {
