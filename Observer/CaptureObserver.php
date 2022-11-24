@@ -90,16 +90,16 @@ class CaptureObserver implements ObserverInterface
      * @param Random                          $random
      */
     public function __construct(
-        SystemConfig                    $systemConfig,
-        Logger                          $altapayLogger,
-        Order                           $order,
-        Data                            $helper,
-        storeConfig                     $storeConfig,
-        OrderLinesHandler               $orderLines,
-        PriceHandler                    $priceHandler,
-        DiscountHandler                 $discountHandler,
+        SystemConfig     $systemConfig,
+        Logger $altapayLogger,
+        Order $order,
+        Data $helper,
+        storeConfig $storeConfig,
+        OrderLinesHandler $orderLines,
+        PriceHandler $priceHandler,
+        DiscountHandler $discountHandler,
         ReconciliationIdentifierFactory $reconciliation,
-        Random                          $random
+        Random $random
     ) {
         $this->systemConfig    = $systemConfig;
         $this->altapayLogger   = $altapayLogger;
