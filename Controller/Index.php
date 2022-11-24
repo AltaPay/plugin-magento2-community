@@ -65,18 +65,14 @@ abstract class Index extends Action
     /**
      * Index constructor.
      *
-     * @param Context $context
+     * @param Context     $context
      * @param PageFactory $pageFactory
-     * @param Order $order
-     * @param Quote $quote
-     * @param Session $checkoutSession
-     * @param Generator $generator
-     * @param Gateway $gateway
-     * @param Logger $altapayLogger
-     * @param EncryptorInterface $encryptor
-     * @param Random $random
-     * @param RedirectFactory $redirectFactory
-     * @param ReconciliationIdentifierFactory $reconciliation
+     * @param Order       $order
+     * @param Quote       $quote
+     * @param Session     $checkoutSession
+     * @param Generator   $generator
+     * @param Gateway     $gateway
+     * @param Logger      $altapayLogger
      */
     public function __construct(
         Context $context,
@@ -147,5 +143,4 @@ abstract class Index extends Action
 
         return $resultRedirect;
     }
-
 }
