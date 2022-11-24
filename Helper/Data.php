@@ -225,9 +225,17 @@ class Data extends AbstractHelper
 
     /**
      * @param string $orderId
+     * @param string $identifier
      * @return mixed
      */
-    public function getReconciliationData($orderId){
-         return $this->reconciliation->create()->getCollection()->addFieldToFilter('order_id', $orderId);
+    public function getReconciliationData($orderId, $identifier = ''){
+        $collection = $this->reconciliation->create()->getCollection()
+             ->addFieldToFilter('order_id', $orderId);
+
+        if($identifier){
+            $collection->addFieldToFilter('identifier', $identifier);
+        }
+
+        return $collection;
     }
 }

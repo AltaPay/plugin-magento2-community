@@ -30,6 +30,7 @@ use Magento\CatalogInventory\Api\StockStateInterface;
 use Magento\CatalogInventory\Api\StockRegistryInterface;
 use SDM\Altapay\Model\TokenFactory;
 use SDM\Altapay\Helper\Data;
+use SDM\Altapay\Model\ReconciliationIdentifierFactory;
 
 /**
  * Class Generator
@@ -122,26 +123,34 @@ class Generator
      * @var Data
      */
     private $helper;
-    
+
+    /**
+     * @var ReconciliationIdentifierFactory
+     */
+    protected $reconciliation;
+
     /**
      * Generator constructor.
      *
-     * @param Quote                          $quote
-     * @param Session                        $checkoutSession
-     * @param Http                           $request
-     * @param Order                          $order
-     * @param OrderSender                    $orderSender
-     * @param SystemConfig                   $systemConfig
-     * @param Logger                         $altapayLogger
+     * @param Quote $quote
+     * @param Session $checkoutSession
+     * @param Http $request
+     * @param Order $order
+     * @param OrderSender $orderSender
+     * @param SystemConfig $systemConfig
+     * @param Logger $altapayLogger
      * @param TransactionRepositoryInterface $transactionRepository
-     * @param OrderLoaderInterface           $orderLoader
-     * @param TransactionFactory             $transactionFactory
-     * @param InvoiceService                 $invoiceService
-     * @param OrderLinesHandler              $orderLines
-     * @param CreatePaymentHandler           $paymentHandler
-     * @param StockStateInterface            $stockItem
-     * @param StockRegistryInterface         $stockRegistry
-     * @param Cart                           $modelCart
+     * @param OrderLoaderInterface $orderLoader
+     * @param TransactionFactory $transactionFactory
+     * @param InvoiceService $invoiceService
+     * @param OrderLinesHandler $orderLines
+     * @param CreatePaymentHandler $paymentHandler
+     * @param StockStateInterface $stockItem
+     * @param StockRegistryInterface $stockRegistry
+     * @param Cart $modelCart
+     * @param TokenFactory $dataToken
+     * @param Data $helper
+     * @param ReconciliationIdentifierFactory $reconciliation
      */
     public function __construct(
         Quote $quote,
@@ -161,7 +170,8 @@ class Generator
         StockRegistryInterface $stockRegistry,
         Cart $modelCart,
         TokenFactory $dataToken,
-        Data $helper
+        Data $helper,
+        ReconciliationIdentifierFactory $reconciliation
     ) {
         $this->quote                 = $quote;
         $this->checkoutSession       = $checkoutSession;
@@ -181,6 +191,7 @@ class Generator
         $this->modelCart             = $modelCart;
         $this->dataToken             = $dataToken;
         $this->helper                = $helper;
+        $this->reconciliation        = $reconciliation;
     }
 
     /**
@@ -530,6 +541,25 @@ class Generator
                             $this->altapayLogger->addCriticalLog('Exception', $e->getMessage());
                         }
                     }
+
+                    $reconciliationData = $transaction->ReconciliationIdentifiers ?? '';
+
+                    if($reconciliationData){
+                        $model = $this->reconciliation->create();
+
+                        foreach($reconciliationData as $key=>$value){
+                            $collection = $this->helper->getReconciliationData($order->getIncrementId(), $value->Id);
+                            if(!$collection->getSize()){
+                                $model->addData([
+                                    "order_id"      => $order->getIncrementId(),
+                                    "identifier"    => $value->Id,
+                                    "type"          => $value->Type
+                                ]);
+                            }
+                        }
+
+                        $model->save();
+                    }
                 }
                 $payment = $order->getPayment();
                 $payment->setPaymentId($paymentId);
@@ -660,7 +690,6 @@ class Generator
     public function avsCheck(RequestInterface $request, $avsCode, $historyComment)
     {
         $checkRejectionCase = false;
-        $transInfo          = null;
         $callback           = new Callback($request->getPostValue());
         $response           = $callback->call();
         if ($response) {
