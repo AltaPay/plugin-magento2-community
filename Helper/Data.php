@@ -53,11 +53,11 @@ class Data extends AbstractHelper
     /**
      * Data constructor.
      *
-     * @param ModuleListInterface $moduleList
-     * @param ProductMetadataInterface $productMetadata
-     * @param ScopeConfigInterface $scopeConfig
-     * @param Order $order
-     * @param Item $taxItem
+     * @param ModuleListInterface             $moduleList
+     * @param ProductMetadataInterface        $productMetadata
+     * @param ScopeConfigInterface            $scopeConfig
+     * @param Order                           $order
+     * @param Item                            $taxItem
      * @param ReconciliationIdentifierFactory $reconciliation
      */
     public function __construct(
