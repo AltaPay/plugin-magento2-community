@@ -74,43 +74,43 @@ class CaptureObserver implements ObserverInterface
      * @var Random
      */
     private $random;
-
+    
     /**
      * CaptureObserver constructor.
      *
-     * @param SystemConfig $systemConfig
-     * @param Logger $altapayLogger
-     * @param Order $order
-     * @param Data $helper
-     * @param storeConfig $storeConfig
-     * @param OrderLinesHandler $orderLines
-     * @param PriceHandler $priceHandler
-     * @param DiscountHandler $discountHandler
+     * @param SystemConfig                    $systemConfig
+     * @param Logger                          $altapayLogger
+     * @param Order                           $order
+     * @param Data                            $helper
+     * @param storeConfig                     $storeConfig
+     * @param OrderLinesHandler               $orderLines
+     * @param PriceHandler                    $priceHandler
+     * @param DiscountHandler                 $discountHandler
      * @param ReconciliationIdentifierFactory $reconciliation
-     * @param Random $random
+     * @param Random                          $random
      */
     public function __construct(
-        SystemConfig $systemConfig,
-        Logger $altapayLogger,
-        Order $order,
-        Data $helper,
-        storeConfig $storeConfig,
-        OrderLinesHandler $orderLines,
-        PriceHandler $priceHandler,
-        DiscountHandler $discountHandler,
+        SystemConfig                    $systemConfig,
+        Logger                          $altapayLogger,
+        Order                           $order,
+        Data                            $helper,
+        storeConfig                     $storeConfig,
+        OrderLinesHandler               $orderLines,
+        PriceHandler                    $priceHandler,
+        DiscountHandler                 $discountHandler,
         ReconciliationIdentifierFactory $reconciliation,
-        Random $random
+        Random                          $random
     ) {
-        $this->systemConfig     = $systemConfig;
-        $this->altapayLogger    = $altapayLogger;
-        $this->order            = $order;
-        $this->helper           = $helper;
-        $this->storeConfig      = $storeConfig;
-        $this->orderLines       = $orderLines;
-        $this->priceHandler     = $priceHandler;
-        $this->discountHandler  = $discountHandler;
-        $this->reconciliation   = $reconciliation;
-        $this->random           = $random;
+        $this->systemConfig    = $systemConfig;
+        $this->altapayLogger   = $altapayLogger;
+        $this->order           = $order;
+        $this->helper          = $helper;
+        $this->storeConfig     = $storeConfig;
+        $this->orderLines      = $orderLines;
+        $this->priceHandler    = $priceHandler;
+        $this->discountHandler = $discountHandler;
+        $this->reconciliation  = $reconciliation;
+        $this->random          = $random;
     }
 
     /**
