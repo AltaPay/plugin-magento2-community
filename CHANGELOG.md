@@ -1,6 +1,10 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [Unreleased]
+### Fixed 
+- Fix multiple agreements configuration issue
+
 ## [3.5.0]
 ### Added
 - Add support for auto-capture functionality with the subscriptions
