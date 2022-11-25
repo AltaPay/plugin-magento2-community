@@ -74,23 +74,23 @@ class CaptureObserver implements ObserverInterface
      * @var Random
      */
     private $random;
-    
+
     /**
      * CaptureObserver constructor.
      *
-     * @param SystemConfig                    $systemConfig
-     * @param Logger                          $altapayLogger
-     * @param Order                           $order
-     * @param Data                            $helper
-     * @param storeConfig                     $storeConfig
-     * @param OrderLinesHandler               $orderLines
-     * @param PriceHandler                    $priceHandler
-     * @param DiscountHandler                 $discountHandler
+     * @param SystemConfig $systemConfig
+     * @param Logger $altapayLogger
+     * @param Order $order
+     * @param Data $helper
+     * @param storeConfig $storeConfig
+     * @param OrderLinesHandler $orderLines
+     * @param PriceHandler $priceHandler
+     * @param DiscountHandler $discountHandler
      * @param ReconciliationIdentifierFactory $reconciliation
-     * @param Random                          $random
+     * @param Random $random
      */
     public function __construct(
-        SystemConfig     $systemConfig,
+        SystemConfig $systemConfig,
         Logger $altapayLogger,
         Order $order,
         Data $helper,
@@ -101,16 +101,16 @@ class CaptureObserver implements ObserverInterface
         ReconciliationIdentifierFactory $reconciliation,
         Random $random
     ) {
-        $this->systemConfig    = $systemConfig;
-        $this->altapayLogger   = $altapayLogger;
-        $this->order           = $order;
-        $this->helper          = $helper;
-        $this->storeConfig     = $storeConfig;
-        $this->orderLines      = $orderLines;
-        $this->priceHandler    = $priceHandler;
-        $this->discountHandler = $discountHandler;
-        $this->reconciliation  = $reconciliation;
-        $this->random          = $random;
+        $this->systemConfig     = $systemConfig;
+        $this->altapayLogger    = $altapayLogger;
+        $this->order            = $order;
+        $this->helper           = $helper;
+        $this->storeConfig      = $storeConfig;
+        $this->orderLines       = $orderLines;
+        $this->priceHandler     = $priceHandler;
+        $this->discountHandler  = $discountHandler;
+        $this->reconciliation   = $reconciliation;
+        $this->random           = $random;
     }
 
     /**
@@ -308,6 +308,22 @@ class CaptureObserver implements ObserverInterface
         /** @var CaptureReservationResponse $response */
         try {
             $response = $api->call();
+            $max_date = '';
+            $latestTransKey = 0;
+            if (isset($response->Transactions)) {
+                foreach ($response->Transactions as $key => $value) {
+                    if ($value->AuthType === "subscription_payment" && $value->CreatedDate > $max_date) {
+                        $max_date = $value->CreatedDate;
+                        $latestTransKey = $key;
+                    }
+                }
+            }
+    
+            if (isset($response->Transactions[$latestTransKey])) {
+                $transaction = $response->Transactions[$latestTransKey];
+                $payment->setLastTransId($transaction->TransactionId);
+                $payment->save();
+            }
         } catch (ResponseHeaderException $e) {
             $this->altapayLogger->addInfoLog('Info', $e->getHeader());
             $this->altapayLogger->addCriticalLog('Exception', $e->getMessage());

@@ -4,6 +4,7 @@ All notable changes to this project will be documented in this file.
 ## [3.5.2]
 ### Added
 - Set a different reconciliation identifier for each transaction
+- Fix: Refund payment issue for subscription payments
 
 ## [3.5.1]
 ### Added
