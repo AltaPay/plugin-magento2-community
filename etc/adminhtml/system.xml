@@ -134,6 +134,11 @@
                 <include path="SDM_Altapay::system/terminal3.xml"/>
                 <include path="SDM_Altapay::system/terminal4.xml"/>
                 <include path="SDM_Altapay::system/terminal5.xml"/>
+                <include path="SDM_Altapay::system/terminal6.xml"/>
+                <include path="SDM_Altapay::system/terminal7.xml"/>
+                <include path="SDM_Altapay::system/terminal8.xml"/>
+                <include path="SDM_Altapay::system/terminal9.xml"/>
+                <include path="SDM_Altapay::system/terminal10.xml"/>
 
             </group>
         </section>

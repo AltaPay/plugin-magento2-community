@@ -32,5 +32,20 @@
         <method name="terminal5">
             <allow_multiple_address>0</allow_multiple_address>
         </method>
+        <method name="terminal6">
+            <allow_multiple_address>0</allow_multiple_address>
+        </method>
+        <method name="terminal7">
+            <allow_multiple_address>0</allow_multiple_address>
+        </method>
+        <method name="terminal8">
+            <allow_multiple_address>0</allow_multiple_address>
+        </method>
+        <method name="terminal9">
+            <allow_multiple_address>0</allow_multiple_address>
+        </method>
+        <method name="terminal10">
+            <allow_multiple_address>0</allow_multiple_address>
+        </method>
     </methods>
 </payment>

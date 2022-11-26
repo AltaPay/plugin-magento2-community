@@ -1,0 +1,100 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Altapay Module for Magento 2.x.
+ *
+ * Copyright © 2018 Altapay. All rights reserved.
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+-->
+
+<include xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_include.xsd">
+    <group id="terminal10" translate="label" type="text" sortOrder="500" showInDefault="1" showInWebsite="1" showInStore="1">
+        <label>Terminal #10</label>
+        <field id="active" translate="label" type="select" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
+            <label>Enabled</label>
+            <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+            <config_path>payment/terminal10/active</config_path>
+        </field>
+        <field id="title" translate="label" type="text" sortOrder="5" showInDefault="1" showInWebsite="1" showInStore="1">
+            <label>Title</label>
+            <config_path>payment/terminal10/title</config_path>
+        </field>
+        <field id="terminalmessage" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+            <label>Custom Message</label>
+            <comment>Add custom text to show under terminal name</comment>
+            <config_path>payment/terminal10/terminalmessage</config_path>
+        </field>
+        <field id="terminalname" translate="label comment" type="select" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+            <label>Terminal Name</label>
+            <comment>Select terminal - Remember to save configuration after you have added your API login and password, to get your terminals</comment>
+            <config_path>payment/terminal10/terminalname</config_path>
+            <source_model>SDM\Altapay\Model\Config\Source\Terminals</source_model>
+            <frontend_class>altapay-terminal-name</frontend_class>
+        </field>
+        <field id="isapplepay" translate="label comment" type="select" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
+            <label>Is Apple Pay?</label>
+            <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+            <config_path>payment/terminal10/isapplepay</config_path>
+        </field>
+        <field id="applepaylabel" translate="label comment" type="text" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
+            <label>Apple Pay Form Label</label>
+            <comment>Add custom text for the Apple Pay popup label</comment>
+            <config_path>payment/terminal10/applepaylabel</config_path>
+        </field>
+        <field id="language" translate="label comment" type="select" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+            <label>Force Language</label>
+            <comment>Force the language of the payment page</comment>
+            <source_model>SDM\Altapay\Model\Config\Source\Languages</source_model>
+            <config_path>payment/terminal10/language</config_path>
+        </field>
+        <field id="capture" translate="label comment" type="select" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
+            <label>Auto Capture</label>
+            <comment>If you only sell download products, which are delivered immediately you can turn this on</comment>
+            <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+            <config_path>payment/terminal10/capture</config_path>
+        </field>
+        <field id="terminallogo" translate="label comment" type="multiselect" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1">
+            <label>Terminal Logo</label>
+            <comment>Select terminal logo that will be displayed on the store with the terminal name.</comment>
+            <config_path>payment/terminal10/terminallogo</config_path>
+            <source_model>SDM\Altapay\Model\Config\Source\TerminalLogo</source_model>
+        </field>
+        <field id="showlogoandtitle" translate="label comment" type="select" sortOrder="50" showInDefault="1" showInWebsite="1" showInStore="1">
+            <label>Show both Logo and Title</label>
+            <comment>If you want to show both terminal logo and title</comment>
+            <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+            <config_path>payment/terminal10/showlogoandtitle</config_path>
+        </field>
+        <field id="savecardtoken" translate="label comment" type="select" sortOrder="60" showInDefault="1" showInWebsite="1" showInStore="1">
+            <label>Enable Customer Token Control</label>
+            <comment>If you allow customer to save credit card token</comment>
+            <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+            <config_path>payment/terminal10/savecardtoken</config_path>
+            <frontend_class>altapay-terminal-token-control</frontend_class>
+        </field>
+        <field id="avscontrol" translate="label comment" type="select" sortOrder="70" showInDefault="1" showInWebsite="1" showInStore="1">
+            <label>AVS</label>
+            <comment>Address Verification System</comment>
+            <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+            <config_path>payment/terminal10/avscontrol</config_path>
+        </field>
+        <field id="enforceavs" translate="label comment" type="select" sortOrder="80" showInDefault="1" showInWebsite="1" showInStore="1">
+            <label>Enforce AVS</label>
+            <comment>All transactions <u>without</u> AVS response will be rejected</comment>
+            <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+            <config_path>payment/terminal10/enforceavs</config_path>
+        </field>
+        <field id="avs_acceptance" translate="label" type="text" sortOrder="90" showInDefault="1" showInWebsite="1" showInStore="1">
+            <label>AVS Accepted Codes</label>
+            <comment>All codes upercase, comma separated</comment>
+            <config_path>payment/terminal10/avs_acceptance</config_path>
+        </field>
+        <field id="sort_order" translate="label" type="text" sortOrder="100" showInDefault="1" showInWebsite="1" showInStore="1">
+            <label>Sort Order</label>
+            <frontend_class>validate-number</frontend_class>
+            <config_path>payment/terminal10/sort_order</config_path>
+        </field>
+    </group>
+</include>

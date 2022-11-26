@@ -153,6 +153,11 @@ class Data extends AbstractHelper
             \SDM\Altapay\Model\Method\Terminal3::METHOD_CODE,
             \SDM\Altapay\Model\Method\Terminal4::METHOD_CODE,
             \SDM\Altapay\Model\Method\Terminal5::METHOD_CODE,
+            \SDM\Altapay\Model\Method\Terminal6::METHOD_CODE,
+            \SDM\Altapay\Model\Method\Terminal7::METHOD_CODE,
+            \SDM\Altapay\Model\Method\Terminal8::METHOD_CODE,
+            \SDM\Altapay\Model\Method\Terminal9::METHOD_CODE,
+            \SDM\Altapay\Model\Method\Terminal10::METHOD_CODE,
         ];
     }
 
