@@ -31,7 +31,7 @@
   <table name="sales_order" resource="default">
     <column xsi:type="text" name="altapay_payment_form_url" nullable="true" comment="Altapay Payment Form Url"/>
     <column xsi:type="boolean" name="altapay_price_includes_tax" nullable="true" comment="Whether catalog prices entered from Magento Admin include tax."/>
-    <column xsi:type="text" name="altapay_order_hash" nullable="true" comment="Alapay Order Hash"/>
+    <column xsi:type="text" name="altapay_order_hash" nullable="true" comment="AltaPay Order Hash"/>
   </table>
   <table name="altapay_token" resource="default" engine="innodb" comment="Altapay Tokens">
     <column xsi:type="int" name="id" padding="10" unsigned="true" nullable="false" identity="true" comment="Id"/>
@@ -48,5 +48,17 @@
     <constraint xsi:type="primary" referenceId="PRIMARY">
       <column name="id"/>
     </constraint>
+  </table>
+  <table name="altapay_reconciliation" resource="default">
+    <column xsi:type="int" name="id" padding="10" unsigned="true" nullable="false" identity="true" comment="id"/>
+    <column xsi:type="int" name="order_id" padding="10" unsigned="true" nullable="false" identity="false" comment="Order ID"/>
+    <column xsi:type="text" name="identifier" nullable="true" comment="Reconciliation Identifier"/>
+    <column xsi:type="text" name="type" nullable="true" comment="Type"/>
+    <constraint xsi:type="primary" referenceId="PRIMARY">
+      <column name="id"/>
+    </constraint>
+    <index referenceId="SDM_ALTAPAY_ORDERID" indexType="btree">
+      <column name="order_id"/>
+    </index>
   </table>
 </schema>

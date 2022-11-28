@@ -230,7 +230,7 @@ In order to reconcile payments on Magento please follow the steps below:
 1. Navigate to the Magento **Admin** page.
 2. Select **Sales** > **Orders** in the left hand pane.
 3. Select the order you want to view.
-4. Copy the Reconciliation Identifier from the **Payment & Shipping Method** section.
+4. Copy the Reconciliation Identifier from the **Reconciliation Details** section.
  
    ![magento_order_view](Docs/magento_order_view.png)
  

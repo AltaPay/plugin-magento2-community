@@ -28,6 +28,8 @@
         "column": {
             "id": true,
             "customer_id": true,
+            "agreement_id": true,
+            "agreement_type": true,
             "token": true,
             "masked_pan": true,
             "currency_code": true,
@@ -35,6 +37,20 @@
             "timestamp": true,
             "expires": true,
             "card_type": true
+        },
+        "constraint": {
+            "PRIMARY": true
+        }
+    },
+    "altapay_reconciliation": {
+        "column": {
+            "id": true,
+            "order_id": true,
+            "identifier": true,
+            "type": true
+        },
+        "index": {
+            "ALTAPAY_RECONCILIATION_ORDER_ID": true
         },
         "constraint": {
             "PRIMARY": true
