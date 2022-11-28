@@ -4,6 +4,7 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 ### Fixed 
 - Fix multiple agreements configuration issue
+- Fix verify_card payment issue with auto-capture functionality
 
 ## [3.5.2]
 ### Added
