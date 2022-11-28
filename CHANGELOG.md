@@ -5,10 +5,18 @@ All notable changes to this project will be documented in this file.
 ### Fixed 
 - Fix multiple agreements configuration issue
 
+## [3.5.2]
+### Added
+- Set a different reconciliation identifier for each transaction
+- Fix: Refund payment issue for subscription payments
+
+## [3.5.1]
+### Added
+- Add support to allow up to 10 payment methods
+
 ## [3.5.0]
 ### Added
 - Add support for auto-capture functionality with the subscriptions
-- Add support to allow up to 10 payment methods
 - Add logos for Apple Pay, Swish and Vipps payment methods
 
 ## [3.4.9]

@@ -36,6 +36,26 @@ define(
             {
                 type: 'terminal5',
                 component: 'SDM_Altapay/js/view/payment/method-renderer/terminal5-method'
+            },
+            {
+                type: 'terminal6',
+                component: 'SDM_Altapay/js/view/payment/method-renderer/terminal6-method'
+            },
+            {
+                type: 'terminal7',
+                component: 'SDM_Altapay/js/view/payment/method-renderer/terminal7-method'
+            },
+            {
+                type: 'terminal8',
+                component: 'SDM_Altapay/js/view/payment/method-renderer/terminal8-method'
+            },
+            {
+                type: 'terminal9',
+                component: 'SDM_Altapay/js/view/payment/method-renderer/terminal9-method'
+            },
+            {
+                type: 'terminal10',
+                component: 'SDM_Altapay/js/view/payment/method-renderer/terminal10-method'
             }
         );
         /** Add view logic here if needed */

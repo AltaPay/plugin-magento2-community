@@ -97,6 +97,91 @@
                 <can_order>1</can_order>
                 <can_use_for_multishipping>1</can_use_for_multishipping>
             </terminal5>
+            <terminal6>
+                <active>0</active>
+                <title />
+                <payment_action>true</payment_action>
+                <model>SDM\Altapay\Model\Method\Terminal6</model>
+                <place_order_url>sdmaltapay/index/request</place_order_url>
+                <can_authorize>1</can_authorize>
+                <can_capture>1</can_capture>
+                <can_capture_partial>1</can_capture_partial>
+                <can_refund>1</can_refund>
+                <can_refund_partial>1</can_refund_partial>
+                <can_cancel>1</can_cancel>
+                <can_use_checkout>1</can_use_checkout>
+                <is_gateway>1</is_gateway>
+                <can_order>1</can_order>
+                <can_use_for_multishipping>1</can_use_for_multishipping>
+            </terminal6>
+            <terminal7>
+                <active>0</active>
+                <title />
+                <payment_action>true</payment_action>
+                <model>SDM\Altapay\Model\Method\Terminal7</model>
+                <place_order_url>sdmaltapay/index/request</place_order_url>
+                <can_authorize>1</can_authorize>
+                <can_capture>1</can_capture>
+                <can_capture_partial>1</can_capture_partial>
+                <can_refund>1</can_refund>
+                <can_refund_partial>1</can_refund_partial>
+                <can_cancel>1</can_cancel>
+                <can_use_checkout>1</can_use_checkout>
+                <is_gateway>1</is_gateway>
+                <can_order>1</can_order>
+                <can_use_for_multishipping>1</can_use_for_multishipping>
+            </terminal7>
+            <terminal8>
+                <active>0</active>
+                <title />
+                <payment_action>true</payment_action>
+                <model>SDM\Altapay\Model\Method\Terminal8</model>
+                <place_order_url>sdmaltapay/index/request</place_order_url>
+                <can_authorize>1</can_authorize>
+                <can_capture>1</can_capture>
+                <can_capture_partial>1</can_capture_partial>
+                <can_refund>1</can_refund>
+                <can_refund_partial>1</can_refund_partial>
+                <can_cancel>1</can_cancel>
+                <can_use_checkout>1</can_use_checkout>
+                <is_gateway>1</is_gateway>
+                <can_order>1</can_order>
+                <can_use_for_multishipping>1</can_use_for_multishipping>
+            </terminal8>
+            <terminal9>
+                <active>0</active>
+                <title />
+                <payment_action>true</payment_action>
+                <model>SDM\Altapay\Model\Method\Terminal9</model>
+                <place_order_url>sdmaltapay/index/request</place_order_url>
+                <can_authorize>1</can_authorize>
+                <can_capture>1</can_capture>
+                <can_capture_partial>1</can_capture_partial>
+                <can_refund>1</can_refund>
+                <can_refund_partial>1</can_refund_partial>
+                <can_cancel>1</can_cancel>
+                <can_use_checkout>1</can_use_checkout>
+                <is_gateway>1</is_gateway>
+                <can_order>1</can_order>
+                <can_use_for_multishipping>1</can_use_for_multishipping>
+            </terminal9>
+            <terminal10>
+                <active>0</active>
+                <title />
+                <payment_action>true</payment_action>
+                <model>SDM\Altapay\Model\Method\Terminal10</model>
+                <place_order_url>sdmaltapay/index/request</place_order_url>
+                <can_authorize>1</can_authorize>
+                <can_capture>1</can_capture>
+                <can_capture_partial>1</can_capture_partial>
+                <can_refund>1</can_refund>
+                <can_refund_partial>1</can_refund_partial>
+                <can_cancel>1</can_cancel>
+                <can_use_checkout>1</can_use_checkout>
+                <is_gateway>1</is_gateway>
+                <can_order>1</can_order>
+                <can_use_for_multishipping>1</can_use_for_multishipping>
+            </terminal10>
         </payment>
     </default>
 </config>
