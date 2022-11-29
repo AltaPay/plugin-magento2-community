@@ -846,9 +846,9 @@ class Generator
      */
     private function getLatestTransaction($response) {
         $max_date = '';
-        $latestTransKey = '';
+        $latestTransKey = 0;
         foreach ($response->Transactions as $key=>$value) {
-            if ($value->CreatedDate > $max_date) {
+            if ($value->AuthType === "subscription_payment" && $value->CreatedDate > $max_date) {
                 $max_date = $value->CreatedDate;
                 $latestTransKey = $key;
             }
