@@ -749,17 +749,15 @@ class Gateway implements GatewayInterface
                     $storeScope,
                     $storeCode
                 );
-            if (isset($response->Transactions[$latestTransKey]->Terminal)) {
-                if ($terminalConfig === $response->Transactions[$latestTransKey]->Terminal) {
-                    $isCaptured =
-                        $this->systemConfig->getTerminalConfigFromTerminalName(
-                            $terminalName,
-                            'capture',
-                            $storeScope,
-                            $storeCode
-                        );
-                    break;
-                }
+            if (isset($response->Transactions[$latestTransKey]->Terminal) && $terminalConfig === $response->Transactions[$latestTransKey]->Terminal) {
+                $isCaptured =
+                    $this->systemConfig->getTerminalConfigFromTerminalName(
+                        $terminalName,
+                        'capture',
+                        $storeScope,
+                        $storeCode
+                    );
+                break;
             }
         }
         
