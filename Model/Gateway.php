@@ -717,7 +717,7 @@ class Gateway implements GatewayInterface
             $requireCapture = $response->Transactions[$latestTransKey]->RequireCapture ?? '';
             $transStatus = $response->Transactions[$latestTransKey]->TransactionStatus ?? '';
             if (strtolower($paymentType) === 'paymentandcapture'
-                || strtolower($paymentType) === 'subscriptionAndCharge'
+                || strtolower($paymentType) === 'subscriptionandcharge'
                 || ($paymentType === 'subscription_payment' && $transStatus === 'captured')
             ) {
                 $this->createInvoice($order, $requireCapture);
