@@ -298,7 +298,7 @@ define(
                 var paymentMethod = window.checkoutConfig.payment[this.getDefaultCode()].terminaldata;
                 for (var obj in paymentMethod) {
                     if (obj === self.getCode()) {
-                        if (paymentMethod[obj].enabledsavetokens != null) {
+                        if (paymentMethod[obj].enabledsavetokens != null && paymentMethod[obj].isLoggedIn != null) {
                             enableSaveCard = paymentMethod[obj].enabledsavetokens;
                         }
                     }
