@@ -544,7 +544,7 @@ class Gateway implements GatewayInterface
             $responseUrl    = $response->Url;
             $paymentId      = $response->PaymentRequestId;
             $max_date       = '';
-            $latestTransKey = '';
+            $latestTransKey = 0;
             if (isset($response->Transactions)) {
                 foreach ($response->Transactions as $key => $value) {
                     if ($value->AuthType === "subscription_payment" && $value->CreatedDate > $max_date) {
@@ -716,8 +716,10 @@ class Gateway implements GatewayInterface
             $paymentType = $response->Transactions[$latestTransKey]->AuthType ?? '';
             $requireCapture = $response->Transactions[$latestTransKey]->RequireCapture ?? '';
             $transStatus = $response->Transactions[$latestTransKey]->TransactionStatus ?? '';
-
-            if ($paymentType === 'subscription_payment' && $transStatus === 'captured') {
+            if (strtolower($paymentType) === 'paymentandcapture'
+                || strtolower($paymentType) === 'subscriptionandcharge'
+                || ($paymentType === 'subscription_payment' && $transStatus === 'captured')
+            ) {
                 $this->createInvoice($order, $requireCapture);
             }
         }
@@ -747,7 +749,7 @@ class Gateway implements GatewayInterface
                     $storeScope,
                     $storeCode
                 );
-            if ($terminalConfig === $response->Transactions[$latestTransKey]->Terminal) {
+            if (isset($response->Transactions[$latestTransKey]->Terminal) && $terminalConfig === $response->Transactions[$latestTransKey]->Terminal) {
                 $isCaptured =
                     $this->systemConfig->getTerminalConfigFromTerminalName(
                         $terminalName,

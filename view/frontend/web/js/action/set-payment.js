@@ -18,7 +18,8 @@ define(
     ],
     function ($, quote, urlBuilder, storage, errorProcessor, customer, fullScreenLoader) {
         'use strict';
-        var agreementsConfig = window.checkoutConfig.checkoutAgreements;
+        var agreementIds = [];
+        var enableAgreements = window.checkoutConfig.checkoutAgreements;
         return function (messageContainer, method) {
 
             var serviceUrl,
@@ -47,12 +48,16 @@ define(
             if (Object.prototype.hasOwnProperty.call(paymentData, '__disableTmpl')) {
                 delete paymentData.__disableTmpl;
             }
+            var agreementsConfig = (window.checkoutConfig.checkoutAgreements && window.checkoutConfig.checkoutAgreements.agreements) ? window.checkoutConfig.checkoutAgreements.agreements : [];
+            for (var i = 0; i < agreementsConfig.length; i++) {
+                agreementIds[i] = agreementsConfig[i].agreementId;
+            }
 
-            if (agreementsConfig.isEnabled) {
+            if (enableAgreements.isEnabled) {
                 if (jQuery(".payment-method._active .checkout-agreements input[type='checkbox']:checked").length == 0) {
                     paymentData.extension_attributes = {agreement_ids: [""]};
                 } else {
-                    paymentData.extension_attributes = {agreement_ids: ["1"]};
+                    paymentData.extension_attributes = {agreement_ids: agreementIds};
                 }
             }
 

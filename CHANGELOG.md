@@ -1,6 +1,11 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [3.5.3]
+### Fixed 
+- Fix: can't checkout when multiple T&C are enabled
+- Fix: verify_card payment issue with the auto-capture functionality
+
 ## [3.5.2]
 ### Added
 - Set a different reconciliation identifier for each transaction

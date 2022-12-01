@@ -228,7 +228,8 @@ class ConfigProvider implements ConfigProviderInterface
                     'showlogoandtitle'  => $showBoth,
                     'enabledsavetokens' => $saveCardToken,
                     'isapplepay'        => $isApplePay,
-                    'applepaylabel'     => $applePayLabel
+                    'applepaylabel'     => $applePayLabel,
+                    'isLoggedIn'        => $currentCustomerId
                 ];
                 if ($saveCardToken == 1 && !empty($savedTokenList)) {
                     $methods[$key]['savedtokenlist']          = json_encode($savedTokenList);

@@ -98,7 +98,7 @@ class ApplePayOrder {
     public function handleCardWalletPayment($response, $order)
     {
         $max_date = '';
-        $latestTransKey = '';
+        $latestTransKey = 0;
         foreach ($response->Transactions as $key=>$value) {
             if ($value->CreatedDate > $max_date) {
                 $max_date = $value->CreatedDate;
