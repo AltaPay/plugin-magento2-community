@@ -35,7 +35,7 @@ class Order {
         cy.get('.button').click().wait(5000)
     }
 
-    cc_payment(CC_TERMINAL_NAME) {        
+    cc_payment(CC_TERMINAL_NAME) {
         cy.contains(CC_TERMINAL_NAME).click({ force: true })
         cy.get('._active > .payment-method-content > :nth-child(5) > div.primary > .action').click().wait(2000)
         cy.get('#creditCardNumberInput').type('4111111111111111')
@@ -473,7 +473,7 @@ class Order {
             }
         })
         //Flush cache
-        cy.get('#menu-magento-backend-system > [onclick="return false;"]').scrollIntoView().click({force:true})
+        cy.get('#menu-magento-backend-system > [onclick="return false;"]').scrollIntoView().click()
         cy.get('.item-system-cache > a').click()
         cy.get('#flush_magento').click()
         cy.get('#flush_system > span').click()

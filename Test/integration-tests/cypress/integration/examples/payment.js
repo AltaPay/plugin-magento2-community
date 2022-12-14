@@ -400,7 +400,7 @@ describe('Payments', function () {
                     cy.get('#order-shipping-method-summary > a').click({ force: true }) 
                     cy.get('.admin__order-shipment-methods-options-list > li:first').click().wait(3000)
                     cy.contains('EmbraceIT Klarna Integration Test Terminal').click().wait(3000)   
-                    cy.get('#submit_order_top_button').click().wait(2000)
+                    cy.get('#submit_order_top_button').click().wait(5000)
                     cy.get('.payment_link > code').then(($a) => {
                         const payment_link = $a.text();
                         cy.origin('https://pensio.com', { args: { payment_link } }, ({ payment_link }) => {                            
@@ -436,4 +436,43 @@ describe('Payments', function () {
         })
     })
 
+    it.only('Subscription Payment', function () {
+        const ord = new Order()
+            ord.clrcookies()
+            ord.visit()
+            cy.get('body').then(($body) => {
+                if ($body.text().includes('DKK') === false) {
+                    ord.admin()
+                    ord.change_currency_to_DKK()
+                }
+            
+    
+        
+        cy.get('.panel > .header > .link > a').click()
+        cy.get('#email').type('qa@yahoo.com')
+        cy.get('.login-container > .block-customer-login > .block-content > #login-form > .fieldset > .password > .control > #pass').type('admin@1234')
+        cy.get('.login-container > .block-customer-login > .block-content > #login-form > .fieldset > .actions-toolbar > div.primary > #send2').click().wait(3000)
+        cy.reload()  
+        cy.contains('Argus All-Weather Tank').click()
+        cy.get('#option-label-size-144-item-166').click().wait(2000)
+        cy.get('#option-label-color-93-item-52').click().wait(2000)
+        cy.get('[for="radio_subscribe_product"]').click()
+        cy.get('[for="subscription_plan_3"]').click().wait(3000)
+        cy.contains('End by a cycle').click()
+        cy.get('.amrec-content > .amrec-input').type('2').wait(3000)
+        cy.get('#product-addtocart-button').click().wait(3000)
+        cy.get('.showcart').click()
+        cy.get('#top-cart-btn-checkout').click().wait(3000)
+        cy.get('.button').click()
+        cy.get(':nth-child(7) > div.primary > .action').click().wait(3000)
+        ord.cc_payment() 
+        cy.get('.page-title > span').should('have.text','Thank you for your purchase!')   
+        ord.admin()
+        ord.capture()
+        ord.refund()
+    
+        })
+
+ 
+})
 })
