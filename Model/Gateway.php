@@ -462,10 +462,10 @@ class Gateway implements GatewayInterface
         }
 
         if (!empty($post['tokenid'])) {
-            $data = $this->getToken($post['tokenid'], null, $order->getCustomerId());
+            $data = $this->getToken($order->getCustomerId(), $post['tokenid'], null);
         }
         elseif (isset($post['transaction_id']) && $post['type'] === "verifyCard") {
-                $data = $this->getToken(null, $post['transaction_id'], $order->getCustomerId());
+                $data = $this->getToken($order->getCustomerId(), null, $post['transaction_id']);
         }
     
         if (!empty($data)) {
@@ -797,7 +797,7 @@ class Gateway implements GatewayInterface
      *
      * @return mixed
      */
-    private function getToken($tokenId = null, $transId = null, $customerId)
+    private function getToken($customerId, $tokenId = null, $transId = null)
     {
         $model      = $this->dataToken->create();
         $collection = $model->getCollection()
