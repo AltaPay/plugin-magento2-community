@@ -1,6 +1,10 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [3.5.5]
+### Fixed 
+Fix: Compilation error due to the PHP 8.0 depreciation functionality of setting required parameters after optional parameters in functions signatures.
+
 ## [3.5.4]
 ### Fixed 
 - Fix: Update altapay/api-php version in composer
