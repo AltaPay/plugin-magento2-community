@@ -791,9 +791,9 @@ class Gateway implements GatewayInterface
     }
 
     /**
+     * @param int $customerId
      * @param string $tokenId
      * @param int $transId
-     * @param int $customerId
      *
      * @return mixed
      */
