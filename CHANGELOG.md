@@ -1,6 +1,10 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [3.5.5]
+### Fixed 
+- Fix: Compilation issues with Php8.1
+
 ## [3.5.4]
 ### Fixed 
 - Fix: Update altapay/api-php version in composer

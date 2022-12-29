@@ -36,8 +36,10 @@ class Order {
     }
 
     cc_payment(CC_TERMINAL_NAME) {        
-        cy.contains(CC_TERMINAL_NAME).click({ force: true })
-        cy.get('._active > .payment-method-content > :nth-child(5) > div.primary > .action').click().wait(2000)
+        if(CC_TERMINAL_NAME){
+            cy.contains(CC_TERMINAL_NAME).click({ force: true })
+            cy.get('._active > .payment-method-content > :nth-child(5) > div.primary > .action').click().wait(2000)
+        }        
         cy.get('#creditCardNumberInput').type('4111111111111111')
         cy.get('#emonth').type('01')
         cy.get('#eyear').type('2023')
@@ -503,7 +505,7 @@ class Order {
     }
 
     change_currency_to_DKK() {
-        cy.get('#menu-magento-backend-stores > [onclick="return false;"]').click()
+        cy.get('#menu-magento-backend-stores > [onclick="return false;"]').click({force:true})
         cy.get('.item-system-config > a').click()
         cy.get('#save').click()
         cy.contains('Currency Setup').click()

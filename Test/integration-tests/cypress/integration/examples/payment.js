@@ -72,39 +72,39 @@ describe('Payments', function () {
         })
     })
 
-    it('iDEAL Payment', function () {
-        const ord = new Order()
-        ord.visit()
-        cy.get('body').then(($body) => {
+    // it('iDEAL Payment', function () {
+    //     const ord = new Order()
+    //     ord.visit()
+    //     cy.get('body').then(($body) => {
 
-            if ($body.text().includes('€') === false) {
-                ord.admin()
-                ord.change_currency_to_EUR_for_iDEAL()
-            }
-            //ord.clrcookies()
-            ord.visit()
-            ord.addproduct()
-            cy.fixture('config').then((admin) => {
-                if (admin.iDEAL_EUR_TERMINAL != "") {
-                    cy.get('body').wait(3000).then(($a) => {
-                        if ($a.find("label:contains('" + admin.iDEAL_EUR_TERMINAL + "')").length) {
-                            ord.ideal_payment(admin.iDEAL_EUR_TERMINAL)
-                            ord.admin()
-                            ord.ideal_refund()
-                        } else {
-                            cy.log(admin.iDEAL_EUR_TERMINAL + ' not found in page')
-                            this.skip()
-                        }
+    //         if ($body.text().includes('€') === false) {
+    //             ord.admin()
+    //             ord.change_currency_to_EUR_for_iDEAL()
+    //         }
+    //         //ord.clrcookies()
+    //         ord.visit()
+    //         ord.addproduct()
+    //         cy.fixture('config').then((admin) => {
+    //             if (admin.iDEAL_EUR_TERMINAL != "") {
+    //                 cy.get('body').wait(3000).then(($a) => {
+    //                     if ($a.find("label:contains('" + admin.iDEAL_EUR_TERMINAL + "')").length) {
+    //                         ord.ideal_payment(admin.iDEAL_EUR_TERMINAL)
+    //                         ord.admin()
+    //                         ord.ideal_refund()
+    //                     } else {
+    //                         cy.log(admin.iDEAL_EUR_TERMINAL + ' not found in page')
+    //                         this.skip()
+    //                     }
 
-                    })
-                }
-                else {
-                    cy.log('iDEAL_EUR_TERMINAL skipped')
-                    this.skip()
-                }
-            })
-        })
-    })
+    //                 })
+    //             }
+    //             else {
+    //                 cy.log('iDEAL_EUR_TERMINAL skipped')
+    //                 this.skip()
+    //             }
+    //         })
+    //     })
+    // })
 
     it('Subscription', function () {
         const ord = new Order()
@@ -329,7 +329,6 @@ describe('Payments', function () {
 
         })
     })
-
     
     it('CC Pay by link', function () {
         const ord = new Order()
@@ -460,13 +459,18 @@ describe('Payments', function () {
             cy.get('#product-addtocart-button').click().wait(3000)
             cy.get('.showcart').click()
             cy.get('#top-cart-btn-checkout').click().wait(3000)
-            cy.get('.button').click()
+            cy.get('.button').click().wait(3000)
             cy.get(':nth-child(7) > div.primary > .action').click().wait(3000)
-            ord.cc_payment()
-            cy.get('.page-title > span').should('have.text', 'Thank you for your purchase!')
-            ord.admin()
-            ord.capture()
-            ord.refund()
+            cy.fixture('config').then((admin) => {
+                if (admin.SUBSCRIPTION_TERMINAL_NAME != "") {
+                    ord.cc_payment('')
+                    cy.get('.page-title > span').should('have.text', 'Thank you for your purchase!')
+                    ord.admin()
+                    ord.capture()
+                    ord.refund()
+                }
+            })
+            
         })
     })
 })
