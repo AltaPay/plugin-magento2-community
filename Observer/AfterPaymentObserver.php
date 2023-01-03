@@ -45,8 +45,8 @@ class AfterPaymentObserver implements ObserverInterface
         )
     {
         $this->systemConfig = $systemConfig;
-        $this->storeManager = $storeManager;    
-        $this->scopeConfig = $scopeConfig; 
+        $this->storeManager = $storeManager;
+        $this->scopeConfig = $scopeConfig;
         $this->transportBuilder = $transportBuilder;
         $this->inlineTranslation = $inlineTranslation;
         $this->helper          = $helper;
@@ -61,8 +61,9 @@ class AfterPaymentObserver implements ObserverInterface
     public function execute(Observer $observer)
     {
         $order = $observer->getEvent()->getOrder();
-        $email = $this->scopeConfig->getValue('trans_email/ident_sales/email',ScopeInterface::SCOPE_STORE);
-        $name  = $this->scopeConfig->getValue('trans_email/ident_sales/name',ScopeInterface::SCOPE_STORE);
+        $storeScope = ScopeInterface::SCOPE_STORE;
+        $email = $this->scopeConfig->getValue('trans_email/ident_sales/email',$storeScope);
+        $name  = $this->scopeConfig->getValue('trans_email/ident_sales/name',$storeScope);
         $payment = $order->getPayment();
         $method = $payment->getMethodInstance();
         $terminalCode = $method->getCode();
@@ -82,7 +83,9 @@ class AfterPaymentObserver implements ObserverInterface
                 $from = array('email' => $email, 'name' => $name);
                 $this->inlineTranslation->suspend();
                 $to = array($order->getCustomerEmail());
-                $transport = $this->transportBuilder->setTemplateIdentifier('payment_template')
+                $templateId = $this->scopeConfig->getValue('payment/sdm_altapay_config/general/payment_template', $storeScope);
+
+                $transport = $this->transportBuilder->setTemplateIdentifier($templateId)
                                 ->setTemplateOptions($templateOptions)
                                 ->setTemplateVars($templateVars)
                                 ->setFrom($from)

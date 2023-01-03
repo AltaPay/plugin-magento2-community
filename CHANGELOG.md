@@ -1,6 +1,10 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [3.5.6]
+### Added 
+- Email template for Pay by link is customizable
+
 ## [3.5.5]
 ### Fixed 
 - Fix: Compilation issues with Php8.1
@@ -17,6 +21,7 @@ All notable changes to this project will be documented in this file.
 ## [3.5.2]
 ### Added
 - Set a different reconciliation identifier for each transaction
+### Fixed 
 - Fix: Refund payment issue for subscription payments
 
 ## [3.5.1]
