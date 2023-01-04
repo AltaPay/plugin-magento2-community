@@ -3,7 +3,8 @@ All notable changes to this project will be documented in this file.
 
 ## [3.5.6]
 ### Added 
-- Email template for Pay by link is customizable
+- Add option to select custom email template for pay by link
+- Allow multiple quantities for subscription product
 
 ## [3.5.5]
 ### Fixed 
