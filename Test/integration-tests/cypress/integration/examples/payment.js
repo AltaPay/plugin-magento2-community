@@ -323,12 +323,13 @@ describe('Payments', function () {
                     cy.get('#add').click()
                     cy.get('#sales_order_create_customer_grid_table > tbody > tr:nth-child(1)').click().wait(3000)
                     cy.reload()
+                    cy.get('#email').clear().type('demo@example.com')
                     cy.get('#add_products').click()
                     cy.get('#sales_order_create_search_grid_table > tbody > tr:nth-child(2)').click()
                     cy.get('#order-search > div.admin__page-section-title > div').click().wait(2000)
                     cy.get('#order-shipping-method-summary > a').click({ force: true })
                     cy.get('.admin__order-shipment-methods-options-list > li:first').click().wait(3000)
-                    cy.contains('EmbraceIT Integration Test Terminal').click().wait(3000)
+                    cy.contains(admin.CC_TERMINAL_NAME).click().wait(3000)
                     cy.get('#submit_order_top_button').click().wait(2000)
                     cy.get('.payment_link > code').then(($a) => {
                         const payment_link = $a.text();
@@ -342,7 +343,7 @@ describe('Payments', function () {
                             cy.get('#pensioCreditCardPaymentSubmitButton').click().wait(3000)
                         })
 
-                        cy.get('.page-title > span').should('have.text','Thank you for your purchase!')
+                        cy.get('.page-title > span').should('have.text', 'Thank you for your purchase!')
                     })
                 }
                 else {
@@ -370,12 +371,13 @@ describe('Payments', function () {
                     cy.get('#add').click()
                     cy.get('#sales_order_create_customer_grid_table > tbody > tr:nth-child(1)').click().wait(4000)
                     cy.reload()
+                    cy.get('#email').clear().type('demo@example.com')
                     cy.get('#add_products').click().wait(2000)
                     cy.get('#sales_order_create_search_grid_table > tbody > tr:nth-child(2)').click()
                     cy.get('#order-search > div.admin__page-section-title > div').click().wait(2000)
                     cy.get('#order-shipping-method-summary > a').click({ force: true })
                     cy.get('.admin__order-shipment-methods-options-list > li:first').click().wait(3000)
-                    cy.contains('EmbraceIT Klarna Integration Test Terminal').click().wait(3000)
+                    cy.contains(admin.KLARNA_DKK_TERMINAL_NAME).click().wait(3000)
                     cy.get('#submit_order_top_button').click().wait(5000)
                     cy.get('.payment_link > code').then(($a) => {
                         const payment_link = $a.text();
@@ -423,19 +425,10 @@ describe('Payments', function () {
             }
             ord.subscription_product()
             ord.visit()
-            cy.contains('Create an Account').click()
-            cy.get('#firstname').type('Test')
-            cy.get('#lastname').type('Person')
-            //Random Username            
-            let text = "";
-            let alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
-            for (let i = 0; i < 10; i++)
-                text += alphabet.charAt(Math.floor(Math.random() * alphabet.length))
-            cy.get('#email_address').type(text + '@example.com')
-            cy.get('#password').type(text + '@1')
-            cy.get('#password-confirmation').type(text + '@1')
-            cy.get('#form-validate > .actions-toolbar > div.primary > .action').click()
-            cy.get('img').click()
+            cy.get('.panel > .header > .link > a').click()
+            cy.get('#email').type('demo@example.com')
+            cy.get('.login-container > .block-customer-login > .block-content > #login-form > .fieldset > .password > .control > #pass').type('admin@1234')
+            cy.get('.login-container > .block-customer-login > .block-content > #login-form > .fieldset > .actions-toolbar > div.primary > #send2').click().wait(3000)
             cy.reload()
             cy.contains('Argus All-Weather Tank').click()
             cy.get('#option-label-size-144-item-166').click().wait(2000)
@@ -447,15 +440,7 @@ describe('Payments', function () {
             cy.get('#product-addtocart-button').click().wait(3000)
             cy.get('.showcart').click()
             cy.get('#top-cart-btn-checkout').click().wait(3000)
-            cy.get('.button').click().wait(3000)
-            cy.get('input[name=firstname]').type('Testperson-dk')
-            cy.get('input[name=lastname]').type('Approved')
-            cy.get('select[name=country_id]').select('Denmark')
-            cy.get('input[name="street[0]"]').type('Sæffleberggate 56,1 mf')
-            cy.get('input[name=city]').type('Varde')
-            cy.get('input[name=postcode]').type('6800')
-            cy.get('input[name=telephone]').type('20123456').wait(3000)
-            cy.get('.button').click().wait(3000)
+            cy.get('.button').click().wait(5000)
             cy.get(':nth-child(5) > div.primary > .action').click().wait(3000)
             cy.fixture('config').then((admin) => {
                 if (admin.SUBSCRIPTION_TERMINAL_NAME != "") {
