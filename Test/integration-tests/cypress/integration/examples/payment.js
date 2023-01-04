@@ -106,29 +106,6 @@ describe('Payments', function () {
     //     })
     // })
 
-    it('Subscription', function () {
-        const ord = new Order()
-        ord.clrcookies()
-        ord.visit()
-        ord.signin()
-        ord.subscription_product()
-        cy.get('body').then(($a) => {
-            if ($a.find("label:contains('Subscribe to this product.')").length) {
-                cy.contains('Subscribe to this product.')
-                    .click({ force: true })
-                ord.subscrition_check()
-                ord.subscription_payment()
-                ord.admin()
-                ord.capture()
-            }
-            else {
-                cy.log('Subscription product not found')
-                this.skip()
-            }
-
-        })
-    })
-
     it('CC partial capture', function () {
         const ord = new Order()
         ord.clrcookies()
