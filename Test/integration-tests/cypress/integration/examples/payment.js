@@ -441,7 +441,7 @@ describe('Payments', function () {
             cy.get('.showcart').click()
             cy.get('#top-cart-btn-checkout').click().wait(3000)
             cy.get('.button').click().wait(5000)
-            cy.get(':nth-child(5) > div.primary > .action').click().wait(3000)
+            cy.contains('Place Order').click().wait(3000)
             cy.fixture('config').then((admin) => {
                 if (admin.SUBSCRIPTION_TERMINAL_NAME != "") {
                     ord.cc_payment('')
