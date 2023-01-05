@@ -438,7 +438,7 @@ describe('Payments', function () {
             cy.contains('End by a cycle').click()
             cy.get('.amrec-content > .amrec-input').type('2').wait(3000)
             cy.get('#product-addtocart-button').click().wait(3000)
-            cy.get('.showcart').click()
+            cy.get('.showcart').click().wait(5000)
             cy.get('#top-cart-btn-checkout').click().wait(3000)
             cy.get('.button').click().wait(5000)
             cy.contains('Place Order').click().wait(3000)
