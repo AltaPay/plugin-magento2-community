@@ -124,6 +124,13 @@ class InstallTermConfig extends Http implements AppInterface
             0
         );
 
+        $this->resourceConfig->saveConfig(
+            'payment/sdm_altapay_config/general/payment_template',
+            'payment_sdm_altapay_config_general_payment_template',
+            'default',
+            0
+        );
+
         // Save Order Status
 
         $this->resourceConfig->saveConfig(

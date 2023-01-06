@@ -110,9 +110,14 @@ class Order {
     }
 
     subscription_product() {
-        cy.get('img').click()
-        cy.contains('Push It Messenger Bag').click({ force: true }).wait(5000)
-
+        cy.get('#menu-magento-catalog-catalog > [onclick="return false;"]').click({force:true})
+        cy.get('.item-catalog-products > a > span').click({force:true}).wait(3000)
+        cy.reload()
+        cy.get('#fulltext').first().focus().clear({force:true}).type('Argus All-Weather Tank').type('{enter}').wait(3000)
+        cy.get('[data-repeat-index="5"] > .data-grid-actions-cell > .action-menu-item').click().wait(3000)
+        cy.get('[data-index="subscription-settings"] > .fieldset-wrapper-title > .admin__collapsible-title > [data-bind="i18n: label"]').click().wait(3000)
+        cy.get('select[name="product[am_recurring_enable]"]').select('global_setting')
+        cy.get('#save-button').click().wait(3000)
     }
     subscrition_check() {
         cy.get('[for="radio_subscribe_product"]').wait(1000).click()

@@ -128,7 +128,16 @@
                         <frontend_model>SDM\Altapay\Block\System\Config\Button</frontend_model>
                     </field>
                 </group>
-
+                <group id="general" translate="label" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <attribute type="expanded">0</attribute>
+                    <label>Pay by link Email Template</label>
+                    <comment><![CDATA[]]></comment>
+                    <field id="payment_template" translate="label" type="select" sortOrder="3" showInDefault="1" showInStore="1" showInWebsite="1">
+                        <label>Email Template</label>
+                        <comment><![CDATA[]]></comment>        
+                        <source_model>SDM\Altapay\Model\Config\Source\Email\Template</source_model>
+                    </field>
+                </group>
                 <include path="SDM_Altapay::system/terminal1.xml"/>
                 <include path="SDM_Altapay::system/terminal2.xml"/>
                 <include path="SDM_Altapay::system/terminal3.xml"/>
