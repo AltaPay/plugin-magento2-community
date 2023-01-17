@@ -3,7 +3,7 @@ All notable changes to this project will be documented in this file.
 
 ## [3.5.7]
 ### Fixed 
-- Fix: Assigned default value to "isReservation" parameter in setCustomer method
+- Fix: The default value for "isReservation" isn't defined.
 
 ## [3.5.6]
 ### Added 
