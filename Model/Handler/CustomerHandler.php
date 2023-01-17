@@ -63,7 +63,7 @@ class CustomerHandler
     
     /**
      * @param Order $order
-     * @param       $isReservation
+     * @param Bool  $isReservation
      *
      * @return Customer
      * @throws \Exception

@@ -1,6 +1,10 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [3.5.7]
+### Fixed 
+- Fix: Assigned default value to "isReservation" parameter in setCustomer method
+
 ## [3.5.6]
 ### Added 
 - Add option to select custom email template for pay by link
