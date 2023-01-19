@@ -63,12 +63,12 @@ class CustomerHandler
     
     /**
      * @param Order $order
-     * @param       $isReservation
+     * @param Bool  $isReservation
      *
      * @return Customer
      * @throws \Exception
      */
-    public function setCustomer(Order $order, $isReservation)
+    public function setCustomer(Order $order, $isReservation = false)
     {
         $address       = new Address();
         $customerEmail = '';

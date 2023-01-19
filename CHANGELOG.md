@@ -1,6 +1,10 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [3.5.7]
+### Fixed 
+- Fix: The default value for "isReservation" isn't defined.
+
 ## [3.5.6]
 ### Added 
 - Add option to select custom email template for pay by link
