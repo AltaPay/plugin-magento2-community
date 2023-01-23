@@ -1,6 +1,10 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [3.5.8]
+### Fixed 
+- Fix: Reconciliation identifiers are shown on the wrong orders.
+
 ## [3.5.7]
 ### Fixed 
 - Fix: The default value for "isReservation" isn't defined.
