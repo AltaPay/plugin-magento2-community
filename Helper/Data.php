@@ -230,8 +230,7 @@ class Data extends AbstractHelper
      */
     public function getReconciliationData($orderId, $identifier = ''){
         $collection = $this->reconciliation->create()->getCollection()
-            ->addFieldToFilter('order_id', $orderId)
-            ->addFieldToFilter('order_id', ['neq' => 0]);
+            ->addFieldToFilter('order_id', $orderId);
 
         if($identifier){
             $collection->addFieldToFilter('identifier', $identifier);
