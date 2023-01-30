@@ -451,6 +451,7 @@ class Gateway implements GatewayInterface
         }
         $terminalName = $this->systemConfig->getTerminalConfig($terminalId, 'terminalname', $storeScope, $storeCode);
         $isApplePay = $this->systemConfig->getTerminalConfig($terminalId, 'isapplepay', $storeScope, $storeCode);
+        $unscheduledType = $this->systemConfig->getTerminalConfig($terminalId, 'unscheduledtype', $storeScope, $storeCode);
         //Transaction Info
         $transactionDetail = $this->helper->transactionDetail($orderId);
         $payment = $order->getPayment();
@@ -474,10 +475,12 @@ class Gateway implements GatewayInterface
             $request->setCreditCardToken($token);
             $request->setAgreement(
                 $this->agreementDetail(
+                    $payment,
                     $quote->getAllItems(),
                     $baseUrl,
                     $data['agreement_type'],
-                    $data['agreement_id']
+                    $data['agreement_id'],
+                    $unscheduledType
                 )
             );
             $isReservation = true;
@@ -510,7 +513,7 @@ class Gateway implements GatewayInterface
             } else {
                 $request->setType('subscription');
             }
-            $request->setAgreement($this->agreementDetail($quote->getAllItems(), $baseUrl, "recurring", null));
+            $request->setAgreement($this->agreementDetail($payment, $quote->getAllItems(), $baseUrl, "recurring", null));
         }
         // check if auto capture enabled
         if (!$this->helper->validateQuote($quote) && $this->systemConfig->getTerminalConfig($terminalId, 'capture', $storeScope, $storeCode)) {
@@ -622,7 +625,7 @@ class Gateway implements GatewayInterface
      *
      * @return array
      */
-    private function agreementDetail($items, $baseUrl, $agreementType, $agreementId = null)
+    private function agreementDetail($payment, $items, $baseUrl, $agreementType, $agreementId = null, $unscheduledType = null)
     {
         $agreementDetails = [];
         if ($items) {
@@ -630,8 +633,8 @@ class Gateway implements GatewayInterface
                 $agreementDetails['id'] = $agreementId;
             }
             $agreementDetails['type'] = $agreementType;
-            if ($agreementType === "unscheduled") {
-                $agreementDetails['unscheduled_type'] = 'incremental';
+            if ($agreementType === "unscheduled" && !empty($unscheduledType)) {
+                $agreementDetails['unscheduled_type'] = $unscheduledType;
             } else {
                 $agreementDetails['adminUrl'] = $baseUrl . 'amasty_recurring/customer/subscriptions/';
                 /** @var Item $item */
@@ -644,6 +647,8 @@ class Gateway implements GatewayInterface
                 }
             }
         }
+        $payment->setAdditionalInformation('agreement_detail', $agreementDetails);
+        $payment->save();
 
         return $agreementDetails;
     }

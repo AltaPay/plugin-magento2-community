@@ -74,6 +74,12 @@
             <config_path>payment/terminal2/savecardtoken</config_path>
             <frontend_class>altapay-terminal-token-control</frontend_class>
         </field>
+        <field id="unscheduledtype" translate="label comment" type="select" sortOrder="60" showInDefault="1" showInWebsite="1" showInStore="1">
+            <label>Unscheduled Type:</label>
+            <comment>If you allow customer to save credit card token choose unschedule type</comment>
+            <config_path>payment/terminal2/unscheduledtype</config_path>
+            <source_model>SDM\Altapay\Model\Config\Source\UnscheduledType</source_model>
+        </field>
         <field id="avscontrol" translate="label comment" type="select" sortOrder="70" showInDefault="1" showInWebsite="1" showInStore="1">
             <label>AVS</label>
             <comment>Address Verification System</comment>
