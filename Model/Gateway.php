@@ -442,6 +442,7 @@ class Gateway implements GatewayInterface
         $baseUrl = $this->storeManager->getStore()->getBaseUrl();
         $storeCode = $order->getStore()->getCode();
         $isReservation = false;
+        $agreementType = "recurring";
         //Authenticate the connection with the Payment Gateway
         $auth = $this->systemConfig->getAuth($storeCode);
         $api = new TestAuthentication($auth);
@@ -451,7 +452,8 @@ class Gateway implements GatewayInterface
         }
         $terminalName = $this->systemConfig->getTerminalConfig($terminalId, 'terminalname', $storeScope, $storeCode);
         $isApplePay = $this->systemConfig->getTerminalConfig($terminalId, 'isapplepay', $storeScope, $storeCode);
-        $unscheduledType = $this->systemConfig->getTerminalConfig($terminalId, 'unscheduledtype', $storeScope, $storeCode);
+        $agreementConfig = $this->systemConfig->getTerminalConfig($terminalId, 'agreementtype', $storeScope, $storeCode);
+        $unscheduledTypeConfig = $this->systemConfig->getTerminalConfig($terminalId, 'unscheduledtype', $storeScope, $storeCode);
         //Transaction Info
         $transactionDetail = $this->helper->transactionDetail($orderId);
         $payment = $order->getPayment();
@@ -480,7 +482,7 @@ class Gateway implements GatewayInterface
                     $baseUrl,
                     $data['agreement_type'],
                     $data['agreement_id'],
-                    $unscheduledType
+                    $data['agreement_unscheduled']
                 )
             );
             $isReservation = true;
@@ -513,8 +515,13 @@ class Gateway implements GatewayInterface
             } else {
                 $request->setType('subscription');
             }
-            $request->setAgreement($this->agreementDetail($payment, $quote->getAllItems(), $baseUrl, "recurring", null));
         }
+
+        if(!$this->helper->validateQuote($quote) && $agreementConfig !== "recurring") {
+            $agreementType = $agreementConfig;
+        }
+
+        $request->setAgreement($this->agreementDetail($payment, $quote->getAllItems(), $baseUrl, $agreementType, null, $unscheduledTypeConfig)); 
         // check if auto capture enabled
         if (!$this->helper->validateQuote($quote) && $this->systemConfig->getTerminalConfig($terminalId, 'capture', $storeScope, $storeCode)) {
             $request->setType('paymentAndCapture');
@@ -633,7 +640,7 @@ class Gateway implements GatewayInterface
                 $agreementDetails['id'] = $agreementId;
             }
             $agreementDetails['type'] = $agreementType;
-            if ($agreementType === "unscheduled" && !empty($unscheduledType)) {
+            if ($agreementType === "unscheduled" ) {
                 $agreementDetails['unscheduled_type'] = $unscheduledType;
             } else {
                 $agreementDetails['adminUrl'] = $baseUrl . 'amasty_recurring/customer/subscriptions/';

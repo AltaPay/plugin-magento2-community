@@ -447,10 +447,12 @@ class Generator
         $cardType       = '';
         $expires        = '';
         $setOrderStatus = true;
-        $agreementType  = "unscheduled";
+        $agreementType = "recurring";
+        $unscheduledType = null;
+
+        // $agreementType  = "unscheduled";
         $storeScope     = \Magento\Store\Model\ScopeInterface::SCOPE_STORE;
         $callback       = new Callback($request->getPostValue());
-    
         try {
             $response                = $callback->call();
             $paymentType             = $response->type;
@@ -471,6 +473,8 @@ class Generator
             $orderStatusCapture      = $this->systemConfig->getStatusConfig('autocapture', $storeScope, $storeCode);
             $responseComment         = __(ConstantConfig::CONSUMER_CANCEL_PAYMENT);
             $historyComment          = __(ConstantConfig::CANCELLED) . '|' . $responseComment;
+            $agreementConfig         = $this->getConfigValue($response, $storeScope, $storeCode, "agreementtype");
+            $unscheduledTypeConfig   = $this->getConfigValue($response, $storeScope, $storeCode, "unscheduledtype");
             
             foreach ($response->Transactions as $key => $transaction) {
                 if ($transaction->CreatedDate > $max_date) {
@@ -519,8 +523,11 @@ class Generator
                     if (isset($transaction->PaymentSchemeName)) {
                         $cardType = $transaction->PaymentSchemeName;
                     }
-                    if ($this->helper->validateQuote($quote)) {
-                        $agreementType = "recurring";
+                    if (!$this->helper->validateQuote($quote) && $agreementConfig !== "recurring") {
+                        $agreementType = $this->getConfigValue($response, $storeScope, $storeCode, "agreementtype");
+                    }
+                    if($agreementType == "unscheduled_type"){
+                        $unscheduledType = $unscheduledTypeConfig;
                     }
                     if ($response->type === "verifyCard") {
                         $model = $this->dataToken->create();
@@ -530,6 +537,7 @@ class Generator
                             "token" => $ccToken,
                             "agreement_id" => $transactionId,
                             "agreement_type" => $agreementType,
+                            "agreement_unscheduled" => $unscheduledType,
                             "masked_pan" => $maskedPan,
                             "currency_code" => $order->getOrderCurrencyCode(),
                             "expires" => $expires,
@@ -854,5 +862,44 @@ class Generator
             }
         }
         return $latestTransKey;
+    }
+    
+    /**
+     * @param $response
+     * @param $terminalName
+     * @param $storeScope
+     * @param $storeCode
+     * @param $field
+     *
+     * @return null
+     */
+    private function getConfigValue(
+        $response,
+        $storeScope,
+        $storeCode,
+        $field = null
+    ) {
+        $configData = null;
+        foreach (SystemConfig::getTerminalCodes() as $terminalName) {
+            $terminalConfig = $this->systemConfig->getTerminalConfigFromTerminalName(
+                    $terminalName,
+                    'terminalname',
+                    $storeScope,
+                    $storeCode
+                );
+            if ($terminalConfig === $response->Transactions[$this->getLatestTransaction($response)]->Terminal
+            ) {
+                
+                $configData = $this->systemConfig->getTerminalConfigFromTerminalName(
+                        $terminalName,
+                        $field,
+                        $storeScope,
+                        $storeCode
+                    );
+                break;
+            }
+        }
+
+        return $configData;
     }
 }

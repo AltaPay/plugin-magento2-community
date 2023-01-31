@@ -2,6 +2,10 @@
 All notable changes to this project will be documented in this file.
 
 ## [3.5.8]
+### Added
+- Pass agreement parameters in chargeSubscription in case agreement[type] is unsceduled.
+
+## [3.5.8]
 ### Fixed 
 - Fix: Reconciliation identifiers are shown on the wrong orders.
 
