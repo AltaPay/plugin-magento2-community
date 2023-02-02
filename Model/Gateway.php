@@ -442,7 +442,6 @@ class Gateway implements GatewayInterface
         $baseUrl = $this->storeManager->getStore()->getBaseUrl();
         $storeCode = $order->getStore()->getCode();
         $isReservation = false;
-        $agreementType = "recurring";
         //Authenticate the connection with the Payment Gateway
         $auth = $this->systemConfig->getAuth($storeCode);
         $api = new TestAuthentication($auth);
@@ -454,6 +453,7 @@ class Gateway implements GatewayInterface
         $isApplePay = $this->systemConfig->getTerminalConfig($terminalId, 'isapplepay', $storeScope, $storeCode);
         $agreementConfig = $this->systemConfig->getTerminalConfig($terminalId, 'agreementtype', $storeScope, $storeCode);
         $unscheduledTypeConfig = $this->systemConfig->getTerminalConfig($terminalId, 'unscheduledtype', $storeScope, $storeCode);
+        $savecardtoken = $this->systemConfig->getTerminalConfig($terminalId, 'savecardtoken', $storeScope, $storeCode);
         //Transaction Info
         $transactionDetail = $this->helper->transactionDetail($orderId);
         $payment = $order->getPayment();
@@ -471,7 +471,7 @@ class Gateway implements GatewayInterface
                 $data = $this->getToken($order->getCustomerId(), null, $post['transaction_id']);
         }
     
-        if (!empty($data)) {
+        if ($savecardtoken && !empty($data)) {
             $request = new ReservationOfFixedAmount($auth);
             $token   = $data['token'];
             $request->setCreditCardToken($token);
@@ -518,6 +518,8 @@ class Gateway implements GatewayInterface
         }
 
         if(!$this->helper->validateQuote($quote) && $agreementConfig !== "recurring") {
+            $agreementType = "unscheduled";
+        } else {
             $agreementType = $agreementConfig;
         }
 

@@ -268,15 +268,16 @@ define(
                 var paymentMethod = window.checkoutConfig.payment[this.getDefaultCode()].terminaldata;
                 for (var obj in paymentMethod) {
                     if (obj === self.getCode()) {
-                        if (paymentMethod[obj].savedtokenlist != " ") {
-                            if (paymentMethod[obj].savedtokenlist != null) {
-                                savedtokenlist = JSON.parse(paymentMethod[obj].savedtokenlist)
+                        if (paymentMethod[obj].savedtokenlist != " " && paymentMethod[obj].savedtokenlist != null) {
+                            if((Object.keys(JSON.parse(paymentMethod[obj].savedtokenlist)).length) > 1){
+                                savedtokenlist = JSON.parse(paymentMethod[obj].savedtokenlist);
                             }
                         }
                     }
                 }
                 return savedtokenlist;
             },
+            
             savedTokenPrimaryOption: function () {
                 var self = this;
                 var savedtokenprimaryoption;

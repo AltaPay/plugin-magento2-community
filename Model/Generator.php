@@ -447,10 +447,7 @@ class Generator
         $cardType       = '';
         $expires        = '';
         $setOrderStatus = true;
-        $agreementType = "recurring";
         $unscheduledType = null;
-
-        // $agreementType  = "unscheduled";
         $storeScope     = \Magento\Store\Model\ScopeInterface::SCOPE_STORE;
         $callback       = new Callback($request->getPostValue());
         try {
@@ -523,10 +520,12 @@ class Generator
                     if (isset($transaction->PaymentSchemeName)) {
                         $cardType = $transaction->PaymentSchemeName;
                     }
-                    if (!$this->helper->validateQuote($quote) && $agreementConfig !== "recurring") {
-                        $agreementType = $this->getConfigValue($response, $storeScope, $storeCode, "agreementtype");
+                    if(!$this->helper->validateQuote($quote) && $agreementConfig !== "recurring") {
+                        $agreementType = "unscheduled";
+                    } else {
+                        $agreementType = $agreementConfig;
                     }
-                    if($agreementType == "unscheduled_type"){
+                    if($agreementType == "unscheduled"){
                         $unscheduledType = $unscheduledTypeConfig;
                     }
                     if ($response->type === "verifyCard") {
