@@ -522,8 +522,9 @@ class Gateway implements GatewayInterface
         } else {
             $agreementType = $agreementConfig;
         }
-
-        $request->setAgreement($this->agreementDetail($payment, $quote->getAllItems(), $baseUrl, $agreementType, null, $unscheduledTypeConfig)); 
+        if($savecardtoken){
+            $request->setAgreement($this->agreementDetail($payment, $quote->getAllItems(), $baseUrl, $agreementType, null, $unscheduledTypeConfig)); 
+        }
         // check if auto capture enabled
         if (!$this->helper->validateQuote($quote) && $this->systemConfig->getTerminalConfig($terminalId, 'capture', $storeScope, $storeCode)) {
             $request->setType('paymentAndCapture');
