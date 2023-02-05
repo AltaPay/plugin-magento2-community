@@ -454,6 +454,8 @@ class Gateway implements GatewayInterface
         $agreementConfig = $this->systemConfig->getTerminalConfig($terminalId, 'agreementtype', $storeScope, $storeCode);
         $unscheduledTypeConfig = $this->systemConfig->getTerminalConfig($terminalId, 'unscheduledtype', $storeScope, $storeCode);
         $savecardtoken = $this->systemConfig->getTerminalConfig($terminalId, 'savecardtoken', $storeScope, $storeCode);
+        $agreementType = null;
+        $data = null;
         //Transaction Info
         $transactionDetail = $this->helper->transactionDetail($orderId);
         $payment = $order->getPayment();
@@ -517,20 +519,19 @@ class Gateway implements GatewayInterface
             }
         }
 
-        if(!$this->helper->validateQuote($quote) && $agreementConfig !== "recurring") {
-            $agreementType = "unscheduled";
-        } else {
-            $agreementType = $agreementConfig;
-        }
-        if($savecardtoken){
-            $request->setAgreement($this->agreementDetail($payment, $quote->getAllItems(), $baseUrl, $agreementType, null, $unscheduledTypeConfig)); 
-        }
         // check if auto capture enabled
         if (!$this->helper->validateQuote($quote) && $this->systemConfig->getTerminalConfig($terminalId, 'capture', $storeScope, $storeCode)) {
             $request->setType('paymentAndCapture');
         }
-        if (isset($post['savecard']) && $post['savecard'] != false) {
+        if (isset($post['savecard']) && $post['savecard'] && $savecardtoken) {
+            $agreementType = $this->helper->validateQuote($quote) ? $agreementConfig : "unscheduled";
             $request->setType('verifyCard');
+        } else {
+            $agreementType = $this->helper->validateQuote($quote) ? "recurring" : null;
+        }
+
+        if (!$isReservation) {
+            $request->setAgreement($this->agreementDetail($payment, $quote->getAllItems(), $baseUrl, $agreementType, null, $unscheduledTypeConfig)); 
         }
         //set orderlines to the request
         $request->setOrderLines($orderLines);
@@ -635,10 +636,10 @@ class Gateway implements GatewayInterface
      *
      * @return array
      */
-    private function agreementDetail($payment, $items, $baseUrl, $agreementType, $agreementId = null, $unscheduledType = null)
+    private function agreementDetail($payment, $items, $baseUrl, $agreementType = null, $agreementId = null, $unscheduledType = null)
     {
         $agreementDetails = [];
-        if ($items) {
+        if ($items && !empty($agreementType)) {
             if ($agreementId) {
                 $agreementDetails['id'] = $agreementId;
             }

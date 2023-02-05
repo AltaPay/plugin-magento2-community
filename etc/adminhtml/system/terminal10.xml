@@ -76,7 +76,7 @@
         </field>
         <field id="unscheduledtype" translate="label comment" type="select" sortOrder="70" showInDefault="1" showInWebsite="1" showInStore="1">
             <label>Unscheduled Type:</label>
-            <comment>If you allow customer to save credit card token choose unschedule type</comment>
+            <comment>This setting will only function if token control is enabled.</comment>
             <config_path>payment/terminal10/unscheduledtype</config_path>
             <source_model>SDM\Altapay\Model\Config\Source\UnscheduledType</source_model>
         </field>

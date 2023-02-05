@@ -472,6 +472,7 @@ class Generator
             $historyComment          = __(ConstantConfig::CANCELLED) . '|' . $responseComment;
             $agreementConfig         = $this->getConfigValue($response, $storeScope, $storeCode, "agreementtype");
             $unscheduledTypeConfig   = $this->getConfigValue($response, $storeScope, $storeCode, "unscheduledtype");
+            $savecardtoken   = $this->getConfigValue($response, $storeScope, $storeCode, "savecardtoken");
             
             foreach ($response->Transactions as $key => $transaction) {
                 if ($transaction->CreatedDate > $max_date) {
@@ -520,10 +521,10 @@ class Generator
                     if (isset($transaction->PaymentSchemeName)) {
                         $cardType = $transaction->PaymentSchemeName;
                     }
-                    if(!$this->helper->validateQuote($quote) && $agreementConfig !== "recurring") {
-                        $agreementType = "unscheduled";
+                    if ($savecardtoken) {
+                        $agreementType = $this->helper->validateQuote($quote) ? $agreementConfig : "unscheduled";
                     } else {
-                        $agreementType = $agreementConfig;
+                        $agreementType = $this->helper->validateQuote($quote) ? "recurring" : null;
                     }
                     if($agreementType == "unscheduled"){
                         $unscheduledType = $unscheduledTypeConfig;
