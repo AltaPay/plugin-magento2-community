@@ -530,7 +530,7 @@ class Gateway implements GatewayInterface
             $agreementType = $this->helper->validateQuote($quote) ? "recurring" : null;
         }
 
-        if (!$isReservation) {
+        if ($savecardtoken && !$isReservation) {
             $request->setAgreement($this->agreementDetail($payment, $quote->getAllItems(), $baseUrl, $agreementType, null, $unscheduledTypeConfig)); 
         }
         //set orderlines to the request
