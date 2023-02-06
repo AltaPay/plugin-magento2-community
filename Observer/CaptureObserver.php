@@ -291,14 +291,16 @@ class CaptureObserver implements ObserverInterface
         $agreementDetail = $payment->getAdditionalInformation('agreement_detail');
         if ($paymentType === 'subscription' || $paymentType === 'subscriptionAndCharge') {
             $api = new ChargeSubscription($this->systemConfig->getAuth($storeCode));
-            if($agreementDetail['type'] === "unscheduled") {
-                $api->setAgreement( 
-                    [
-                        "agreement_type" =>  $agreementDetail['type'],
-                        "unscheduled_type" =>  $agreementDetail['unscheduled_type']
-                    ]);
-            } else {
-                $api->setAgreement(["agreement_type" =>  $agreementDetail['type']]);
+            if(!empty($agreementDetail)){
+                if($agreementDetail['type'] === "unscheduled") {
+                    $api->setAgreement( 
+                        [
+                            "agreement_type" =>  $agreementDetail['type'],
+                            "unscheduled_type" =>  $agreementDetail['unscheduled_type']
+                        ]);
+                } else {
+                    $api->setAgreement(["agreement_type" =>  $agreementDetail['type']]);
+                }
             }
         } else {
             $api = new CaptureReservation($this->systemConfig->getAuth($storeCode));
