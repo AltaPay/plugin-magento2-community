@@ -214,8 +214,9 @@ class ConfigProvider implements ConfigProviderInterface
             $isApplePay    = $this->scopeConfig->getValue($paymentCode . '/isapplepay', $storeScope, $storeCode);
             $applePayLabel = $this->scopeConfig->getValue($paymentCode . '/applepaylabel', $storeScope, $storeCode);
             $agreementType = $this->scopeConfig->getValue($paymentCode . '/agreementtype', $storeScope, $storeCode);
-            if($agreementType === "recurring") {
+            if($agreementType === "recurring" || $agreementType === "instalment") {
                 $savedTokenList = null;
+                $saveCardToken = null;
             }
             if ($terminalStatus == 1) {
                 $methods[$key] = [

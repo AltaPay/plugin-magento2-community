@@ -523,16 +523,13 @@ class Gateway implements GatewayInterface
         if (!$this->helper->validateQuote($quote) && $this->systemConfig->getTerminalConfig($terminalId, 'capture', $storeScope, $storeCode)) {
             $request->setType('paymentAndCapture');
         }
-        if (isset($post['savecard']) && $post['savecard'] && $savecardtoken) {
-            $agreementType = $this->helper->validateQuote($quote) ? $agreementConfig : "unscheduled";
+        if (isset($post['savecard']) && $post['savecard'] && $savecardtoken && (empty($agreementConfig) || $agreementConfig === "unscheduled")) {
+            $request->setAgreement($this->agreementDetail($payment, $quote->getAllItems(), $baseUrl, $agreementConfig, null, $unscheduledTypeConfig));
             $request->setType('verifyCard');
         } else {
-            $agreementType = $this->helper->validateQuote($quote) ? "recurring" : null;
+            $request->setAgreement($this->agreementDetail($payment, $quote->getAllItems(), $baseUrl, $agreementConfig)); 
         }
 
-        if ($savecardtoken && !$isReservation) {
-            $request->setAgreement($this->agreementDetail($payment, $quote->getAllItems(), $baseUrl, $agreementType, null, $unscheduledTypeConfig)); 
-        }
         //set orderlines to the request
         $request->setOrderLines($orderLines);
 
@@ -644,9 +641,10 @@ class Gateway implements GatewayInterface
                 $agreementDetails['id'] = $agreementId;
             }
             $agreementDetails['type'] = $agreementType;
-            if ($agreementType === "unscheduled" ) {
+            if ($agreementType === "unscheduled") {
                 $agreementDetails['unscheduled_type'] = $unscheduledType;
-            } else {
+            }
+            if ($agreementType === "recurring") {
                 $agreementDetails['adminUrl'] = $baseUrl . 'amasty_recurring/customer/subscriptions/';
                 /** @var Item $item */
                 foreach ($items as $item) {
