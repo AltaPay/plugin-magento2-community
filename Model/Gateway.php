@@ -42,6 +42,7 @@ use SDM\Altapay\Api\TransactionRepositoryInterface;
 use Magento\Sales\Model\Order\Invoice;
 use Magento\Framework\DB\TransactionFactory;
 use Magento\Sales\Model\Service\InvoiceService;
+use Altapay\Api\Others\Terminals;
 
 /**
  * Class Gateway
@@ -456,6 +457,11 @@ class Gateway implements GatewayInterface
         $savecardtoken = $this->systemConfig->getTerminalConfig($terminalId, 'savecardtoken', $storeScope, $storeCode);
         $agreementType = null;
         $data = null;
+        $isCreditCard = false;
+        $nature = $this->terminalNature($auth, $terminalName);
+        if(count($nature) == 1 && $nature[0]->Nature === "CreditCard") {
+            $isCreditCard = true;
+        }
         //Transaction Info
         $transactionDetail = $this->helper->transactionDetail($orderId);
         $payment = $order->getPayment();
@@ -523,11 +529,13 @@ class Gateway implements GatewayInterface
         if (!$this->helper->validateQuote($quote) && $this->systemConfig->getTerminalConfig($terminalId, 'capture', $storeScope, $storeCode)) {
             $request->setType('paymentAndCapture');
         }
-        if (isset($post['savecard']) && $post['savecard'] && $savecardtoken && (empty($agreementConfig) || $agreementConfig === "unscheduled")) {
-            $request->setAgreement($this->agreementDetail($payment, $quote->getAllItems(), $baseUrl, $agreementConfig, null, $unscheduledTypeConfig));
-            $request->setType('verifyCard');
-        } else {
+        if ($isCreditCard) {
+            if (isset($post['savecard']) && $post['savecard'] && $savecardtoken && (empty($agreementConfig) || $agreementConfig === "unscheduled")) {
+                $request->setAgreement($this->agreementDetail($payment, $quote->getAllItems(), $baseUrl, $agreementConfig, null, $unscheduledTypeConfig));
+                $request->setType('verifyCard');
+            } else {
             $request->setAgreement($this->agreementDetail($payment, $quote->getAllItems(), $baseUrl, $agreementConfig)); 
+            }
         }
 
         //set orderlines to the request
@@ -824,5 +832,25 @@ class Gateway implements GatewayInterface
         }
         
         return $collection->getFirstItem()->getData();
+    }
+
+    /**
+     * Retrieve the nature of the selected terminal
+     * 
+     * @param object $auth
+     * @param string $selectedTerminal
+     * 
+     * @return array An array of nature objects
+     */
+    private function terminalNature($auth, $selectedTerminal)
+    {
+        $call     = new Terminals($auth);
+        $response = $call->call();
+        foreach ($response->Terminals as $terminal) {
+            if($terminal->Title == $selectedTerminal) {
+                return $terminal->Natures;
+            }
+        }
+        return [];
     }
 }
