@@ -15,9 +15,10 @@ define(
         'Magento_Checkout/js/view/payment/default',
         'Magento_Customer/js/customer-data',
         'SDM_Altapay/js/action/set-payment',
-        'Magento_Checkout/js/action/redirect-on-success'
+        'Magento_Checkout/js/action/redirect-on-success',
+        'Magento_Checkout/js/model/quote'
     ],
-    function ($, Component, storage, Action, redirectOnSuccessAction) {
+    function ($, Component, storage, Action, redirectOnSuccessAction, quote) {
         'use strict';
 
         return Component.extend({
@@ -157,7 +158,7 @@ define(
                     "total": {
                         "label": applePayLabel,
                         "type": "final",
-                        "amount": configData.grandTotalAmount
+                        "amount": quote.totals().base_grand_total
                     }
                 };
                 
@@ -186,7 +187,7 @@ define(
                     let total = {
                         "label": applePayLabel,
                         "type": "final",
-                        "amount": configData.grandTotalAmount
+                        "amount": quote.totals().base_grand_total
                     }
             
                     const update = { "newTotal": total };
