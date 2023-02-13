@@ -141,7 +141,7 @@ class ConfigProvider implements ConfigProviderInterface
         $getCurrentQuote     = $this->_checkoutSession->getQuote();
         $config                     = [];
         $baseUrl                    = $this->_storeManager->getStore()->getBaseUrl();
-        $grandTotal                 = $getCurrentQuote->getGrandTotal();
+
         $countryCode                = $this->scopeConfig->getValue('general/country/default',
         \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
         return [
@@ -153,7 +153,6 @@ class ConfigProvider implements ConfigProviderInterface
                     'auth'         => $this->checkAuth(),
                     'connection'   => $this->checkConn(),
                     'terminaldata' => $activePaymentMethod,
-                    'grandTotalAmount' => $grandTotal,
                     'countryCode' => $countryCode,
                     'currencyCode' => $this->_storeManager->getStore()->getBaseCurrencyCode(),
                     'baseUrl' => $baseUrl
