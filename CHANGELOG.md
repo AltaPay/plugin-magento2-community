@@ -1,6 +1,10 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [3.5.9]
+### Fixed 
+- Fix: Order confirmation email is not sent when paying via Apple Pay
+
 ## [3.5.8]
 ### Fixed 
 - Fix: Reconciliation identifiers are shown on the wrong orders.
