@@ -19,6 +19,7 @@ use Magento\Sales\Model\Order;
 use SDM\Altapay\Model\ConstantConfig;
 use SDM\Altapay\Model\Handler\CreatePaymentHandler;
 use Magento\Framework\DB\TransactionFactory;
+use Magento\Sales\Model\Order\Email\Sender\OrderSender;
 
 class ApplePayOrder {
 
@@ -67,6 +68,11 @@ class ApplePayOrder {
      */
     private $transactionFactory;
 
+    /**
+     * @var OrderSender
+     */
+    private $orderSender;
+
     public function __construct(
         OrderLoaderInterface $orderLoader,
         Session $checkoutSession,
@@ -76,7 +82,8 @@ class ApplePayOrder {
         SystemConfig $systemConfig,
         Order $order,
         CreatePaymentHandler $paymentHandler,
-        TransactionFactory $transactionFactory
+        TransactionFactory $transactionFactory,
+        OrderSender $orderSender
     ) {
         $this->orderLoader           = $orderLoader;
         $this->checkoutSession       = $checkoutSession;
@@ -87,6 +94,7 @@ class ApplePayOrder {
         $this->order                 = $order;
         $this->paymentHandler        = $paymentHandler;
         $this->transactionFactory    = $transactionFactory;
+        $this->orderSender           = $orderSender;
     }
 
     /**
@@ -134,6 +142,10 @@ class ApplePayOrder {
                 $payment->setAdditionalInformation('card_type', $cardType);
                 $payment->setAdditionalInformation('payment_type', $paymentType);
                 $payment->save();
+                //send order confirmation email
+                if (!$order->getEmailSent()) {
+                    $this->orderSender->send($order);
+                }
                 //save transaction data
                 $parametersData  = null;
                 $transactionData = json_encode($response);
