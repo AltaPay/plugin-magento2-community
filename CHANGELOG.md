@@ -1,7 +1,7 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
-## [3.5.9]
+## [unreleased]
 ### Added
 - Pass agreement parameters in chargeSubscription in case agreement[type] is unsceduled.
 - Add configuration field and set the possible value of agreement[unscheduled_type].
