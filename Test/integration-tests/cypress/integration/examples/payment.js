@@ -383,6 +383,7 @@ describe('Payments', function () {
                         const payment_link = $a.text();
                         cy.origin('https://pensio.com', { args: { payment_link } }, ({ payment_link }) => {
                             cy.visit(payment_link)
+                            cy.get('#radio_pay_later').click().wait(3000)
                             cy.get('[id=submitbutton]').click().wait(5000)
                             cy.wait(5000)
                             cy.get('[id=klarna-pay-later-fullscreen]').then(function ($iFrame) {
