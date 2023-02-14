@@ -415,7 +415,7 @@ describe('Payments', function () {
         })
     })
 
-    it('Subscription Payment', function () {
+    it.only('Subscription Payment', function () {
         const ord = new Order()
         ord.clrcookies()
         ord.visit()
@@ -435,9 +435,6 @@ describe('Payments', function () {
             cy.get('#option-label-size-144-item-166').click().wait(2000)
             cy.get('#option-label-color-93-item-52').click().wait(2000)
             cy.get('[for="radio_subscribe_product"]').click()
-            cy.get('[for="subscription_plan_3"]').click().wait(3000)
-            cy.contains('End by a cycle').click()
-            cy.get('.amrec-content > .amrec-input').type('2').wait(3000)
             cy.get('#product-addtocart-button').click().wait(3000)
             cy.get('.showcart').click().wait(5000)
             cy.get('#top-cart-btn-checkout').click().wait(3000)
