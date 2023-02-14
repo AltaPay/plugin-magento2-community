@@ -415,7 +415,7 @@ describe('Payments', function () {
         })
     })
 
-    it.only('Subscription Payment', function () {
+    it('Subscription Payment', function () {
         const ord = new Order()
         ord.clrcookies()
         ord.visit()
