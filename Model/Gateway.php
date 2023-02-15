@@ -530,11 +530,18 @@ class Gateway implements GatewayInterface
             $request->setType('paymentAndCapture');
         }
         if ($isCreditCard) {
-            if (isset($post['savecard']) && $post['savecard'] && $savecardtoken && (empty($agreementConfig) || $agreementConfig === "unscheduled")) {
-                $request->setAgreement($this->agreementDetail($payment, $quote->getAllItems(), $baseUrl, $agreementConfig, null, $unscheduledTypeConfig));
-                $request->setType('verifyCard');
-            } else {
-            $request->setAgreement($this->agreementDetail($payment, $quote->getAllItems(), $baseUrl, $agreementConfig)); 
+            $shouldSaveCard = isset($post['savecard']) && $post['savecard'] && $savecardtoken;
+            $isRecurringProduct = $this->helper->validateQuote($quote);
+            
+            if ($agreementConfig === "recurring" || $agreementConfig === "instalment") {
+                if ($isRecurringProduct) {
+                    $request->setAgreement($this->agreementDetail($payment, $quote->getAllItems(), $baseUrl, $agreementConfig));
+                }
+            } elseif (empty($agreementConfig) || $agreementConfig === "unscheduled") {
+                if ($shouldSaveCard) {
+                    $request->setAgreement($this->agreementDetail($payment, $quote->getAllItems(), $baseUrl, "unscheduled", null, $unscheduledTypeConfig));
+                    $request->setType('verifyCard');
+                }
             }
         }
 
