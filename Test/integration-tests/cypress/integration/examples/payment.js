@@ -383,6 +383,7 @@ describe('Payments', function () {
                         const payment_link = $a.text();
                         cy.origin('https://pensio.com', { args: { payment_link } }, ({ payment_link }) => {
                             cy.visit(payment_link)
+                            cy.get('#radio_pay_later').click().wait(3000)
                             cy.get('[id=submitbutton]').click().wait(5000)
                             cy.wait(5000)
                             cy.get('[id=klarna-pay-later-fullscreen]').then(function ($iFrame) {
@@ -433,10 +434,7 @@ describe('Payments', function () {
             cy.contains('Argus All-Weather Tank').click()
             cy.get('#option-label-size-144-item-166').click().wait(2000)
             cy.get('#option-label-color-93-item-52').click().wait(2000)
-            cy.get('[for="radio_subscribe_product"]').click()
-            cy.get('[for="subscription_plan_3"]').click().wait(3000)
-            cy.contains('End by a cycle').click()
-            cy.get('.amrec-content > .amrec-input').type('2').wait(3000)
+            cy.get('[for="radio_subscribe_product"]').click()            
             cy.get('#product-addtocart-button').click().wait(3000)
             cy.get('.showcart').click().wait(5000)
             cy.get('#top-cart-btn-checkout').click().wait(3000)
