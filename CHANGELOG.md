@@ -4,6 +4,7 @@ All notable changes to this project will be documented in this file.
 ## [3.5.9]
 ### Fixed 
 - Fix: Order confirmation email is not sent when paying via Apple Pay
+- Fix: Compilation issue caused by new parameters added to varchar field type.
 
 ## [3.5.8]
 ### Fixed 
