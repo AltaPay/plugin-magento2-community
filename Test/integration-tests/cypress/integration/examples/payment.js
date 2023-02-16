@@ -434,7 +434,7 @@ describe('Payments', function () {
             cy.contains('Argus All-Weather Tank').click()
             cy.get('#option-label-size-144-item-166').click().wait(2000)
             cy.get('#option-label-color-93-item-52').click().wait(2000)
-            cy.get('[for="radio_subscribe_product"]').click()            
+            cy.get('[for="radio_subscribe_product"]').click()
             cy.get('#product-addtocart-button').click().wait(3000)
             cy.get('.showcart').click().wait(5000)
             cy.get('#top-cart-btn-checkout').click().wait(3000)

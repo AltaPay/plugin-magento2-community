@@ -1,10 +1,14 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
-## [unreleased]
+## [3.5.9]
 ### Added
 - Pass agreement parameters in chargeSubscription in case agreement[type] is unsceduled.
 - Add configuration field and set the possible value of agreement[unscheduled_type].
+
+### Fixed 
+- Fix: Order confirmation email is not sent when paying via Apple Pay
+- Fix: Compilation issue caused by new parameters added to varchar field type.
 
 ### Fixed 
 - Fix: An incorrect amount is transmitted to the payment gateway when using the ApplePay payment method

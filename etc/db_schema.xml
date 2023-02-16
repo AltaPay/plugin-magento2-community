@@ -52,7 +52,7 @@
   </table>
   <table name="altapay_reconciliation" resource="default">
     <column xsi:type="int" name="id" padding="10" unsigned="true" nullable="false" identity="true" comment="id"/>
-    <column xsi:type="varchar" name="order_id" padding="32" unsigned="true" nullable="false" identity="false" comment="Order ID"/>
+    <column xsi:type="varchar" name="order_id" nullable="false" comment="Order ID"/>
     <column xsi:type="text" name="identifier" nullable="true" comment="Reconciliation Identifier"/>
     <column xsi:type="text" name="type" nullable="true" comment="Type"/>
     <constraint xsi:type="primary" referenceId="PRIMARY">

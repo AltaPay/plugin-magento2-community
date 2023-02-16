@@ -24,6 +24,7 @@ abstract class ConstantConfig
     const CONSUMER_PAYMENT_FAILED = 'Altapay - Consumer has tried to pay but the payment failed';
     const PAYMENT_COMPLETE = 'Payment is completed';
     const OK_CALLBACK = 'OK callback from Altapay';
+    const CARDWALLET_CALLBACK = 'CardWallet callback from Altapay';
     const BROWSER_BK_BUTTON_COMMENT = 'Payment failed! Consumer has pressed the back button from the payment page.';
 
     /* config url */
