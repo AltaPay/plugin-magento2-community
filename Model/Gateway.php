@@ -42,6 +42,7 @@ use SDM\Altapay\Api\TransactionRepositoryInterface;
 use Magento\Sales\Model\Order\Invoice;
 use Magento\Framework\DB\TransactionFactory;
 use Magento\Sales\Model\Service\InvoiceService;
+use Altapay\Api\Others\Terminals;
 
 /**
  * Class Gateway
@@ -451,6 +452,16 @@ class Gateway implements GatewayInterface
         }
         $terminalName = $this->systemConfig->getTerminalConfig($terminalId, 'terminalname', $storeScope, $storeCode);
         $isApplePay = $this->systemConfig->getTerminalConfig($terminalId, 'isapplepay', $storeScope, $storeCode);
+        $agreementConfig = $this->systemConfig->getTerminalConfig($terminalId, 'agreementtype', $storeScope, $storeCode);
+        $unscheduledTypeConfig = $this->systemConfig->getTerminalConfig($terminalId, 'unscheduledtype', $storeScope, $storeCode);
+        $savecardtoken = $this->systemConfig->getTerminalConfig($terminalId, 'savecardtoken', $storeScope, $storeCode);
+        $agreementType = null;
+        $data = null;
+        $isCreditCard = false;
+        $nature = $this->terminalNature($auth, $terminalName);
+        if(count($nature) == 1 && $nature[0]->Nature === "CreditCard") {
+            $isCreditCard = true;
+        }
         //Transaction Info
         $transactionDetail = $this->helper->transactionDetail($orderId);
         $payment = $order->getPayment();
@@ -468,16 +479,18 @@ class Gateway implements GatewayInterface
                 $data = $this->getToken($order->getCustomerId(), null, $post['transaction_id']);
         }
     
-        if (!empty($data)) {
+        if ($savecardtoken && !empty($data)) {
             $request = new ReservationOfFixedAmount($auth);
             $token   = $data['token'];
             $request->setCreditCardToken($token);
             $request->setAgreement(
                 $this->agreementDetail(
+                    $payment,
                     $quote->getAllItems(),
                     $baseUrl,
                     $data['agreement_type'],
-                    $data['agreement_id']
+                    $data['agreement_id'],
+                    $data['agreement_unscheduled']
                 )
             );
             $isReservation = true;
@@ -510,15 +523,28 @@ class Gateway implements GatewayInterface
             } else {
                 $request->setType('subscription');
             }
-            $request->setAgreement($this->agreementDetail($quote->getAllItems(), $baseUrl, "recurring", null));
         }
+
         // check if auto capture enabled
         if (!$this->helper->validateQuote($quote) && $this->systemConfig->getTerminalConfig($terminalId, 'capture', $storeScope, $storeCode)) {
             $request->setType('paymentAndCapture');
         }
-        if (isset($post['savecard']) && $post['savecard'] != false) {
-            $request->setType('verifyCard');
+        if ($isCreditCard) {
+            $shouldSaveCard = isset($post['savecard']) && $post['savecard'] && $savecardtoken;
+            $isRecurringProduct = $this->helper->validateQuote($quote);
+            
+            if ($agreementConfig === "recurring" || $agreementConfig === "instalment") {
+                if ($isRecurringProduct) {
+                    $request->setAgreement($this->agreementDetail($payment, $quote->getAllItems(), $baseUrl, $agreementConfig));
+                }
+            } elseif (empty($agreementConfig) || $agreementConfig === "unscheduled") {
+                if ($shouldSaveCard) {
+                    $request->setAgreement($this->agreementDetail($payment, $quote->getAllItems(), $baseUrl, "unscheduled", null, $unscheduledTypeConfig));
+                    $request->setType('verifyCard');
+                }
+            }
         }
+
         //set orderlines to the request
         $request->setOrderLines($orderLines);
 
@@ -622,17 +648,18 @@ class Gateway implements GatewayInterface
      *
      * @return array
      */
-    private function agreementDetail($items, $baseUrl, $agreementType, $agreementId = null)
+    private function agreementDetail($payment, $items, $baseUrl, $agreementType = null, $agreementId = null, $unscheduledType = null)
     {
         $agreementDetails = [];
-        if ($items) {
+        if ($items && !empty($agreementType)) {
             if ($agreementId) {
                 $agreementDetails['id'] = $agreementId;
             }
             $agreementDetails['type'] = $agreementType;
             if ($agreementType === "unscheduled") {
-                $agreementDetails['unscheduled_type'] = 'incremental';
-            } else {
+                $agreementDetails['unscheduled_type'] = $unscheduledType;
+            }
+            if ($agreementType === "recurring") {
                 $agreementDetails['adminUrl'] = $baseUrl . 'amasty_recurring/customer/subscriptions/';
                 /** @var Item $item */
                 foreach ($items as $item) {
@@ -644,6 +671,8 @@ class Gateway implements GatewayInterface
                 }
             }
         }
+        $payment->setAdditionalInformation('agreement_detail', $agreementDetails);
+        $payment->save();
 
         return $agreementDetails;
     }
@@ -810,5 +839,25 @@ class Gateway implements GatewayInterface
         }
         
         return $collection->getFirstItem()->getData();
+    }
+
+    /**
+     * Retrieve the nature of the selected terminal
+     * 
+     * @param object $auth
+     * @param string $selectedTerminal
+     * 
+     * @return array An array of nature objects
+     */
+    private function terminalNature($auth, $selectedTerminal)
+    {
+        $call     = new Terminals($auth);
+        $response = $call->call();
+        foreach ($response->Terminals as $terminal) {
+            if($terminal->Title == $selectedTerminal) {
+                return $terminal->Natures;
+            }
+        }
+        return [];
     }
 }

@@ -141,7 +141,7 @@ class ConfigProvider implements ConfigProviderInterface
         $getCurrentQuote     = $this->_checkoutSession->getQuote();
         $config                     = [];
         $baseUrl                    = $this->_storeManager->getStore()->getBaseUrl();
-        $grandTotal                 = $getCurrentQuote->getGrandTotal();
+
         $countryCode                = $this->scopeConfig->getValue('general/country/default',
         \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
         return [
@@ -153,7 +153,6 @@ class ConfigProvider implements ConfigProviderInterface
                     'auth'         => $this->checkAuth(),
                     'connection'   => $this->checkConn(),
                     'terminaldata' => $activePaymentMethod,
-                    'grandTotalAmount' => $grandTotal,
                     'countryCode' => $countryCode,
                     'currencyCode' => $this->_storeManager->getStore()->getBaseCurrencyCode(),
                     'baseUrl' => $baseUrl
@@ -172,17 +171,13 @@ class ConfigProvider implements ConfigProviderInterface
         $model             = $this->dataToken->create();
         $savedTokenList    = [];
         $primary           = '';
-        $agreementType     = "unscheduled";
         $currentCustomerId = $this->customerSession->getCustomer()->getId();
 
         if (!empty($currentCustomerId)) {
-            if ($this->helper->validateQuote($quote)) {
-                $agreementType = "recurring";
-            }
             $collection = $model->getCollection()
                                 ->addFieldToSelect(['id', 'masked_pan', 'primary', 'expires'])
                                 ->addFieldToFilter('customer_id', $currentCustomerId)
-                                ->addFieldToFilter('agreement_type', $agreementType);
+                                ->addFieldToFilter('agreement_type', "unscheduled");
             if (!empty($collection)) {
                 $primary          = $this->ccTokenPrimaryOption($collection);
                 $savedTokenList[] = [
@@ -217,6 +212,11 @@ class ConfigProvider implements ConfigProviderInterface
             $saveCardToken = $this->scopeConfig->getValue($paymentCode . '/savecardtoken', $storeScope, $storeCode);
             $isApplePay    = $this->scopeConfig->getValue($paymentCode . '/isapplepay', $storeScope, $storeCode);
             $applePayLabel = $this->scopeConfig->getValue($paymentCode . '/applepaylabel', $storeScope, $storeCode);
+            $agreementType = $this->scopeConfig->getValue($paymentCode . '/agreementtype', $storeScope, $storeCode);
+            if($agreementType === "recurring" || $agreementType === "instalment") {
+                $savedTokenList = null;
+                $saveCardToken = null;
+            }
             if ($terminalStatus == 1) {
                 $methods[$key] = [
                     'label'             => $label,
