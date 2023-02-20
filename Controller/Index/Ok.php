@@ -60,7 +60,13 @@ class Ok extends Index implements CsrfAwareActionInterface
                 strtolower($post['avs_text'])
             );
         }
-    
+        if (isset($post['fraud_recommendation']) && isset($post['fraud_explanation'])) {
+            $checkAvs = $this->generator->fraudCheck(
+                $this->getRequest(),
+                strtolower($post['fraud_recommendation']),
+                strtolower($post['fraud_explanation'])
+            );
+        }
         if ($this->checkPost() && $checkAvs == false) {
             $isSuccessful = $this->generator->handleOkAction($this->getRequest());
             if (strtolower($post['type']) === "verifycard") {
@@ -81,7 +87,7 @@ class Ok extends Index implements CsrfAwareActionInterface
                 return $this->setSuccessPath($orderId);
             }
         } else {
-            $this->redirectToCheckoutPage();
+            return $this->_redirect('checkout');
         }
     }
     
