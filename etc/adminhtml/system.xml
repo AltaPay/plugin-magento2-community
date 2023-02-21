@@ -120,11 +120,10 @@
                         <label>Enable Fraud Services</label>
                         <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                     </field>
-                    <field id="orderstatus_fraud_detected" translate="label comment" type="select" sortOrder="4" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <field id="orderstatus_fraud" translate="label comment" type="select" sortOrder="2" showInDefault="1" showInWebsite="0" showInStore="0">
                         <label>Order status - Fraud detected</label>
                         <comment>The status on the order if fraud is detected</comment>
                         <source_model>SDM\Altapay\Model\Config\Source\Order\Status\Fraud</source_model>
-                        <config_path>payment/altapay_status/fraud</config_path>
                     </field>
                 </group>
                 <group id="altapay_config_terminalsync" translate="label comment" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">

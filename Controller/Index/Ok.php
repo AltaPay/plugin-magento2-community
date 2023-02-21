@@ -46,11 +46,11 @@ class Ok extends Index implements CsrfAwareActionInterface
     public function execute()
     {
         $this->writeLog();
-        $checkAvs     = false;
-        $post         = $this->getRequest()->getPostValue();
-        $orderId      = $post['shop_orderid'];
-        $order        = $this->order->loadByIncrementId($orderId);
-        $payment      = $order->getPayment();
+        $checkAvs = false;
+        $post = $this->getRequest()->getPostValue();
+        $orderId = $post['shop_orderid'];
+        $order = $this->order->loadByIncrementId($orderId);
+        $payment = $order->getPayment();
         $terminalCode = $payment->getMethod();
         
         if (isset($post['avs_code']) && isset($post['avs_text'])) {
@@ -60,15 +60,20 @@ class Ok extends Index implements CsrfAwareActionInterface
                 strtolower($post['avs_text'])
             );
         }
-        if (isset($post['fraud_recommendation']) && isset($post['fraud_explanation'])) {
-            $checkAvs = $this->generator->fraudCheck(
+        
+        if (isset($post['fraud_recommendation'])
+            && isset($post['fraud_explanation'])
+        ) {
+            $checkFraud = $this->generator->fraudCheck(
                 $this->getRequest(),
                 strtolower($post['fraud_recommendation']),
                 strtolower($post['fraud_explanation'])
             );
         }
-        if ($this->checkPost() && $checkAvs == false) {
-            $isSuccessful = $this->generator->handleOkAction($this->getRequest());
+        
+        if ($this->checkPost() && $checkAvs == false && $checkFraud == false) {
+            $isSuccessful =
+                $this->generator->handleOkAction($this->getRequest());
             if (strtolower($post['type']) === "verifycard") {
                 $response = $this->gateway->createRequest(
                     $terminalCode[strlen($terminalCode) - 1],
@@ -80,12 +85,14 @@ class Ok extends Index implements CsrfAwareActionInterface
                     $this->redirectToCheckoutPage();
                 }
             }
-        
+            
             if (isset($isSuccessful) && !$isSuccessful) {
                 $this->redirectToCheckoutPage();
             } else {
                 return $this->setSuccessPath($orderId);
             }
+        } elseif ($checkFraud) {
+            return $this->redirectToCheckoutPage();
         } else {
             return $this->_redirect('checkout');
         }

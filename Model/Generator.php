@@ -893,23 +893,39 @@ class Generator
      * @param                  $avsCode
      * @param                  $historyComment
      *
-     * @return bool
+     * @return void
      */
     public function fraudCheck(RequestInterface $request, $fraudStatus, $message)
     {
         $checkRejectionCase = false;
-        $callback           = new Callback($request->getPostValue());
-        $response           = $callback->call();
+        $callback               = new Callback($request->getPostValue());
+        $response               = $callback->call();
+        $fraudCheck             = false;
         if ($response) {
             $order                 = $this->loadOrderFromCallback($response);
             $storeScope            = \Magento\Store\Model\ScopeInterface::SCOPE_STORE;
             $storeCode             = $order->getStore()->getCode();
-            $transInfo             = $this->getTransactionInfoFromResponse($response);
             $fraudConfig           = $this->systemConfig->getFraudConfig('enable_fraud', $storeScope, $storeCode);
-            $fraudOrderStatus      = $this->systemConfig->getFraudConfig('orderstatus_fraud_detected', $storeScope, $storeCode);
-            if ($fraudConfig) {
-                // TODO: Handle fraud order
+            $statusKey             = $this->systemConfig->getFraudConfig('orderstatus_fraud', $storeScope, $storeCode);      
+            $transInfo             = $this->getTransactionInfoFromResponse($response);
+            
+            if ($fraudConfig && $fraudStatus === "deny") {
+                $fraudCheck    = true;
+                //check if order status set in configuration
+                $state         = Order::STATE_PAYMENT_REVIEW;
+                // Save payment info in order to retrieve it for release operation
+                if ($order->getId()) {
+                    $this->savePaymentData($response, $order);
+                }
+                if ($statusKey === "holded") {
+                    $state = Order::STATE_HOLDED;
+                }
+                $this->handleOrderStateAction($request, $state, $statusKey, $message, $transInfo);
+                //save failed transaction data
+                $this->saveTransactionData($request, $response, $order);
             }
+
+            return $fraudCheck;
         }
     }
 }
