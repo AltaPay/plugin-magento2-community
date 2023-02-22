@@ -90,7 +90,7 @@ class Ok extends Index implements CsrfAwareActionInterface
                 return $this->setSuccessPath($orderId);
             }
         } elseif ($checkFraud) {
-            return $this->redirectToCheckoutPage();
+            $this->redirectToCheckoutPage();
         } else {
             return $this->_redirect('checkout');
         }

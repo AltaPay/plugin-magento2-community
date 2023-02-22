@@ -333,9 +333,8 @@ class Generator
             $order             = $this->loadOrderFromCallback($response);
             $payment           = $order->getPayment();
             $lastTransactionId = $payment->getLastTransId();
-            $checkTransactionId = !empty($lastTransactionId) && $lastTransactionId != $response->transactionId;
-
-            if ($checkTransactionId || ($msg === "Fraud detected") ) {
+            
+            if (!empty($lastTransactionId) && $lastTransactionId != $response->transactionId) {
                 if (strtolower($response->status) === "succeeded") {
                     $transInfo = $this->getTransactionInfoFromResponse($response);
                     //check if order status set in configuration
@@ -449,6 +448,7 @@ class Generator
             $agreementConfig         = $this->getConfigValue($response, $storeScope, $storeCode, "agreementtype");
             $unscheduledTypeConfig   = $this->getConfigValue($response, $storeScope, $storeCode, "unscheduledtype");
             $saveCardToken           = $this->getConfigValue($response, $storeScope, $storeCode, "savecardtoken");
+            
             foreach ($response->Transactions as $key => $transaction) {
                 if ($transaction->CreatedDate > $max_date) {
                     $max_date       = $transaction->CreatedDate;
