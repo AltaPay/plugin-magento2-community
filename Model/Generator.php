@@ -793,6 +793,7 @@ class Generator
         $payment = $order->getPayment();
         $payment->setPaymentId($response->paymentId);
         $payment->setLastTransId($response->transactionId);
+        $payment->setAdditionalInformation('payment_type', $response->type);
         $payment->save();
     }
 
@@ -911,8 +912,11 @@ class Generator
             
             if ($fraudConfig && $fraudStatus === "deny") {
                 $fraudCheck    = true;
-                //check if order status set in configuration
                 $state         = Order::STATE_PAYMENT_REVIEW;
+                //check if order status set in configuration
+                if($response->type === "paymentAndCapture") {
+                    $state         = Order::STATE_PROCESSING;
+                }
                 // Save payment info in order to retrieve it for release operation
                 if ($order->getId()) {
                     $this->savePaymentData($response, $order);

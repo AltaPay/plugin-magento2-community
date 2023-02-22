@@ -47,6 +47,7 @@ class Ok extends Index implements CsrfAwareActionInterface
     {
         $this->writeLog();
         $checkAvs = false;
+        $checkFraud = false;
         $post = $this->getRequest()->getPostValue();
         $orderId = $post['shop_orderid'];
         $order = $this->order->loadByIncrementId($orderId);
@@ -61,9 +62,7 @@ class Ok extends Index implements CsrfAwareActionInterface
             );
         }
         
-        if (isset($post['fraud_recommendation'])
-            && isset($post['fraud_explanation'])
-        ) {
+        if (isset($post['fraud_recommendation']) && isset($post['fraud_explanation'])) {
             $checkFraud = $this->generator->fraudCheck(
                 $this->getRequest(),
                 strtolower($post['fraud_recommendation']),
@@ -72,8 +71,7 @@ class Ok extends Index implements CsrfAwareActionInterface
         }
         
         if ($this->checkPost() && $checkAvs == false && $checkFraud == false) {
-            $isSuccessful =
-                $this->generator->handleOkAction($this->getRequest());
+            $isSuccessful = $this->generator->handleOkAction($this->getRequest());
             if (strtolower($post['type']) === "verifycard") {
                 $response = $this->gateway->createRequest(
                     $terminalCode[strlen($terminalCode) - 1],
