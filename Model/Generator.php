@@ -898,24 +898,15 @@ class Generator
             $storeCode             = $order->getStore()->getCode();
             $fraudConfig           = $this->systemConfig->getFraudConfig('enable_fraud', $storeScope, $storeCode);
             $enableReleaseRefund   = $this->systemConfig->getFraudConfig('enable_release_refund', $storeScope, $storeCode);
-            $statusKey             = $this->systemConfig->getFraudConfig('orderstatus_fraud', $storeScope, $storeCode);      
             $transInfo             = $this->getTransactionInfoFromResponse($response);
             
             if ($fraudConfig && $enableReleaseRefund && $fraudStatus === "deny") {
                 $fraudCheck    = true;
-                $state         = Order::STATE_PAYMENT_REVIEW;
-                //check if order status set in configuration
-                if($response->type === "paymentAndCapture") {
-                    $state         = Order::STATE_PROCESSING;
-                }
                 // Save payment info in order to retrieve it for release operation
                 if ($order->getId()) {
                     $this->savePaymentData($response, $order);
                 }
-                if ($statusKey === "holded") {
-                    $state = Order::STATE_HOLDED;
-                }
-                $this->handleOrderStateAction($request, $state, $statusKey, $message, $transInfo);
+                $this->handleOrderStateAction($request, Order::STATE_PAYMENT_REVIEW, "fraud", $message, $transInfo);
                 //save failed transaction data
                 $this->saveTransactionData($request, $response, $order);
             }
