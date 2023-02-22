@@ -46,11 +46,11 @@ class Ok extends Index implements CsrfAwareActionInterface
     public function execute()
     {
         $this->writeLog();
-        $checkAvs = false;
-        $checkFraud = false;
-        $post = $this->getRequest()->getPostValue();
-        $orderId = $post['shop_orderid'];
-        $order = $this->order->loadByIncrementId($orderId);
+        $checkAvs     = false;
+        $checkFraud   = false;
+        $post         = $this->getRequest()->getPostValue();
+        $orderId      = $post['shop_orderid'];
+        $order        = $this->order->loadByIncrementId($orderId);
         $payment = $order->getPayment();
         $terminalCode = $payment->getMethod();
         
@@ -66,7 +66,7 @@ class Ok extends Index implements CsrfAwareActionInterface
             $checkFraud = $this->generator->fraudCheck(
                 $this->getRequest(),
                 strtolower($post['fraud_recommendation']),
-                strtolower($post['fraud_explanation'])
+                $post['fraud_explanation']
             );
         }
         

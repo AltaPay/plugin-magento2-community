@@ -448,7 +448,7 @@ class Generator
             $agreementConfig         = $this->getConfigValue($response, $storeScope, $storeCode, "agreementtype");
             $unscheduledTypeConfig   = $this->getConfigValue($response, $storeScope, $storeCode, "unscheduledtype");
             $saveCardToken           = $this->getConfigValue($response, $storeScope, $storeCode, "savecardtoken");
-            
+
             foreach ($response->Transactions as $key => $transaction) {
                 if ($transaction->CreatedDate > $max_date) {
                     $max_date       = $transaction->CreatedDate;
@@ -881,10 +881,11 @@ class Generator
 
     /**
      * @param RequestInterface $request
-     * @param                  $avsCode
-     * @param                  $historyComment
+     * @param string $fraudStatus
+     * @param string $message
      *
-     * @return void
+     * @return bool
+     * @throws AlreadyExistsException
      */
     public function fraudCheck(RequestInterface $request, $fraudStatus, $message)
     {
@@ -899,7 +900,6 @@ class Generator
             $fraudConfig           = $this->systemConfig->getFraudConfig('enable_fraud', $storeScope, $storeCode);
             $enableReleaseRefund   = $this->systemConfig->getFraudConfig('enable_release_refund', $storeScope, $storeCode);
             $transInfo             = $this->getTransactionInfoFromResponse($response);
-            
             if ($fraudConfig && $enableReleaseRefund && $fraudStatus === "deny") {
                 $fraudCheck    = true;
                 // Save payment info in order to retrieve it for release operation

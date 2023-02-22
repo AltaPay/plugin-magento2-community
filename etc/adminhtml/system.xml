@@ -114,15 +114,14 @@
                 </group>
                 <group id="fraud_setting" translate="label comment" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
                     <attribute type="expanded">0</attribute>
-                    <label>Fraud setting</label>
+                    <label>Fraud Detection Service</label>
                     <comment><![CDATA[]]></comment>
                     <field id="enable_fraud" translate="label" type="select" sortOrder="1" showInDefault="1" showInWebsite="0" showInStore="0">
-                        <label>Enable Fraud Services</label>
+                        <label>Enable</label>
                         <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                     </field>
                     <field id="enable_release_refund" translate="label" type="select" sortOrder="1" showInDefault="1" showInWebsite="0" showInStore="0">
-                        <label>Relese/Refund Upon Denys</label>
-                        <comment>The status on the order if fraud is detected</comment>
+                        <label>Release/Refund - Fraud detected</label>
                         <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                     </field>
                 </group>
