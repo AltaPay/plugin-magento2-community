@@ -885,14 +885,12 @@ class Generator
      * @param string $message
      *
      * @return bool
-     * @throws AlreadyExistsException
      */
     public function fraudCheck(RequestInterface $request, $fraudStatus, $message)
     {
-        $checkRejectionCase = false;
-        $callback               = new Callback($request->getPostValue());
-        $response               = $callback->call();
-        $fraudCheck             = false;
+        $callback   = new Callback($request->getPostValue());
+        $response   = $callback->call();
+
         if ($response) {
             $order                 = $this->loadOrderFromCallback($response);
             $storeScope            = \Magento\Store\Model\ScopeInterface::SCOPE_STORE;
@@ -909,9 +907,11 @@ class Generator
                 $this->handleOrderStateAction($request, Order::STATE_PAYMENT_REVIEW, "fraud", $message, $transInfo);
                 //save failed transaction data
                 $this->saveTransactionData($request, $response, $order);
+
+                return true;
             }
 
-            return $fraudCheck;
+            return false;
         }
     }
 }
