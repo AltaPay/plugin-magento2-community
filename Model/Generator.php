@@ -444,8 +444,6 @@ class Generator
             $storeCode               = $order->getStore()->getCode();
             $orderStatusAfterPayment = $this->systemConfig->getStatusConfig('process', $storeScope, $storeCode);
             $orderStatusCapture      = $this->systemConfig->getStatusConfig('autocapture', $storeScope, $storeCode);
-            $fraudConfig             = $this->systemConfig->getFraudConfig('enable_fraud', $storeScope, $storeCode);
-            $fraudOrderStatus        = $this->systemConfig->getFraudConfig('enabled_release_refund', $storeScope, $storeCode);
             $responseComment         = __(ConstantConfig::CONSUMER_CANCEL_PAYMENT);
             $historyComment          = __(ConstantConfig::CANCELLED) . '|' . $responseComment;
             $agreementConfig         = $this->getConfigValue($response, $storeScope, $storeCode, "agreementtype");
@@ -458,9 +456,6 @@ class Generator
                 }
             }
             $transaction = $response->Transactions[$latestTransKey];
-            $fraudRecommendation = $transaction->FraudRecommendation;
-            $fraudExplaination = $transaction->FraudExplanation;
-
 
             if ($paymentStatus === 'released') {
                 $this->handleCancelStatusAction($request, $response->status);
@@ -596,11 +591,6 @@ class Generator
                 if (strtolower($paymentType) === 'paymentandcapture' || strtolower($paymentType) === 'subscriptionandcharge') {
                     $this->createInvoice($order, $response->requireCapture);
                 }
-                // if($fraudConfig && $fraudRecommendation === "Deny") {
-                //     $this->handleFailedStatusAction($request, "Fraud detected", $fraudExplaination, $response->status);
-               
-                //     return false;
-                // }
             }
         } catch (\Exception $e) {
             $this->altapayLogger->addCriticalLog('Exception', $e->getMessage());
@@ -907,10 +897,11 @@ class Generator
             $storeScope            = \Magento\Store\Model\ScopeInterface::SCOPE_STORE;
             $storeCode             = $order->getStore()->getCode();
             $fraudConfig           = $this->systemConfig->getFraudConfig('enable_fraud', $storeScope, $storeCode);
+            $enableReleaseRefund   = $this->systemConfig->getFraudConfig('enable_release_refund', $storeScope, $storeCode);
             $statusKey             = $this->systemConfig->getFraudConfig('orderstatus_fraud', $storeScope, $storeCode);      
             $transInfo             = $this->getTransactionInfoFromResponse($response);
             
-            if ($fraudConfig && $fraudStatus === "deny") {
+            if ($fraudConfig && $enableReleaseRefund && $fraudStatus === "deny") {
                 $fraudCheck    = true;
                 $state         = Order::STATE_PAYMENT_REVIEW;
                 //check if order status set in configuration
