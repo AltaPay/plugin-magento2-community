@@ -51,7 +51,7 @@ class Ok extends Index implements CsrfAwareActionInterface
         $post         = $this->getRequest()->getPostValue();
         $orderId      = $post['shop_orderid'];
         $order        = $this->order->loadByIncrementId($orderId);
-        $payment = $order->getPayment();
+        $payment      = $order->getPayment();
         $terminalCode = $payment->getMethod();
         
         if (isset($post['avs_code']) && isset($post['avs_text'])) {
