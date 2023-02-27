@@ -236,4 +236,24 @@ class SystemConfig
 
         return $storeScope;
     }
+    /**
+     * @param string               $configKey
+     * @param ScopeConfigInterface $storeScope
+     * @param null|string          $storeCode
+     *
+     * @return string
+     */
+    public function getFraudConfig($configKey, $storeScope = null, $storeCode = null)
+    {
+        $storeScope = $this->checkStoreScope($storeScope);
+
+        return $this->scopeConfig->getValue(
+            sprintf(
+                'payment/sdm_altapay_config/fraud_setting/%s',
+                $configKey
+            ),
+            $storeScope,
+            $storeCode
+        );
+    }
 }

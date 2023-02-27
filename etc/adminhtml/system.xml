@@ -19,7 +19,7 @@
                 <attribute type="expanded">1</attribute>
                 <group id="cronScheduled" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1"
                     showInStore="1">
-                    <label>Orders Cron Setting</label>
+                    <label>Orders cron setting</label>
                     <field id="enabled" translate="label" type="select" sortOrder="1" showInDefault="1" showInWebsite="0" showInStore="0">
                         <label>Cancel orders with pending payments</label>
                         <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
@@ -99,13 +99,6 @@
                         <config_path>payment/altapay_status/process</config_path>
                     </field>
 
-                    <field id="orderstatus_fraud_detected" translate="label comment" type="select" sortOrder="4" showInDefault="1" showInWebsite="1" showInStore="1">
-                        <label>Order status - Fraud detected</label>
-                        <comment>The status on the order if fraud is detected</comment>
-                        <source_model>SDM\Altapay\Model\Config\Source\Order\Status\Fraud</source_model>
-                        <config_path>payment/altapay_status/fraud</config_path>
-                    </field>
-
                     <field id="orderstatus_cancel" translate="label comment" type="select" sortOrder="5" showInDefault="1" showInWebsite="1" showInStore="1">
                         <label>Order status - cancel</label>
                         <comment>The status on the order if a user cancel the order in the payment window</comment>
@@ -119,9 +112,22 @@
                         <config_path>payment/altapay_status/autocapture</config_path>
                     </field>
                 </group>
+                <group id="fraud_setting" translate="label comment" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <attribute type="expanded">0</attribute>
+                    <label>Fraud Detection Service</label>
+                    <comment><![CDATA[]]></comment>
+                    <field id="enable_fraud" translate="label" type="select" sortOrder="1" showInDefault="1" showInWebsite="0" showInStore="0">
+                        <label>Enable</label>
+                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    </field>
+                    <field id="enable_release_refund" translate="label" type="select" sortOrder="1" showInDefault="1" showInWebsite="0" showInStore="0">
+                        <label>Release/Refund - Fraud detected</label>
+                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    </field>
+                </group>
                 <group id="altapay_config_terminalsync" translate="label comment" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
                     <attribute type="expanded">0</attribute>
-                    <label>Terminal Sync</label>
+                    <label>Terminal sync</label>
                     <comment><![CDATA[]]></comment>
                     <field id="sync_terminal" translate="label" type="button" sortOrder="7" showInDefault="1" showInWebsite="1" showInStore="1">
                         <label>Synchronize payment methods</label>
@@ -130,7 +136,7 @@
                 </group>
                 <group id="general" translate="label" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
                     <attribute type="expanded">0</attribute>
-                    <label>Pay by link Email Template</label>
+                    <label>Pay by link email template</label>
                     <comment><![CDATA[]]></comment>
                     <field id="payment_template" translate="label" type="select" sortOrder="3" showInDefault="1" showInStore="1" showInWebsite="1">
                         <label>Email Template</label>

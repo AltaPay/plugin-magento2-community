@@ -42,17 +42,17 @@ class Generator
      * @var Quote
      */
     private $quote;
-    
+
     /**
      * @var Session
      */
     private $checkoutSession;
-    
+
     /**
      * @var Http
      */
     private $request;
-    
+
     /**
      * @var Order
      */
@@ -65,27 +65,27 @@ class Generator
      * @var OrderSender
      */
     private $orderSender;
-    
+
     /**
      * @var SystemConfig
      */
     private $systemConfig;
-    
+
     /**
      * @var Logger
      */
     private $altapayLogger;
-    
+
     /**
      * @var TransactionRepositoryInterface
      */
     private $transactionRepository;
-    
+
     /**
      * @var OrderLoaderInterface
      */
     private $orderLoader;
-    
+
     /**
      * @var TransactionFactory
      */
@@ -98,27 +98,27 @@ class Generator
      * @var CreatePaymentHandler
      */
     private $paymentHandler;
-    
+
     /**
      * @var StockStateInterface
      */
     private $stockItem;
-    
+
     /**
      * @var StockRegistryInterface
      */
     private $stockRegistry;
-    
+
     /**
      * @var Cart
      */
     private $modelCart;
-    
+
     /**
      * @var TokenFactory
      */
     private $dataToken;
-    
+
     /**
      * @var Data
      */
@@ -128,7 +128,7 @@ class Generator
      * @var ReconciliationIdentifierFactory
      */
     protected $reconciliation;
-    
+
     /**
      * Generator constructor.
      *
@@ -264,7 +264,7 @@ class Generator
             $responseComment = __(ConstantConfig::UNKNOWN_PAYMENT_STATUS_MERCHANT);
         }
         $historyComment = __(ConstantConfig::CANCELLED) . '|' . $responseComment;
-        //TODO: fetch the MerchantErrorMessage and use it as historyComment
+
         $callback = new Callback($request->getPostValue());
         $response = $callback->call();
         if ($response) {
@@ -277,12 +277,13 @@ class Generator
                     $statusKey         = Order::STATE_CANCELED;
                     $storeCode         = $order->getStore()->getCode();
                     $storeScope        = \Magento\Store\Model\ScopeInterface::SCOPE_STORE;
+
                     $orderStatusCancel = $this->systemConfig->getStatusConfig('cancel', $storeScope, $storeCode);
-                
+                   
                     if ($orderStatusCancel) {
                         $statusKey = $orderStatusCancel;
                     }
-                    $this->handleOrderStateAction($request,  Order::STATE_CANCELED, $statusKey, $historyComment);
+                    $this->handleOrderStateAction($request, Order::STATE_CANCELED, $statusKey, $historyComment);
                     //save failed transaction data
                     $this->saveTransactionData($request, $response, $order);
                 }
@@ -310,32 +311,6 @@ class Generator
 
     /**
      * @param RequestInterface $request
-     *
-     * @return mixed
-     */
-    public function handleFailStatusRedirectFormAction(RequestInterface $request)
-    {
-        //TODO:refactor this method
-        $formUrl  = null;
-        $callback = new Callback($request->getPostValue());
-        $response = $callback->call();
-        if ($response) {
-            $order   = $this->orderLoader->getOrderByOrderIncrementId($response->shopOrderId);
-            $formUrl = $order->getAltapayPaymentFormUrl();
-            if ($formUrl) {
-                $order->addStatusHistoryComment(__(ConstantConfig::DECLINED_PAYMENT_FORM));
-            } else {
-                $order->addStatusHistoryComment(__(ConstantConfig::DECLINED_PAYMENT_SECTION));
-            }
-            $order->setState(Order::STATE_PENDING_PAYMENT);
-            $order->getResource()->save($order);
-        }
-
-        return $formUrl;
-    }
-
-    /**
-     * @param RequestInterface $request
      * @param                  $msg
      * @param                  $merchantErrorMsg
      * @param                  $responseStatus
@@ -358,7 +333,8 @@ class Generator
             $order             = $this->loadOrderFromCallback($response);
             $payment           = $order->getPayment();
             $lastTransactionId = $payment->getLastTransId();
-            if (!empty($lastTransactionId) && $lastTransactionId != $response->transactionId ) {
+            
+            if (!empty($lastTransactionId) && $lastTransactionId != $response->transactionId) {
                 if (strtolower($response->status) === "succeeded") {
                     $transInfo = $this->getTransactionInfoFromResponse($response);
                     //check if order status set in configuration
@@ -366,7 +342,7 @@ class Generator
                     $storeCode         = $order->getStore()->getCode();
                     $storeScope        = \Magento\Store\Model\ScopeInterface::SCOPE_STORE;
                     $orderStatusCancel = $this->systemConfig->getStatusConfig('cancel', $storeScope, $storeCode);
-                    
+
                     if ($orderStatusCancel) {
                         $statusKey = $orderStatusCancel;
                     }
@@ -464,7 +440,6 @@ class Generator
             $statusKey               = 'process';
             $status                  = $response->status;
             $order                   = $this->orderLoader->getOrderByOrderIncrementId($response->shopOrderId);
-            $quote                   = $this->quote->loadByIdWithoutStore($order->getQuoteId());
             $storeCode               = $order->getStore()->getCode();
             $orderStatusAfterPayment = $this->systemConfig->getStatusConfig('process', $storeScope, $storeCode);
             $orderStatusCapture      = $this->systemConfig->getStatusConfig('autocapture', $storeScope, $storeCode);
@@ -472,37 +447,37 @@ class Generator
             $historyComment          = __(ConstantConfig::CANCELLED) . '|' . $responseComment;
             $agreementConfig         = $this->getConfigValue($response, $storeScope, $storeCode, "agreementtype");
             $unscheduledTypeConfig   = $this->getConfigValue($response, $storeScope, $storeCode, "unscheduledtype");
-            $savecardtoken           = $this->getConfigValue($response, $storeScope, $storeCode, "savecardtoken");
-            
+            $saveCardToken           = $this->getConfigValue($response, $storeScope, $storeCode, "savecardtoken");
+
             foreach ($response->Transactions as $key => $transaction) {
                 if ($transaction->CreatedDate > $max_date) {
                     $max_date       = $transaction->CreatedDate;
                     $latestTransKey = $key;
                 }
             }
-            
+            $transaction = $response->Transactions[$latestTransKey];
+
             if ($paymentStatus === 'released') {
                 $this->handleCancelStatusAction($request, $response->status);
                 return false;
             }
-    
+
             if ($paymentType === 'subscriptionAndCharge' && $status === 'succeeded') {
-                $transaction = $response->Transactions[$latestTransKey];
                 $authType    = $transaction->AuthType;
                 $transStatus = $transaction->TransactionStatus;
-                
+
                 if (isset($transaction) && $authType === 'subscription_payment' && $transStatus !== 'captured') {
                     //check if order status set in configuration
                     $statusKey         = Order::STATE_CANCELED;
                     $orderStatusCancel = $this->systemConfig->getStatusConfig('cancel', $storeScope, $storeCode);
-    
+
                     if ($orderStatusCancel) {
                         $statusKey = $orderStatusCancel;
                     }
-                    $this->handleOrderStateAction($request,  Order::STATE_CANCELED, $statusKey, $historyComment);
+                    $this->handleOrderStateAction($request, Order::STATE_CANCELED, $statusKey, $historyComment);
                     //save failed transaction data
                     $this->saveTransactionData($request, $response, $order);
-    
+
                     return false;
                 }
             }
@@ -521,7 +496,7 @@ class Generator
                     if (isset($transaction->PaymentSchemeName)) {
                         $cardType = $transaction->PaymentSchemeName;
                     }
-                    if ($savecardtoken && (empty($agreementConfig) || $agreementConfig === "unscheduled")) {
+                    if ($saveCardToken && (empty($agreementConfig) || $agreementConfig === "unscheduled")) {
                         $agreementType = "unscheduled";
                     } else {
                         $agreementType = $agreementConfig;
@@ -582,7 +557,7 @@ class Generator
                 //send order confirmation email
                 $this->sendOrderConfirmationEmail($comment, $order);
                 //unset redirect if success
-                $this->checkoutSession->unsAltapayCustomerRedirect(); 
+                $this->checkoutSession->unsAltapayCustomerRedirect();
                 //save transaction data
                 $this->transactionRepository->addTransactionData(
                     $order->getIncrementId(),
@@ -705,8 +680,8 @@ class Generator
             $storeScope            = \Magento\Store\Model\ScopeInterface::SCOPE_STORE;
             $storeCode             = $order->getStore()->getCode();
             $transInfo             = $this->getTransactionInfoFromResponse($response);
-            $isAvsEnabled          = $this->checkAvsConfig($response, $storeCode, $storeScope, 'avscontrol');
-            $isAvsEnforced         = $this->checkAvsConfig($response, $storeCode, $storeScope, 'enforceavs');
+            $isAvsEnabled          = $this->terminalConfiguration($response, $storeCode, $storeScope, 'avscontrol');
+            $isAvsEnforced         = $this->terminalConfiguration($response, $storeCode, $storeScope, 'enforceavs');
             $getAcceptedAvsResults = $this->getAcceptedAvsResults($response, $storeCode, $storeScope);
 
             if ($isAvsEnabled) {
@@ -744,7 +719,7 @@ class Generator
      *
      * @return bool
      */
-    private function checkAvsConfig($response, $storeCode, $storeScope, $configField)
+    private function terminalConfiguration($response, $storeCode, $storeScope, $configField)
     {
         $isEnabled = false;
         foreach (SystemConfig::getTerminalCodes() as $terminalName) {
@@ -808,6 +783,7 @@ class Generator
         $payment = $order->getPayment();
         $payment->setPaymentId($response->paymentId);
         $payment->setLastTransId($response->transactionId);
+        $payment->setAdditionalInformation('payment_type', $response->type);
         $payment->save();
     }
 
@@ -846,7 +822,7 @@ class Generator
             }
         }
     }
-    
+
     /**
      * @param $response
      *
@@ -863,7 +839,7 @@ class Generator
         }
         return $latestTransKey;
     }
-    
+
     /**
      * @param $response
      * @param $terminalName
@@ -889,7 +865,7 @@ class Generator
                 );
             if ($terminalConfig === $response->Transactions[$this->getLatestTransaction($response)]->Terminal
             ) {
-                
+
                 $configData = $this->systemConfig->getTerminalConfigFromTerminalName(
                         $terminalName,
                         $field,
@@ -901,5 +877,41 @@ class Generator
         }
 
         return $configData;
+    }
+
+    /**
+     * @param RequestInterface $request
+     * @param string $fraudStatus
+     * @param string $message
+     *
+     * @return bool
+     */
+    public function fraudCheck(RequestInterface $request, $fraudStatus, $message)
+    {
+        $callback   = new Callback($request->getPostValue());
+        $response   = $callback->call();
+
+        if ($response) {
+            $order                 = $this->loadOrderFromCallback($response);
+            $storeScope            = \Magento\Store\Model\ScopeInterface::SCOPE_STORE;
+            $storeCode             = $order->getStore()->getCode();
+            $fraudConfig           = $this->systemConfig->getFraudConfig('enable_fraud', $storeScope, $storeCode);
+            $enableReleaseRefund   = $this->systemConfig->getFraudConfig('enable_release_refund', $storeScope, $storeCode);
+            $transInfo             = $this->getTransactionInfoFromResponse($response);
+            if ($fraudConfig && $enableReleaseRefund && $fraudStatus === "deny") {
+                $fraudCheck    = true;
+                // Save payment info in order to retrieve it for release operation
+                if ($order->getId()) {
+                    $this->savePaymentData($response, $order);
+                }
+                $this->handleOrderStateAction($request, Order::STATE_PAYMENT_REVIEW, "fraud", $message, $transInfo);
+                //save failed transaction data
+                $this->saveTransactionData($request, $response, $order);
+
+                return true;
+            }
+
+            return false;
+        }
     }
 }
