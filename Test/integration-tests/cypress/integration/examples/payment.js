@@ -452,4 +452,44 @@ describe('Payments', function () {
 
         })
     })
+
+    it('MobilePay Pyament ', function () {
+        const ord = new Order()
+        ord.clrcookies()
+        ord.visit()
+        cy.get('body').then(($body) => {
+          ord.admin()
+          if ($body.text().includes('DKK') === false) {
+            ord.change_currency_to_DKK()
+          }
+          ord.visit()
+          ord.addproduct()
+          cy.wait(3000)
+          cy.contains('EmbraceIT MobilePay Integration Test Terminal').click().wait(5000)
+          cy.get('._active > .payment-method-content > :nth-child(5) > div.primary > .action > span').click().wait(5000)
+          cy.get('input[type="tel"]').first().click().clear().click().type('84758830')
+          cy.contains('Continue').first().click().wait(10000)
+          cy.url().then(url => {
+      
+            const arr = url.split('&');
+            var paramObj = {};
+            arr.forEach(param => {
+              const [key, value] = param.split('=');
+              paramObj[key] = value;
+            });
+      
+            cy.request('POST', 'https://api.sandbox.mobilepay.dk/cardpassthrough-regressiontester-restapi/api/v1/product/payments/simulation/enter-phone-and-swipe/' + paramObj['id'], { phoneNumber: "+4584758830" }).then(
+              (response) => {
+                expect(response.status).to.eq(200)
+                cy.wait(20000)
+              })
+      
+          })
+      
+          cy.get('.page-title > span').should('have.text', 'Thank you for your purchase!')
+          ord.admin()
+          ord.capture()
+          ord.refund()
+        })
+      })
 })
