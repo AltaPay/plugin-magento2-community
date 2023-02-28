@@ -74,24 +74,30 @@
             <config_path>payment/termina4/savecardtoken</config_path>
             <frontend_class>altapay-terminal-token-control</frontend_class>
         </field>
-        <field id="avscontrol" translate="label comment" type="select" sortOrder="70" showInDefault="1" showInWebsite="1" showInStore="1">
+        <field id="unscheduledtype" translate="label comment" type="select" sortOrder="70" showInDefault="1" showInWebsite="1" showInStore="1">
+            <label>Unscheduled Type:</label>
+            <comment>This setting will only function if token control is enabled.</comment>
+            <config_path>payment/terminal/unscheduledtype</config_path>
+            <source_model>SDM\Altapay\Model\Config\Source\UnscheduledType</source_model>
+        </field>
+        <field id="avscontrol" translate="label comment" type="select" sortOrder="80" showInDefault="1" showInWebsite="1" showInStore="1">
             <label>AVS</label>
             <comment>Address Verification System</comment>
             <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
             <config_path>payment/terminal4/avscontrol</config_path>
         </field>
-        <field id="enforceavs" translate="label comment" type="select" sortOrder="80" showInDefault="1" showInWebsite="1" showInStore="1">
+        <field id="enforceavs" translate="label comment" type="select" sortOrder="90" showInDefault="1" showInWebsite="1" showInStore="1">
             <label>Enforce AVS</label>
             <comment>All transactions <u>without</u> AVS response will be rejected</comment>
             <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
             <config_path>payment/terminal4/enforceavs</config_path>
         </field>
-        <field id="avs_acceptance" translate="label" type="text" sortOrder="90" showInDefault="1" showInWebsite="1" showInStore="1">
+        <field id="avs_acceptance" translate="label" type="text" sortOrder="100" showInDefault="1" showInWebsite="1" showInStore="1">
             <label>AVS Accepted Codes</label>
             <comment>All codes upercase, comma separated</comment>
             <config_path>payment/terminal4/avs_acceptance</config_path>
         </field>
-        <field id="sort_order" translate="label" type="text" sortOrder="100" showInDefault="1" showInWebsite="1" showInStore="1">
+        <field id="sort_order" translate="label" type="text" sortOrder="150" showInDefault="1" showInWebsite="1" showInStore="1">
             <label>Sort Order</label>
             <frontend_class>validate-number</frontend_class>
             <config_path>payment/terminal4/sort_order</config_path>

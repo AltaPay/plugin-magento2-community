@@ -24,6 +24,8 @@ We highly recommend gathering all the below information, before starting the ins
 
 [Configure order status](#configure-order-status)
 
+[Configure fraud detection](#configure-fraud-detection)
+
 [Configure terminals](#configure-terminals)
 
 [Save credit cards](#save-credit-cards)
@@ -146,6 +148,14 @@ Navigate to: Admin \> Stores \> Configuration \> Sales (Tab) \> Payment
 Methods
 
 ![order_status_configuration](docs/order_status_configuration.png)
+
+## Configure fraud detection
+
+Navigate to: Admin \> Stores \> Configuration \> Sales (Tab) \> Payment
+Methods
+
+![fraud_setting](docs/fraud_setting.png)
+
 
 ## Synchronize terminal
 

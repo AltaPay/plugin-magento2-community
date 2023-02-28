@@ -38,6 +38,7 @@
     <column xsi:type="int" name="customer_id" padding="11" unsigned="false" nullable="false" identity="false" comment="Customer Id"/>
     <column xsi:type="int" name="agreement_id"  padding="10" unsigned="false" nullable="true" comment="Agreement ID"/>
     <column xsi:type="varchar" name="agreement_type" nullable="true" length="255" comment="Agreement Type"/>
+    <column xsi:type="varchar" name="agreement_unscheduled" nullable="true" length="255" comment="Unscheduled Type"/>
     <column xsi:type="text" name="token" nullable="false" comment="Token"/>
     <column xsi:type="text" name="masked_pan" nullable="false" comment="Masked Pan"/>
     <column xsi:type="text" name="currency_code" nullable="false" comment="Currency Code"/>
@@ -51,7 +52,7 @@
   </table>
   <table name="altapay_reconciliation" resource="default">
     <column xsi:type="int" name="id" padding="10" unsigned="true" nullable="false" identity="true" comment="id"/>
-    <column xsi:type="varchar" name="order_id" padding="32" unsigned="true" nullable="false" identity="false" comment="Order ID"/>
+    <column xsi:type="varchar" name="order_id" nullable="false" comment="Order ID"/>
     <column xsi:type="text" name="identifier" nullable="true" comment="Reconciliation Identifier"/>
     <column xsi:type="text" name="type" nullable="true" comment="Type"/>
     <constraint xsi:type="primary" referenceId="PRIMARY">

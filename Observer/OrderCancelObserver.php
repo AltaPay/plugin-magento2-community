@@ -15,6 +15,7 @@ use Altapay\Response\ReleaseReservationResponse;
 use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
 use SDM\Altapay\Model\SystemConfig;
+use Altapay\Api\Payments\RefundCapturedReservation;
 
 class OrderCancelObserver implements ObserverInterface
 {
@@ -48,7 +49,12 @@ class OrderCancelObserver implements ObserverInterface
         $payment = $order->getPayment();
 
         if (in_array($payment->getMethod(), SystemConfig::getTerminalCodes()) && $payment->getLastTransId()) {
-            $api = new ReleaseReservation($this->systemConfig->getAuth($order->getStore()->getCode()));
+            if ($payment->getAdditionalInformation('payment_type') === "paymentAndCapture") {
+                $api = new RefundCapturedReservation($this->systemConfig->getAuth($order->getStore()->getCode()));
+                $api->setAmount((float)number_format($order->getGrandTotal(), 2, '.', ''));
+            } else {
+                $api = new ReleaseReservation($this->systemConfig->getAuth($order->getStore()->getCode()));
+            }
             $api->setTransaction($payment->getLastTransId());
             /** @var ReleaseReservationResponse $response */
             try {
