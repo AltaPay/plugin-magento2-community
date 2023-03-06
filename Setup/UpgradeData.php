@@ -8,11 +8,34 @@ use Magento\Framework\Setup\ModuleContextInterface;
 
 class UpgradeData implements UpgradeDataInterface
 {
+    /**
+     * @var ModuleDataSetupInterface
+     */
+    private $moduleDataSetup;
+
+    /**
+     * @var Context
+     */
+    private $context;
+
+    /**
+     * UpgradeData constructor.
+     *
+     * @param ModuleDataSetupInterface $moduleDataSetup
+     * @param Context $context
+     */
+    public function __construct(
+        ModuleDataSetupInterface $moduleDataSetup
+    ) {
+        $this->moduleDataSetup = $moduleDataSetup;
+    }
+
+
     public function upgrade(ModuleDataSetupInterface $setup, ModuleContextInterface $context)
     {
         $setup->startSetup();
         
-        if (version_compare($context->getVersion(), '3.6.0', '<')) {
+        if (version_compare($context->getVersion(), '3.6.1', '<')) {
             $connection = $this->moduleDataSetup->getConnection();
             $tableName = $this->moduleDataSetup->getTable('altapay_token');
             $connection->update(

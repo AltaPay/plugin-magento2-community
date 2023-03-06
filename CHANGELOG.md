@@ -1,6 +1,10 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [3.6.1]
+### Added
+- Masked PAN has been modified to display only the last four digits.
+
 ## [3.6.0]
 ### Added
 - Add configuration to enable the handling of fraudulent payments.
