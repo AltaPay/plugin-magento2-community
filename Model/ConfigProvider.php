@@ -187,7 +187,7 @@ class ConfigProvider implements ConfigProviderInterface
                 foreach ($collection as $item) {
                     $data             = $item->getData();
                     $id               = $data['id'];
-                    $maskedPan        = $data['masked_pan'] . ' (' . $data['expires'] . ')';
+                    $maskedPan        = $data['masked_pan'];
                     $savedTokenList[] = [
                         'id'        => $id,
                         'maskedPan' => $maskedPan

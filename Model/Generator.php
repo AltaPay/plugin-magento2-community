@@ -431,7 +431,9 @@ class Generator
             $paymentType             = $response->type;
             $paymentStatus           = strtolower($response->paymentStatus);
             $ccToken                 = $response->creditCardToken;
-            $maskedPan               = $response->maskedCreditCard;
+            $responsemaskedPan       = $response->maskedCreditCard;
+            $last_four_digits        = substr($responsemaskedPan, -4); // Get the last 4 digits of the number
+            $maskedPan               = str_repeat('*', strlen($responsemaskedPan) - 4) . $last_four_digits; // Mask the rest of the number with asterisks and concatenate with the last 4 digits
             $paymentId               = $response->paymentId;
             $transactionId           = $response->transactionId;
             $parametersData          = json_encode($request->getPostValue());
