@@ -14,15 +14,9 @@ class UpgradeData implements UpgradeDataInterface
     private $moduleDataSetup;
 
     /**
-     * @var Context
-     */
-    private $context;
-
-    /**
      * UpgradeData constructor.
      *
      * @param ModuleDataSetupInterface $moduleDataSetup
-     * @param Context $context
      */
     public function __construct(
         ModuleDataSetupInterface $moduleDataSetup
