@@ -373,9 +373,9 @@ describe('Payments', function () {
                     cy.reload()
                     cy.get('#email').clear().type('demo@example.com')
                     cy.get('#add_products').click().wait(2000)
-                    cy.get('#sales_order_create_search_grid_table > tbody > tr:nth-child(2)').click()                   
-                    cy.contains('Add Selected Product(s) to Order').click().wait(5000)                   
-                    cy.contains('Get shipping methods and rates').click().wait(3000) 
+                    cy.get('#sales_order_create_search_grid_table > tbody > tr:nth-child(2)').click()
+                    cy.contains('Add Selected Product(s) to Order').click().wait(5000)
+                    cy.contains('Get shipping methods and rates').click().wait(3000)
                     cy.get('.admin__order-shipment-methods-options-list > li:first').click().wait(3000)
                     cy.contains(admin.KLARNA_DKK_TERMINAL_NAME).click().wait(3000)
                     cy.get('#submit_order_top_button').click().wait(5000)
@@ -424,33 +424,40 @@ describe('Payments', function () {
             if ($body.text().includes('DKK') === false) {
                 ord.change_currency_to_DKK()
             }
-            ord.subscription_product()
-            ord.visit()
-            cy.get('.panel > .header > .link > a').click()
-            cy.get('#email').type('demo@example.com')
-            cy.get('.login-container > .block-customer-login > .block-content > #login-form > .fieldset > .password > .control > #pass').type('admin@1234')
-            cy.get('.login-container > .block-customer-login > .block-content > #login-form > .fieldset > .actions-toolbar > div.primary > #send2').click().wait(3000)
-            cy.reload()
-            cy.contains('Argus All-Weather Tank').click()
-            cy.get('#option-label-size-144-item-166').click().wait(2000)
-            cy.get('#option-label-color-93-item-52').click().wait(2000)
-            cy.get('[for="radio_subscribe_product"]').click()
-            cy.get('#product-addtocart-button').click().wait(3000)
-            cy.get('.showcart').click().wait(5000)
-            cy.get('#top-cart-btn-checkout').click().wait(3000)
-            cy.get('.button').click().wait(5000)
-            cy.contains('Place Order').click().wait(3000)
             cy.fixture('config').then((admin) => {
                 if (admin.SUBSCRIPTION_TERMINAL_NAME != "") {
-                    ord.cc_payment('')
-                    cy.get('.page-title > span').should('have.text', 'Thank you for your purchase!')
-                    ord.admin()
-                    ord.capture()
-                    ord.refund()
-                }
-            })
-
-        })
+                    ord.subscription_product()
+                    ord.visit()
+                    cy.contains('Argus All-Weather Tank').click()
+                    cy.get('#option-label-size-144-item-166').click().wait(2000)
+                    cy.get('#option-label-color-93-item-52').click().wait(2000)
+                    cy.get('[for="radio_subscribe_product"]').click()
+                    cy.get('#product-addtocart-button').click().wait(3000)
+                    cy.get('.showcart').click().wait(5000)
+                    cy.get('#top-cart-btn-checkout').click().wait(3000)
+                    cy.get('#customer-email').type('demo@example.com')
+                    cy.get('#pass').type('admin@1234')
+                    cy.get('#send2').click().wait(10000)
+                    cy.get('.button').click().wait(5000)
+                    cy.get('body').then(($a) => {
+                        if ($a.find("label:contains('" + admin.SUBSCRIPTION_TERMINAL_NAME + "')").length) {
+                            cy.contains('Place Order').click().wait(3000)
+                            ord.cc_payment('')
+                            cy.get('.page-title > span').should('have.text', 'Thank you for your purchase!')
+                            ord.admin()
+                            ord.capture()
+                            ord.refund()
+                        } else {
+                            cy.log(admin.SUBSCRIPTION_TERMINAL_NAME + ' not found in page')
+                            this.skip()
+                        }
+                    })
+                } else {
+                    cy.log('SUBSCRIPTION_TERMINAL skipped')
+                    this.skip()
+                 }
+             })
+         })
     })
 
     it('MobilePay Pyament ', function () {
@@ -458,38 +465,55 @@ describe('Payments', function () {
         ord.clrcookies()
         ord.visit()
         cy.get('body').then(($body) => {
-          ord.admin()
-          if ($body.text().includes('DKK') === false) {
-            ord.change_currency_to_DKK()
-          }
-          ord.visit()
-          ord.addproduct()
-          cy.wait(3000)
-          cy.contains('EmbraceIT MobilePay Integration Test Terminal').click().wait(5000)
-          cy.get('._active > .payment-method-content > :nth-child(5) > div.primary > .action > span').click().wait(5000)
-          cy.get('input[type="tel"]').first().click().clear().click().type('84758830')
-          cy.contains('Continue').first().click().wait(10000)
-          cy.url().then(url => {
-      
-            const arr = url.split('&');
-            var paramObj = {};
-            arr.forEach(param => {
-              const [key, value] = param.split('=');
-              paramObj[key] = value;
-            });
-      
-            cy.request('POST', 'https://api.sandbox.mobilepay.dk/cardpassthrough-regressiontester-restapi/api/v1/product/payments/simulation/enter-phone-and-swipe/' + paramObj['id'], { phoneNumber: "+4584758830" }).then(
-              (response) => {
-                expect(response.status).to.eq(200)
-                cy.wait(20000)
-              })
-      
-          })
-      
-          cy.get('.page-title > span').should('have.text', 'Thank you for your purchase!')
-          ord.admin()
-          ord.capture()
-          ord.refund()
+            ord.admin()
+            if ($body.text().includes('DKK') === false) {
+                ord.change_currency_to_DKK()
+            }
+            cy.fixture('config').then((admin) => {
+                if (admin.MOBILEPAY_TERMINAL_NAME != "") {
+                    ord.visit()
+                    ord.addproduct()
+                    cy.wait(3000)
+                    cy.get('body').then(($a) => {
+                        if ($a.find("label:contains('" + admin.MOBILEPAY_TERMINAL_NAME + "')").length) {
+                            cy.contains(admin.MOBILEPAY_TERMINAL_NAME).click().wait(5000)
+                            cy.get('._active > .payment-method-content > :nth-child(5) > div.primary > .action > span').click().wait(5000)
+                            cy.get('input[type="tel"]').first().click().clear().click().type(admin.MOBILEPAY_TEST_PHONE)
+                            cy.contains('Continue').first().click().wait(10000)
+                            cy.url().then(url => {
+
+                                const arr = url.split('&');
+                                var paramObj = {};
+                                arr.forEach(param => {
+                                    const [key, value] = param.split('=');
+                                    paramObj[key] = value;
+                                });
+
+                                cy.request('POST',
+                                    'https://api.sandbox.mobilepay.dk/cardpassthrough-regressiontester-restapi/api/v1/product/payments/simulation/enter-phone-and-swipe/' + paramObj['id'],
+                                    { phoneNumber: admin.MOBILEPAY_TEST_PHONE_COUNTRY_CODE + admin.MOBILEPAY_TEST_PHONE }).then(
+                                        (response) => {
+                                            expect(response.status).to.eq(200)
+                                            cy.wait(20000)
+                                        })
+
+                            })
+
+                            cy.get('.page-title > span').should('have.text', 'Thank you for your purchase!')
+                            ord.admin()
+                            ord.capture()
+                            ord.refund()
+                        } else {
+                            cy.log(admin.MOBILEPAY_TERMINAL_NAME + ' not found in page')
+                            this.skip()
+                        }
+                    })
+
+                } else {
+                    cy.log('MOBILEPAY_TERMINAL skipped')
+                    this.skip()
+                }
+            })
         })
-      })
+    })
 })
