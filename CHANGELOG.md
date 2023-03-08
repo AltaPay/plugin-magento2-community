@@ -3,7 +3,7 @@ All notable changes to this project will be documented in this file.
 
 ## [3.6.1]
 ### Added
-- Masked PAN has been modified to display only the last four digits.
+- Show the last four digits instead of masked PAN on the card selection.
 
 ## [3.6.0]
 ### Added
