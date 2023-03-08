@@ -124,7 +124,7 @@ jobs:
         uses: jsdaniell/create-json@1.1.2
         with:
           name: "config.json"
-          json: '{"shopURL": "http://${{ needs.terraform.outputs.ip }}/magento","adminURL": "http://${{ needs.terraform.outputs.ip }}/magento/admin","adminUsername": "${{secrets.CMS_ADMIN_USER}}","adminPass": "${{secrets.CMS_ADMIN_PASS}}", "CC_TERMINAL_NAME": "${{secrets.CC_TERMINAL_NAME}}", "KLARNA_DKK_TERMINAL_NAME": "${{secrets.KLARNA_DKK_TERMINAL_NAME}}", "SUBSCRIPTION_TERMINAL_NAME": "${{secrets.SUBSCRIPTION_TERMINAL_NAME}}", "iDEAL_EUR_TERMINAL": "${{secrets.IDEAL_EUR_TERMINAL_NAME}}"}'
+          json: '{"shopURL": "http://${{ needs.terraform.outputs.ip }}/magento","adminURL": "http://${{ needs.terraform.outputs.ip }}/magento/admin","adminUsername": "${{secrets.CMS_ADMIN_USER}}","adminPass": "${{secrets.CMS_ADMIN_PASS}}", "CC_TERMINAL_NAME": "${{secrets.CC_TERMINAL_NAME}}", "KLARNA_DKK_TERMINAL_NAME": "${{secrets.KLARNA_DKK_TERMINAL_NAME}}", "SUBSCRIPTION_TERMINAL_NAME": "${{secrets.SUBSCRIPTION_TERMINAL_NAME}}", "iDEAL_EUR_TERMINAL": "${{secrets.IDEAL_EUR_TERMINAL_NAME}}, "MOBILEPAY_TERMINAL_NAME": "${{secrets.MOBILEPAY_TERMINAL_NAME}}, "MOBILEPAY_TEST_PHONE": "${{secrets.MOBILEPAY_TEST_PHONE}}, "MOBILEPAY_TEST_PHONE_COUNTRY_CODE": "${{secrets.MOBILEPAY_TEST_PHONE_COUNTRY_CODE}}"}'
           dir: Test/integration-tests/cypress/fixtures/
 
       - name: Install Cypress Dependencies
