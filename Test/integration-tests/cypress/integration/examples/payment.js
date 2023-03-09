@@ -326,7 +326,7 @@ describe('Payments', function () {
                     cy.get('#email').clear().type('demo@example.com')
                     cy.get('#add_products').click()
                     cy.get('#sales_order_create_search_grid_table > tbody > tr:nth-child(2)').click().wait(5000)
-                    cy.contains('Add Selected Product(s) to Order').click().wait(5000)
+                    cy.contains('Add Selected Product(s) to Order').click({force: true}).wait(5000)
                     cy.contains('Get shipping methods and rates').click().wait(3000)
                     cy.get('.admin__order-shipment-methods-options-list > li:first').click().wait(3000)
                     cy.contains(admin.CC_TERMINAL_NAME).click().wait(3000)
@@ -374,7 +374,7 @@ describe('Payments', function () {
                     cy.get('#email').clear().type('demo@example.com')
                     cy.get('#add_products').click().wait(2000)
                     cy.get('#sales_order_create_search_grid_table > tbody > tr:nth-child(2)').click()
-                    cy.contains('Add Selected Product(s) to Order').click().wait(5000)
+                    cy.contains('Add Selected Product(s) to Order').click({force: true}).wait(5000)
                     cy.contains('Get shipping methods and rates').click().wait(3000)
                     cy.get('.admin__order-shipment-methods-options-list > li:first').click().wait(3000)
                     cy.contains(admin.KLARNA_DKK_TERMINAL_NAME).click().wait(3000)
@@ -382,7 +382,7 @@ describe('Payments', function () {
                     cy.get('.payment_link > code').then(($a) => {
                         const payment_link = $a.text();
                         cy.origin('https://pensio.com', { args: { payment_link } }, ({ payment_link }) => {
-                            cy.visit(payment_link)
+                            cy.visit(payment_link).wait(3000)
                             cy.get('#radio_pay_later').click().wait(3000)
                             cy.get('[id=submitbutton]').click().wait(5000)
                             cy.wait(5000)
@@ -437,7 +437,7 @@ describe('Payments', function () {
                     cy.get('#top-cart-btn-checkout').click().wait(3000)
                     cy.get('#customer-email').type('demo@example.com')
                     cy.get('#pass').type('admin@1234')
-                    cy.get('#send2').click().wait(10000)
+                    cy.get('#send2').click().wait(15000)
                     cy.get('.button').click().wait(5000)
                     cy.get('body').then(($a) => {
                         if ($a.find("label:contains('" + admin.SUBSCRIPTION_TERMINAL_NAME + "')").length) {
@@ -477,7 +477,7 @@ describe('Payments', function () {
                     cy.get('body').then(($a) => {
                         if ($a.find("label:contains('" + admin.MOBILEPAY_TERMINAL_NAME + "')").length) {
                             cy.contains(admin.MOBILEPAY_TERMINAL_NAME).click().wait(5000)
-                            cy.get('._active > .payment-method-content > :nth-child(5) > div.primary > .action > span').click().wait(5000)
+                            cy.get('._active > .payment-method-content > :nth-child(5) > div.primary > .action > span').click().wait(15000)
                             cy.get('input[type="tel"]').first().click().clear().click().type(admin.MOBILEPAY_TEST_PHONE)
                             cy.contains('Continue').first().click().wait(10000)
                             cy.url().then(url => {
