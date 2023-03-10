@@ -1,6 +1,10 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [3.6.1]
+### Added
+- Set Callback parameters in the reservation API
+
 ## [3.6.0]
 ### Added
 - Add configuration to enable the handling of fraudulent payments.
