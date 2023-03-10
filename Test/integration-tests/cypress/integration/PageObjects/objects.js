@@ -190,6 +190,7 @@ class Order {
         cy.get('.even > :nth-child(1) > .col-qty-invoice > .input-text').clear().type('0')
         cy.contains("Update Qty's").click()
         cy.wait(6000)
+        cy.reload().wait(3000)
         cy.contains('Submit Invoice').click()
         cy.wait(6000)
         cy.get(':nth-child(1) > .note-list-comment').should('include.text', 'Captured amount')
@@ -210,7 +211,8 @@ class Order {
         cy.get('.even > :nth-child(1) > .col-refund > .input-text').clear().type('0')
         cy.get('.col-refund > span').click()
         cy.contains("Update Qty's").click().wait(2000)
-        cy.xpath('/html/body/div[3]/main/div[2]/div/div/form/div[2]/section[2]/div[2]/div[2]/div[3]/div[3]/button[2]').click()
+        cy.reload().wait(3000)
+        cy.xpath('/html/body/div[2]/main/div[2]/div/div/form/div[2]/section[2]/div[2]/div[2]/div[3]/div[3]/button[2]').click()
         cy.wait(3000)
         cy.get(':nth-child(1) > .note-list-comment').should('include.text', 'We refunded')
     }

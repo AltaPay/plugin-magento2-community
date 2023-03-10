@@ -2,6 +2,7 @@
 	"chromeWebSecurity": false,
 	"experimentalSessionAndOrigin": true,
 	"videoCompression": false,
+	"includeShadowDom": true,
 	"retries": {
 
 		"runMode": 2,
