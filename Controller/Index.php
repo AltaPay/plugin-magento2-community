@@ -21,6 +21,8 @@ use SDM\Altapay\Model\Gateway;
 use Magento\Framework\Controller\Result\RedirectFactory;
 use Magento\Framework\Encryption\EncryptorInterface;
 use Magento\Framework\Math\Random;
+use Magento\Store\Model\StoreManagerInterface;
+use Magento\Framework\App\Config\ScopeConfigInterface;
 /**
  * Class Index
  */
@@ -63,6 +65,16 @@ abstract class Index extends Action
     protected $pageFactory;
 
     /**
+     * @var StoreManagerInterface
+     */
+    protected $storeManager;
+
+    /**
+     * @var ScopeConfigInterface
+     */
+    protected $scopeConfig;
+
+    /**
      * Index constructor.
      *
      * @param Context     $context
@@ -85,7 +97,9 @@ abstract class Index extends Action
         Logger $altapayLogger,
         EncryptorInterface $encryptor,
         Random $random,
-        RedirectFactory $redirectFactory
+        RedirectFactory $redirectFactory,
+        ScopeConfigInterface $scopeConfig,
+        StoreManagerInterface $storeManager
         
     ) {
         parent::__construct($context);
@@ -99,6 +113,8 @@ abstract class Index extends Action
         $this->encryptor       = $encryptor;
         $this->random          = $random;
         $this->redirectFactory = $redirectFactory;
+        $this->scopeConfig     = $scopeConfig;
+        $this->storeManager    = $storeManager;
     }
 
     /**
