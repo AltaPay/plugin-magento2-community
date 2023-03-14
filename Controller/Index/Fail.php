@@ -15,6 +15,8 @@ use SDM\Altapay\Controller\Index;
 use Magento\Framework\App\CsrfAwareActionInterface;
 use Magento\Framework\App\RequestInterface;
 use Magento\Framework\App\Request\InvalidRequestException;
+use Magento\Store\Model\StoreManagerInterface;
+use Magento\Framework\App\Config\ScopeConfigInterface;
 
 class Fail extends Index implements CsrfAwareActionInterface
 {
@@ -46,16 +48,25 @@ class Fail extends Index implements CsrfAwareActionInterface
     {
         $this->writeLog();
         $status = '';
+        $cardErrorMsgConfig = $this->scopeConfig->getValue(
+            'payment/sdm_altapay_config/error_message/enable',
+            \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
+            $this->storeManager->getStore()->getCode()
+        );
         try {
             $this->generator->restoreOrderFromRequest($this->getRequest());
             $post                         = $this->getRequest()->getPostValue();
             $merchantError                = '';
             $status                       = strtolower($post['status']);
-            $cardHolderMessageMustBeShown = false;
-
-            if (isset($post['cardholder_message_must_be_shown'])) {
-                $cardHolderMessageMustBeShown = $post['cardholder_message_must_be_shown'];
+            $hasCardholderError           = isset($post['cardholder_error_message']);
+            $shouldShowCardholderMessage  = (!isset($post['cardholder_message_must_be_shown']) || $post['cardholder_message_must_be_shown'] == "true");
+            
+            if($hasCardholderError && ($shouldShowCardholderMessage || $cardErrorMsgConfig)) {
+                $msg = $post['cardholder_error_message'];
+            } elseif(isset($post['error_message']) ) {
+                $msg = $post['error_message'];
             }
+            
 
             if (isset($post['error_message']) && isset($post['merchant_error_message'])) {
                 if ($post['error_message'] != $post['merchant_error_message']) {
