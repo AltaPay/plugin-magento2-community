@@ -1,9 +1,9 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
-## [3.6.1]
-### Added
-- Set Callback parameters in the reservation API
+## [unreleased]
+### Fixed
+- Fix saved card redirection issue for `Unscheduled Type` charge.
 
 ## [3.6.0]
 ### Added
