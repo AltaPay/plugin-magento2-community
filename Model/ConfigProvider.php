@@ -186,8 +186,8 @@ class ConfigProvider implements ConfigProviderInterface
                 ];
                 foreach ($collection as $item) {
                     $data             = $item->getData();
+                    $maskedPAN        = str_repeat('*', 8) . substr($data['masked_pan'], -4);
                     $id               = $data['id'];
-                    $maskedPan        = $data['masked_pan']; // Last four digits
                     $savedTokenList[] = [
                         'id'        => $id,
                         'maskedPan' => $maskedPan

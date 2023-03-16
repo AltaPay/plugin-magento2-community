@@ -431,9 +431,6 @@ class Generator
             $paymentType             = $response->type;
             $paymentStatus           = strtolower($response->paymentStatus);
             $ccToken                 = $response->creditCardToken;
-            $maskedPan               = $response->maskedCreditCard;
-            $lastFourDigits          = substr($maskedPan, -4); // Get the last 4 digits of the number
-            $maskedPan               = str_repeat('*', strlen($maskedPan) - 4) . $lastFourDigits; // Mask the rest of the number with asterisks and concatenate with the last 4 digits
             $paymentId               = $response->paymentId;
             $transactionId           = $response->transactionId;
             $parametersData          = json_encode($request->getPostValue());
@@ -492,6 +489,7 @@ class Generator
                 $this->resetCanceledQty($order);
                 if (isset($response->Transactions[$latestTransKey])) {
                     $transaction = $response->Transactions[$latestTransKey];
+                    $lastFourDigits = $transaction->CardInformation->LastFourDigits;
                     if (isset($transaction->CreditCardExpiry->Month) && isset($transaction->CreditCardExpiry->Year)) {
                         $expires = $transaction->CreditCardExpiry->Month . '/' . $transaction->CreditCardExpiry->Year;
                     }
@@ -515,7 +513,7 @@ class Generator
                             "agreement_id" => $transactionId,
                             "agreement_type" => $agreementType,
                             "agreement_unscheduled" => $unscheduledType,
-                            "masked_pan" => $maskedPan,
+                            "masked_pan" => $lastFourDigits,
                             "currency_code" => $order->getOrderCurrencyCode(),
                             "expires" => $expires,
                             "card_type" => $cardType
@@ -551,7 +549,7 @@ class Generator
                 $payment->setLastTransId($transactionId);
                 $payment->setCcTransId($response->creditCardToken);
                 $payment->setAdditionalInformation('cc_token', $ccToken);
-                $payment->setAdditionalInformation('masked_credit_card', $maskedPan);
+                $payment->setAdditionalInformation('last_four_digits', $lastFourDigits);
                 $payment->setAdditionalInformation('expires', $expires);
                 $payment->setAdditionalInformation('card_type', $cardType);
                 $payment->setAdditionalInformation('payment_type', $paymentType);

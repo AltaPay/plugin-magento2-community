@@ -31,9 +31,10 @@ if (!empty($collection) && $collection->getSize() > 0) {
             </thead>
             <tbody>
             <?php foreach ($collection as $item): ?>
+                <?php $maskedPAN = str_repeat('*', 8) . substr($item->getMaskedPan(), -4); ?>
                 <tr id="token-custom-name-status-<?= $block->escapeHtml($item->getId()); ?>">
                     <td data-th="<?= $block->escapeHtml(__('Card type')); ?>" class="col card-type"><?= $block->escapeHtml($item->getCardType()); ?></td>
-                    <td data-th="<?= $block->escapeHtml(__('Masked pan')); ?>" class="col card-type"><?= $block->escapeHtml($item->getMaskedPan()); ?></td>
+                    <td data-th="<?= $block->escapeHtml(__('Masked pan')); ?>" class="col card-type"><?= $block->escapeHtml($maskedPAN); ?></td>
                     <td data-th="<?= $block->escapeHtml(__('Expires')); ?>"
                         class="col card-expiry-date"><?= $block->escapeHtml($item->getExpires()); ?></td>
                     <td data-th="<?= $block->escapeHtml(__('Primary')); ?>" class="col created_at" >

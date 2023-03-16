@@ -32,12 +32,17 @@ class UpgradeData implements UpgradeDataInterface
         if (version_compare($context->getVersion(), '3.6.1', '<')) {
             $connection = $this->moduleDataSetup->getConnection();
             $tableName = $this->moduleDataSetup->getTable('altapay_token');
-            $connection->update(
-                $tableName,
-                [
-                    'masked_pan' => new \Zend_Db_Expr("CONCAT('************', RIGHT(masked_pan, 4))")
-                ]
-            ); 
+            $column = 'masked_pan';
+            // Remove asterisks and leave last 4 digits from all existing records in the table
+            $connection->beginTransaction();
+            try {
+                $query = "UPDATE {$tableName} SET {$column} = SUBSTR(REPLACE({$column}, '*', ''), -4) WHERE {$column} LIKE '%*%'";
+                $connection->query($query);
+                $connection->commit();
+            } catch (\Exception $e) {
+                $connection->rollBack();
+                throw $e;
+            }
         }
         
         $setup->endSetup();
