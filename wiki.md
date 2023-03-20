@@ -185,13 +185,14 @@ To synchronize the terminals with the gateway, click on the **Synchronize Termin
 
 _**Note:** Remember to follow Magento's [Cache Management](https://docs.magento.com/user-guide/system/cache-management.html) guidelines to clear the site cache when updating the configurations._
 
-#Save credit cards
+# Save credit cards
 1. To enable save credit cards option for customers follow the bellow steps
     * Navigate to Admin \> Stores \> Configuration \> Sales \> Payment Methods > AltaPay
     * Choose Terminal
-    * "Enable Customer Token Control" to Yes 
+    * "Enable Customer Token Control" to Yes
+    * Choose Unscheduled Type from the list.
 
-    ![save_card_config](docs/save_card_config.png)
+        ![save_card_config](docs/save_card_config.png)
 
 2. A new field will be appeared on checkout page for saving the credit card for later use
 

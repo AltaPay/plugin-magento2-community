@@ -1,6 +1,10 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [3.6.1]
+### Added
+- Show the last four digits instead of masked PAN on the card selection.
+
 ## [3.6.0]
 ### Added
 - Add configuration to enable the handling of fraudulent payments.
