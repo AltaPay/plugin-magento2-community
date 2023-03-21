@@ -23,6 +23,9 @@ use SDM\Altapay\Model\SystemConfig;
 use Magento\Framework\App\ResourceConnection;
 use SDM\Altapay\Logger\Logger;
 use Magento\Catalog\Model\Indexer\Product\Price\Processor;
+use Altapay\Api\Ecommerce\Callback;
+use Magento\Framework\App\Config\ScopeConfigInterface;
+use Magento\Store\Model\StoreManagerInterface;
 
 class RestoreQuote
 {
@@ -83,7 +86,18 @@ class RestoreQuote
      * @var Logger
      */
     protected $altapayLogger;
-
+    
+    /**
+     * @var ScopeConfigInterface
+     */
+    protected $scopeConfig;
+    
+    /**
+     * @var StoreManagerInterface
+     */
+    protected $storeManager;
+    
+    
     /**
      * RestoreQuote Constructor
      *
@@ -98,6 +112,7 @@ class RestoreQuote
      * @param SystemConfig             $systemConfig
      * @param ResourceConnection       $modelResource
      * @param Logger                   $altapayLogger
+     *
      */
     public function __construct(
         Session $checkoutSession,
@@ -111,7 +126,9 @@ class RestoreQuote
         SystemConfig $systemConfig,
         ResourceConnection $modelResource,
         Logger $altapayLogger,
-        Processor $priceIndexer
+        Processor $priceIndexer,
+        ScopeConfigInterface $scopeConfig,
+        StoreManagerInterface $storeManager
     ) {
         $this->checkoutSession = $checkoutSession;
         $this->orderFactory    = $orderFactory;
@@ -125,6 +142,8 @@ class RestoreQuote
         $this->modelResource   = $modelResource;
         $this->altapayLogger   = $altapayLogger;
         $this->priceIndexer    = $priceIndexer;
+        $this->scopeConfig     = $scopeConfig;
+        $this->storeManager    = $storeManager;
     }
 
     /**
@@ -148,12 +167,26 @@ class RestoreQuote
 
             //get transaction details if failure and redirect to cart
             $getTransactionData = $this->getTransactionData($orderId);
-
+    
             //if fail set message and history
             if (!empty($getTransactionData)) {
                 $getTransactionDataDecode = json_decode($getTransactionData);
-                if (isset($getTransactionDataDecode->error_message)) {
-                    $message = $getTransactionDataDecode->error_message;
+                $shouldShowCardholderMessage = false;
+                $xml = simplexml_load_string($getTransactionDataDecode->xml);
+                $cardholderErrorMessage = $xml->Body->CardHolderErrorMessage;
+                $message = "Error with the Payment.";
+                if (isset($getTransactionDataDecode->cardholder_message_must_be_shown)) {
+                    $shouldShowCardholderMessage = (bool)($getTransactionDataDecode->cardholder_message_must_be_shown === "true");
+                }
+                $cardErrorMsgConfig = (bool)$this->scopeConfig->getValue(
+                    'payment/sdm_altapay_config/error_message/enable',
+                    \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
+                    $this->storeManager->getStore()->getCode()
+                );
+                if (isset($post['error_message']) && $cardholderErrorMessage == null ) {
+                    $message = $post['error_message'];
+                } elseif ($shouldShowCardholderMessage || $cardErrorMsgConfig) {
+                    $message = $cardholderErrorMessage;
                 }
             } else {
                 $browserBackBtn = true;

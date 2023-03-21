@@ -48,38 +48,32 @@ class Fail extends Index implements CsrfAwareActionInterface
     {
         $this->writeLog();
         $status = '';
-        $cardErrorMsgConfig = $this->scopeConfig->getValue(
-            'payment/sdm_altapay_config/error_message/enable',
-            \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
-            $this->storeManager->getStore()->getCode()
-        );
         try {
             $this->generator->restoreOrderFromRequest($this->getRequest());
             $post                         = $this->getRequest()->getPostValue();
             $merchantError                = '';
             $status                       = strtolower($post['status']);
-            $hasCardholderError           = isset($post['cardholder_error_message']);
-            $shouldShowCardholderMessage  = (!isset($post['cardholder_message_must_be_shown']) || $post['cardholder_message_must_be_shown'] == "true");
-            
-            if($hasCardholderError && ($shouldShowCardholderMessage || $cardErrorMsgConfig)) {
-                $msg = $post['cardholder_error_message'];
-            } elseif(isset($post['error_message']) ) {
+            $cardholderErrorMessage = $this->generator->getCardHolderErrorMessage($this->getRequest());
+            $shouldShowCardholderMessage = (bool)($this->getRequest()->getPost('cardholder_message_must_be_shown') === "true");
+            $cardErrorMsgConfig = (bool)$this->scopeConfig->getValue(
+                'payment/sdm_altapay_config/error_message/enable',
+                \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
+                $this->storeManager->getStore()->getCode()
+            );
+    
+            $msg = "Error with the Payment.";
+            if (isset($post['error_message']) && $cardholderErrorMessage == null) {
                 $msg = $post['error_message'];
+            } elseif ($shouldShowCardholderMessage || $cardErrorMsgConfig) {
+                $msg = $cardholderErrorMessage;
             }
-            
 
             if (isset($post['error_message']) && isset($post['merchant_error_message'])) {
                 if ($post['error_message'] != $post['merchant_error_message']) {
                     $merchantError = $post['merchant_error_message'];
                 }
             }
-
-            if (isset($post['error_message']) && $cardHolderMessageMustBeShown == "true") {
-                $msg = $post['error_message'];
-            } else {
-                $msg = "Error with the Payment.";
-            }
-
+            
             //Set order status, if available from the payment gateway
             switch ($status) {
                 case "cancelled":

@@ -53,10 +53,18 @@ class Notification extends Index implements CsrfAwareActionInterface
                 //Set order status, if available from the payment gateway
                 $merchantError                = '';
                 $status                       = strtolower($post['status']);
-                $cardHolderMessageMustBeShown = false;
-
-                if (isset($post['cardholder_message_must_be_shown'])) {
-                    $cardHolderMessageMustBeShown = $post['cardholder_message_must_be_shown'];
+                $msg                          = "Error with the Payment.";
+                $cardholderErrorMessage = $this->generator->getCardHolderErrorMessage($this->getRequest());
+                $shouldShowCardholderMessage = (bool)($this->getRequest()->getPost('cardholder_message_must_be_shown') === "true");
+                $cardErrorMsgConfig = (bool)$this->scopeConfig->getValue(
+                    'payment/sdm_altapay_config/error_message/enable',
+                    \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
+                    $this->storeManager->getStore()->getCode()
+                );
+                if (isset($post['error_message']) && $cardholderErrorMessage == null) {
+                    $msg = $post['error_message'];
+                } elseif ($shouldShowCardholderMessage || $cardErrorMsgConfig) {
+                    $msg = $cardholderErrorMessage;
                 }
 
                 if (isset($post['error_message']) && isset($post['merchant_error_message'])) {
@@ -64,16 +72,7 @@ class Notification extends Index implements CsrfAwareActionInterface
                         $merchantError = $post['merchant_error_message'];
                     }
                 }
-
-                if (isset($post['error_message']) && $cardHolderMessageMustBeShown == "true") {
-                    $msg = $post['error_message'];
-                } else {
-                    $msg = "Error with the Payment.";
-                }
-
-                if ($status == "cancelled") {
-                    $msg = "Payment canceled";
-                }
+                
                 $this->handleNotification($status, $msg, $merchantError);
             }
         } catch (\Exception $e) {
