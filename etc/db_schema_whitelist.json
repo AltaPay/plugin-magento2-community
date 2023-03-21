@@ -30,7 +30,7 @@
             "customer_id": true,
             "agreement_id": true,
             "agreement_type": true,
-            "agreement_unscheduled":true,
+            "agreement_unscheduled": true,
             "token": true,
             "masked_pan": true,
             "currency_code": true,
