@@ -1,6 +1,10 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [3.6.3]
+### Fixed
+- Resolved an issue in the code that was causing a "Undefined variable: maskedPan" notice to be thrown.
+
 ## [3.6.2]
 ### Fixed
 - Fix saved card redirection issue for `Unscheduled Type` charge.
