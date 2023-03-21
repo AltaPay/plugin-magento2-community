@@ -1,6 +1,10 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [3.6.2]
+### Fixed
+- Fix saved card redirection issue for `Unscheduled Type` charge.
+
 ## [3.6.1]
 ### Added
 - Show the last four digits instead of masked PAN on the card selection.

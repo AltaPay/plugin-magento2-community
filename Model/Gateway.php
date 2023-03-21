@@ -503,10 +503,11 @@ class Gateway implements GatewayInterface
             ->setCustomerInfo($this->customerHandler->setCustomer($order, $isReservation))
             ->setTransactionInfo($transactionDetail)
             ->setCookie($this->request->getServer('HTTP_COOKIE'))
-            ->setSaleReconciliationIdentifier($this->random->getUniqueHash());
+            ->setSaleReconciliationIdentifier($this->random->getUniqueHash())
+            ->setConfig($this->setConfig());
         
         if(!$isReservation) {
-            $request->setConfig($this->setConfig())->setSalesTax((float)number_format($order->getTaxAmount(), 2, '.', ''));
+            $request->setSalesTax((float)number_format($order->getTaxAmount(), 2, '.', ''));
         }
         if ($fraud = $this->systemConfig->getTerminalConfig($terminalId, 'fraud', $storeScope, $storeCode)) {
             $request->setFraudService($fraud);
