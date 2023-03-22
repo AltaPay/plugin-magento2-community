@@ -51,28 +51,9 @@ class Fail extends Index implements CsrfAwareActionInterface
         try {
             $this->generator->restoreOrderFromRequest($this->getRequest());
             $post                         = $this->getRequest()->getPostValue();
-            $merchantError                = '';
             $status                       = strtolower($post['status']);
-            $cardholderErrorMessage = $this->generator->getCardHolderErrorMessage($this->getRequest());
-            $shouldShowCardholderMessage = (bool)($this->getRequest()->getPost('cardholder_message_must_be_shown') === "true");
-            $cardErrorMsgConfig = (bool)$this->scopeConfig->getValue(
-                'payment/sdm_altapay_config/error_message/enable',
-                \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
-                $this->storeManager->getStore()->getCode()
-            );
-    
-            $msg = "Error with the Payment.";
-            if (isset($post['error_message']) && $cardholderErrorMessage == null) {
-                $msg = $post['error_message'];
-            } elseif ($shouldShowCardholderMessage || $cardErrorMsgConfig) {
-                $msg = $cardholderErrorMessage;
-            }
-
-            if (isset($post['error_message']) && isset($post['merchant_error_message'])) {
-                if ($post['error_message'] != $post['merchant_error_message']) {
-                    $merchantError = $post['merchant_error_message'];
-                }
-            }
+            $merchantError                = $this->handleMerchantErrorMessage();
+            $msg                          = $this->handleErrorMessage();
             
             //Set order status, if available from the payment gateway
             switch ($status) {

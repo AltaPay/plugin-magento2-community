@@ -170,11 +170,11 @@ class RestoreQuote
     
             //if fail set message and history
             if (!empty($getTransactionData)) {
-                $getTransactionDataDecode = json_decode($getTransactionData);
                 $shouldShowCardholderMessage = false;
+                $message = "Error with the Payment.";
+                $getTransactionDataDecode = json_decode($getTransactionData);
                 $xml = simplexml_load_string($getTransactionDataDecode->xml);
                 $cardholderErrorMessage = $xml->Body->CardHolderErrorMessage;
-                $message = "Error with the Payment.";
                 if (isset($getTransactionDataDecode->cardholder_message_must_be_shown)) {
                     $shouldShowCardholderMessage = (bool)($getTransactionDataDecode->cardholder_message_must_be_shown === "true");
                 }
@@ -183,9 +183,9 @@ class RestoreQuote
                     \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
                     $this->storeManager->getStore()->getCode()
                 );
-                if (isset($post['error_message']) && $cardholderErrorMessage == null ) {
-                    $message = $post['error_message'];
-                } elseif ($shouldShowCardholderMessage || $cardErrorMsgConfig) {
+                if (isset($getTransactionDataDecode->error_message) && empty($cardholderErrorMessage)) {
+                    $message = $getTransactionDataDecode->error_message;
+                } elseif ($cardholderErrorMessage && ($shouldShowCardholderMessage || $cardErrorMsgConfig)) {
                     $message = $cardholderErrorMessage;
                 }
             } else {
