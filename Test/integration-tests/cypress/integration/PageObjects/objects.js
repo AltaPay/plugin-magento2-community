@@ -52,6 +52,7 @@ class Order {
         cy.contains(KLARNA_DKK_TERMINAL_NAME).click({ force: true })
         cy.wait(3000)
         cy.get('._active > .payment-method-content > :nth-child(5) > div.primary > .action').click().wait(5000)
+        cy.reload().wait(3000)
         cy.get('#radio_pay_later').click().wait(8000)
         cy.get('[id=submitbutton]').click().wait(5000)
         cy.wait(5000)
