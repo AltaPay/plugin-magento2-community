@@ -5,6 +5,10 @@ All notable changes to this project will be documented in this file.
 ### Added
 -  Improve error logging for frontend.
 
+## [3.6.3]
+### Fixed
+Fix: undefined variable maskedPan
+
 ## [3.6.2]
 ### Fixed
 - Fix saved card redirection issue for `Unscheduled Type` charge.
