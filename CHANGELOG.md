@@ -1,6 +1,10 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [3.6.4]
+### Added
+-  Improve error logging for frontend.
+
 ## [3.6.3]
 ### Fixed
 Fix: undefined variable maskedPan

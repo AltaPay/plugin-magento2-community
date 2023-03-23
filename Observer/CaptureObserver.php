@@ -325,7 +325,7 @@ class CaptureObserver implements ObserverInterface
             if (isset($response->Transactions)) {
                 foreach ($response->Transactions as $key => $value) {
                     if ($value->AuthType === "subscription_payment" && $value->CreatedDate > $max_date) {
-                        $max_date = $value->CreatedDate;
+                        $max_date       = $value->CreatedDate;
                         $latestTransKey = $key;
                     }
                 }

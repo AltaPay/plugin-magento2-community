@@ -15,6 +15,8 @@ use SDM\Altapay\Controller\Index;
 use Magento\Framework\App\CsrfAwareActionInterface;
 use Magento\Framework\App\RequestInterface;
 use Magento\Framework\App\Request\InvalidRequestException;
+use Magento\Store\Model\StoreManagerInterface;
+use Magento\Framework\App\Config\ScopeConfigInterface;
 
 class Fail extends Index implements CsrfAwareActionInterface
 {
@@ -49,26 +51,10 @@ class Fail extends Index implements CsrfAwareActionInterface
         try {
             $this->generator->restoreOrderFromRequest($this->getRequest());
             $post                         = $this->getRequest()->getPostValue();
-            $merchantError                = '';
             $status                       = strtolower($post['status']);
-            $cardHolderMessageMustBeShown = false;
-
-            if (isset($post['cardholder_message_must_be_shown'])) {
-                $cardHolderMessageMustBeShown = $post['cardholder_message_must_be_shown'];
-            }
-
-            if (isset($post['error_message']) && isset($post['merchant_error_message'])) {
-                if ($post['error_message'] != $post['merchant_error_message']) {
-                    $merchantError = $post['merchant_error_message'];
-                }
-            }
-
-            if (isset($post['error_message']) && $cardHolderMessageMustBeShown == "true") {
-                $msg = $post['error_message'];
-            } else {
-                $msg = "Error with the Payment.";
-            }
-
+            $merchantError                = $this->handleMerchantErrorMessage();
+            $msg                          = $this->handleErrorMessage();
+            
             //Set order status, if available from the payment gateway
             switch ($status) {
                 case "cancelled":

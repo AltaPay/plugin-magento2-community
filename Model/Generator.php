@@ -271,23 +271,19 @@ class Generator
             $order             = $this->loadOrderFromCallback($response);
             $payment           = $order->getPayment();
             $lastTransactionId = $payment->getLastTransId();
-            if (!empty($lastTransactionId) && $lastTransactionId != $response->transactionId ) {
-                if (strtolower($response->status) === "succeeded") {
-                    //check if order status set in configuration
-                    $statusKey         = Order::STATE_CANCELED;
-                    $storeCode         = $order->getStore()->getCode();
-                    $storeScope        = \Magento\Store\Model\ScopeInterface::SCOPE_STORE;
+            //check if order status set in configuration
+            $statusKey         = Order::STATE_CANCELED;
+            $storeCode         = $order->getStore()->getCode();
+            $storeScope        = \Magento\Store\Model\ScopeInterface::SCOPE_STORE;
 
-                    $orderStatusCancel = $this->systemConfig->getStatusConfig('cancel', $storeScope, $storeCode);
-                   
-                    if ($orderStatusCancel) {
-                        $statusKey = $orderStatusCancel;
-                    }
-                    $this->handleOrderStateAction($request, Order::STATE_CANCELED, $statusKey, $historyComment);
-                    //save failed transaction data
-                    $this->saveTransactionData($request, $response, $order);
-                }
+            $orderStatusCancel = $this->systemConfig->getStatusConfig('cancel', $storeScope, $storeCode);
+            
+            if ($orderStatusCancel) {
+                $statusKey = $orderStatusCancel;
             }
+            $this->handleOrderStateAction($request, Order::STATE_CANCELED, $statusKey, $historyComment);
+            //save failed transaction data
+            $this->saveTransactionData($request, $response, $order);
         }
     }
 
@@ -333,24 +329,19 @@ class Generator
             $order             = $this->loadOrderFromCallback($response);
             $payment           = $order->getPayment();
             $lastTransactionId = $payment->getLastTransId();
-            
-            if (!empty($lastTransactionId) && $lastTransactionId != $response->transactionId) {
-                if (strtolower($response->status) === "succeeded") {
-                    $transInfo = $this->getTransactionInfoFromResponse($response);
-                    //check if order status set in configuration
-                    $statusKey         = Order::STATE_CANCELED;
-                    $storeCode         = $order->getStore()->getCode();
-                    $storeScope        = \Magento\Store\Model\ScopeInterface::SCOPE_STORE;
-                    $orderStatusCancel = $this->systemConfig->getStatusConfig('cancel', $storeScope, $storeCode);
+            $transInfo = $this->getTransactionInfoFromResponse($response);
+            //check if order status set in configuration
+            $statusKey         = Order::STATE_CANCELED;
+            $storeCode         = $order->getStore()->getCode();
+            $storeScope        = \Magento\Store\Model\ScopeInterface::SCOPE_STORE;
+            $orderStatusCancel = $this->systemConfig->getStatusConfig('cancel', $storeScope, $storeCode);
 
-                    if ($orderStatusCancel) {
-                        $statusKey = $orderStatusCancel;
-                    }
-                    $this->handleOrderStateAction($request, Order::STATE_CANCELED, $statusKey, $historyComment, $transInfo);
-                    //save failed transaction data
-                    $this->saveTransactionData($request, $response, $order);
-                }
+            if ($orderStatusCancel) {
+                $statusKey = $orderStatusCancel;
             }
+            $this->handleOrderStateAction($request, Order::STATE_CANCELED, $statusKey, $historyComment, $transInfo);
+            //save failed transaction data
+            $this->saveTransactionData($request, $response, $order);
         }
     }
 
@@ -913,5 +904,20 @@ class Generator
 
             return false;
         }
+    }
+    
+    /**
+     * Get the CardHolderErrorMessage from the request object.
+     *
+     * @param RequestInterface $request
+     *
+     * @return string|null Returns the CardHolderErrorMessage, or null if it doesn't exist.
+     */
+    public function getCardHolderErrorMessage(RequestInterface $request)
+    {
+        $callback = new Callback($request->getPostValue());
+        $response = $callback->call();
+        
+        return $response->CardHolderErrorMessage ?? null;
     }
 }

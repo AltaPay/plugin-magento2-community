@@ -51,29 +51,10 @@ class Notification extends Index implements CsrfAwareActionInterface
             if ($this->checkPost()) {
                 $post = $this->getRequest()->getParams();
                 //Set order status, if available from the payment gateway
-                $merchantError                = '';
                 $status                       = strtolower($post['status']);
-                $cardHolderMessageMustBeShown = false;
-
-                if (isset($post['cardholder_message_must_be_shown'])) {
-                    $cardHolderMessageMustBeShown = $post['cardholder_message_must_be_shown'];
-                }
-
-                if (isset($post['error_message']) && isset($post['merchant_error_message'])) {
-                    if ($post['error_message'] != $post['merchant_error_message']) {
-                        $merchantError = $post['merchant_error_message'];
-                    }
-                }
-
-                if (isset($post['error_message']) && $cardHolderMessageMustBeShown == "true") {
-                    $msg = $post['error_message'];
-                } else {
-                    $msg = "Error with the Payment.";
-                }
-
-                if ($status == "cancelled") {
-                    $msg = "Payment canceled";
-                }
+                $merchantError                = $this->handleMerchantErrorMessage();
+                $msg                          = $this->handleErrorMessage();
+                
                 $this->handleNotification($status, $msg, $merchantError);
             }
         } catch (\Exception $e) {

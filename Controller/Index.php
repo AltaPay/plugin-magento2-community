@@ -21,6 +21,8 @@ use SDM\Altapay\Model\Gateway;
 use Magento\Framework\Controller\Result\RedirectFactory;
 use Magento\Framework\Encryption\EncryptorInterface;
 use Magento\Framework\Math\Random;
+use Magento\Store\Model\StoreManagerInterface;
+use Magento\Framework\App\Config\ScopeConfigInterface;
 /**
  * Class Index
  */
@@ -63,6 +65,16 @@ abstract class Index extends Action
     protected $pageFactory;
 
     /**
+     * @var StoreManagerInterface
+     */
+    protected $storeManager;
+
+    /**
+     * @var ScopeConfigInterface
+     */
+    protected $scopeConfig;
+
+    /**
      * Index constructor.
      *
      * @param Context     $context
@@ -85,7 +97,9 @@ abstract class Index extends Action
         Logger $altapayLogger,
         EncryptorInterface $encryptor,
         Random $random,
-        RedirectFactory $redirectFactory
+        RedirectFactory $redirectFactory,
+        ScopeConfigInterface $scopeConfig,
+        StoreManagerInterface $storeManager
         
     ) {
         parent::__construct($context);
@@ -99,6 +113,8 @@ abstract class Index extends Action
         $this->encryptor       = $encryptor;
         $this->random          = $random;
         $this->redirectFactory = $redirectFactory;
+        $this->scopeConfig     = $scopeConfig;
+        $this->storeManager    = $storeManager;
     }
 
     /**
@@ -142,5 +158,45 @@ abstract class Index extends Action
         }
 
         return $resultRedirect;
+    }
+    
+    /**
+     * Returns the merchant error message
+     *
+     * @return string
+     */
+    protected function handleMerchantErrorMessage(): string
+    {
+        $post  = $this->getRequest()->getPostValue();
+        if (isset($post['error_message']) && isset($post['merchant_error_message'])) {
+            if ($post['error_message'] != $post['merchant_error_message']) {
+                return $post['merchant_error_message'];
+            }
+        }
+        return "";
+    }
+    
+    /**
+     * Returns the error_message or cardholder error message
+     *
+     * @return mixed|string|null
+     */
+    protected function handleErrorMessage() {
+        $msg = "Error with the Payment.";
+        $post  = $this->getRequest()->getPostValue();
+        $cardholderErrorMessage = $this->generator->getCardHolderErrorMessage($this->getRequest());
+        $shouldShowCardholderMessage = (bool)($this->getRequest()->getPost('cardholder_message_must_be_shown') === "true");
+        $cardErrorMsgConfig = (bool)$this->scopeConfig->getValue(
+            'payment/sdm_altapay_config/error_message/enable',
+            \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
+            $this->storeManager->getStore()->getCode()
+        );
+        if (isset($post['error_message']) && $cardholderErrorMessage === null) {
+            $msg = $post['error_message'];
+        } elseif ($cardholderErrorMessage && ($shouldShowCardholderMessage || $cardErrorMsgConfig)) {
+            $msg = $cardholderErrorMessage;
+        }
+        
+        return $msg;
     }
 }
