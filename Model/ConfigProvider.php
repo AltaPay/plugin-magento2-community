@@ -190,7 +190,7 @@ class ConfigProvider implements ConfigProviderInterface
                     $id               = $data['id'];
                     $savedTokenList[] = [
                         'id'        => $id,
-                        'maskedPan' => $maskedPan
+                        'maskedPan' => $maskedPAN
                     ];
                 }
             }
