@@ -3,7 +3,7 @@ All notable changes to this project will be documented in this file.
 
 ## [3.6.3]
 ### Fixed
-- Resolved an issue in the code that was causing a "Undefined variable: maskedPan" notice to be thrown.
+Fix: undefined variable maskedPan
 
 ## [3.6.2]
 ### Fixed
