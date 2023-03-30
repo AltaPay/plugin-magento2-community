@@ -1,4 +1,4 @@
-import Order from '../PageObjects/objects'
+import Order from '../PageObjects/objects.cy'
 
 describe('Payments', function () {
 
@@ -320,20 +320,32 @@ describe('Payments', function () {
                 if (admin.CC_TERMINAL_NAME != "") {
                     cy.get('#menu-magento-sales-sales').click()
                     cy.get('.item-sales-order > a').click()
-                    cy.get('#add').click()
-                    cy.get('#sales_order_create_customer_grid_table > tbody > tr:nth-child(1)').click().wait(3000)
-                    cy.reload()
-                    cy.get('#email').clear().type('demo@example.com')
-                    cy.get('#add_products').click()
-                    cy.get('#sales_order_create_search_grid_table > tbody > tr:nth-child(2)').click().wait(5000)
-                    cy.contains('Add Selected Product(s) to Order').click({force: true}).wait(5000)
-                    cy.contains('Get shipping methods and rates').click().wait(3000)
+                    cy.get('#add').click().wait(3000)
+                    cy.contains('Create New Customer').click()
+                    let text = "";
+                    let alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
+                    for (let i = 0; i < 10; i++){
+                        text += alphabet.charAt(Math.floor(Math.random() * alphabet.length))
+                    }
+                    cy.get('#email').type(text + '@example.com')
+                    cy.get('#order-billing_address_firstname').clear().type('Test')
+                    cy.get('#order-billing_address_lastname').clear().type('Person-dk')
+                    cy.get('#order-billing_address_street0').clear().type('Nygårdsvej 3A')
+                    cy.get('select[id=order-billing_address_country_id]').select('Denmark')
+                    cy.get('.modal-footer > .action-primary > span').click()
+                    cy.get('#order-billing_address_city').clear().type('København Ø')
+                    cy.get('#order-billing_address_postcode').clear().type('2100')
+                    cy.get('#order-billing_address_telephone').clear().type('20123456').wait(3000)
+                    cy.get('#add_products').click().wait(3000)
+                    cy.get('#sales_order_create_search_grid_table > tbody > tr:nth-child(2)').click({force: true}).wait(5000)
+                    cy.contains('Add Selected Product(s) to Order').click({force: true}).wait(8000)                    
+                    cy.contains('Get shipping methods and rates').focus().click({force: true}).wait(3000)
                     cy.get('.admin__order-shipment-methods-options-list > li:first').click().wait(3000)
                     cy.contains(admin.CC_TERMINAL_NAME).click().wait(3000)
                     cy.get('#submit_order_top_button').click().wait(2000)
                     cy.get('.payment_link > code').then(($a) => {
                         const payment_link = $a.text();
-                        cy.origin('https://pensio.com', { args: { payment_link } }, ({ payment_link }) => {
+                        cy.origin('https://testgateway.pensio.com', { args: { payment_link } }, ({ payment_link }) => {
                             cy.visit(payment_link)
                             cy.get('#creditCardNumberInput').type('4111111111111111')
                             cy.get('#emonth').type('01')
@@ -349,7 +361,7 @@ describe('Payments', function () {
                 else {
                     cy.log('CC_TERMINAL_NAME skipped')
                     this.skip()
-                }
+                 }
             })
         })
     })
@@ -365,23 +377,36 @@ describe('Payments', function () {
                 ord.change_currency_to_DKK()
             }
             cy.fixture('config').then((admin) => {
-                if (admin.KLARNA_DKK_TERMINAL_NAME != "") {
+                if (admin.CC_TERMINAL_NAME != "") {
                     cy.get('#menu-magento-sales-sales').click()
                     cy.get('.item-sales-order > a').click()
-                    cy.get('#add').click()
-                    cy.get('#sales_order_create_customer_grid_table > tbody > tr:nth-child(1)').click().wait(4000)
-                    cy.reload()
-                    cy.get('#email').clear().type('demo@example.com')
-                    cy.get('#add_products').click().wait(2000)
-                    cy.get('#sales_order_create_search_grid_table > tbody > tr:nth-child(2)').click()
-                    cy.contains('Add Selected Product(s) to Order').click({force: true}).wait(5000)
-                    cy.contains('Get shipping methods and rates').click().wait(3000)
+                    cy.get('#add').click().wait(3000)
+                    cy.contains('Create New Customer').click({force: true})
+                    cy.reload().wait(3000)
+                    let text = "";
+                    let alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
+                    for (let i = 0; i < 10; i++){
+                        text += alphabet.charAt(Math.floor(Math.random() * alphabet.length))
+                    }
+                    cy.get('#email').type(text + '@example.com')
+                    cy.get('#order-billing_address_firstname').clear().type('Test')
+                    cy.get('#order-billing_address_lastname').clear().type('Person-dk')
+                    cy.get('#order-billing_address_street0').clear().type('Nygårdsvej 3A')
+                    cy.get('select[id=order-billing_address_country_id]').select('Denmark')
+                    cy.get('.modal-footer > .action-primary > span').click()
+                    cy.get('#order-billing_address_city').clear().type('København Ø')
+                    cy.get('#order-billing_address_postcode').clear().type('2100')
+                    cy.get('#order-billing_address_telephone').clear().type('20123456').wait(3000)
+                    cy.get('#add_products').click().wait(3000)
+                    cy.get('#sales_order_create_search_grid_table > tbody > tr:nth-child(2)').click({force: true}).wait(5000)
+                    cy.contains('Add Selected Product(s) to Order').click({force: true}).wait(8000)                    
+                    cy.contains('Get shipping methods and rates').focus().click({force: true}).wait(3000)
                     cy.get('.admin__order-shipment-methods-options-list > li:first').click().wait(3000)
                     cy.contains(admin.KLARNA_DKK_TERMINAL_NAME).click().wait(3000)
-                    cy.get('#submit_order_top_button').click().wait(5000)
+                    cy.get('#submit_order_top_button').click().wait(2000)
                     cy.get('.payment_link > code').then(($a) => {
                         const payment_link = $a.text();
-                        cy.origin('https://pensio.com', { args: { payment_link } }, ({ payment_link }) => {
+                        cy.origin('https://testgateway.pensio.com', { args: { payment_link } }, ({ payment_link }) => {
                             cy.visit(payment_link).wait(3000)
                             cy.get('#radio_pay_later').click().wait(3000)
                             cy.get('[id=submitbutton]').click().wait(5000)

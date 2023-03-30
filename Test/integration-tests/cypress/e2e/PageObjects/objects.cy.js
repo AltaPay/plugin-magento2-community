@@ -1,4 +1,4 @@
-require('cypress-xpath')
+require('@cypress/xpath');
 
 class Order {
     clrcookies() {

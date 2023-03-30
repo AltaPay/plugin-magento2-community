@@ -1,4 +1,4 @@
-import Order from '../PageObjects/objects'
+import Order from '../PageObjects/objects.cy'
 
 if(Cypress.env('runDiscountsTests')){
 
