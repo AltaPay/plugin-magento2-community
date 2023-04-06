@@ -42,7 +42,7 @@ class Order {
         }        
         cy.get('#creditCardNumberInput').type('4111111111111111')
         cy.get('#emonth').type('01')
-        cy.get('#eyear').type('2023')
+        cy.get('#eyear').type('2025')
         cy.get('#cvcInput').type('123')
         cy.get('#cardholderNameInput').type('testname')
         cy.get('#pensioCreditCardPaymentSubmitButton').click().wait(3000)
@@ -549,7 +549,7 @@ class Order {
                     cy.contains('Create New Customer').focus().click({ force: true }).wait(3000)
                     cy.reload().wait(3000)
                     let text = "";
-                    let alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
+                    let alphabet = "abcdefghijklmnopqrstuvwxyz123456789"
                     for (let i = 0; i < 10; i++) {
                         text += alphabet.charAt(Math.floor(Math.random() * alphabet.length))
                     }
