@@ -890,7 +890,6 @@ class Generator
             $enableReleaseRefund   = $this->systemConfig->getFraudConfig('enable_release_refund', $storeScope, $storeCode);
             $transInfo             = $this->getTransactionInfoFromResponse($response);
             if ($fraudConfig && $enableReleaseRefund && $fraudStatus === "deny") {
-                $fraudCheck    = true;
                 // Save payment info in order to retrieve it for release operation
                 if ($order->getId()) {
                     $this->savePaymentData($response, $order);
