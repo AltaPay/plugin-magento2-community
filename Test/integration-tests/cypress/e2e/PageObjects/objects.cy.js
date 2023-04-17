@@ -1,4 +1,4 @@
-require('cypress-xpath')
+require('@cypress/xpath');
 
 class Order {
     clrcookies() {
@@ -42,7 +42,7 @@ class Order {
         }        
         cy.get('#creditCardNumberInput').type('4111111111111111')
         cy.get('#emonth').type('01')
-        cy.get('#eyear').type('2023')
+        cy.get('#eyear').type('2025')
         cy.get('#cvcInput').type('123')
         cy.get('#cardholderNameInput').type('testname')
         cy.get('#pensioCreditCardPaymentSubmitButton').click().wait(3000)
@@ -539,6 +539,38 @@ class Order {
         cy.get('#flush_magento').click()
         cy.get('#flush_system > span').click()
         cy.get('.action-primary > span').click().wait(60000)
+    }
+
+    create_customer_and_order(){
+        cy.get('#menu-magento-sales-sales').click()
+                    cy.get('.item-sales-order > a').click()
+                    cy.get('#add').click()
+                    cy.reload().wait(3000)
+                    cy.contains('Create New Customer').focus().click({ force: true }).wait(3000)
+                    cy.reload().wait(3000)
+                    let text = "";
+                    let alphabet = "abcdefghijklmnopqrstuvwxyz123456789"
+                    for (let i = 0; i < 10; i++) {
+                        text += alphabet.charAt(Math.floor(Math.random() * alphabet.length))
+                    }
+                    cy.get('#email').type(text + '@example.com')
+                    cy.get('#order-billing_address_firstname').clear().type('Test')
+                    cy.get('#order-billing_address_lastname').clear().type('Person-dk')
+                    cy.get('#order-billing_address_street0').clear().type('Nygårdsvej 3A')
+                    cy.get('#order-billing_address_city').clear().type('København Ø')
+                    cy.get('#order-billing_address_postcode').clear().type('2100')
+                    cy.get('#order-billing_address_telephone').clear().type('20123456').wait(3000)
+                    cy.get('select[id=order-billing_address_country_id]').select('Denmark')
+                    cy.get('body').then(($a) => {
+                        if ($a.find(".modal-footer > .action-primary > span").length) {
+                            cy.get('.modal-footer > .action-primary > span').click()
+                        }
+                    })
+                    cy.get('#add_products').click()
+                    cy.get('#sales_order_create_search_grid_table > tbody > tr:nth-child(2)').click().wait(5000)
+                    cy.contains('Add Selected Product(s) to Order').focus().trigger('mouseover').click({force: true}).wait(5000)
+                    cy.contains('Get shipping methods and rates').focus().trigger('mouseover').click({ force: true }).wait(5000)
+                    cy.get('.admin__order-shipment-methods-options-list > li:first').click().wait(3000)
     }
 }
 

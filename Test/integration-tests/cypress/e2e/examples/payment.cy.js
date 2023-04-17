@@ -1,6 +1,8 @@
-import Order from '../PageObjects/objects'
+import Order from '../PageObjects/objects.cy'
 
 describe('Payments', function () {
+
+
 
     it('CC full capture and refund', function () {
         const ord = new Order()
@@ -318,22 +320,13 @@ describe('Payments', function () {
             }
             cy.fixture('config').then((admin) => {
                 if (admin.CC_TERMINAL_NAME != "") {
-                    cy.get('#menu-magento-sales-sales').click()
-                    cy.get('.item-sales-order > a').click()
-                    cy.get('#add').click()
-                    cy.get('#sales_order_create_customer_grid_table > tbody > tr:nth-child(1)').click().wait(3000)
-                    cy.reload()
-                    cy.get('#email').clear().type('demo@example.com')
-                    cy.get('#add_products').click()
-                    cy.get('#sales_order_create_search_grid_table > tbody > tr:nth-child(2)').click().wait(5000)
-                    cy.contains('Add Selected Product(s) to Order').click({force: true}).wait(5000)
-                    cy.contains('Get shipping methods and rates').click().wait(3000)
-                    cy.get('.admin__order-shipment-methods-options-list > li:first').click().wait(3000)
+
+                    ord.create_customer_and_order();
                     cy.contains(admin.CC_TERMINAL_NAME).click().wait(3000)
                     cy.get('#submit_order_top_button').click().wait(2000)
                     cy.get('.payment_link > code').then(($a) => {
                         const payment_link = $a.text();
-                        cy.origin('https://pensio.com', { args: { payment_link } }, ({ payment_link }) => {
+                        cy.origin('https://testgateway.pensio.com', { args: { payment_link } }, ({ payment_link }) => {
                             cy.visit(payment_link)
                             cy.get('#creditCardNumberInput').type('4111111111111111')
                             cy.get('#emonth').type('01')
@@ -365,23 +358,13 @@ describe('Payments', function () {
                 ord.change_currency_to_DKK()
             }
             cy.fixture('config').then((admin) => {
-                if (admin.KLARNA_DKK_TERMINAL_NAME != "") {
-                    cy.get('#menu-magento-sales-sales').click()
-                    cy.get('.item-sales-order > a').click()
-                    cy.get('#add').click()
-                    cy.get('#sales_order_create_customer_grid_table > tbody > tr:nth-child(1)').click().wait(4000)
-                    cy.reload()
-                    cy.get('#email').clear().type('demo@example.com')
-                    cy.get('#add_products').click().wait(2000)
-                    cy.get('#sales_order_create_search_grid_table > tbody > tr:nth-child(2)').click()
-                    cy.contains('Add Selected Product(s) to Order').click({force: true}).wait(5000)
-                    cy.contains('Get shipping methods and rates').click().wait(3000)
-                    cy.get('.admin__order-shipment-methods-options-list > li:first').click().wait(3000)
+                if (admin.CC_TERMINAL_NAME != "") {
+                    ord.create_customer_and_order();
                     cy.contains(admin.KLARNA_DKK_TERMINAL_NAME).click().wait(3000)
-                    cy.get('#submit_order_top_button').click().wait(5000)
+                    cy.get('#submit_order_top_button').click().wait(2000)
                     cy.get('.payment_link > code').then(($a) => {
                         const payment_link = $a.text();
-                        cy.origin('https://pensio.com', { args: { payment_link } }, ({ payment_link }) => {
+                        cy.origin('https://testgateway.pensio.com', { args: { payment_link } }, ({ payment_link }) => {
                             cy.visit(payment_link).wait(3000)
                             cy.get('#radio_pay_later').click().wait(3000)
                             cy.get('[id=submitbutton]').click().wait(5000)
@@ -455,9 +438,9 @@ describe('Payments', function () {
                 } else {
                     cy.log('SUBSCRIPTION_TERMINAL skipped')
                     this.skip()
-                 }
-             })
-         })
+                }
+            })
+        })
     })
 
     it('MobilePay Pyament ', function () {
