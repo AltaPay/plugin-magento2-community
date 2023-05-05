@@ -51,6 +51,7 @@ class TerminalLogo
             'maestro'           => 'Maestro',
             'mastercard'        => 'Mastercard',
             'mobilepay'         => 'Mobilepay',
+            'paypal'            => 'PayPal',
             'seb'               => 'SEB',
             'swish'             => 'Swish',
             'viabill'           => 'Viabill',
