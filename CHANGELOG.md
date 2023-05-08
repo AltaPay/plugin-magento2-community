@@ -3,6 +3,7 @@ All notable changes to this project will be documented in this file.
 
 ## [3.6.6]
 ### Fixed
+-  Supports API changes from 20230412
 -  Update API-PHP version to enforce the right HTTP methods on all API endpoints.
 
 ## [3.6.5]
