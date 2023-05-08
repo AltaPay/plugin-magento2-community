@@ -4,20 +4,20 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "bda5f10e0747784d7cecedd4e5779c23",
+    "content-hash": "157917d7d8beea7c987e7c0100ba418c",
     "packages": [
         {
             "name": "altapay/api-php",
-            "version": "3.2.8",
+            "version": "3.2.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/AltaPay/api-php.git",
-                "reference": "2f80c986e96d903050927df4c561c2f6895c1712"
+                "reference": "5b6618913a77f5941596668475596828bd388953"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/AltaPay/api-php/zipball/2f80c986e96d903050927df4c561c2f6895c1712",
-                "reference": "2f80c986e96d903050927df4c561c2f6895c1712",
+                "url": "https://api.github.com/repos/AltaPay/api-php/zipball/5b6618913a77f5941596668475596828bd388953",
+                "reference": "5b6618913a77f5941596668475596828bd388953",
                 "shasum": ""
             },
             "require": {
@@ -36,7 +36,7 @@
             "require-dev": {
                 "friendsofphp/php-cs-fixer": "^3.0",
                 "fzaninotto/faker": "^1.6",
-                "phpstan/phpstan": "^1.8",
+                "phpstan/phpstan": "^0.12.94",
                 "phpstan/phpstan-phpunit": "*",
                 "phpstan/phpstan-strict-rules": "*",
                 "phpunit/phpunit": "^7.0 || ^8.0 || ^9.0"
@@ -58,9 +58,9 @@
             ],
             "support": {
                 "issues": "https://github.com/AltaPay/api-php/issues",
-                "source": "https://github.com/AltaPay/api-php/tree/3.2.8"
+                "source": "https://github.com/AltaPay/api-php/tree/3.2.2"
             },
-            "time": "2022-11-03T08:09:46+00:00"
+            "time": "2022-04-21T05:57:44+00:00"
         },
         {
             "name": "guzzlehttp/guzzle",
