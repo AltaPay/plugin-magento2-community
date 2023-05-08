@@ -22,6 +22,6 @@
   ],
 
   "require": {
-    "google/apiclient": "dev-magento2-composer-test"
+    "altapay/magento2-community": "dev-magento2-composer-test"
   }
 }
