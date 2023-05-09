@@ -1,7 +1,6 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
-
 ## [3.6.6]
 ### Fixed
 -  Add PayPal to terminal logos.
