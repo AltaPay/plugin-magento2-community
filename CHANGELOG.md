@@ -1,6 +1,10 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [3.6.8]
+### Fixed
+-  Add PayPal to terminal logos.
+
 ## [3.6.7]
 ### Fixed
 -  Supports API changes from 20230412
