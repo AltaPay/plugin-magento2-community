@@ -1,6 +1,10 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [3.6.9]
+### Fixed
+-  Resolve plugin compatibility issue with php8.2
+
 ## [3.6.8]
 ### Fixed
 -  Add PayPal to terminal logos.
