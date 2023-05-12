@@ -9,6 +9,7 @@
 
 namespace SDM\Altapay\Model\Plugin\Checkout\Controller;
 
+use Magento\Checkout\Model\Cart;
 use Magento\Framework\Controller\Result\RedirectFactory;
 use Magento\Framework\Message\ManagerInterface;
 use Magento\Framework\UrlFactory;
@@ -17,28 +18,40 @@ use Magento\Framework\DataObject;
 
 class Restrict
 {
+    /**
+     * @var UrlFactory
+     */
     private $urlModel;
+    
+    /**
+     * @var RedirectFactory
+     */
     private $resultRedirectFactory;
+    
+    /**
+     * @var ManagerInterface
+     */
     private $messageManager;
-
+    
+    /**
+     * @var Cart
+     */
+    private $cart;
+    
     public function __construct(
-        UrlFactory                   $urlFactory,
-        RedirectFactory              $redirectFactory,
-        \Magento\Checkout\Model\Cart $cart,
-        ManagerInterface             $messageManager
-    )
-    {
+        UrlFactory       $urlFactory,
+        RedirectFactory  $redirectFactory,
+        Cart             $cart,
+        ManagerInterface $messageManager
+    ) {
 
         $this->urlModel = $urlFactory;
         $this->resultRedirectFactory = $redirectFactory;
         $this->cart = $cart;
         $this->messageManager = $messageManager;
     }
-
-    public function aroundExecute(
-        Index    $subject,
-        \Closure $proceed
-    )
+    
+    public function aroundExecute(Index $subject, \Closure $proceed)
     {
         // get array of all items what can be display directly
         $itemsVisible = $this->cart->getQuote()->getAllVisibleItems();

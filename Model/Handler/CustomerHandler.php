@@ -121,15 +121,15 @@ class CustomerHandler
      */
     private function createAddressObject($address, $addObject)
     {
-        $addObject->Email      = $address['email'];
-        $addObject->Firstname  = $address['firstname'];
-        $addObject->Lastname   = $address['lastname'];
-        $addObject->Address    = $address['street'];
-        $addObject->City       = $address['city'];
-        $addObject->PostalCode = $address['postcode'];
-        $addObject->Region     = $address['region'] ?: '0';
-        $addObject->Country    = $address['country_id'];
-
+        $addObject->setEmail($address['email']);
+        $addObject->setFirstname($address['firstname']);
+        $addObject->setLastname($address['lastname']);
+        $addObject->setAddress($address['street']);
+        $addObject->setCity($address['city']);
+        $addObject->setPostalCode($address['postcode']);
+        $addObject->setRegion($address['region'] ?: '0');
+        $addObject->setCountry($address['country_id']);
+    
         return $addObject;
     }
 }

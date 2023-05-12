@@ -30,6 +30,59 @@ use Magento\CatalogRule\Model\ResourceModel\Rule\CollectionFactory as RuleCollec
 
 class InstallTermConfig extends Http implements AppInterface
 {
+    /**
+     * @var Filesystem
+     */
+    protected $_filesystem;
+    /**
+     * @var ObjectManagerInterface
+     */
+    protected $_objectManager;
+    /**
+     * @var Event\Manager
+     */
+    protected $_eventManager;
+    /**
+     * @var AreaList
+     */
+    protected $_areaList;
+    /**
+     * @var RequestHttp
+     */
+    protected $_request;
+    /**
+     * @var ResponseHttp
+     */
+    protected $_response;
+    /**
+     * @var ConfigLoaderInterface
+     */
+    protected $_configLoader;
+    /**
+     * @var State
+     */
+    protected $_state;
+    /**
+     * @var Registry
+     */
+    protected $registry;
+    /**
+     * @var Config
+     */
+    protected $resourceConfig;
+    /**
+     * @var EncryptorInterface
+     */
+    protected $encryptor;
+    /**
+     * @var TypeListInterface
+     */
+    protected $cacheTypeList;
+    /**
+     * @var RuleCollectionFactory
+     */
+    protected $ruleCollectionFactory;
+    
     public function __construct(
         ObjectManagerInterface $objectManager,
         Event\Manager $eventManager,

@@ -11,7 +11,10 @@ namespace SDM\Altapay\Observer;
 
 use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
+use Magento\Framework\Mail\Template\TransportBuilder;
+use Magento\Framework\Translate\Inline\StateInterface;
 use Magento\Sales\Model\Order;
+use Magento\Store\Model\StoreManagerInterface;
 use SDM\Altapay\Model\SystemConfig;
 use SDM\Altapay\Model\Gateway;
 use Magento\Framework\App\Config\ScopeConfigInterface;
@@ -30,15 +33,42 @@ class AfterPaymentObserver implements ObserverInterface
      */
     private $helper;
     /**
+     * @var StoreManagerInterface
+     */
+    protected $storeManager;
+    /**
+     * @var ScopeConfigInterface
+     */
+    protected $scopeConfig;
+    /**
+     * @var TransportBuilder
+     */
+    protected $transportBuilder;
+    /**
+     * @var StateInterface
+     */
+    protected $inlineTranslation;
+    /**
+     * @var Gateway
+     */
+    protected $gateway;
+    
+    /**
      * BeforePaymentObserver constructor.
      *
-     * @param SystemConfig $systemConfig
+     * @param SystemConfig          $systemConfig
+     * @param StoreManagerInterface $storeManager
+     * @param TransportBuilder      $transportBuilder
+     * @param StateInterface        $inlineTranslation
+     * @param ScopeConfigInterface  $scopeConfig
+     * @param Data                  $helper
+     * @param Gateway               $gateway
      */
     public function __construct(
         SystemConfig $systemConfig,
-        \Magento\Store\Model\StoreManagerInterface $storeManager,
-        \Magento\Framework\Mail\Template\TransportBuilder $transportBuilder,
-        \Magento\Framework\Translate\Inline\StateInterface $inlineTranslation,
+        StoreManagerInterface $storeManager,
+        TransportBuilder $transportBuilder,
+        StateInterface $inlineTranslation,
         ScopeConfigInterface $scopeConfig,
         Data $helper,
         Gateway $gateway
