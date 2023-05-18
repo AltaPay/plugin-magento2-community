@@ -17,10 +17,12 @@ AltaPay has made it much easier for you as merchant/developer to receive secure 
 | Instant Capture           | &check;       |
 | Multi Capture             | &check;       |
 | Recurring / Subscription  | &check;       |
+| Release                   | &check;       |
 | Refund                    | &check;       |
+| Multi Refund              | &check;       |
 | 3D Secure                 | &check;       |
-| Fraud prevention          | &check;       |
-| Reconciliation            | &cross;       |
+| Fraud prevention (other)  | &check;       |
+| Reconciliation            | &check;       |
 | MO/TO                     | &cross;       |
 
 </td><td valign="top">
