@@ -11,7 +11,7 @@ AltaPay has made it much easier for you as merchant/developer to receive secure 
 <tr><td>
 
 | Functionalities	        | Support       |
-| ------------------------- | ------------- |
+| :------------------------ | :-----------: |
 | Reservation               | &check;       |
 | Capture                   | &check;       |
 | Instant Capture           | &check;       |
@@ -28,7 +28,7 @@ AltaPay has made it much easier for you as merchant/developer to receive secure 
 </td><td valign="top">
 
 | Payment Methods	  | Support       |
-| ------------------- | ------------- |
+| ------------------- | :-----------: |
 | Card                | &check;       |
 | Invoice             | &check;       |
 | ePayments           | &check;       |
