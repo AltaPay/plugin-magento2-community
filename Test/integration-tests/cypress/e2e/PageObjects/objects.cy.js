@@ -507,8 +507,10 @@ class Order {
         cy.get('#menu-magento-sales-sales > [onclick="return false;"]').click()
         cy.get('.item-sales-order > a').click().wait(9000)
         cy.xpath('//*[@id="container"]/div/div[4]/table/tbody/tr[1]/td[2]/div').click()
-        cy.get('#order_creditmemo > span').click()
-        cy.contains('Refund Offline').click()
+        cy.get('[data-ui-id="sales-order-tabs-tab-item-order-invoices"] > #sales_order_view_tabs_order_invoices').click()
+        cy.get('.data-grid-actions-cell > .action-menu-item').click()
+        cy.get('#credit-memo > span').click().wait(2000)
+        cy.xpath('/html/body/div[2]/main/div[2]/div/div/form/div[2]/section[2]/div[2]/div[2]/div[3]/div[3]/button[2]/span').click()
         cy.wait(3000)
         cy.get(':nth-child(1) > .note-list-comment').should('include.text', 'We refunded')
     }
