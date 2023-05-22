@@ -127,7 +127,7 @@ class CaptureObserver implements ObserverInterface
         $paymentType      = $payment->getAdditionalInformation('payment_type');
         $orderObject      = $this->order->loadByIncrementId($orderIncrementId);
         $storeCode        = $invoice->getStore()->getCode();
-        if (in_array($payment->getMethod(), SystemConfig::getTerminalCodes())) {
+        if (in_array($payment->getMethod(), SystemConfig::getTerminalCodes()) && strtolower($paymentType) !== "paymentandcapture") {
             //Create orderlines from order items
             $orderLines = $this->processInvoiceOrderLines($invoice);
             //Send request for payment refund

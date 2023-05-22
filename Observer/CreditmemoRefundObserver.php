@@ -119,7 +119,9 @@ class CreditmemoRefundObserver implements ObserverInterface
     public function execute(Observer $observer)
     {
         $memo = $observer['creditmemo'];
-        if ($memo->getDoTransaction()) {
+        $payment = $memo->getOrder()->getPayment();
+        $paymentType = $payment->getAdditionalInformation('payment_type');
+        if ($memo->getDoTransaction() || (strtolower($paymentType) === "paymentandcapture")) {
             $orderIncrementId = $memo->getOrder()->getIncrementId();
             $orderObject      = $this->order->loadByIncrementId($orderIncrementId);
             $storeCode        = $memo->getStore()->getCode();
