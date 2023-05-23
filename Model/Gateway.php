@@ -137,32 +137,36 @@ class Gateway implements GatewayInterface
      * @var InvoiceService
      */
     private $invoiceService;
+    /**
+     * @var Random
+     */
+    private $random;
     
     /**
      * Gateway constructor.
      *
-     * @param Session                        $checkoutSession
-     * @param UrlInterface                   $urlInterface
-     * @param Http                           $request
-     * @param Order                          $order
-     * @param SystemConfig                   $systemConfig
-     * @param OrderLoaderInterface           $orderLoader
-     * @param Quote                          $quote
-     * @param Data                           $helper
-     * @param storeConfig                    $storeConfig
-     * @param Logger                         $altapayLogger
-     * @param CustomerHandler                $customerHandler
-     * @param OrderLinesHandler              $orderLines
-     * @param PriceHandler                   $priceHandler
-     * @param DiscountHandler                $discountHandler
-     * @param CreatePaymentHandler           $paymentHandler
-     * @param TokenFactory                   $dataToken
-     * @param ApplePayOrder                  $applePayOrder
-     * @param StoreManagerInterface          $storeManager
-     * @param Random                         $random
-     * @param TransactionRepositoryInterface $transactionRepository
-     * @param TransactionFactory             $transactionFactory
-     * @param InvoiceService                 $invoiceService
+     * @param Session                          $checkoutSession
+     * @param UrlInterface                     $urlInterface
+     * @param Http                             $request
+     * @param Order                            $order
+     * @param SystemConfig                     $systemConfig
+     * @param OrderLoaderInterface             $orderLoader
+     * @param Quote                            $quote
+     * @param Data                             $helper
+     * @param storeConfig                      $storeConfig
+     * @param Logger                           $altapayLogger
+     * @param CustomerHandler                  $customerHandler
+     * @param OrderLinesHandler                $orderLines
+     * @param PriceHandler                     $priceHandler
+     * @param DiscountHandler                  $discountHandler
+     * @param CreatePaymentHandler             $paymentHandler
+     * @param TokenFactory  $dataToken
+     * @param ApplePayOrder $applePayOrder
+     * @param StoreManagerInterface            $storeManager
+     * @param Random                           $random
+     * @param TransactionRepositoryInterface   $transactionRepository
+     * @param TransactionFactory               $transactionFactory
+     * @param InvoiceService                   $invoiceService
      */
     public function __construct(
         Session $checkoutSession,

@@ -73,18 +73,35 @@ abstract class Index extends Action
      * @var ScopeConfigInterface
      */
     protected $scopeConfig;
-
+    /**
+     * @var EncryptorInterface
+     */
+    protected $encryptor;
+    /**
+     * @var Random
+     */
+    protected $random;
+    /**
+     * @var RedirectFactory
+     */
+    protected $redirectFactory;
+    
     /**
      * Index constructor.
      *
-     * @param Context     $context
-     * @param PageFactory $pageFactory
-     * @param Order       $order
-     * @param Quote       $quote
-     * @param Session     $checkoutSession
-     * @param Generator   $generator
-     * @param Gateway     $gateway
-     * @param Logger      $altapayLogger
+     * @param Context               $context
+     * @param PageFactory           $pageFactory
+     * @param Order                 $order
+     * @param Quote                 $quote
+     * @param Session               $checkoutSession
+     * @param Generator             $generator
+     * @param Gateway               $gateway
+     * @param Logger                $altapayLogger
+     * @param EncryptorInterface    $encryptor
+     * @param Random                $random
+     * @param RedirectFactory       $redirectFactory
+     * @param ScopeConfigInterface  $scopeConfig
+     * @param StoreManagerInterface $storeManager
      */
     public function __construct(
         Context $context,

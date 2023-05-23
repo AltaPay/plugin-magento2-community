@@ -96,6 +96,10 @@ class RestoreQuote
      * @var StoreManagerInterface
      */
     protected $storeManager;
+    /**
+     * @var Processor
+     */
+    protected $priceIndexer;
     
     
     /**
@@ -112,7 +116,9 @@ class RestoreQuote
      * @param SystemConfig             $systemConfig
      * @param ResourceConnection       $modelResource
      * @param Logger                   $altapayLogger
-     *
+     * @param Processor                $priceIndexer
+     * @param ScopeConfigInterface     $scopeConfig
+     * @param StoreManagerInterface    $storeManager
      */
     public function __construct(
         Session $checkoutSession,

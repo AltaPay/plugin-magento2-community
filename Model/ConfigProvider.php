@@ -81,20 +81,29 @@ class ConfigProvider implements ConfigProviderInterface
      * @var Cart
      */
     private $cart;
-
-
+    /**
+     * @var Logger
+     */
+    private $altapayLogger;
+    
+    
     /**
      * ConfigProvider constructor.
      *
-     * @param Data                 $data
-     * @param Escaper              $escaper
-     * @param Allmethods           $allPaymentMethod
-     * @param UrlInterface         $urlInterface
-     * @param SystemConfig         $systemConfig
-     * @param ScopeConfigInterface $scopeConfig
-     * @param Repository           $assetRepository
-     * @param TokenFactory         $dataToken
-     * @param Session              $customerSession
+     * @param Data                            $data
+     * @param Escaper                         $escaper
+     * @param Allmethods                      $allPaymentMethod
+     * @param UrlInterface                    $urlInterface
+     * @param SystemConfig                    $systemConfig
+     * @param ScopeConfigInterface            $scopeConfig
+     * @param Repository                      $assetRepository
+     * @param TokenFactory $dataToken
+     * @param Session                         $customerSession
+     * @param CheckoutSession                 $checkoutSession
+     * @param Logger                          $altapayLogger
+     * @param StoreManagerInterface           $storeManager
+     * @param Helper                          $helper
+     * @param Cart                            $cart
      */
     public function __construct(
         Data $data,
