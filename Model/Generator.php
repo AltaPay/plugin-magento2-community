@@ -540,6 +540,7 @@ class Generator
                 $payment->setAdditionalInformation('expires', $expires);
                 $payment->setAdditionalInformation('card_type', $cardType);
                 $payment->setAdditionalInformation('payment_type', $paymentType);
+                $payment->setAdditionalInformation('require_capture', $response->requireCapture);
                 $payment->save();
                 //send order confirmation email
                 $this->sendOrderConfirmationEmail($comment, $order);
@@ -576,7 +577,7 @@ class Generator
                 $order->getResource()->save($order);
 
                 if (strtolower($paymentType) === 'paymentandcapture' || strtolower($paymentType) === 'subscriptionandcharge') {
-                    $this->createInvoice($order, $response->requireCapture);
+                    $this->createInvoice($order);
                 }
             }
         } catch (\Exception $e) {

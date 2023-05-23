@@ -121,17 +121,28 @@ class CaptureObserver implements ObserverInterface
      */
     public function execute(\Magento\Framework\Event\Observer $observer)
     {
+        $paymetRequireCapture = false;
         $payment          = $observer['payment'];
         $invoice          = $observer['invoice'];
         $orderIncrementId = $invoice->getOrder()->getIncrementId();
         $paymentType      = $payment->getAdditionalInformation('payment_type');
+        $requireCapture   = $payment->getAdditionalInformation('require_capture');
+        if (filter_var($requireCapture, FILTER_VALIDATE_BOOLEAN) === true) {
+            $paymetRequireCapture = true;
+        }
         $orderObject      = $this->order->loadByIncrementId($orderIncrementId);
         $storeCode        = $invoice->getStore()->getCode();
-        if (in_array($payment->getMethod(), SystemConfig::getTerminalCodes()) && strtolower($paymentType) !== "paymentandcapture") {
-            //Create orderlines from order items
-            $orderLines = $this->processInvoiceOrderLines($invoice);
-            //Send request for payment refund
-            $this->sendInvoiceRequest($paymentType, $invoice, $orderLines, $orderObject, $payment, $storeCode);
+
+        if (in_array($payment->getMethod(), SystemConfig::getTerminalCodes()) ) {
+            if(
+                (strtolower($paymentType) !== "paymentandcapture") ||
+                ($paymetRequireCapture && strtolower($paymentType) === "paymentandcapture")
+           ) {
+                //Create orderlines from order items
+                $orderLines = $this->processInvoiceOrderLines($invoice);
+                //Send request for payment refund
+                $this->sendInvoiceRequest($paymentType, $invoice, $orderLines, $orderObject, $payment, $storeCode);
+            }
         }
     }
 

@@ -754,7 +754,7 @@ class Gateway implements GatewayInterface
                 || strtolower($paymentType) === 'subscriptionandcharge'
                 || ($paymentType === 'subscription_payment' && $transStatus === 'captured')
             ) {
-                $this->createInvoice($order, $requireCapture);
+                $this->createInvoice($order);
             }
         }
 
@@ -800,11 +800,10 @@ class Gateway implements GatewayInterface
     
     /**
      * @param Order $order
-     * @param bool  $requireCapture
      *
      * @return void
      */
-    public function createInvoice(Order $order, bool $requireCapture = false)
+    public function createInvoice(Order $order)
     {
         if (!$order->getInvoiceCollection()->count()) {
             $invoice = $this->invoiceService->prepareInvoice($order);
