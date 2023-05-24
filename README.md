@@ -6,6 +6,40 @@ AltaPay has made it much easier for you as merchant/developer to receive secure 
 [![Total Downloads](http://poser.pugx.org/altapay/magento2-community/downloads)](https://packagist.org/packages/altapay/magento2-community)
 [![License](http://poser.pugx.org/altapay/magento2-community/license)](https://packagist.org/packages/altapay/magento2-community)
 
+## Supported Payment Methods & Functionalities
+<table>
+<tr><td>
+
+| Functionalities	        | Support       |
+| :------------------------ | :-----------: |
+| Reservation               | &check;       |
+| Capture                   | &check;       |
+| Instant Capture           | &check;       |
+| Multi Capture             | &check;       |
+| Recurring / Subscription  | &check;       |
+| Release                   | &check;       |
+| Refund                    | &check;       |
+| Multi Refund              | &check;       |
+| 3D Secure                 | &check;       |
+| Fraud prevention (other)  | &check;       |
+| Reconciliation            | &check;       |
+| MO/TO                     | &cross;       |
+
+</td><td valign="top">
+
+| Payment Methods	  | Support       |
+| ------------------- | :-----------: |
+| Card                | &check;       |
+| Invoice             | &check;       |
+| ePayments           | &check;       |
+| Bank-to-bank        | &check;       |
+| Interbank           | &check;       |
+| Cash Wallet         | &check;       |
+| Mobile Wallet       | &check;       |
+
+</td></tr> </table>
+
+
 **Note, If you are getting 403 forbidden error in "Magento Commerce Cloud". It can be caused by "Fastly", which blocks our callbacks. In this case, please contact fastly support.**
 
 ## Compatibility
