@@ -15,6 +15,7 @@ use Altapay\Response\CallbackResponse;
 use Magento\Checkout\Model\Session;
 use Magento\Framework\App\Request\Http;
 use Magento\Framework\App\RequestInterface;
+use Magento\Sales\Model\Order\Invoice;
 use SDM\Altapay\Logger\Logger;
 use Magento\Quote\Model\Quote;
 use Magento\Sales\Model\Order;
@@ -223,20 +224,15 @@ class Generator
     }
 
     /**
-     * @param      $order
-     * @param bool $requireCapture
+     * @param $order
+     *
+     * @return void
      */
-    public function createInvoice($order, $requireCapture = false)
+    public function createInvoice($order)
     {
-        if (filter_var($requireCapture, FILTER_VALIDATE_BOOLEAN) === true) {
-            $captureType = \Magento\Sales\Model\Order\Invoice::CAPTURE_ONLINE;
-        } else {
-            $captureType = \Magento\Sales\Model\Order\Invoice::CAPTURE_OFFLINE;
-        }
-
         if (!$order->getInvoiceCollection()->count()) {
             $invoice = $this->invoiceService->prepareInvoice($order);
-            $invoice->setRequestedCaptureCase($captureType);
+            $invoice->setRequestedCaptureCase(Invoice::CAPTURE_ONLINE);
             $invoice->register();
             $invoice->getOrder()->setCustomerNoteNotify(false);
             $invoice->getOrder()->setIsInProcess(true);
@@ -544,6 +540,7 @@ class Generator
                 $payment->setAdditionalInformation('expires', $expires);
                 $payment->setAdditionalInformation('card_type', $cardType);
                 $payment->setAdditionalInformation('payment_type', $paymentType);
+                $payment->setAdditionalInformation('require_capture', $response->requireCapture);
                 $payment->save();
                 //send order confirmation email
                 $this->sendOrderConfirmationEmail($comment, $order);
@@ -580,7 +577,7 @@ class Generator
                 $order->getResource()->save($order);
 
                 if (strtolower($paymentType) === 'paymentandcapture' || strtolower($paymentType) === 'subscriptionandcharge') {
-                    $this->createInvoice($order, $response->requireCapture);
+                    $this->createInvoice($order);
                 }
             }
         } catch (\Exception $e) {

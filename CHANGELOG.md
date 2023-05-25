@@ -1,6 +1,10 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [3.6.10]
+### Fixed
+-  Fix - Missing refund callback in case of auto-capture enable
+
 ## [3.6.9]
 ### Fixed
 -  Resolve plugin compatibility issue with php8.2

@@ -754,7 +754,7 @@ class Gateway implements GatewayInterface
                 || strtolower($paymentType) === 'subscriptionandcharge'
                 || ($paymentType === 'subscription_payment' && $transStatus === 'captured')
             ) {
-                $this->createInvoice($order, $requireCapture);
+                $this->createInvoice($order);
             }
         }
 
@@ -800,21 +800,14 @@ class Gateway implements GatewayInterface
     
     /**
      * @param Order $order
-     * @param bool  $requireCapture
      *
      * @return void
      */
-    public function createInvoice(Order $order, bool $requireCapture = false)
+    public function createInvoice(Order $order)
     {
-        if (filter_var($requireCapture, FILTER_VALIDATE_BOOLEAN) === true) {
-            $captureType = Invoice::CAPTURE_ONLINE;
-        } else {
-            $captureType = Invoice::CAPTURE_OFFLINE;
-        }
-
         if (!$order->getInvoiceCollection()->count()) {
             $invoice = $this->invoiceService->prepareInvoice($order);
-            $invoice->setRequestedCaptureCase($captureType);
+            $invoice->setRequestedCaptureCase(Invoice::CAPTURE_ONLINE);
             $invoice->register();
             $invoice->getOrder()->setCustomerNoteNotify(false);
             $invoice->getOrder()->setIsInProcess(true);
