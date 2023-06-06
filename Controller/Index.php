@@ -23,6 +23,8 @@ use Magento\Framework\Encryption\EncryptorInterface;
 use Magento\Framework\Math\Random;
 use Magento\Store\Model\StoreManagerInterface;
 use Magento\Framework\App\Config\ScopeConfigInterface;
+use SDM\Altapay\Helper\Data;
+
 /**
  * Class Index
  */
@@ -85,6 +87,10 @@ abstract class Index extends Action
      * @var RedirectFactory
      */
     protected $redirectFactory;
+    /**
+     * @var Data
+     */
+    protected $helper;
     
     /**
      * Index constructor.
@@ -102,22 +108,24 @@ abstract class Index extends Action
      * @param RedirectFactory       $redirectFactory
      * @param ScopeConfigInterface  $scopeConfig
      * @param StoreManagerInterface $storeManager
+     * @param Data                  $helper
      */
     public function __construct(
-        Context $context,
-        PageFactory $pageFactory,
-        Order $order,
-        Quote $quote,
-        Session $checkoutSession,
-        Generator $generator,
-        Gateway $gateway,
-        Logger $altapayLogger,
-        EncryptorInterface $encryptor,
-        Random $random,
-        RedirectFactory $redirectFactory,
-        ScopeConfigInterface $scopeConfig,
-        StoreManagerInterface $storeManager
-        
+        Context               $context,
+        PageFactory           $pageFactory,
+        Order                 $order,
+        Quote                 $quote,
+        Session               $checkoutSession,
+        Generator             $generator,
+        Gateway               $gateway,
+        Logger                $altapayLogger,
+        EncryptorInterface    $encryptor,
+        Random                $random,
+        RedirectFactory       $redirectFactory,
+        ScopeConfigInterface  $scopeConfig,
+        StoreManagerInterface $storeManager,
+        Data                  $helper
+    
     ) {
         parent::__construct($context);
         $this->order           = $order;
@@ -132,6 +140,7 @@ abstract class Index extends Action
         $this->redirectFactory = $redirectFactory;
         $this->scopeConfig     = $scopeConfig;
         $this->storeManager    = $storeManager;
+        $this->helper          = $helper;
     }
 
     /**

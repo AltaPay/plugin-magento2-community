@@ -14,6 +14,8 @@ use SDM\Altapay\Controller\Index;
 use Magento\Framework\App\CsrfAwareActionInterface;
 use Magento\Framework\App\RequestInterface;
 use Magento\Framework\App\Request\InvalidRequestException;
+use Magento\Store\Model\ScopeInterface;
+use Magento\Framework\Exception\LocalizedException;
 
 class Ok extends Index implements CsrfAwareActionInterface
 {
@@ -51,8 +53,24 @@ class Ok extends Index implements CsrfAwareActionInterface
         $post         = $this->getRequest()->getPostValue();
         $orderId      = $post['shop_orderid'];
         $order        = $this->order->loadByIncrementId($orderId);
+        $storeCode    = $order->getStore()->getCode();
+        $storeScope   = ScopeInterface::SCOPE_STORE;
         $payment      = $order->getPayment();
         $terminalCode = $payment->getMethod();
+        // Retrieve the value of the secret from the store's configuration
+        $secret       = $this->scopeConfig->getValue(
+            'payment/' . $terminalCode . '/terminalsecret',
+            $storeScope,
+            $storeCode
+        );
+        // Verify if the secret matches with the gateway
+        if (!empty($secret) && !empty($post['checksum'])) {
+            $checksumData = $this->helper->calculateCheckSum($post, $secret);
+            if ($post['checksum'] != $checksumData) {
+                $this->altapayLogger->addCriticalLog('Exception', 'Checksum validation failed!');
+                return;
+            }
+        }
         
         if (isset($post['avs_code']) && isset($post['avs_text'])) {
             $checkAvs = $this->generator->avsCheck(
@@ -80,19 +98,19 @@ class Ok extends Index implements CsrfAwareActionInterface
                 if ($response['result'] === 'success') {
                     return $this->setSuccessPath($orderId);
                 } else {
-                    $this->redirectToCheckoutPage();
+                    return $this->redirectToCheckoutPage();
                 }
             }
             
             if (isset($isSuccessful) && !$isSuccessful) {
-                $this->redirectToCheckoutPage();
+                return $this->redirectToCheckoutPage();
             } else {
                 return $this->setSuccessPath($orderId);
             }
         } elseif ($checkFraud) {
             $this->redirectToCheckoutPage();
         } else {
-            return $this->_redirect('checkout');
+            return $this->_redirect('checkout/cart');
         }
     }
     
@@ -104,6 +122,6 @@ class Ok extends Index implements CsrfAwareActionInterface
         $this->_eventManager->dispatch('order_cancel_after', ['order' => $this->order]);
         $this->generator->restoreOrderFromRequest($this->getRequest());
         
-        return $this->_redirect('checkout');
+        return $this->_redirect('checkout/cart');
     }
 }

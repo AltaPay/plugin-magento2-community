@@ -14,6 +14,7 @@ use SDM\Altapay\Controller\Index;
 use Magento\Framework\App\CsrfAwareActionInterface;
 use Magento\Framework\App\RequestInterface;
 use Magento\Framework\App\Request\InvalidRequestException;
+use Magento\Store\Model\ScopeInterface;
 
 class Open extends Index implements CsrfAwareActionInterface
 {
@@ -44,7 +45,31 @@ class Open extends Index implements CsrfAwareActionInterface
     public function execute()
     {
         $this->writeLog();
-
+        $post         = $this->getRequest()->getPostValue();
+        $orderId      = $post['shop_orderid'];
+        $order        = $this->order->loadByIncrementId($orderId);
+        $storeCode    = $order->getStore()->getCode();
+        $storeScope   = ScopeInterface::SCOPE_STORE;
+        $payment      = $order->getPayment();
+        $terminalCode = $payment->getMethod();
+        // Retrieve the value of the secret from the store's configuration
+        $secret = $this->scopeConfig->getValue(
+            'payment/' . $terminalCode . '/terminalsecret',
+            $storeScope,
+            $storeCode
+        );
+        // Verify if the secret matches with the gateway
+        if (!empty($secret) && !empty($post['checksum'])) {
+            $checksumData =
+                $this->helper->calculateCheckSum($post, $secret);
+            if ($post['checksum'] != $checksumData) {
+                $this->altapayLogger->addCriticalLog('Exception',
+                    'Checksum validation failed!');
+                
+                return;
+            }
+        }
+        
         return $this->_redirect('checkout/onepage/success');
     }
 }

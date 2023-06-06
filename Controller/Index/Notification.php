@@ -14,6 +14,7 @@ use SDM\Altapay\Controller\Index;
 use Magento\Framework\App\CsrfAwareActionInterface;
 use Magento\Framework\App\RequestInterface;
 use Magento\Framework\App\Request\InvalidRequestException;
+use Magento\Store\Model\ScopeInterface;
 
 class Notification extends Index implements CsrfAwareActionInterface
 {
@@ -51,9 +52,30 @@ class Notification extends Index implements CsrfAwareActionInterface
             if ($this->checkPost()) {
                 $post = $this->getRequest()->getParams();
                 //Set order status, if available from the payment gateway
-                $status                       = strtolower($post['status']);
-                $merchantError                = $this->handleMerchantErrorMessage();
-                $msg                          = $this->handleErrorMessage();
+                $status        = strtolower($post['status']);
+                $merchantError = $this->handleMerchantErrorMessage();
+                $msg           = $this->handleErrorMessage();    
+                $orderId      = $post['shop_orderid'];
+                $order        = $this->order->loadByIncrementId($orderId);
+                $storeCode    = $order->getStore()->getCode();
+                $storeScope   = ScopeInterface::SCOPE_STORE;
+                $payment      = $order->getPayment();
+                $terminalCode = $payment->getMethod();
+                
+                // Retrieve the value of the secret from the store's configuration
+                $secret       = $this->scopeConfig->getValue(
+                    'payment/' . $terminalCode . '/terminalsecret',
+                    $storeScope,
+                    $storeCode
+                );
+                // Verify if the secret matches with the gateway
+                if (!empty($secret) && !empty($post['checksum'])) {
+                    $checksumData = $this->helper->calculateCheckSum($post, $secret);
+                    if ($post['checksum'] != $checksumData) {
+                        $this->altapayLogger->addCriticalLog('Exception', 'Checksum validation failed!');
+                        return;
+                    }
+                }
                 
                 $this->handleNotification($status, $msg, $merchantError);
             }
