@@ -1,6 +1,10 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [3.6.11]
+### Added
+-  Use checksum to validate requests for the callbacks 
+
 ## [3.6.10]
 ### Fixed
 -  Fix - Missing refund callback in case of auto-capture enable
