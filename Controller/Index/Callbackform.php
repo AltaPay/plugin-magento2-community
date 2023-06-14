@@ -66,7 +66,7 @@ class Callbackform extends Action implements CsrfAwareActionInterface
         PageFactory          $resultPageFactory,
         ScopeConfigInterface $scopeConfig,
         Data                 $helper,
-        Logger                $altapayLogger,
+        Logger               $altapayLogger,
         Order                $order
     ) {
         $this->scopeConfig       = $scopeConfig;
@@ -114,7 +114,7 @@ class Callbackform extends Action implements CsrfAwareActionInterface
             $storeScope,
             $storeCode
         );
-    
+        // Verify if the secret matches with the gateway
         if (!empty($secret) && !empty($post['checksum'])) {
              $checksumData = $this->helper->calculateCheckSum($post, $secret);
             if ($post['checksum'] != $checksumData) {

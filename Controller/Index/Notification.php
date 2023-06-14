@@ -54,13 +54,13 @@ class Notification extends Index implements CsrfAwareActionInterface
                 //Set order status, if available from the payment gateway
                 $status        = strtolower($post['status']);
                 $merchantError = $this->handleMerchantErrorMessage();
-                $msg           = $this->handleErrorMessage();    
-                $orderId      = $post['shop_orderid'];
-                $order        = $this->order->loadByIncrementId($orderId);
-                $storeCode    = $order->getStore()->getCode();
-                $storeScope   = ScopeInterface::SCOPE_STORE;
-                $payment      = $order->getPayment();
-                $terminalCode = $payment->getMethod();
+                $msg           = $this->handleErrorMessage();
+                $orderId       = $post['shop_orderid'];
+                $order         = $this->order->loadByIncrementId($orderId);
+                $storeCode     = $order->getStore()->getCode();
+                $storeScope    = ScopeInterface::SCOPE_STORE;
+                $payment       = $order->getPayment();
+                $terminalCode  = $payment->getMethod();
                 
                 // Retrieve the value of the secret from the store's configuration
                 $secret       = $this->scopeConfig->getValue(
@@ -69,13 +69,7 @@ class Notification extends Index implements CsrfAwareActionInterface
                     $storeCode
                 );
                 // Verify if the secret matches with the gateway
-                if (!empty($secret) && !empty($post['checksum'])) {
-                    $checksumData = $this->helper->calculateCheckSum($post, $secret);
-                    if ($post['checksum'] != $checksumData) {
-                        $this->altapayLogger->addCriticalLog('Exception', 'Checksum validation failed!');
-                        return;
-                    }
-                }
+                if (!$this->validateChecksum($post, $secret)) return;
                 
                 $this->handleNotification($status, $msg, $merchantError);
             }

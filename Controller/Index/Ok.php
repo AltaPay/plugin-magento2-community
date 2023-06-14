@@ -64,13 +64,7 @@ class Ok extends Index implements CsrfAwareActionInterface
             $storeCode
         );
         // Verify if the secret matches with the gateway
-        if (!empty($secret) && !empty($post['checksum'])) {
-            $checksumData = $this->helper->calculateCheckSum($post, $secret);
-            if ($post['checksum'] != $checksumData) {
-                $this->altapayLogger->addCriticalLog('Exception', 'Checksum validation failed!');
-                return;
-            }
-        }
+        if (!$this->validateChecksum($post, $secret)) return;
         
         if (isset($post['avs_code']) && isset($post['avs_text'])) {
             $checkAvs = $this->generator->avsCheck(

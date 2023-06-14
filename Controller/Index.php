@@ -225,4 +225,21 @@ abstract class Index extends Action
         
         return $msg;
     }
+    
+    /**
+     * @param $post
+     * @param $secret
+     *
+     * @return bool
+     */
+    protected function validateChecksum($post, $secret) {
+        if (!empty($secret) && !empty($post['checksum'])) {
+            $checksumData = $this->helper->calculateCheckSum($post, $secret);
+            if ($post['checksum'] != $checksumData) {
+                $this->altapayLogger->addCriticalLog('Exception', 'Checksum validation failed!');
+                return false;
+            }
+        }
+        return true;
+    }
 }
