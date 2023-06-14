@@ -73,7 +73,7 @@ class Callbackform extends Action implements CsrfAwareActionInterface
         $this->order             = $order;
         $this->resultPageFactory = $resultPageFactory;
         $this->helper            = $helper;
-        $this->altapayLogger   = $altapayLogger;
+        $this->altapayLogger     = $altapayLogger;
         parent::__construct($context);
     }
 
