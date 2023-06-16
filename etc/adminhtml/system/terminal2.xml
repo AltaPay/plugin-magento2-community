@@ -33,6 +33,11 @@
             <source_model>SDM\Altapay\Model\Config\Source\Terminals</source_model>
             <frontend_class>altapay-terminal-name</frontend_class>
         </field>
+        <field id="terminalsecret" translate="label comment" type="text" sortOrder="25" showInDefault="1" showInWebsite="1" showInStore="1">
+            <label>Secret</label>
+            <comment>Add the payment method secret as defined in the AltaPay payment gateway</comment>
+            <config_path>payment/terminal2/terminalsecret</config_path>
+        </field>
         <field id="isapplepay" translate="label comment" type="select" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
             <label>Is Apple Pay?</label>
             <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>

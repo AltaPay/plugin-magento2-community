@@ -174,7 +174,7 @@ To synchronize the terminals with the gateway, click on the **Synchronize Termin
 
 4.  Select the terminal name in the drop-down list
 
-5.  Optional fields: 'Custom Message', 'Force language', 'Is Apple Pay?', 'Apple Pay Form Label', 'Auto
+5.  Optional fields: 'Custom Message', 'Force language', 'Secret',  'Is Apple Pay?', 'Apple Pay Form Label', 'Auto
     capture', 'Terminal Logo', 'Show both Logo and Title', 'Enable Customer Token Control', 'AVS', 'Enforce AVS', 'AVS accepted codes', 'Sort Order'.
 
 6.  If Apple Pay terminal is selected from the Terminal dropdown, make sure to enable isapplepay option.

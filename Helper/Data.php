@@ -238,4 +238,26 @@ class Data extends AbstractHelper
 
         return $collection;
     }
+    
+    /**
+     * @param $post
+     * @param $secret
+     *
+     * @return string
+     */
+    public function calculateCheckSum($post, $secret)
+    {
+        $inputData = [
+            'amount' => $post['amount'],
+            'currency' => $post['currency'],
+            'shop_orderid' => $post['shop_orderid']
+        ];
+        $inputData['secret'] = $secret;
+        ksort($inputData);
+        $data = array();
+        foreach ($inputData as $name => $value) {
+            $data[] = $name . "=" . $value;
+        }
+        return md5(join(',', $data));
+    }
 }

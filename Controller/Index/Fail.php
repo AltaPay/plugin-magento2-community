@@ -17,6 +17,7 @@ use Magento\Framework\App\RequestInterface;
 use Magento\Framework\App\Request\InvalidRequestException;
 use Magento\Store\Model\StoreManagerInterface;
 use Magento\Framework\App\Config\ScopeConfigInterface;
+use Magento\Store\Model\ScopeInterface;
 
 class Fail extends Index implements CsrfAwareActionInterface
 {
@@ -50,10 +51,25 @@ class Fail extends Index implements CsrfAwareActionInterface
         $status = '';
         try {
             $this->generator->restoreOrderFromRequest($this->getRequest());
-            $post                         = $this->getRequest()->getPostValue();
-            $status                       = strtolower($post['status']);
-            $merchantError                = $this->handleMerchantErrorMessage();
-            $msg                          = $this->handleErrorMessage();
+            $post          = $this->getRequest()->getPostValue();
+            $status        = strtolower($post['status']);
+            $merchantError = $this->handleMerchantErrorMessage();
+            $msg           = $this->handleErrorMessage();
+        
+            $orderId      = $post['shop_orderid'];
+            $order        = $this->order->loadByIncrementId($orderId);
+            $storeCode    = $order->getStore()->getCode();
+            $storeScope   = ScopeInterface::SCOPE_STORE;
+            $payment      = $order->getPayment();
+            $terminalCode = $payment->getMethod();
+            // Retrieve the value of the secret from the store's configuration
+            $secret = $this->scopeConfig->getValue(
+                'payment/' . $terminalCode . '/terminalsecret',
+                $storeScope,
+                $storeCode
+            );
+            // Verify if the secret matches with the gateway
+            if (!$this->validateChecksum($post, $secret)) return;
             
             //Set order status, if available from the payment gateway
             switch ($status) {
