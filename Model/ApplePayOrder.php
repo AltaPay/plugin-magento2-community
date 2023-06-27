@@ -153,8 +153,7 @@ class ApplePayOrder {
                     $order->getIncrementId(),
                     $transaction->TransactionId,
                     $transaction->PaymentId,
-                    $transactionData,
-                    $parametersData
+                    $transactionData
                 );
                 $orderStatusAfterPayment = $this->systemConfig->getStatusConfig('process', $storeScope, $storeCode);
                 $orderStatusCapture      = $this->systemConfig->getStatusConfig('autocapture', $storeScope, $storeCode);

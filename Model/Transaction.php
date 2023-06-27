@@ -122,13 +122,4 @@ class Transaction extends AbstractModel implements TransactionInterface, Identit
     {
         $this->setData(TransactionInterface::PARAMETERS_DATA, $parametersdata);
     }
-
-    /**
-     * @return string
-     * @see TransactionInterface
-     */
-    public function getParametersdata()
-    {
-        return $this->getData(TransactionInterface::PARAMETERS_DATA);
-    }
 }

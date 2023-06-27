@@ -704,14 +704,17 @@ class Gateway implements GatewayInterface
             $payment->setAdditionalInformation('payment_type', $transaction->AuthType);
             $payment->save();
             //save transaction data
-            $parametersData  = json_encode($request);
-            $transactionData = json_encode($response);
+            $errorMessages = [
+                "error_message" => null,
+                "cardholder_message_must_be_shown" => $response->CardHolderMessageMustBeShown,
+                "cardholder_error_message" => $response->CardHolderErrorMessage
+            ];
+            $transactionData = json_encode($errorMessages);
             $this->transactionRepository->addTransactionData(
                 $order->getIncrementId(),
                 $transaction->TransactionId,
                 $transaction->PaymentId,
-                $transactionData,
-                $parametersData
+                $transactionData
             );
         }
         $orderStatusAfterPayment = $this->systemConfig->getStatusConfig('process', $storeScope, $storeCode);

@@ -178,19 +178,19 @@ class RestoreQuote
             if (!empty($getTransactionData)) {
                 $shouldShowCardholderMessage = false;
                 $message = "Error with the Payment.";
-                $getTransactionDataDecode = json_decode($getTransactionData);
-                $xml = simplexml_load_string($getTransactionDataDecode->xml);
-                $cardholderErrorMessage = $xml->Body->CardHolderErrorMessage;
-                if (isset($getTransactionDataDecode->cardholder_message_must_be_shown)) {
-                    $shouldShowCardholderMessage = (bool)($getTransactionDataDecode->cardholder_message_must_be_shown === "true");
+                $transactionData = json_decode($getTransactionData);
+                // $xml = simplexml_load_string($transactionData->xml);
+                $cardholderErrorMessage = $transactionData->cardholder_error_message;
+                if (isset($transactionData->cardholder_message_must_be_shown)) {
+                    $shouldShowCardholderMessage = (bool)($transactionData->cardholder_message_must_be_shown === "true");
                 }
                 $cardErrorMsgConfig = (bool)$this->scopeConfig->getValue(
                     'payment/sdm_altapay_config/error_message/enable',
                     \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
                     $this->storeManager->getStore()->getCode()
                 );
-                if (isset($getTransactionDataDecode->error_message) && empty($cardholderErrorMessage)) {
-                    $message = $getTransactionDataDecode->error_message;
+                if (isset($transactionData->error_message) && empty($cardholderErrorMessage)) {
+                    $message = $transactionData->error_message;
                 } elseif ($cardholderErrorMessage && ($shouldShowCardholderMessage || $cardErrorMsgConfig)) {
                     $message = $cardholderErrorMessage;
                 }
@@ -260,7 +260,7 @@ class RestoreQuote
         $connection = $this->modelResource->getConnection();
         $table      = $this->modelResource->getTableName('sdm_altapay');
         $sql        = $connection->select()
-                                 ->from($table, ['parametersdata'])
+                                 ->from($table, ['transactiondata'])
                                  ->where('orderid = ?', $orderId);
 
         return $connection->fetchOne($sql);

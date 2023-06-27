@@ -290,14 +290,18 @@ class Generator
      */
     private function saveTransactionData($request, $response, $order)
     {
-        $parametersData  = json_encode($request->getPostValue());
-        $transactionData = json_encode($response);
+        $parametersData  = $request->getPostValue();
+        $errorMessages = [
+            "error_message" => $parametersData['error_message'],
+            "cardholder_message_must_be_shown" => $response->CardHolderMessageMustBeShown,
+            "cardholder_error_message" => $response->CardHolderErrorMessage
+        ];
+        $transactionData = json_encode($errorMessages);
         $this->transactionRepository->addTransactionData(
             $order->getIncrementId(),
             $response->transactionId,
             $response->paymentId,
-            $transactionData,
-            $parametersData
+            $transactionData
         );
     }
 
@@ -546,14 +550,8 @@ class Generator
                 $this->sendOrderConfirmationEmail($comment, $order);
                 //unset redirect if success
                 $this->checkoutSession->unsAltapayCustomerRedirect();
-                //save transaction data
-                $this->transactionRepository->addTransactionData(
-                    $order->getIncrementId(),
-                    $response->transactionId,
-                    $response->paymentId,
-                    $transactionData,
-                    $parametersData
-                );
+                //save failed transaction data
+                $this->saveTransactionData($request, $response, $order);
 
                 if ($this->isCaptured($response, $storeCode, $storeScope, $latestTransKey) && $orderStatusCapture == "complete")
                 {

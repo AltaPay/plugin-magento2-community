@@ -16,7 +16,7 @@
     <column xsi:type="varchar" name="transactionid" nullable="true" length="255" comment="Transaction ID"/>
     <column xsi:type="varchar" name="paymentid" nullable="true" length="255" comment="Payment ID"/>
     <column xsi:type="text" name="transactiondata" nullable="true" comment="Transaction data"/>
-    <column xsi:type="text" name="parametersdata" nullable="true" comment="Parameters data"/>
+    <column xsi:type="text" name="parametersdata" nullable="true" comment="Parameters data" disabled="true"/>
     <column xsi:type="timestamp" name="created_at" on_update="false" nullable="false" default="CURRENT_TIMESTAMP" comment="Created date"/>
     <constraint xsi:type="primary" referenceId="PRIMARY">
       <column name="id"/>

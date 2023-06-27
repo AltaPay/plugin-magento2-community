@@ -54,16 +54,6 @@ interface TransactionInterface
     public function getOrderid();
 
     /**
-     * @param string $parametersdata
-     */
-    public function setParametersdata($parametersdata);
-
-    /**
-     * @return string
-     */
-    public function getParametersdata();
-
-    /**
      * @param string $transactiondata
      */
     public function setTransactiondata($transactiondata);

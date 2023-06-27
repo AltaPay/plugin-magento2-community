@@ -50,9 +50,8 @@ class TransactionRepository implements TransactionRepositoryInterface
      * @param string $transactionid
      * @param string $paymentid
      * @param string $transactiondata
-     * @param string $parametersdata
      */
-    public function addTransactionData($orderid, $transactionid, $paymentid, $transactiondata, $parametersdata)
+    public function addTransactionData($orderid, $transactionid, $paymentid, $transactiondata)
     {
         /** @var Transaction $transaction */
         $transaction = $this->transactionFactory->create();
@@ -60,7 +59,6 @@ class TransactionRepository implements TransactionRepositoryInterface
         $transaction->setTransactionid($transactionid);
         $transaction->setPaymentid($paymentid);
         $transaction->setTransactiondata($transactiondata);
-        $transaction->setParametersdata($parametersdata);
         $transaction->getResource()->save($transaction);
     }
 }
