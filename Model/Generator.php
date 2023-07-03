@@ -292,7 +292,7 @@ class Generator
     {
         $parametersData  = $request->getPostValue();
         $errorMessages = [
-            "error_message" => $parametersData['error_message'],
+            "error_message" => isset($parametersData['error_message']) ? $parametersData['error_message'] : 'null',
             "cardholder_message_must_be_shown" => $response->CardHolderMessageMustBeShown,
             "cardholder_error_message" => $response->CardHolderErrorMessage
         ];
