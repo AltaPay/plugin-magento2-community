@@ -146,15 +146,6 @@ class ApplePayOrder {
                 if (!$order->getEmailSent()) {
                     $this->orderSender->send($order);
                 }
-                //save transaction data
-                $parametersData  = null;
-                $transactionData = json_encode($response);
-                $this->transactionRepository->addTransactionData(
-                    $order->getIncrementId(),
-                    $transaction->TransactionId,
-                    $transaction->PaymentId,
-                    $transactionData
-                );
                 $orderStatusAfterPayment = $this->systemConfig->getStatusConfig('process', $storeScope, $storeCode);
                 $orderStatusCapture      = $this->systemConfig->getStatusConfig('autocapture', $storeScope, $storeCode);
                 $setOrderStatus          = true;

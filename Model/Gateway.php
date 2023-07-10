@@ -706,8 +706,8 @@ class Gateway implements GatewayInterface
             //save transaction data
             $errorMessages = [
                 "error_message" => null,
-                "cardholder_message_must_be_shown" => $response->CardHolderMessageMustBeShown,
-                "cardholder_error_message" => $response->CardHolderErrorMessage
+                "cardholder_message_must_be_shown" => isset($response->CardHolderMessageMustBeShown) ? $response->CardHolderMessageMustBeShown : null,
+                "cardholder_error_message" => isset($response->CardHolderErrorMessage) ? $response->CardHolderErrorMessage : null
             ];
             $transactionData = json_encode($errorMessages);
             $this->transactionRepository->addTransactionData(

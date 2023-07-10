@@ -114,12 +114,21 @@ class Transaction extends AbstractModel implements TransactionInterface, Identit
     }
 
     /**
-     * @param string $parametersdata
+     * @param string $xmlFlag
      *
      * @see TransactionInterface
      */
-    public function setParametersdata($parametersdata)
+    public function setXmlFlag($xmlFlag)
     {
-        $this->setData(TransactionInterface::PARAMETERS_DATA, $parametersdata);
+        $this->setData(TransactionInterface::XML_FLAG, $xmlFlag);
+    }
+
+    /**
+     * @return string
+     * @see TransactionInterface
+     */
+    public function getXmlFlag()
+    {
+        return $this->getData(TransactionInterface::XML_FLAG);
     }
 }

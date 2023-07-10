@@ -179,10 +179,9 @@ class RestoreQuote
                 $shouldShowCardholderMessage = false;
                 $message = "Error with the Payment.";
                 $transactionData = json_decode($getTransactionData);
-                // $xml = simplexml_load_string($transactionData->xml);
-                $cardholderErrorMessage = $transactionData->cardholder_error_message;
-                if (isset($transactionData->cardholder_message_must_be_shown)) {
-                    $shouldShowCardholderMessage = (bool)($transactionData->cardholder_message_must_be_shown === "true");
+                $cardholderErrorMessage = $transactionData->CardHolderErrorMessage;
+                if (isset($transactionData->CardHolderErrorMessageMustBeShown)) {
+                    $shouldShowCardholderMessage = (bool)($transactionData->CardHolderErrorMessageMustBeShown === "true");
                 }
                 $cardErrorMsgConfig = (bool)$this->scopeConfig->getValue(
                     'payment/sdm_altapay_config/error_message/enable',

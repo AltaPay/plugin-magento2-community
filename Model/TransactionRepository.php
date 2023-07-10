@@ -59,6 +59,7 @@ class TransactionRepository implements TransactionRepositoryInterface
         $transaction->setTransactionid($transactionid);
         $transaction->setPaymentid($paymentid);
         $transaction->setTransactiondata($transactiondata);
+        $transaction->setXmlFlag(true);
         $transaction->getResource()->save($transaction);
     }
 }

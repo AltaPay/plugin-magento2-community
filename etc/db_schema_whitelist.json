@@ -6,7 +6,6 @@
             "transactionid": true,
             "paymentid": true,
             "transactiondata": true,
-            "parametersdata": true,
             "created_at": true
         },
         "index": {
