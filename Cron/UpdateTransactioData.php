@@ -17,14 +17,28 @@ use Magento\Framework\App\Config\ScopeConfigInterface;
 class UpdateTransactioData
 {
     const CRON_ENABLED = 'payment/sdm_altapay_config/cronScheduledTableOpt/enabled';
+    /**
+     * @var LoggerInterface
+     */
     protected $logger;
+    /**
+     * @var ResourceConnection
+     */
     protected $resource;
+    /**
+     * @var ResourceConnection
+     */
     protected $connection;
     /**
      * @var ScopeConfigInterface
      */
     protected $scopeConfig;
     
+    /**
+     * @param LoggerInterface      $logger
+     * @param ResourceConnection   $resource
+     * @param ScopeConfigInterface $scopeConfig
+     */
     public function __construct(
         LoggerInterface      $logger,
         ResourceConnection   $resource,

@@ -82,16 +82,11 @@ class CronAltapayTableConfig extends Value
         try {
             if ($cronEnabled) {
                 $cronExprArray  = [
-                    intval($time[1]),
-                    // Hour
-                    intval($time[0]),
-                    // Minute
-                    $frequency == Frequency::CRON_MONTHLY ? '1' : '*',
-                    // Day of the month
+                    intval($time[1]), // Hour
+                    intval($time[0]), // Minute
+                    $frequency == Frequency::CRON_MONTHLY ? '1' : '*', // Day of the month
                     '*',
-                    // Month
-                    $frequency == Frequency::CRON_WEEKLY ? '1' : '*',
-                    // Day of the week
+                    $frequency == Frequency::CRON_WEEKLY ? '1' : '*', // Day of the week
                 ];
                 $cronExprString = join(' ', $cronExprArray);
                 $this->_configValueFactory->create()->load(
