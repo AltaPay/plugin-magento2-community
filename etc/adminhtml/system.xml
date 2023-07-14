@@ -40,10 +40,12 @@
                 </group>
                 <group id="cronScheduledTableOpt" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1"
                        showInStore="1">
-                    <label>Query Optimization cron setting</label>
+                       <comment><![CDATA[Enabling this configuration will result in freeing up the database space without impacting any data or functionality.]]></comment>
+                    <label>Optimize Altapay Table</label>
                     <field id="enabled" translate="label" type="select" sortOrder="1" showInDefault="1" showInWebsite="0" showInStore="0">
-                        <label>Optimize AltaPay Table</label>
+                        <label>Enabled</label>
                         <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                        <comment><![CDATA[Enable this only if you have orders that are created by extension version prior to 3.7.0]]></comment>
                     </field>
                     <field id="frequency" translate="label" type="select" sortOrder="2" showInDefault="1" showInWebsite="1"
                            showInStore="1">
