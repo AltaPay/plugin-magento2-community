@@ -14,7 +14,7 @@
         <job name="sdm_altapay_cron_job" instance="SDM\Altapay\Model\Cron\UpdateOrderStatus" method="execute">
             <config_path>crontab/default/jobs/sdm_altapay_cron_job/schedule/cron_expr</config_path>
         </job>
-         <job name="sdm_altapay_cron_tranasaction_data" instance="SDM\Altapay\Cron\UpdateTransactioData" method="execute">
+         <job name="sdm_altapay_cron_tranasaction_data" instance="SDM\Altapay\Cron\UpdateTransactionData" method="execute">
              <config_path>crontab/default/jobs/sdm_altapay_cron_tranasaction_data/schedule/cron_expr</config_path>
         </job>
     </group>

@@ -55,6 +55,11 @@
                            showInStore="1">
                         <label>Start Time</label>
                     </field>
+                    <field id="limit" translate="label comment" sortOrder="4" type="text" showInDefault="1" showInWebsite="0">
+                        <label>Maximum Number of Records to Optimize</label>
+                        <validate>validate-digits validate-not-negative-number validate-length minimum-length-3 maximum-length-4 </validate>
+                        <comment><![CDATA[Set a limit to update 100 to 9999 records at a time]]></comment>
+                    </field>
                 </group>
                 <group id="altapay_config_api" translate="label" type="text" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
                     <attribute type="expanded">0</attribute>
