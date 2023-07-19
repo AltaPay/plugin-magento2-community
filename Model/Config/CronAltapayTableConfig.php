@@ -50,7 +50,7 @@ class CronAltapayTableConfig extends Value
      * @param AbstractDb|null       $resourceCollection
      * @param ScopeConfigInterface  $scopeConfig
      * @param                       $runModelPath
-     * @param array                 $data
+     * @param                       $data
      */
     public function __construct(
         Context              $context,
@@ -60,13 +60,14 @@ class CronAltapayTableConfig extends Value
         AbstractResource     $resource = null,
         AbstractDb           $resourceCollection = null,
         ScopeConfigInterface $scopeConfig,
-        $runModelPath = '',
-        array                $data = []
+                             $runModelPath = '',
+                             $data = []
     ) {
         $this->_runModelPath       = $runModelPath;
         $this->_configValueFactory = $configValueFactory;
         $this->scopeConfig         = $scopeConfig;
-        parent::__construct($context, $registry, $scopeConfig, $cacheTypeList, $resource, $resourceCollection, $data);
+        parent::__construct($context, $registry, $scopeConfig, $cacheTypeList,
+            $resource, $resourceCollection, $data);
     }
     
     /**

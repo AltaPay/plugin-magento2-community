@@ -290,9 +290,9 @@ class Generator
      */
     private function saveTransactionData($request, $response, $order)
     {
-        $parametersData  = $request->getPostValue();
+        $postValues  = $request->getPostValue();
         $errorMessages = [
-            "error_message" => isset($parametersData['error_message']) ? $parametersData['error_message'] : 'null',
+            "error_message" => isset($postValues['error_message']) ? $postValues['error_message'] : 'null',
             "cardholder_message_must_be_shown" => isset($response->CardHolderMessageMustBeShown) ? $response->CardHolderMessageMustBeShown : null,
             "cardholder_error_message" => isset($response->CardHolderErrorMessage) ? $response->CardHolderErrorMessage : null
         ];
@@ -424,7 +424,6 @@ class Generator
             $ccToken                 = $response->creditCardToken;
             $paymentId               = $response->paymentId;
             $transactionId           = $response->transactionId;
-            $parametersData          = json_encode($request->getPostValue());
             $transactionData         = json_encode($response);
             $orderState              = Order::STATE_PROCESSING;
             $statusKey               = 'process';

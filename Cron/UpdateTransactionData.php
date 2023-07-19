@@ -65,23 +65,18 @@ class UpdateTransactionData
         $batchLimit = $this->scopeConfig->getValue(self::CRON_BATCH_LIMIT, $storeScope);
         $tableName = $this->resource->getTableName('sdm_altapay');
         $columnName = 'transactiondata';
-
+        if (!$cronEnabled) {
+            $this->logger->info('Cron is not enabled');
+            return;
+        }
         try {
-            if (!$cronEnabled) {
-                $this->logger->info('Cron is not enabled');
-                return;
-            }
-
             // Check if there are remaining records to update
             $hasRemainingRecords = $this->hasRemainingRecords($tableName);
             if ($hasRemainingRecords) {
                 // Start transaction
                 $this->connection->beginTransaction();
-                $batchSize = 100; // Adjust batch size as per your needs
                 try {
-                    if(!empty($batchLimit)) {
-                        $batchSize = $batchLimit; 
-                    }
+                    $batchSize = !empty($batchLimit) ? $batchLimit : 100;
 
                     $updateSql = "UPDATE $tableName
                       SET has_xml_flag = 1,

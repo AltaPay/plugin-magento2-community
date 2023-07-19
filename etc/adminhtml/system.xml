@@ -41,7 +41,7 @@
                 <group id="cronScheduledTableOpt" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1"
                        showInStore="1">
                        <comment><![CDATA[Enabling this configuration will result in freeing up the database space without impacting any data or functionality.]]></comment>
-                    <label>Optimize Altapay Table</label>
+                    <label>Optimize Altapay table</label>
                     <field id="enabled" translate="label" type="select" sortOrder="1" showInDefault="1" showInWebsite="0" showInStore="0">
                         <label>Enabled</label>
                         <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
@@ -55,10 +55,10 @@
                     </field>
                     <field id="time" translate="label comment" sortOrder="3" type="time" showInDefault="1" showInWebsite="1"
                            showInStore="1">
-                        <label>Start Time</label>
+                        <label>Start time</label>
                     </field>
                     <field id="limit" translate="label comment" sortOrder="4" type="text" showInDefault="1" showInWebsite="0">
-                        <label>Maximum Number of Records to Optimize</label>
+                        <label>Maximum number of records to optimize</label>
                         <validate>validate-digits validate-not-negative-number validate-length minimum-length-3 maximum-length-4 </validate>
                         <comment><![CDATA[Set a limit to update 100 to 9999 records at a time]]></comment>
                     </field>
