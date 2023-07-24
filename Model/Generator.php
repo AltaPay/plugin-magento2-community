@@ -290,14 +290,18 @@ class Generator
      */
     private function saveTransactionData($request, $response, $order)
     {
-        $parametersData  = json_encode($request->getPostValue());
-        $transactionData = json_encode($response);
+        $postValues  = $request->getPostValue();
+        $errorMessages = [
+            "error_message" => isset($postValues['error_message']) ? $postValues['error_message'] : 'null',
+            "cardholder_message_must_be_shown" => isset($response->CardHolderMessageMustBeShown) ? $response->CardHolderMessageMustBeShown : null,
+            "cardholder_error_message" => isset($response->CardHolderErrorMessage) ? $response->CardHolderErrorMessage : null
+        ];
+        $transactionData = json_encode($errorMessages);
         $this->transactionRepository->addTransactionData(
             $order->getIncrementId(),
             $response->transactionId,
             $response->paymentId,
-            $transactionData,
-            $parametersData
+            $transactionData
         );
     }
 
@@ -420,7 +424,6 @@ class Generator
             $ccToken                 = $response->creditCardToken;
             $paymentId               = $response->paymentId;
             $transactionId           = $response->transactionId;
-            $parametersData          = json_encode($request->getPostValue());
             $transactionData         = json_encode($response);
             $orderState              = Order::STATE_PROCESSING;
             $statusKey               = 'process';
@@ -546,14 +549,8 @@ class Generator
                 $this->sendOrderConfirmationEmail($comment, $order);
                 //unset redirect if success
                 $this->checkoutSession->unsAltapayCustomerRedirect();
-                //save transaction data
-                $this->transactionRepository->addTransactionData(
-                    $order->getIncrementId(),
-                    $response->transactionId,
-                    $response->paymentId,
-                    $transactionData,
-                    $parametersData
-                );
+                //save failed transaction data
+                $this->saveTransactionData($request, $response, $order);
 
                 if ($this->isCaptured($response, $storeCode, $storeScope, $latestTransKey) && $orderStatusCapture == "complete")
                 {

@@ -19,8 +19,8 @@ interface TransactionInterface
     const PAYMENT_ID           = 'paymentid';
     const TRANSACTION_ID       = 'transactionid';
     const ORDER_ID             = 'orderid';
+    const XML_FLAG             = 'has_xml_flag';
     const TRANSACTION_DATA     = 'transactiondata';
-    const PARAMETERS_DATA      = 'parametersdata';
     const CREATED_AT           = 'created_at';
 
     /**
@@ -54,16 +54,6 @@ interface TransactionInterface
     public function getOrderid();
 
     /**
-     * @param string $parametersdata
-     */
-    public function setParametersdata($parametersdata);
-
-    /**
-     * @return string
-     */
-    public function getParametersdata();
-
-    /**
      * @param string $transactiondata
      */
     public function setTransactiondata($transactiondata);
@@ -72,4 +62,14 @@ interface TransactionInterface
      * @return string
      */
     public function getTransactiondata();
+
+    /**
+     * @param string $transactiondata
+     */
+    public function setXmlFlag($transactiondata);
+
+    /**
+     * @return string
+     */
+    public function getXmlFlag();
 }

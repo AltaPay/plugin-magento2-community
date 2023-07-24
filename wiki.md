@@ -22,6 +22,8 @@ We highly recommend gathering all the below information, before starting the ins
 
 [Configure cron scheduler](#configure-cron-scheduler)
 
+[Optimize AltaPay table](#optimize-altapay-table)
+
 [Configure order status](#configure-order-status)
 
 [Configure fraud detection](#configure-fraud-detection)
@@ -141,6 +143,18 @@ payment methods and configuring payments.
 To update all the orders without a scheduler you can click on the "Change status now".
 
 ![configure-cron-scheduler](docs/cron_schedule.png)
+
+## Optimize AltaPay table
+
+**_Note: You can skip this section if you do not have orders created through the plugin version before 3.7.0 or if you don't want to optimize the previous orders data._**
+
+1. Navigate to: Admin > Stores > Configuration > Sales (Tab) > Payment Methods
+2. To optimize the AltaPay table, choose Yes  
+3. Select the frequency for a cron job 
+4. Set a start time when the scheduler should run
+5. Set a maximum number of records to optimize
+
+    ![optimize-altapay-table](docs/optimize-altapay-table.png)
 
 ## Configure order status
 

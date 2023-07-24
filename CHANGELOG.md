@@ -1,6 +1,11 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [3.7.0]
+### Added
+-  Add cron configuration to optimize transaction data created by extension version prior to 3.7.0
+-  Update saving mechanism to store only mandatory data
+
 ## [3.6.11]
 ### Added
 -  Implement checksum functionality
