@@ -275,7 +275,7 @@ class CreditmemoRefundObserver implements ObserverInterface
         if ($memo->getTransactionId()) {
             $refund->setTransaction($payment->getLastTransId());
         }
-        $refund->setAmount((float)number_format($grandTotal, 2, '.', ''));
+        $refund->setAmount((float)number_format($memo->getBaseGrandTotal(), 2, '.', ''));
         $refund->setOrderLines($orderLines);
         $refund->setReconciliationIdentifier($reconciliationIdentifier);
         try {
