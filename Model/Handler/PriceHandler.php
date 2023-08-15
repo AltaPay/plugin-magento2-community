@@ -138,7 +138,7 @@ class PriceHandler
         //Discount compensation calculation - Gateway calculation pattern
         $gatewaySubTotal = ($unitPrice * $quantity) + $taxAmount;
         $gatewaySubTotal = $gatewaySubTotal - ($gatewaySubTotal * ($discountedAmount / 100));
-        $cmsSubTotal = $item->getRowTotal() - $item->getDiscountAmount() + $item->getTaxAmount() + $item->getDiscountTaxCompensationAmount();
+        $cmsSubTotal = $item->getBaseRowTotal() - $item->getBaseDiscountAmount() + $item->getBaseTaxAmount() + $item->getDiscountTaxCompensationAmount();
             $compensation = $cmsSubTotal - $gatewaySubTotal;
 
         return $compensation;
