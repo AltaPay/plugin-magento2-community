@@ -502,8 +502,8 @@ class Gateway implements GatewayInterface
 
         $request->setTerminal($terminalName)
             ->setShopOrderId($order->getIncrementId())
-            ->setAmount((float)number_format($order->getGrandTotal(), 2, '.', ''))
-            ->setCurrency($order->getOrderCurrencyCode())
+            ->setAmount((float)number_format($order->getBaseGrandTotal(), 2, '.', ''))
+            ->setCurrency($order->getBaseCurrencyCode())
             ->setCustomerInfo($this->customerHandler->setCustomer($order, $isReservation))
             ->setTransactionInfo($transactionDetail)
             ->setCookie($this->request->getServer('HTTP_COOKIE'))

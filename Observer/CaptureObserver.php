@@ -291,7 +291,7 @@ class CaptureObserver implements ObserverInterface
      */
     private function sendInvoiceRequest($paymentType, $invoice, $orderLines, $orderObject, $payment, $storeCode)
     {
-        $grandTotal = (float)$invoice->getGrandTotal();
+        $grandTotal = (float)$invoice->getBaseGrandTotal();
         $payment    = $invoice->getOrder()->getPayment();
         $reconciliationIdentifier  = $this->random->getUniqueHash();
         $agreementDetail = $payment->getAdditionalInformation('agreement_detail');
