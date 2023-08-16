@@ -15,6 +15,7 @@ use Magento\Framework\App\CsrfAwareActionInterface;
 use Magento\Framework\App\RequestInterface;
 use Magento\Framework\App\Request\InvalidRequestException;
 use Magento\Store\Model\ScopeInterface;
+use Altapay\Api\Ecommerce\Callback;
 
 class Notification extends Index implements CsrfAwareActionInterface
 {
@@ -38,7 +39,7 @@ class Notification extends Index implements CsrfAwareActionInterface
     /**
      * Dispatch request
      *
-     * @return string
+     * @return string|void
      * @throws \Magento\Framework\Exception\NotFoundException
      */
     public function execute()
@@ -51,15 +52,28 @@ class Notification extends Index implements CsrfAwareActionInterface
         try {
             if ($this->checkPost()) {
                 $post = $this->getRequest()->getParams();
+
+                $callback   = new Callback($post);
+                $response   = $callback->call();
+
+                $latestTransKey = $this->helper->getLatestTransaction($response->Transactions, 'subscription_payment');
+
+                $transaction            = $response->Transactions[$latestTransKey];
+                $gatewayTransactionId   = $transaction->TransactionId;
+                $orderId                = $post['shop_orderid'];
+                $order                  = $this->order->loadByIncrementId($orderId);
+                $payment                = $order->getPayment();
+                $orderTransactionId     = $payment->getLastTransId();
+
+                // Return if the incoming transaction id is different from order transaction id
+                if($orderTransactionId != $gatewayTransactionId) return;
+
                 //Set order status, if available from the payment gateway
                 $status        = strtolower($post['status']);
                 $merchantError = $this->handleMerchantErrorMessage();
                 $msg           = $this->handleErrorMessage();
-                $orderId       = $post['shop_orderid'];
-                $order         = $this->order->loadByIncrementId($orderId);
                 $storeCode     = $order->getStore()->getCode();
                 $storeScope    = ScopeInterface::SCOPE_STORE;
-                $payment       = $order->getPayment();
                 $terminalCode  = $payment->getMethod();
                 
                 // Retrieve the value of the secret from the store's configuration

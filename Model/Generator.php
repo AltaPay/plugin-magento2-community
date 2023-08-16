@@ -405,8 +405,6 @@ class Generator
      */
     private function completeCheckout($comment, RequestInterface $request)
     {
-        $max_date       = '';
-        $latestTransKey = '';
         $cardType       = '';
         $expires        = '';
         $setOrderStatus = true;
@@ -435,13 +433,8 @@ class Generator
             $unscheduledTypeConfig   = $this->getConfigValue($response, $storeScope, $storeCode, "unscheduledtype");
             $saveCardToken           = $this->getConfigValue($response, $storeScope, $storeCode, "savecardtoken");
 
-            foreach ($response->Transactions as $key => $transaction) {
-                if ($transaction->CreatedDate > $max_date) {
-                    $max_date       = $transaction->CreatedDate;
-                    $latestTransKey = $key;
-                }
-            }
-            $transaction = $response->Transactions[$latestTransKey];
+            $latestTransKey = $this->helper->getLatestTransaction($response->Transactions);
+            $transaction    = $response->Transactions[$latestTransKey];
 
             if ($paymentStatus === 'released') {
                 $this->handleCancelStatusAction($request, $response->status);
@@ -533,7 +526,7 @@ class Generator
                 }
                 $payment = $order->getPayment();
                 $payment->setPaymentId($paymentId);
-                $payment->setLastTransId($transactionId);
+                $payment->setLastTransId($transaction->TransactionId);
                 $payment->setCcTransId($response->creditCardToken);
                 $payment->setAdditionalInformation('cc_token', $ccToken);
                 $payment->setAdditionalInformation('last_four_digits', $lastFourDigits);
@@ -604,7 +597,7 @@ class Generator
      * @param $response
      * @param $storeCode
      * @param $storeScope
-     *
+     * @param $latestTransKey
      * @return bool|\Magento\Payment\Model\MethodInterface
      */
     private function isCaptured($response, $storeCode, $storeScope, $latestTransKey)
@@ -830,7 +823,6 @@ class Generator
 
     /**
      * @param $response
-     * @param $terminalName
      * @param $storeScope
      * @param $storeCode
      * @param $field

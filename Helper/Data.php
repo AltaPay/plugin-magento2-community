@@ -260,4 +260,25 @@ class Data extends AbstractHelper
         }
         return md5(join(',', $data));
     }
+
+    /**
+     * @param $transactions
+     * @param string $authType
+     * @return int|string
+     */
+    public function getLatestTransaction($transactions, $authType = ''){
+        $latestDate     = '';
+        $latestTransKey = 0;
+        foreach ($transactions as $key=>$value) {
+            $isLatest = ($authType && $value->AuthType === $authType && $value->CreatedDate > $latestDate) ||
+                (!$authType && $value->CreatedDate > $latestDate);
+
+            if ($isLatest) {
+                $latestDate     = $value->CreatedDate;
+                $latestTransKey = $key;
+            }
+        }
+
+        return $latestTransKey;
+    }
 }
