@@ -574,9 +574,10 @@ class Gateway implements GatewayInterface
             $response       = $request->call();
             $responseUrl    = $response->Url;
             $paymentId      = $response->PaymentRequestId;
-
-            $latestTransKey = $this->helper->getLatestTransaction($response->Transactions, 'subscription_payment');
-            
+            $latestTransKey = 0;
+            if (isset($response->Transactions)) {
+                $latestTransKey = $this->helper->getLatestTransaction($response->Transactions, 'subscription_payment');
+            }
             if (strtolower($response->Result) === "success" && $responseUrl == null) {
                 $this->handleReservation($order, $response, $request, $latestTransKey);
                 $isReservation = true;
