@@ -45,6 +45,7 @@ class Order {
         cy.get('#eyear').type('2025')
         cy.get('#cvcInput').type('123')
         cy.get('#cardholderNameInput').type('testname')
+        cy.get('#cardholderEmailInput').type('demo@example.com')
         cy.get('#pensioCreditCardPaymentSubmitButton').click().wait(3000)
     }
 
