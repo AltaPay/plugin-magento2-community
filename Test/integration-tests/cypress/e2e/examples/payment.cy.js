@@ -333,6 +333,7 @@ describe('Payments', function () {
                             cy.get('#eyear').type('2023')
                             cy.get('#cvcInput').type('123')
                             cy.get('#cardholderNameInput').type('testname')
+                            cy.get('#cardholderEmailInput').type('demo@example.com').wait(3000)
                             cy.get('#pensioCreditCardPaymentSubmitButton').click().wait(3000)
                         })
 
