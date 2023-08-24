@@ -200,10 +200,14 @@ class DiscountHandler
         $item,
         $taxAmount
     ) {
-        $rowTotal = $item->getRowTotal()-$item->getDiscountAmount()+$item->getTaxAmount()+$item->getDiscountTaxCompensationAmount();
+        $currencyConfig = $this->storeConfig->useDisplayChargedCurrency();
+        $rowTotal = $item->getBaseRowTotal()-$item->getBaseDiscountAmount()+$item->getBaseTaxAmount()+$item->getDiscountTaxCompensationAmount();
+        if($currencyConfig ) {
+            $rowTotal = $item->getRowTotal()-$item->getDiscountAmount()+$item->getTaxAmount()+$item->getDiscountTaxCompensationAmount();
+        }
         $discount = ['discount' => 0, 'catalogDiscount' => false];
         $originalPriceWithTax = $originalPrice + $taxAmount;
-        if ($discountAmount && $originalPrice == $priceInclTax) {
+        if ($originalPrice != 0 && $discountAmount && $originalPrice == $priceInclTax) {
             $discountAmount = ($discountAmount * 100) / ($originalPrice * $quantity);
         } elseif ($originalPrice > 0 && $originalPrice > $priceInclTax && empty($discountAmount)) {
             $discount['catalogDiscount'] = true;

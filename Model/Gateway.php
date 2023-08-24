@@ -348,21 +348,21 @@ class Gateway implements GatewayInterface
     {
         $orderLines = [];
         $storePriceIncTax = $this->storeConfig->storePriceIncTax();
-
+        $currencyConfig = $this->storeConfig->useDisplayChargedCurrency();
         foreach ($order->getAllItems() as $item) {
             $productType = $item->getProductType();
-            $originalPrice = $item->getBaseOriginalPrice();
+            $originalPrice = $currencyConfig ? $item->getOriginalPrice() : $item->getBaseOriginalPrice();
             $taxPercent = $item->getTaxPercent();
-            $discountAmount = $item->getBaseDiscountAmount();
+            $discountAmount = $currencyConfig ? $item->getDiscountAmount() : $item->getBaseDiscountAmount();
             $parentItemType = "";
             if ($item->getParentItem()) {
                 $parentItemType = $item->getParentItem()->getProductType();
             }
             if ($productType != "bundle" && $parentItemType != "configurable") {
 
-                if ($originalPrice == 0) {
+                if ($item->getTaxAmount() > 0) {
                     $originalPrice = $item->getPriceInclTax();
-                }
+               }
 
                 if ($storePriceIncTax) {
                     $unitPriceWithoutTax = $this->priceHandler->getPriceWithoutTax($originalPrice, $taxPercent);
@@ -499,11 +499,14 @@ class Gateway implements GatewayInterface
             );
             $isReservation = true;
         }
+        $currencyConfig = $this->storeConfig->useDisplayChargedCurrency();
+        $grandTotal = $currencyConfig ? $order->getGrandTotal() : $order->getBaseGrandTotal();
+        $currencyCode = $currencyConfig ? $order->getOrderCurrencyCode() : $order->getBaseCurrencyCode();
 
         $request->setTerminal($terminalName)
             ->setShopOrderId($order->getIncrementId())
-            ->setAmount((float)number_format($order->getBaseGrandTotal(), 2, '.', ''))
-            ->setCurrency($order->getBaseCurrencyCode())
+            ->setAmount((float)number_format($grandTotal, 2, '.', ''))
+            ->setCurrency($currencyCode)
             ->setCustomerInfo($this->customerHandler->setCustomer($order, $isReservation))
             ->setTransactionInfo($transactionDetail)
             ->setCookie($this->request->getServer('HTTP_COOKIE'))

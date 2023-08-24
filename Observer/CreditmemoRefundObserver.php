@@ -192,14 +192,15 @@ class CreditmemoRefundObserver implements ObserverInterface
             $qty         = $item->getQty();
             $taxPercent  = $item->getOrderItem()->getTaxPercent();
             $productType = $item->getOrderItem()->getProductType();
+            $currencyConfig = $this->storeConfig->useDisplayChargedCurrency();
             if ($qty > 0 && $productType != 'bundle') {
-                if($item->getDiscountAmount()) {
-                    $discountAmount = $item->getDiscountAmount();
+                if($item->getOrderItem()->getDiscountAmount()) {
+                    $discountAmount = $item->getOrderItem()->getDiscountAmount();
                 }
-                $originalPrice  = $item->getOrderItem()->getOriginalPrice();
+                $originalPrice = $currencyConfig ? $item->getOrderItem()->getOriginalPrice() : $item->getOrderItem()->getBaseOriginalPrice();
                 $totalPrice     = $originalPrice * $qty;
 
-                if ($originalPrice == 0) {
+                if ($item->getOrderItem()->getTaxAmount() > 0) {
                     $originalPrice = $item->getPriceInclTax();
                 }
 
@@ -267,12 +268,14 @@ class CreditmemoRefundObserver implements ObserverInterface
      */
     private function sendRefundRequest($memo, $orderLines, $orderObject, $payment, $storeCode)
     {
+        $currencyConfig = $this->storeConfig->useDisplayChargedCurrency();
+        $grandTotal = $currencyConfig ? (float)$memo->getGrandTotal() : (float)$memo->getBaseGrandTotal();
         $refund = new RefundCapturedReservation($this->systemConfig->getAuth($storeCode));
         $reconciliationIdentifier  = $this->random->getUniqueHash();
         if ($memo->getTransactionId()) {
             $refund->setTransaction($payment->getLastTransId());
         }
-        $refund->setAmount((float)number_format($memo->getBaseGrandTotal(), 2, '.', ''));
+        $refund->setAmount((float)number_format($grandTotal, 2, '.', ''));
         $refund->setOrderLines($orderLines);
         $refund->setReconciliationIdentifier($reconciliationIdentifier);
         try {
