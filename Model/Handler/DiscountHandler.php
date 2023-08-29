@@ -201,6 +201,11 @@ class DiscountHandler
         $item,
         $taxAmount
     ) {
+        $displayCurrency = $this->storeConfig->useDisplayCurrency();
+        $rowTotal = $item->getBaseRowTotal()-$item->getBaseDiscountAmount()+$item->getBaseTaxAmount()+$item->getDiscountTaxCompensationAmount();
+        if($displayCurrency ) {
+            $rowTotal = $item->getRowTotal()-$item->getDiscountAmount()+$item->getTaxAmount()+$item->getDiscountTaxCompensationAmount();
+        }
         $discount = ['discount' => 0, 'catalogDiscount' => false];
         $originalPriceWithTax = $originalPrice + $taxAmount;
 
