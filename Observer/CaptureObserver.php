@@ -205,7 +205,7 @@ class CaptureObserver implements ObserverInterface
                 $totalPrice     = $originalPrice * $qty;
 
                 if ($item->getOrderItem()->getTaxAmount() > 0) {
-                    $originalPrice = $item->getPriceInclTax();
+                    $originalPrice = $displayCurrency ? $item->getPriceInclTax() : $item->getBasePriceInclTax();
                 }
 
                 if ($storePriceIncTax) {

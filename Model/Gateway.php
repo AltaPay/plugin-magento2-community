@@ -361,9 +361,9 @@ class Gateway implements GatewayInterface
             if ($productType != "bundle" && $parentItemType != "configurable") {
 
                 if ($item->getTaxAmount() > 0) {
-                    $originalPrice = $item->getPriceInclTax();
+                    $originalPrice = $displayCurrency ? $item->getPriceInclTax() : $item->getBasePriceInclTax();
                }
-
+               
                 if ($storePriceIncTax) {
                     $unitPriceWithoutTax = $this->priceHandler->getPriceWithoutTax($originalPrice, $taxPercent);
                     $unitPrice = bcdiv($unitPriceWithoutTax, 1, 2);
@@ -394,6 +394,7 @@ class Gateway implements GatewayInterface
                     $order,
                     true
                 );
+
                 $roundingCompensation = $this->priceHandler->compensationAmountCal(
                     $item,
                     $unitPrice,
