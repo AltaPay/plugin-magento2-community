@@ -17,7 +17,7 @@ class ChargedCurrency implements ArrayInterface
     /**
      * @var array
      */
-    private static $availible = [
+    private static $chargedCurrencyOptions = [
         'base_currency' => 'Global/Website currency',
         'display_currency' => 'Display currency'
     ];
@@ -30,7 +30,7 @@ class ChargedCurrency implements ArrayInterface
     public function toOptionArray()
     {
         $output = [];
-        foreach (self::$availible as $key => $label) {
+        foreach (self::$chargedCurrencyOptions as $key => $label) {
             $output[] = ['value' => $key, 'label' => $label];
         }
 

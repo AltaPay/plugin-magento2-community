@@ -188,7 +188,8 @@ class DiscountHandler
      * @param $discountAmount
      * @param $quantity
      * @param $discountOnAllItems
-     *
+     * @param $item
+     * @param $taxAmount
      * @return array
      */
     public function getItemDiscountInformation(
@@ -200,20 +201,28 @@ class DiscountHandler
         $item,
         $taxAmount
     ) {
-        $displayCurrency = $this->storeConfig->useDisplayCurrency();
-        $rowTotal = $item->getBaseRowTotal()-$item->getBaseDiscountAmount()+$item->getBaseTaxAmount()+$item->getDiscountTaxCompensationAmount();
-        if($displayCurrency ) {
-            $rowTotal = $item->getRowTotal()-$item->getDiscountAmount()+$item->getTaxAmount()+$item->getDiscountTaxCompensationAmount();
-        }
         $discount = ['discount' => 0, 'catalogDiscount' => false];
         $originalPriceWithTax = $originalPrice + $taxAmount;
+
         if ($originalPrice != 0 && $discountAmount && $originalPrice == $priceInclTax) {
             $discountAmount = ($discountAmount * 100) / ($originalPrice * $quantity);
         } elseif ($originalPrice > 0 && $originalPrice > $priceInclTax && empty($discountAmount)) {
             $discount['catalogDiscount'] = true;
-            $discountAmount      = $this->catalogDiscount($originalPrice, $priceInclTax);
+            $discountAmount = $this->catalogDiscount($originalPrice, $priceInclTax);
         } elseif ($originalPrice > 0 && $originalPrice > $priceInclTax && $discountAmount) {
             $discount['catalogDiscount'] = true;
+            $displayCurrency = $this->storeConfig->useDisplayCurrency();
+            $rowTotal = $item->getBaseRowTotal() -
+                $item->getBaseDiscountAmount() +
+                $item->getBaseTaxAmount() +
+                $item->getBaseDiscountTaxCompensationAmount();
+
+            if ($displayCurrency) {
+                $rowTotal = $item->getRowTotal() -
+                    $item->getDiscountAmount() +
+                    $item->getTaxAmount() +
+                    $item->getDiscountTaxCompensationAmount();
+            }
             if (!$this->storeConfig->storePriceIncTax()) {
                 $discountAmount = $originalPriceWithTax - $rowTotal;
                 $discountPercentage = ($discountAmount * 100) / $originalPriceWithTax;
