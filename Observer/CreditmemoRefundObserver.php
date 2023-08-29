@@ -192,12 +192,12 @@ class CreditmemoRefundObserver implements ObserverInterface
             $qty         = $item->getQty();
             $taxPercent  = $item->getOrderItem()->getTaxPercent();
             $productType = $item->getOrderItem()->getProductType();
-            $currencyConfig = $this->storeConfig->useDisplayChargedCurrency();
+            $displayCurrency = $this->storeConfig->useDisplayCurrency();
             if ($qty > 0 && $productType != 'bundle') {
                 if($item->getOrderItem()->getDiscountAmount()) {
                     $discountAmount = $item->getOrderItem()->getDiscountAmount();
                 }
-                $originalPrice = $currencyConfig ? $item->getOrderItem()->getOriginalPrice() : $item->getOrderItem()->getBaseOriginalPrice();
+                $originalPrice = $displayCurrency ? $item->getOrderItem()->getOriginalPrice() : $item->getOrderItem()->getBaseOriginalPrice();
                 $totalPrice     = $originalPrice * $qty;
 
                 if ($item->getOrderItem()->getTaxAmount() > 0) {
@@ -268,8 +268,8 @@ class CreditmemoRefundObserver implements ObserverInterface
      */
     private function sendRefundRequest($memo, $orderLines, $orderObject, $payment, $storeCode)
     {
-        $currencyConfig = $this->storeConfig->useDisplayChargedCurrency();
-        $grandTotal = $currencyConfig ? (float)$memo->getGrandTotal() : (float)$memo->getBaseGrandTotal();
+        $displayCurrency = $this->storeConfig->useDisplayCurrency();
+        $grandTotal = $displayCurrency ? (float)$memo->getGrandTotal() : (float)$memo->getBaseGrandTotal();
         $refund = new RefundCapturedReservation($this->systemConfig->getAuth($storeCode));
         $reconciliationIdentifier  = $this->random->getUniqueHash();
         if ($memo->getTransactionId()) {

@@ -44,10 +44,10 @@ class PriceHandler
     /**
      * @param $item
      * @param $unitPrice
-     * @param $couponCode
+     * @param $couponAmount
      * @param $itemDiscount
-     *
-     * @return mixed
+     * @param $discountAllItems
+     * @return array
      */
     public function dataForPrice($item, $unitPrice, $couponAmount, $itemDiscount, $discountAllItems)
     {
@@ -56,9 +56,10 @@ class PriceHandler
         $quantity                = $item->getQtyOrdered();
         $originalPrice           = $item->getBaseOriginalPrice();
         $data["taxAmount"]       = $this->calculateTaxAmount($unitPrice, $taxPercent, $quantity);
-        $currencyConfig          = $this->storeConfig->useDisplayChargedCurrency();
+        $displayCurrency          = $this->storeConfig->useDisplayCurrency();
         $rowTotal                = ($item->getBaseRowTotal()-$item->getBaseDiscountAmount()+$item->getBaseTaxAmount()+$item->getDiscountTaxCompensationAmount());
-        if($currencyConfig ) {
+
+        if($displayCurrency ) {
             $rowTotal            = ($item->getRowTotal()-$item->getDiscountAmount()+$item->getTaxAmount()+$item->getDiscountTaxCompensationAmount());
         }
         if ($this->storeConfig->storePriceIncTax()) {
@@ -142,9 +143,9 @@ class PriceHandler
         //Discount compensation calculation - Gateway calculation pattern
         $gatewaySubTotal = ($unitPrice * $quantity) + $taxAmount;
         $gatewaySubTotal = $gatewaySubTotal - ($gatewaySubTotal * ($discountedAmount / 100));
-        $currencyConfig = $this->storeConfig->useDisplayChargedCurrency();
+        $displayCurrency = $this->storeConfig->useDisplayCurrency();
         $cmsSubTotal = $item->getBaseRowTotal() - $item->getBaseDiscountAmount() + $item->getBaseTaxAmount() + $item->getDiscountTaxCompensationAmount();
-        if ($currencyConfig) {
+        if ($displayCurrency) {
             $cmsSubTotal = $item->getRowTotal() - $item->getDiscountAmount() + $item->getTaxAmount() + $item->getDiscountTaxCompensationAmount();
         }
 

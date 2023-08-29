@@ -196,12 +196,12 @@ class CaptureObserver implements ObserverInterface
             $qty         = $item->getQty();
             $taxPercent  = $item->getOrderItem()->getTaxPercent();
             $productType = $item->getOrderItem()->getProductType();
-            $currencyConfig = $this->storeConfig->useDisplayChargedCurrency();
+            $displayCurrency = $this->storeConfig->useDisplayCurrency();
             if ($qty > 0 && $productType != 'bundle' && $item->getPriceInclTax()) {
                 if($item->getOrderItem()->getDiscountAmount()) {
                     $discountAmount = $item->getOrderItem()->getDiscountAmount();
                 }
-                $originalPrice = $currencyConfig ? $item->getOrderItem()->getOriginalPrice() : $item->getOrderItem()->getBaseOriginalPrice();
+                $originalPrice = $displayCurrency ? $item->getOrderItem()->getOriginalPrice() : $item->getOrderItem()->getBaseOriginalPrice();
                 $totalPrice     = $originalPrice * $qty;
 
                 if ($item->getOrderItem()->getTaxAmount() > 0) {
@@ -292,8 +292,8 @@ class CaptureObserver implements ObserverInterface
      */
     private function sendInvoiceRequest($paymentType, $invoice, $orderLines, $orderObject, $payment, $storeCode)
     {
-        $currencyConfig = $this->storeConfig->useDisplayChargedCurrency();
-        $grandTotal = $currencyConfig ? (float)$invoice->getGrandTotal() : (float)$invoice->getBaseGrandTotal();
+        $displayCurrency = $this->storeConfig->useDisplayCurrency();
+        $grandTotal = $displayCurrency ? (float)$invoice->getGrandTotal() : (float)$invoice->getBaseGrandTotal();
         $payment    = $invoice->getOrder()->getPayment();
         $reconciliationIdentifier  = $this->random->getUniqueHash();
         $agreementDetail = $payment->getAdditionalInformation('agreement_detail');

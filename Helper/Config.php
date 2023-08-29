@@ -18,7 +18,10 @@ use Magento\SalesRule\Model\RuleFactory;
  */
 class Config extends AbstractHelper
 {
-    const CHARGED_CURRENCY_SETTING = 'payment/sdm_altapay_config/charged_currency/setting';
+    /**
+     * Charged currency configuration
+     */
+    const CHARGED_CURRENCY = 'payment/sdm_altapay_config/charged_currency/setting';
     /**
      * @var ScopeConfigInterface
      */
@@ -127,8 +130,8 @@ class Config extends AbstractHelper
      *
      * @return bool
      */
-    public function useDisplayChargedCurrency() {
-        $config = $this->scopeConfig->getValue(self::CHARGED_CURRENCY_SETTING);
+    public function useDisplayCurrency() {
+        $config = $this->scopeConfig->getValue(self::CHARGED_CURRENCY);
         return ($config === 'display_currency') ? true : false;
     }
 }
