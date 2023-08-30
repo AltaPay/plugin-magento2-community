@@ -45,6 +45,7 @@ class Order {
         cy.get('#eyear').type('2025')
         cy.get('#cvcInput').type('123')
         cy.get('#cardholderNameInput').type('testname')
+        cy.get('#cardholderEmailInput').type('demo@example.com')
         cy.get('#pensioCreditCardPaymentSubmitButton').click().wait(3000)
     }
 
@@ -570,7 +571,7 @@ class Order {
                     })
                     cy.get('#add_products').click()
                     cy.get('#sales_order_create_search_grid_table > tbody > tr:nth-child(2)').click().wait(5000)
-                    cy.contains('Add Selected Product(s) to Order').focus().trigger('mouseover').click({force: true}).wait(5000)
+                    cy.get('#order-search .admin__page-section-title .actions button').focus().trigger('mouseover').click().wait(3000)
                     cy.contains('Get shipping methods and rates').focus().trigger('mouseover').click({ force: true }).wait(5000)
                     cy.get('.admin__order-shipment-methods-options-list > li:first').click().wait(3000)
     }

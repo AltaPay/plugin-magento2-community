@@ -326,16 +326,8 @@ class CaptureObserver implements ObserverInterface
         /** @var CaptureReservationResponse $response */
         try {
             $response = $api->call();
-            $max_date = '';
-            $latestTransKey = 0;
-            if (isset($response->Transactions)) {
-                foreach ($response->Transactions as $key => $value) {
-                    if ($value->AuthType === "subscription_payment" && $value->CreatedDate > $max_date) {
-                        $max_date       = $value->CreatedDate;
-                        $latestTransKey = $key;
-                    }
-                }
-            }
+
+            $latestTransKey = $this->helper->getLatestTransaction($response->Transactions, 'subscription_payment');
     
             if (isset($response->Transactions[$latestTransKey])) {
                 $transaction = $response->Transactions[$latestTransKey];

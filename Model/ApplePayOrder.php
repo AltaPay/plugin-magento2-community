@@ -20,6 +20,7 @@ use SDM\Altapay\Model\ConstantConfig;
 use SDM\Altapay\Model\Handler\CreatePaymentHandler;
 use Magento\Framework\DB\TransactionFactory;
 use Magento\Sales\Model\Order\Email\Sender\OrderSender;
+use SDM\Altapay\Helper\Data;
 
 class ApplePayOrder {
 
@@ -73,6 +74,24 @@ class ApplePayOrder {
      */
     private $orderSender;
 
+    /**
+     * @var Data
+     */
+    protected $helper;
+
+    /**
+     * @param OrderLoaderInterface $orderLoader
+     * @param Session $checkoutSession
+     * @param StockStateInterface $stockItem
+     * @param StockRegistryInterface $stockRegistry
+     * @param TransactionRepositoryInterface $transactionRepository
+     * @param SystemConfig $systemConfig
+     * @param Order $order
+     * @param CreatePaymentHandler $paymentHandler
+     * @param TransactionFactory $transactionFactory
+     * @param OrderSender $orderSender
+     * @param Data $helper
+     */
     public function __construct(
         OrderLoaderInterface $orderLoader,
         Session $checkoutSession,
@@ -83,7 +102,8 @@ class ApplePayOrder {
         Order $order,
         CreatePaymentHandler $paymentHandler,
         TransactionFactory $transactionFactory,
-        OrderSender $orderSender
+        OrderSender $orderSender,
+        Data $helper
     ) {
         $this->orderLoader           = $orderLoader;
         $this->checkoutSession       = $checkoutSession;
@@ -95,6 +115,7 @@ class ApplePayOrder {
         $this->paymentHandler        = $paymentHandler;
         $this->transactionFactory    = $transactionFactory;
         $this->orderSender           = $orderSender;
+        $this->helper                = $helper;
     }
 
     /**
@@ -105,14 +126,8 @@ class ApplePayOrder {
      */
     public function handleCardWalletPayment($response, $order)
     {
-        $max_date = '';
-        $latestTransKey = 0;
-        foreach ($response->Transactions as $key=>$value) {
-            if ($value->CreatedDate > $max_date) {
-                $max_date = $value->CreatedDate;
-                $latestTransKey = $key;
-            }
-        }
+        $latestTransKey = $this->helper->getLatestTransaction($response->Transactions);
+
         if ($response && $response->Result === 'Success' && isset($response->Transactions[$latestTransKey])) {
             $transaction = $response->Transactions[$latestTransKey];
             $paymentType    = $transaction->AuthType;

@@ -1,6 +1,10 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [3.6.12]
+### Fixed
+- Fix: Order cancelled/released if plugin receives fail notification with the same order id but a different transaction id.
+
 ## [3.6.11]
 ### Added
 -  Implement checksum functionality
