@@ -228,9 +228,10 @@ class Gateway implements GatewayInterface
     public function createRequest($terminalId, $orderId)
     {
         $order = $this->order->load($orderId);
+        $displayCurrency = $this->storeConfig->useDisplayCurrency();
         if ($order->getId()) {
             $couponCode = $order->getDiscountDescription();
-            $couponCodeAmount = $order->getDiscountAmount();
+            $couponCodeAmount = $displayCurrency ? $order->getDiscountAmount() : $order->getBaseDiscountAmount();
             $discountAllItems = $this->discountHandler->allItemsHaveDiscount($order->getAllItems());
             $orderLines = $this->itemOrderLines($couponCodeAmount, $order, $discountAllItems);
             if ($this->orderLines->sendShipment($order) && !empty($order->getShippingMethod(true))) {
@@ -403,7 +404,7 @@ class Gateway implements GatewayInterface
                     true
                 );
                 // check if rounding compensation amount, send in the separate orderline
-                if ($roundingCompensation > 0 || $roundingCompensation < 0) {
+                if (!$discountAllItems && ($roundingCompensation > 0 || $roundingCompensation < 0)) {
                     $orderLines[] = $this->orderLines->compensationOrderLine(
                         "Compensation Amount",
                         "comp-" . $item->getItemId(),

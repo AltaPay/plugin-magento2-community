@@ -10,17 +10,13 @@
 namespace SDM\Altapay\Model\Config\Source;
 
 use Magento\Framework\Option\ArrayInterface;
-<<<<<<< HEAD
 use Magento\Store\Model\ScopeInterface;
 use SDM\Altapay\Model\SystemConfig;
-=======
->>>>>>> d74338b (Refactor code)
 
 class CreditCardFormStyle implements ArrayInterface
 {
 
     /**
-<<<<<<< HEAD
      * @var SystemConfig
      */
     private $systemConfig;
@@ -36,8 +32,6 @@ class CreditCardFormStyle implements ArrayInterface
     }
 
     /**
-=======
->>>>>>> d74338b (Refactor code)
      * @var array
      */
     private static $designOptions = [
@@ -53,7 +47,6 @@ class CreditCardFormStyle implements ArrayInterface
      */
     public function toOptionArray()
     {
-<<<<<<< HEAD
         $storeScope = ScopeInterface::SCOPE_STORE;
         $storeCode = $this->systemConfig->resolveCurrentStoreCode();
         $login = $this->systemConfig->getApiConfig('api_log_in', $storeScope, $storeCode);
@@ -66,10 +59,6 @@ class CreditCardFormStyle implements ArrayInterface
         
         $output = [];
         foreach ($options as $key => $label) {
-=======
-        $output = [];
-        foreach (self::$designOptions as $key => $label) {
->>>>>>> d74338b (Refactor code)
             $output[] = ['value' => $key, 'label' => $label];
         }
 

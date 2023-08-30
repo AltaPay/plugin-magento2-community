@@ -54,7 +54,8 @@ class PriceHandler
         $data["catalogDiscount"] = false;
         $taxPercent              = $item->getTaxPercent();
         $quantity                = $item->getQtyOrdered();
-        $originalPrice           = $item->getBaseOriginalPrice();
+        $displayCurrency         = $this->storeConfig->useDisplayCurrency();
+        $originalPrice           = $displayCurrency ? $item->getOriginalPrice() : $item->getBaseOriginalPrice();
         $data["taxAmount"]       = $this->calculateTaxAmount($unitPrice, $taxPercent, $quantity);
         $displayCurrency          = $this->storeConfig->useDisplayCurrency();
         $rowTotal                = ($item->getBaseRowTotal()-$item->getBaseDiscountAmount()+$item->getBaseTaxAmount()+$item->getDiscountTaxCompensationAmount());
@@ -63,9 +64,9 @@ class PriceHandler
             $rowTotal            = ($item->getRowTotal()-$item->getDiscountAmount()+$item->getTaxAmount()+$item->getDiscountTaxCompensationAmount());
         }
         if ($this->storeConfig->storePriceIncTax()) {
-            $price = $item->getPriceInclTax();
+            $price = $displayCurrency ? $item->getPriceInclTax() : $item->getBasePriceInclTax();
         } else {
-            $price = $item->getPrice();
+            $price = $displayCurrency ? $item->getPrice() : $item->getBasePrice();
         }
         if ($originalPrice > $price && abs((float)$couponAmount) > 0 && !$discountAllItems) {
             $originalPrice = $originalPrice * $quantity;

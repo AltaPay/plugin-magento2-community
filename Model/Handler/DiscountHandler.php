@@ -246,15 +246,16 @@ class DiscountHandler
     public function allItemsHaveDiscount($orderItems)
     {
         $discountOnAllItems = true;
+        $displayCurrency = $this->storeConfig->useDisplayCurrency();
         foreach ($orderItems as $item) {
             $appliedRule    = $item->getAppliedRuleIds();
             $productType    = $item->getProductType();
-            $originalPrice  = $item->getBaseOriginalPrice();
+            $originalPrice  = $displayCurrency ? $item->getOriginalPrice() : $item->getBaseOriginalPrice();
             
             if ($this->storeConfig->storePriceIncTax()) {
-                $price = $item->getPriceInclTax();
+                $price = $displayCurrency ? $item->getPriceInclTax() : $item->getBasePriceInclTax();
             } else {
-                $price = $item->getPrice();
+                $price = $displayCurrency ? $item->getPrice() : $item->getBasePrice();
             }        
             if ($originalPrice > $price) {
                 $discountOnAllItems = false;
