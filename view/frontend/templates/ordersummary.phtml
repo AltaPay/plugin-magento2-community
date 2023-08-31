@@ -52,7 +52,7 @@ $block->getViewFileUrl('SDM_Altapay::css/ordersummary.css') ?>">
                 <th class="mark" scope="row"><?= $block->escapeHtml(__('Cart Subtotal')) ?></th>
                 <td class="amount">
                     <span class="price" data-th="Cart Subtotal">
-                    <?= $block->escapeHtml($block->getFormatedPrice($order->getBaseSubtotal())); ?>
+                    <?= $block->escapeHtml($block->getFormatedPrice($order->getSubtotal())); ?>
                     </span>
                 </td>
             </tr>
@@ -93,7 +93,7 @@ $block->getViewFileUrl('SDM_Altapay::css/ordersummary.css') ?>">
                 <td class="amount" data-th="Order Total">
                     <strong>
                         <span class="price">
-                            <?= $block->escapeHtml($block->getFormatedPrice($order->getBaseGrandTotal())); ?>
+                            <?= $block->escapeHtml($block->getFormatedPrice($order->getGrandTotal())); ?>
                         </span>
                     </strong>
                 </td>
