@@ -364,7 +364,7 @@ class Gateway implements GatewayInterface
                 if ($item->getTaxAmount() > 0) {
                     $originalPrice = $displayCurrency ? $item->getPriceInclTax() : $item->getBasePriceInclTax();
                }
-               
+
                 if ($storePriceIncTax) {
                     $unitPriceWithoutTax = $this->priceHandler->getPriceWithoutTax($originalPrice, $taxPercent);
                     $unitPrice = bcdiv($unitPriceWithoutTax, 1, 2);
@@ -395,7 +395,6 @@ class Gateway implements GatewayInterface
                     $order,
                     true
                 );
-
                 $roundingCompensation = $this->priceHandler->compensationAmountCal(
                     $item,
                     $unitPrice,
@@ -507,8 +506,8 @@ class Gateway implements GatewayInterface
 
         $request->setTerminal($terminalName)
             ->setShopOrderId($order->getIncrementId())
-            ->setAmount((float)number_format($order->getBaseGrandTotal(), 2, '.', ''))
-            ->setCurrency($order->getBaseCurrencyCode())
+            ->setAmount((float)number_format($grandTotal, 2, '.', ''))
+            ->setCurrency($currencyCode)
             ->setCustomerInfo($this->customerHandler->setCustomer($order, $isReservation))
             ->setTransactionInfo($transactionDetail)
             ->setCookie($this->request->getServer('HTTP_COOKIE'))

@@ -16,6 +16,7 @@ use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
 use SDM\Altapay\Model\SystemConfig;
 use Altapay\Api\Payments\RefundCapturedReservation;
+use SDM\Altapay\Helper\Config as storeConfig;
 
 class OrderCancelObserver implements ObserverInterface
 {
@@ -26,13 +27,22 @@ class OrderCancelObserver implements ObserverInterface
     private $systemConfig;
 
     /**
+     * @var Helper Config
+     */
+    private $storeConfig;
+
+    /**
      * OrderCancelObserver constructor.
      *
      * @param SystemConfig $systemConfig
+     * @param storeConfig $storeConfig
      */
-    public function __construct(SystemConfig $systemConfig)
+    public function __construct(
+        SystemConfig $systemConfig,
+        storeConfig $storeConfig)
     {
         $this->systemConfig = $systemConfig;
+        $this->storeConfig  = $storeConfig;
     }
 
     /**
@@ -48,10 +58,13 @@ class OrderCancelObserver implements ObserverInterface
         /** @var \Magento\Sales\Model\Order\Payment $payment */
         $payment = $order->getPayment();
 
+        $displayCurrency = $this->storeConfig->useDisplayCurrency();
+        $grandTotal = $displayCurrency ? $order->getGrandTotal() : $order->getBaseGrandTotal();
+
         if (in_array($payment->getMethod(), SystemConfig::getTerminalCodes()) && $payment->getLastTransId()) {
             if ($payment->getAdditionalInformation('payment_type') === "paymentAndCapture") {
                 $api = new RefundCapturedReservation($this->systemConfig->getAuth($order->getStore()->getCode()));
-                $api->setAmount((float)number_format($order->getBaseGrandTotal(), 2, '.', ''));
+                $api->setAmount((float)number_format($grandTotal, 2, '.', ''));
             } else {
                 $api = new ReleaseReservation($this->systemConfig->getAuth($order->getStore()->getCode()));
             }

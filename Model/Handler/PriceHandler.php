@@ -57,7 +57,6 @@ class PriceHandler
         $displayCurrency         = $this->storeConfig->useDisplayCurrency();
         $originalPrice           = $displayCurrency ? $item->getOriginalPrice() : $item->getBaseOriginalPrice();
         $data["taxAmount"]       = $this->calculateTaxAmount($unitPrice, $taxPercent, $quantity);
-        $displayCurrency          = $this->storeConfig->useDisplayCurrency();
         $rowTotal                = ($item->getBaseRowTotal()-$item->getBaseDiscountAmount()+$item->getBaseTaxAmount()+$item->getDiscountTaxCompensationAmount());
 
         if($displayCurrency ) {

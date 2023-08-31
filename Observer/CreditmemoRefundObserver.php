@@ -269,13 +269,13 @@ class CreditmemoRefundObserver implements ObserverInterface
     private function sendRefundRequest($memo, $orderLines, $orderObject, $payment, $storeCode)
     {
         $displayCurrency = $this->storeConfig->useDisplayCurrency();
-        $grandTotal = $displayCurrency ? (float)$memo->getGrandTotal() : (float)$memo->getBaseGrandTotal();
+        $grandTotal = $displayCurrency ? $memo->getGrandTotal() : $memo->getBaseGrandTotal();
         $refund = new RefundCapturedReservation($this->systemConfig->getAuth($storeCode));
         $reconciliationIdentifier  = $this->random->getUniqueHash();
         if ($memo->getTransactionId()) {
             $refund->setTransaction($payment->getLastTransId());
         }
-        $refund->setAmount((float)number_format($memo->getBaseGrandTotal(), 2, '.', ''));
+        $refund->setAmount((float)number_format($grandTotal, 2, '.', ''));
         $refund->setOrderLines($orderLines);
         $refund->setReconciliationIdentifier($reconciliationIdentifier);
         try {
