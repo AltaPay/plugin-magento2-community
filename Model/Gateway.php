@@ -271,9 +271,10 @@ class Gateway implements GatewayInterface
     public function createRequestApplepay($terminalId, $orderId, $providerData)
     {
         $order = $this->order->load($orderId);
+        $displayCurrency = $this->storeConfig->useDisplayCurrency();
         if ($order->getId()) {
             $couponCode = $order->getDiscountDescription();
-            $couponCodeAmount = $order->getDiscountAmount();
+            $couponCodeAmount = $displayCurrency ? $order->getDiscountAmount() : $order->getBaseDiscountAmount();
             $discountAllItems = $this->discountHandler->allItemsHaveDiscount($order->getAllItems());
             $orderLines = $this->itemOrderLines($couponCodeAmount, $order, $discountAllItems);
             if ($this->orderLines->sendShipment($order) && !empty($order->getShippingMethod(true))) {

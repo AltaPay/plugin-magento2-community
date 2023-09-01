@@ -21,7 +21,7 @@ class Config extends AbstractHelper
     /**
      * Charged currency configuration
      */
-    const CHARGED_CURRENCY = 'payment/sdm_altapay_config/charged_currency/setting';
+    const ALTAPAY_CHARGED_CURRENCY = 'payment/sdm_altapay_config/charged_currency/setting';
     /**
      * @var ScopeConfigInterface
      */
@@ -126,12 +126,12 @@ class Config extends AbstractHelper
     }
     
     /**
-     * Get the charged currency configuration.
+     * Check if display currency is enabled
      *
      * @return bool
      */
     public function useDisplayCurrency() {
-        $config = $this->scopeConfig->getValue(self::CHARGED_CURRENCY);
+        $config = $this->scopeConfig->getValue(self::ALTAPAY_CHARGED_CURRENCY);
         return ($config === 'display_currency') ? true : false;
     }
 }

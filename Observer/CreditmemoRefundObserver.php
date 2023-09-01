@@ -145,7 +145,8 @@ class CreditmemoRefundObserver implements ObserverInterface
     private function processRefundOrderItems($memo)
     {
         $couponCode       = $memo->getDiscountDescription();
-        $couponCodeAmount = $memo->getDiscountAmount();
+        $displayCurrency  = $this->storeConfig->useDisplayCurrency();
+        $couponCodeAmount = $displayCurrency ? $memo->getDiscountAmount() : $memo->getBaseDiscountAmount();
         //Return true if discount enabled on all items
         $discountAllItems = $this->discountHandler->allItemsHaveDiscount($memo->getOrder()->getAllVisibleItems());
         //order lines for items
@@ -168,7 +169,7 @@ class CreditmemoRefundObserver implements ObserverInterface
                 );
             }
         }
-        if(!empty($this->fixedProductTax($memo))){
+        if(!empty($this->fixedProductTax($memo, $displayCurrency))){
             //order lines for FPT
             $orderLines[] = $this->orderLines->fixedProductTaxOrderLine($this->fixedProductTax($memo));
         }
@@ -193,6 +194,7 @@ class CreditmemoRefundObserver implements ObserverInterface
             $taxPercent  = $item->getOrderItem()->getTaxPercent();
             $productType = $item->getOrderItem()->getProductType();
             $displayCurrency = $this->storeConfig->useDisplayCurrency();
+            $priceInclTax = $displayCurrency ? $item->getPriceInclTax() : $item->getBasePriceInclTax();
             if ($qty > 0 && $productType != 'bundle') {
                 if($item->getOrderItem()->getDiscountAmount()) {
                     $discountAmount = $item->getOrderItem()->getDiscountAmount();
@@ -201,16 +203,16 @@ class CreditmemoRefundObserver implements ObserverInterface
                 $totalPrice     = $originalPrice * $qty;
 
                 if ($item->getOrderItem()->getTaxAmount() > 0) {
-                    $originalPrice = $displayCurrency ? $item->getPriceInclTax() : $item->getBasePriceInclTax();
+                    $originalPrice = $priceInclTax;
                 }
 
                 if ($storePriceIncTax) {
                     $priceWithoutTax = $this->priceHandler->getPriceWithoutTax($originalPrice, $taxPercent);
-                    $price           = $item->getPriceInclTax();
+                    $price           = $priceInclTax;
                     $unitPrice       = bcdiv($priceWithoutTax, 1, 2);
                     $taxAmount       = $this->priceHandler->calculateTaxAmount($priceWithoutTax, $taxPercent, $qty);
                 } else {
-                    $price           = $item->getPrice();
+                    $price           = $displayCurrency ? $item->getPrice() : $item->getBasePrice();
                     $unitPrice       = $originalPrice;
                     $taxAmount       = $this->priceHandler->calculateTaxAmount($unitPrice, $taxPercent, $qty);
                 }
@@ -315,14 +317,15 @@ class CreditmemoRefundObserver implements ObserverInterface
 
     /**
      * @param $order
+     * @param $displayCurrency
      *
      * @return float|int
      */
-    public function fixedProductTax($memo){
+    public function fixedProductTax($memo, $displayCurrency){
 
         $weeTaxAmount = 0;
         foreach ($memo->getAllItems() as $item) {
-            $weeTaxAmount +=  $item->getWeeeTaxAppliedRowAmount();
+            $weeTaxAmount += $displayCurrency ? $item->getWeeeTaxAppliedRowAmount() : $item->getBaseWeeeTaxAppliedRowAmount();
         }
 
         return $weeTaxAmount;

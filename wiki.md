@@ -22,6 +22,8 @@ We highly recommend gathering all the below information, before starting the ins
 
 [Configure cron scheduler](#configure-cron-scheduler)
 
+[Charged currency setting](#charged-currency-setting)
+
 [Configure order status](#configure-order-status)
 
 [Credit Card form styling](#credit-card-form-styling)
@@ -143,6 +145,16 @@ payment methods and configuring payments.
 To update all the orders without a scheduler you can click on the "Change status now".
 
 ![configure-cron-scheduler](docs/cron_schedule.png)
+
+## Charged currency setting
+
+You can select currency used for AltaPay payment processing from charged currency setting section.
+
+**Display currency:** The currency visible on the store view or display is used.
+
+**Global/Website currency:** The base currency is used.
+
+![charged-currency-setting](docs/charged_currency_setting.png)
 
 ## Configure order status
 
