@@ -12,9 +12,10 @@ namespace SDM\Altapay\Helper;
 use Magento\Framework\App\Helper\AbstractHelper;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\SalesRule\Model\RuleFactory;
+use Magento\Store\Model\StoreManagerInterface;
 
 /**
- * Class Config for getting store configrations information.
+ * Class Config for getting store configuration information.
  */
 class Config extends AbstractHelper
 {
@@ -28,17 +29,25 @@ class Config extends AbstractHelper
     protected $rule;
 
     /**
+     * @var StoreManagerInterface
+     */
+    protected $storeManager;
+
+    /**
      * Config constructor.
      *
      * @param ScopeConfigInterface $scopeConfig
-     * @param RuleFactory          $rule
+     * @param RuleFactory $rule
+     * @param StoreManagerInterface $storeManager
      */
     public function __construct(
         ScopeConfigInterface $scopeConfig,
-        RuleFactory $rule
+        RuleFactory $rule,
+        StoreManagerInterface $storeManager
     ) {
-        $this->scopeConfig = $scopeConfig;
-        $this->rule        = $rule;
+        $this->scopeConfig  = $scopeConfig;
+        $this->rule         = $rule;
+        $this->storeManager = $storeManager;
     }
 
     /**
@@ -90,7 +99,7 @@ class Config extends AbstractHelper
     }
 
     /**
-     * Get image url by imagename.
+     * Get image url by image name.
      *
      * @param        $order
      * @param string $image
@@ -109,5 +118,17 @@ class Config extends AbstractHelper
         }
 
         return $url;
+    }
+
+    /**
+     * @return string
+     */
+    public function ccFormStyle()
+    {
+        return $this->scopeConfig->getValue(
+            'payment/sdm_altapay_config/cc_form_style/cc_form_options',
+            $this->getStoreScope(),
+            $this->storeManager->getStore()->getCode()
+        );
     }
 }

@@ -6,7 +6,7 @@
  * file that was distributed with this source code.
  */
 
-input#pensioCreditCardPaymentSubmitButton {
+.creaditcard-callback-form.legacy input#pensioCreditCardPaymentSubmitButton {
     background-image: none;
     background: #1979c3;
     border: 1px solid #1979c3;
@@ -24,15 +24,15 @@ input#pensioCreditCardPaymentSubmitButton {
 #notice-cookie-block {
     display: none;
 }
-select#emonth {
-    width: 50%;
+.creaditcard-callback-form.legacy select#emonth {
+   width: 50%;
 }
 
-select#eyear {
-    width: 48%;
+.creaditcard-callback-form.legacy select#eyear {
+   width: 48%;
 }
 
-.pensio_payment_form_row.expiry_row {
+.creaditcard-callback-form.legacy .pensio_payment_form_row.expiry_row {
     padding-bottom: 24px;
 }
 
@@ -40,7 +40,7 @@ div#savecreditcard {
     display: none;
 }
 
-input#pensioCreditCardPaymentSubmitButton:disabled {
+.creaditcard-callback-form.legacy input#pensioCreditCardPaymentSubmitButton:disabled {
     opacity: 0.4;
 }
 
@@ -48,7 +48,7 @@ aside.modal-custom.opc-sidebar.opc-summary-wrapper {
     margin: 0px;
 }
 
-.opc-block-summary .minicart-items-wrapper{
+.opc-block-summary .minicart-items-wrapper {
     max-height: 250px;
 }
 
@@ -57,9 +57,308 @@ footer.page-footer, .sections.nav-sections, .panel.header, .block.block-search, 
 }
 
 @media (min-width: 768px) {
-.creaditcard-callback-form {
-    margin:0px;
-    width: 33.33333333%;
-    float: left;
- }
+    .creaditcard-callback-form {
+        margin: 0px;
+        width: 33.33333333%;
+        float: left;
+    }
+}
+
+/** Checkout Styling **/
+
+.creaditcard-callback-form.checkout {
+    text-align: left;
+    background-color: white;
+    border: 1px solid rgba(0, 0, 0, 0.16);
+    padding: 20px 25px 25px 25px;
+    box-sizing: border-box;
+    border-radius: 10px;
+    position: relative;
+    margin-top: 46px;
+    margin-bottom: 40px;
+    box-shadow: rgba(50, 50, 93, 0.25) 0 2px 5px -1px;
+}
+
+.creaditcard-callback-form.checkout .payment-title {
+    margin: 0;
+}
+
+.creaditcard-callback-form.checkout form {
+    margin: 0;
+}
+
+.creaditcard-callback-form.checkout .payment-headline {
+    margin-block-start: 0;
+}
+
+.creaditcard-callback-form.checkout .pensio_payment_form_card-number {
+    position: relative;
+}
+
+.creaditcard-callback-form.checkout .pensio_payment_form_card-number, 
+.creaditcard-callback-form.checkout .pensio_payment_form_cardholder,
+.creaditcard-callback-form.checkout .pensio_payment_form-cvc-input {
+    margin-top: 4px;
+}
+
+.creaditcard-callback-form.checkout .pensio_payment_form_card-number input,
+.creaditcard-callback-form.checkout .pensio_payment_form_cardholder input {
+    padding: 12px 14px;
+    width: 100%;
+    border-radius: 3px;
+    border: 1px solid rgba(0, 0, 0, 0.16);
+    cursor: pointer;
+    font-size: 16px;
+    box-sizing: border-box;
+    color: #666;
+    height: auto;
+}
+
+.creaditcard-callback-form.checkout .pensioCreditCardInput {
+    color: #666;
+}
+
+.creaditcard-callback-form.checkout .pensio_payment_form_month select, 
+.creaditcard-callback-form.checkout .pensio_payment_form_year select, 
+.creaditcard-callback-form.checkout #idealIssuer {
+    margin-top: 4px;
+    padding: 12px 14px;
+    width: 100%;
+    border-radius: 3px;
+    border: 1px solid rgba(0, 0, 0, 0.16);
+    cursor: pointer;
+    font-size: 16px;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background-image: linear-gradient(45deg, transparent 50%, black 50%),
+    linear-gradient(135deg, black 50%, transparent 50%);
+    background-position: calc(100% - 20px) calc(20px + 2px),
+    calc(100% - 15px) calc(20px + 2px),
+    100% 0;
+    background-size: 5px 5px, 5px 5px, 40px 40px;
+    background-repeat: no-repeat;
+    height: auto;
+}
+
+.creaditcard-callback-form.checkout .pensio_payment_form-cvc-input input {
+    padding: 12px 14px;
+    width: 100%;
+    border-radius: 3px;
+    border: 1px solid rgba(0, 0, 0, 0.16);
+    cursor: pointer;
+    font-size: 16px;
+    height: auto;
+}
+
+.creaditcard-callback-form.checkout .pensio_payment_form_expiration {
+    display: flex;
+    width: 100%;
+    gap: 0 10px;
+}
+
+.creaditcard-callback-form.checkout .pensio_payment_form_month {
+    width: 30%;
+
+}
+
+.creaditcard-callback-form.checkout .pensio_payment_form_year {
+    width: 30%;
+
+}
+
+.creaditcard-callback-form.checkout .pensio_payment_form_cvc {
+    width: 40%;
+}
+
+.creaditcard-callback-form.checkout .pensio_payment_form-cvc-input {
+    display: flex;
+    position: relative;
+}
+
+.creaditcard-callback-form.checkout .cvc-icon {
+    width: 30px;
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    align-items: center;
+}
+
+.creaditcard-callback-form.checkout .credit-card-visa-icon {
+    position: absolute;
+    top: 0;
+    right: 0;
+    display: flex;
+    padding-right: 7px;
+    padding-top: 14px;
+    align-items: center;
+}
+
+.creaditcard-callback-form.checkout .credit-card-mastercard-icon {
+    position: absolute;
+    top: 0;
+    right: 0;
+    display: flex;
+    padding-right: 50px;
+    padding-top: 14px;
+    align-items: center;
+}
+
+.creaditcard-callback-form.checkout .credit-card-maestro-icon {
+    position: absolute;
+    top: 0;
+    right: 0;
+    display: flex;
+    padding-right: 90px;
+    padding-top: 14px;
+    align-items: center;
+}
+
+.creaditcard-callback-form.checkout #creditCardTypeIcon {
+    height: 40%;
+    width: auto;
+    position: absolute;
+    display: flex;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    margin: auto 1rem auto auto;
+}
+
+.creaditcard-callback-form.checkout #creditCardTypeSecondIcon {
+    height: 40%;
+    width: auto;
+    position: absolute;
+    display: flex;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    margin: auto 4rem auto auto;
+}
+
+.creaditcard-callback-form.checkout #selectCardLabel {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    margin: 0 2rem 2px 0;
+    font-size: 10px;
+    opacity: 0.7;
+}
+
+.creaditcard-callback-form.checkout .pensio_payment_form_cvc-info-text {
+    font-size: 10px;
+    line-height: normal;
+}
+
+.creaditcard-callback-form.checkout .pensio_payment_form_label_cell {
+    font-size: 16px
+}
+
+.creaditcard-callback-form.checkout .expiry_row, .cardnumber_row {
+    margin-top: 10px;
+}
+
+.creaditcard-callback-form.checkout .cardnumber_row {
+    margin-bottom: 20px;
+}
+
+.creaditcard-callback-form.checkout .expiry_row {
+    display: flex;
+    width: 100%;
+    gap: 0 10px;
+}
+
+.creaditcard-callback-form.checkout .submit_row {
+    margin-top: 20px;
+}
+
+.creaditcard-callback-form.checkout .AltaPaySubmitButton {
+    outline: none;
+    background: #31C37E;
+    padding: 15px 16px;
+    color: white;
+    border-radius: 3px;
+    width: 100%;
+    border: none;
+    cursor: pointer;
+    box-shadow: rgba(0, 0, 0, 0.16) 0 1px 4px;
+    font-weight: bold;
+    font-size: 17px;
+}
+
+.creaditcard-callback-form.checkout .AltaPaySubmitButton:hover {
+    background: #16b36e;
+
+}
+
+.creaditcard-callback-form.checkout .AltaPaySubmitButton:disabled {
+    background: black;
+    outline: none;
+    padding: 15px 16px;
+    color: white;
+    border-radius: 3px;
+    width: 100%;
+    border: none;
+    cursor: pointer;
+    box-shadow: rgba(0, 0, 0, 0.16) 0 1px 4px;
+    font-weight: bold;
+    font-size: 17px;
+
+}
+
+/*errors*/
+
+.creaditcard-callback-form.checkout .pensio_required_field_indicator, 
+.creaditcard-callback-form.checkout #invalid_amex_cvc, 
+.creaditcard-callback-form.checkout #invalid_cvc, 
+.creaditcard-callback-form.checkout #invalid_cardholdername {
+    color: red;
+    font-size: 12px;
+    margin-top: 4px;
+    line-height: normal;
+}
+
+.creaditcard-callback-form.checkout .pensio_payment_form_invalid-cvc-input,
+.creaditcard-callback-form.checkout .pensio_payment_form_invalid-cardholder-input {
+    color: red;
+}
+
+.creaditcard-callback-form.checkout .PensioCloseButton,
+.creaditcard-callback-form.checkout .CustomAltaPayCloseButton {
+    width: 40px;
+    height: 20px;
+    font-size: 18px;
+    background-color: red;
+    color: white;
+    cursor: pointer;
+    padding: 4px;
+    position: absolute;
+    right: 0;
+    top: 0;
+}
+
+.creaditcard-callback-form.checkout .PensioRadioButton {
+    border: none;
+    background-color: transparent;
+    cursor: pointer;
+}
+
+.creaditcard-callback-form.checkout div.PensioMultiformContainer form {
+    display: none;
+}
+
+.creaditcard-callback-form.checkout #PensioJavascriptDisabledSurchargeNotice {
+    color: red;
+    background-color: white;
+}
+
+.creaditcard-callback-form.checkout #iDealPayment table {
+    width: 100%;
+}
+
+.creaditcard-callback-form.checkout #iDealPayment #pensioPaymentIdealSubmitButton {
+    margin-top: 20px;
+}
+
+.creaditcard-callback-form.checkout #idealIssuer select {
+    color: #666;
 }
