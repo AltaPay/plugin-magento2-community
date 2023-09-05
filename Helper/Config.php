@@ -12,7 +12,6 @@ namespace SDM\Altapay\Helper;
 use Magento\Framework\App\Helper\AbstractHelper;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\SalesRule\Model\RuleFactory;
-use Magento\Store\Model\StoreManagerInterface;
 
 /**
  * Class Config for getting store configuration information.
@@ -29,25 +28,17 @@ class Config extends AbstractHelper
     protected $rule;
 
     /**
-     * @var StoreManagerInterface
-     */
-    protected $storeManager;
-
-    /**
      * Config constructor.
      *
      * @param ScopeConfigInterface $scopeConfig
-     * @param RuleFactory $rule
-     * @param StoreManagerInterface $storeManager
+     * @param RuleFactory          $rule
      */
     public function __construct(
         ScopeConfigInterface $scopeConfig,
-        RuleFactory $rule,
-        StoreManagerInterface $storeManager
+        RuleFactory $rule
     ) {
-        $this->scopeConfig  = $scopeConfig;
-        $this->rule         = $rule;
-        $this->storeManager = $storeManager;
+        $this->scopeConfig = $scopeConfig;
+        $this->rule        = $rule;
     }
 
     /**
@@ -121,14 +112,12 @@ class Config extends AbstractHelper
     }
 
     /**
+     * Get Credit Card form style value.
+     *
      * @return string
      */
     public function ccFormStyle()
     {
-        return $this->scopeConfig->getValue(
-            'payment/sdm_altapay_config/cc_form_style/cc_form_options',
-            $this->getStoreScope(),
-            $this->storeManager->getStore()->getCode()
-        );
+        return $this->scopeConfig->getValue('payment/sdm_altapay_config/cc_form_style/cc_form_options');
     }
 }
