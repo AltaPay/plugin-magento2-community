@@ -55,8 +55,8 @@ aside.modal-custom.opc-sidebar.opc-summary-wrapper {
 footer.page-footer, .sections.nav-sections, .panel.header, .block.block-search, .minicart-wrapper {
     display: none;
 }
+@media (min-width: 992px) {
 
-@media (min-width: 768px) {
     .creaditcard-callback-form {
         margin: 0px;
         width: 33.33333333%;
@@ -74,7 +74,6 @@ footer.page-footer, .sections.nav-sections, .panel.header, .block.block-search, 
     box-sizing: border-box;
     border-radius: 10px;
     position: relative;
-    margin-top: 46px;
     margin-bottom: 40px;
     box-shadow: rgba(50, 50, 93, 0.25) 0 2px 5px -1px;
 }
@@ -361,4 +360,13 @@ footer.page-footer, .sections.nav-sections, .panel.header, .block.block-search, 
 
 .creaditcard-callback-form.checkout #idealIssuer select {
     color: #666;
+}
+
+@media (max-width: 991px) {
+    .opc-sidebar, .creaditcard-callback-form {
+        width: 100%;
+        float: none;
+        clear: both;
+        margin-bottom: 40px;
+    }
 }
