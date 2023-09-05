@@ -77,7 +77,8 @@
                         <source_model>SDM\Altapay\Model\Config\Source\Authentication</source_model>
                     </field>
                 </group>
-                <group id="altapay_config_status" translate="label comment" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
+
+                <group id="altapay_config_status" translate="label comment" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
                     <attribute type="expanded">0</attribute>
 
                     <label>Order status</label>
