@@ -1,5 +1,8 @@
 # Changelog
 All notable changes to this project will be documented in this file.
+## [3.6.13]
+### Added
+- Add a new design option with a modern look for the Credit Card form.
 
 ## [3.6.12]
 ### Fixed
