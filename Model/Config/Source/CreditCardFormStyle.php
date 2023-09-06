@@ -10,9 +10,26 @@
 namespace SDM\Altapay\Model\Config\Source;
 
 use Magento\Framework\Option\ArrayInterface;
+use Magento\Store\Model\ScopeInterface;
+use SDM\Altapay\Model\SystemConfig;
 
 class CreditCardFormStyle implements ArrayInterface
 {
+
+    /**
+     * @var SystemConfig
+     */
+    private $systemConfig;
+
+    /**
+     * CreditCardFormStyle constructor.
+     *
+     * @param SystemConfig $systemConfig
+     */
+    public function __construct(SystemConfig $systemConfig)
+    {
+        $this->systemConfig = $systemConfig;
+    }
 
     /**
      * @var array
@@ -30,8 +47,18 @@ class CreditCardFormStyle implements ArrayInterface
      */
     public function toOptionArray()
     {
+        $storeScope = ScopeInterface::SCOPE_STORE;
+        $storeCode = $this->systemConfig->resolveCurrentStoreCode();
+        $login = $this->systemConfig->getApiConfig('api_log_in', $storeScope, $storeCode);
+        $options = self::$designOptions;
+
+        // Set checkout by default for new merchants
+        if (empty($login)) {
+            $options = array_merge(["checkout" => $options["checkout"]], $options);
+        }
+        
         $output = [];
-        foreach (self::$designOptions as $key => $label) {
+        foreach ($options as $key => $label) {
             $output[] = ['value' => $key, 'label' => $label];
         }
 
