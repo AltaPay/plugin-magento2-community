@@ -24,6 +24,8 @@ We highly recommend gathering all the below information, before starting the ins
 
 [Configure order status](#configure-order-status)
 
+[Credit Card form styling](#credit-card-form-styling)
+
 [Configure fraud detection](#configure-fraud-detection)
 
 [Configure terminals](#configure-terminals)
@@ -148,6 +150,22 @@ Navigate to: Admin \> Stores \> Configuration \> Sales (Tab) \> Payment
 Methods
 
 ![order_status_configuration](docs/order_status_configuration.png)
+
+## Credit Card form styling
+
+Choose one of the below options from `Credit Card form style` dropdown to change the styling of Credit Card form on the checkout page.
+
+![Credit Card form styling configuration](docs/cc_form_style.jpg)
+
+- `Legacy` Choose this option if legacy form is enabled from the gateway side.
+
+    ![altapay_cc_legacy_form.png](docs/legacy_style.jpg)
+
+- `Checkout` Select the option to show the Credit Card form in a modern look. Make sure the checkout form is enabled from the gateway side.
+
+    ![Checkout Style](docs/checkout_style.jpg)
+
+- `Custom` This option can be selected to implement custom styling on the payment page. Selecting this option will remove all the styling from the payment page.
 
 ## Configure fraud detection
 

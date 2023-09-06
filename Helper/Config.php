@@ -14,7 +14,7 @@ use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\SalesRule\Model\RuleFactory;
 
 /**
- * Class Config for getting store configrations information.
+ * Class Config for getting store configuration information.
  */
 class Config extends AbstractHelper
 {
@@ -90,7 +90,7 @@ class Config extends AbstractHelper
     }
 
     /**
-     * Get image url by imagename.
+     * Get image url by image name.
      *
      * @param        $order
      * @param string $image
@@ -109,5 +109,15 @@ class Config extends AbstractHelper
         }
 
         return $url;
+    }
+
+    /**
+     * Get Credit Card form style value.
+     *
+     * @return string
+     */
+    public function ccFormStyle()
+    {
+        return $this->scopeConfig->getValue('payment/sdm_altapay_config/cc_form_style/cc_form_options');
     }
 }

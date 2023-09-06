@@ -8,6 +8,12 @@
  */
 ?>
 
-<div class="creaditcard-callback-form">
+
+<?php 
+$config = $this->helper('SDM\Altapay\Helper\Config');
+$ccFormStyle = !empty($config->ccFormStyle()) ? $config->ccFormStyle() : 'legacy';
+?>
+
+<div class="creaditcard-callback-form <?= $ccFormStyle ?>">
     <form id="PensioPaymentForm"></form>
 </div>
