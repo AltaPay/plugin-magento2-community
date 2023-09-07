@@ -30,7 +30,7 @@ jobs:
         with:
           repository: AltaPay/plugin-infrastructure
           token: ${{ secrets.ACCESS_TOKEN }}
-          ref: 'origin/main'
+          ref: 'origin/magento_composer_install'
 
       # Install version 1.0.8 of Terraform CLI
       - name: Setup Terraform
@@ -46,7 +46,7 @@ jobs:
 
       # Select a Terraform workspace
       - name: Terraform workspace
-        run: terraform workspace select magento24x
+        run: terraform workspace select magento245
         working-directory: ../plugin-infrastructure/provision/plugins
 
 
@@ -87,7 +87,7 @@ jobs:
           options: |
             -u ubuntu
             -i inventory
-            --extra-vars "branch_name=${{env.TEST_BRANCH_NAME}} gatewayURL=${{ secrets.GATEWAYURL }} gatewayUser=${{ secrets.GATEWAYUSER }} gatewayPass=${{ secrets.GATEWAYPASS }} mg2_admin_email=${{secrets.CMS_ADMIN_EMAIL}} mg2_admin_user=${{secrets.CMS_ADMIN_USER}} mg2_admin_password=${{secrets.CMS_ADMIN_PASS}}"   
+            --extra-vars "branch_name=${{env.TEST_BRANCH_NAME}} variable_host=magento245 gatewayURL=${{ secrets.GATEWAYURL }} gatewayUser=${{ secrets.GATEWAYUSER }} gatewayPass=${{ secrets.GATEWAYPASS }} mg2_admin_email=${{secrets.CMS_ADMIN_EMAIL}} mg2_admin_user=${{secrets.CMS_ADMIN_USER}} mg2_admin_password=${{secrets.CMS_ADMIN_PASS}}"   
       
 
       # Export IP for use in cypress tests config
@@ -124,7 +124,7 @@ jobs:
         uses: jsdaniell/create-json@1.1.2
         with:
           name: "config.json"
-          json: '{"shopURL": "http://${{ needs.terraform.outputs.ip }}/magento","adminURL": "http://${{ needs.terraform.outputs.ip }}/magento/admin","adminUsername": "${{secrets.CMS_ADMIN_USER}}","adminPass": "${{secrets.CMS_ADMIN_PASS}}", "CC_TERMINAL_NAME": "${{secrets.CC_TERMINAL_NAME}}", "KLARNA_DKK_TERMINAL_NAME": "${{secrets.KLARNA_DKK_TERMINAL_NAME}}", "SUBSCRIPTION_TERMINAL_NAME": "${{secrets.SUBSCRIPTION_TERMINAL_NAME}}", "iDEAL_EUR_TERMINAL": "${{secrets.IDEAL_EUR_TERMINAL_NAME}}", "MOBILEPAY_TERMINAL_NAME": "${{secrets.MOBILEPAY_TERMINAL_NAME}}", "MOBILEPAY_TEST_PHONE": "${{secrets.MOBILEPAY_TEST_PHONE}}", "MOBILEPAY_TEST_PHONE_COUNTRY_CODE": "${{secrets.MOBILEPAY_TEST_PHONE_COUNTRY_CODE}}"}'
+          json: '{"shopURL": "http://${{ needs.terraform.outputs.ip }}","adminURL": "http://${{ needs.terraform.outputs.ip }}/admin","adminUsername": "${{secrets.CMS_ADMIN_USER}}","adminPass": "${{secrets.CMS_ADMIN_PASS}}", "CC_TERMINAL_NAME": "${{secrets.CC_TERMINAL_NAME}}", "KLARNA_DKK_TERMINAL_NAME": "${{secrets.KLARNA_DKK_TERMINAL_NAME}}", "SUBSCRIPTION_TERMINAL_NAME": "${{secrets.SUBSCRIPTION_TERMINAL_NAME}}", "iDEAL_EUR_TERMINAL": "${{secrets.IDEAL_EUR_TERMINAL_NAME}}", "MOBILEPAY_TERMINAL_NAME": "${{secrets.MOBILEPAY_TERMINAL_NAME}}", "MOBILEPAY_TEST_PHONE": "${{secrets.MOBILEPAY_TEST_PHONE}}", "MOBILEPAY_TEST_PHONE_COUNTRY_CODE": "${{secrets.MOBILEPAY_TEST_PHONE_COUNTRY_CODE}}"}'
           dir: Test/integration-tests/cypress/fixtures/
 
       - name: Install Cypress Dependencies
