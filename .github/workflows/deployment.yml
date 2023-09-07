@@ -32,6 +32,7 @@ jobs:
           repository: AltaPay/plugin-infrastructure
           token: ${{ secrets.ACCESS_TOKEN }}
           ref: 'magento_composer_install'
+          path: 'plugin-infrastructure'
 
       # Install version 1.0.8 of Terraform CLI
       - name: Setup Terraform
