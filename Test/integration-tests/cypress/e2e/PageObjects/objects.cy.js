@@ -22,6 +22,11 @@ class Order {
         cy.get('input[name=firstname]').type('Testperson-dk')
         cy.get('input[name=lastname]').type('Approved')
         cy.get('select[name=country_id]').select('Denmark')
+        cy.get('body').then(($p) => {
+            if ($p.find('select[name=region_id]').length) {
+                cy.get('select[name=region_id]').select('Hovedstaden')
+            }
+        })
         cy.get('input[name="street[0]"]').type('Sæffleberggate 56,1 mf')
         cy.get('input[name=city]').type('Varde')
         cy.get('input[name=postcode]').type('6800')
