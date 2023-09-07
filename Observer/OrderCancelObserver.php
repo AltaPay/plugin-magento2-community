@@ -58,8 +58,8 @@ class OrderCancelObserver implements ObserverInterface
         /** @var \Magento\Sales\Model\Order\Payment $payment */
         $payment = $order->getPayment();
 
-        $displayCurrency = $this->storeConfig->useDisplayCurrency();
-        $grandTotal = $displayCurrency ? $order->getGrandTotal() : $order->getBaseGrandTotal();
+        $baseCurrency = $this->storeConfig->useBaseCurrency();
+        $grandTotal = $baseCurrency ? $order->getBaseGrandTotal() : $order->getGrandTotal();
 
         if (in_array($payment->getMethod(), SystemConfig::getTerminalCodes()) && $payment->getLastTransId()) {
             if ($payment->getAdditionalInformation('payment_type') === "paymentAndCapture") {

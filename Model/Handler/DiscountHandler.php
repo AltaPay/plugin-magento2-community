@@ -211,17 +211,17 @@ class DiscountHandler
             $discountAmount = $this->catalogDiscount($originalPrice, $priceInclTax);
         } elseif ($originalPrice > 0 && $originalPrice > $priceInclTax && $discountAmount) {
             $discount['catalogDiscount'] = true;
-            $displayCurrency = $this->storeConfig->useDisplayCurrency();
-            $rowTotal = $item->getBaseRowTotal() -
-                $item->getBaseDiscountAmount() +
-                $item->getBaseTaxAmount() +
-                $item->getBaseDiscountTaxCompensationAmount();
+            $baseCurrency = $this->storeConfig->useBaseCurrency();
+            $rowTotal = $item->getRowTotal() -
+                $item->getDiscountAmount() +
+                $item->getTaxAmount() +
+                $item->getDiscountTaxCompensationAmount();
 
-            if ($displayCurrency) {
-                $rowTotal = $item->getRowTotal() -
-                    $item->getDiscountAmount() +
-                    $item->getTaxAmount() +
-                    $item->getDiscountTaxCompensationAmount();
+            if ($baseCurrency) {
+                $rowTotal = $item->getBaseRowTotal() -
+                    $item->getBaseDiscountAmount() +
+                    $item->getBaseTaxAmount() +
+                    $item->getBaseDiscountTaxCompensationAmount();
             }
             if (!$this->storeConfig->storePriceIncTax()) {
                 $discountAmount = (($originalPriceWithTax - $rowTotal) * 100) / $originalPriceWithTax;
@@ -244,16 +244,16 @@ class DiscountHandler
     public function allItemsHaveDiscount($orderItems)
     {
         $discountOnAllItems = true;
-        $displayCurrency = $this->storeConfig->useDisplayCurrency();
+        $baseCurrency = $this->storeConfig->useBaseCurrency();
         foreach ($orderItems as $item) {
             $appliedRule    = $item->getAppliedRuleIds();
             $productType    = $item->getProductType();
-            $originalPrice  = $displayCurrency ? $item->getOriginalPrice() : $item->getBaseOriginalPrice();
+            $originalPrice  = $baseCurrency ? $item->getBaseOriginalPrice() : $item->getOriginalPrice();
             
             if ($this->storeConfig->storePriceIncTax()) {
-                $price = $displayCurrency ? $item->getPriceInclTax() : $item->getBasePriceInclTax();
+                $price = $baseCurrency ? $item->getBasePriceInclTax() : $item->getPriceInclTax();
             } else {
-                $price = $displayCurrency ? $item->getPrice() : $item->getBasePrice();
+                $price = $baseCurrency ? $item->getBasePrice() : $item->getPrice();
             }        
             if ($originalPrice > $price) {
                 $discountOnAllItems = false;

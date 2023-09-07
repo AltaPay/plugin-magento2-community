@@ -149,8 +149,8 @@ class CaptureObserver implements ObserverInterface
     private function processInvoiceOrderLines($invoice)
     {
         $couponCode       = $invoice->getDiscountDescription();
-        $displayCurrency = $this->storeConfig->useDisplayCurrency();
-        $couponCodeAmount = $displayCurrency ? $invoice->getDiscountAmount() : $invoice->getBaseDiscountAmount();
+        $baseCurrency = $this->storeConfig->useBaseCurrency();
+        $couponCodeAmount = $baseCurrency ? $invoice->getBaseDiscountAmount() : $invoice->getDiscountAmount();
         //Return true if discount enabled on all items
         $discountAllItems = $this->discountHandler->allItemsHaveDiscount($invoice->getOrder()->getAllVisibleItems());
         //order lines for items
@@ -173,7 +173,7 @@ class CaptureObserver implements ObserverInterface
                 );
             }
         }
-        if(!empty($this->fixedProductTax($invoice, $displayCurrency))){
+        if(!empty($this->fixedProductTax($invoice, $baseCurrency))){
             //order lines for FPT
             $orderLines[] = $this->orderLines->fixedProductTaxOrderLine($this->fixedProductTax($invoice));
         }
@@ -197,13 +197,13 @@ class CaptureObserver implements ObserverInterface
             $qty         = $item->getQty();
             $taxPercent  = $item->getOrderItem()->getTaxPercent();
             $productType = $item->getOrderItem()->getProductType();
-            $displayCurrency = $this->storeConfig->useDisplayCurrency();
-            $priceInclTax = $displayCurrency ? $item->getPriceInclTax() : $item->getBasePriceInclTax();
+            $baseCurrency = $this->storeConfig->useBaseCurrency();
+            $priceInclTax = $baseCurrency ? $item->getBasePriceInclTax() : $item->getPriceInclTax();
             if ($qty > 0 && $productType != 'bundle' && $priceInclTax) {
                 if($item->getOrderItem()->getDiscountAmount()) {
                     $discountAmount = $item->getOrderItem()->getDiscountAmount();
                 }
-                $originalPrice = $displayCurrency ? $item->getOrderItem()->getOriginalPrice() : $item->getOrderItem()->getBaseOriginalPrice();
+                $originalPrice = $baseCurrency ? $item->getOrderItem()->getBaseOriginalPrice() : $item->getOrderItem()->getOriginalPrice();
                 $totalPrice     = $originalPrice * $qty;
 
                 if ($item->getOrderItem()->getTaxAmount() > 0) {
@@ -216,7 +216,7 @@ class CaptureObserver implements ObserverInterface
                     $unitPrice       = bcdiv($priceWithoutTax, 1, 2);
                     $taxAmount       = $this->priceHandler->calculateTaxAmount($priceWithoutTax, $taxPercent, $qty);
                 } else {
-                    $price           = $displayCurrency ? $item->getPrice() : $item->getBasePrice();
+                    $price           = $baseCurrency ? $item->getBasePrice() : $item->getPrice();
                     $unitPrice       = $originalPrice;
                     $taxAmount       = $this->priceHandler->calculateTaxAmount($unitPrice, $taxPercent, $qty);
                 }
@@ -294,8 +294,8 @@ class CaptureObserver implements ObserverInterface
      */
     private function sendInvoiceRequest($paymentType, $invoice, $orderLines, $orderObject, $payment, $storeCode)
     {
-        $displayCurrency = $this->storeConfig->useDisplayCurrency();
-        $grandTotal = $displayCurrency ? (float)$invoice->getGrandTotal() : (float)$invoice->getBaseGrandTotal();
+        $baseCurrency = $this->storeConfig->useBaseCurrency();
+        $grandTotal = $baseCurrency ? (float)$invoice->getBaseGrandTotal() : (float)$invoice->getGrandTotal();
         $payment    = $invoice->getOrder()->getPayment();
         $reconciliationIdentifier  = $this->random->getUniqueHash();
         $agreementDetail = $payment->getAdditionalInformation('agreement_detail');
@@ -379,14 +379,14 @@ class CaptureObserver implements ObserverInterface
 
     /**
      * @param Magento\Sales\Model\Order\Invoice $invoice
-     * @param $displayCurrency
+     * @param $baseCurrency
      * @return float
      */
-    public function fixedProductTax($invoice, $displayCurrency)
+    public function fixedProductTax($invoice, $baseCurrency)
     {
         $weeTaxAmount = 0.0;
         foreach ($invoice->getAllItems() as $item) {
-            $weeTaxAmount += $displayCurrency ? $item->getWeeeTaxAppliedRowAmount() : $item->getBaseWeeeTaxAppliedRowAmount();
+            $weeTaxAmount += $baseCurrency ? $item->getBaseWeeeTaxAppliedRowAmount() : $item->getWeeeTaxAppliedRowAmount();
         }
 
         return $weeTaxAmount;

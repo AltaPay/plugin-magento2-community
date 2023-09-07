@@ -126,12 +126,12 @@ class Config extends AbstractHelper
     }
     
     /**
-     * Check if display currency is enabled
+     * Check if base currency is enabled
      *
      * @return bool
      */
-    public function useDisplayCurrency() {
+    public function useBaseCurrency() {
         $config = $this->scopeConfig->getValue(self::ALTAPAY_CHARGED_CURRENCY);
-        return ($config === 'display_currency') ? true : false;
+        return ($config === 'base_currency') ? true : false;
     }
 }

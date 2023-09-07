@@ -228,10 +228,10 @@ class Gateway implements GatewayInterface
     public function createRequest($terminalId, $orderId)
     {
         $order = $this->order->load($orderId);
-        $displayCurrency = $this->storeConfig->useDisplayCurrency();
+        $baseCurrency = $this->storeConfig->useBaseCurrency();
         if ($order->getId()) {
             $couponCode = $order->getDiscountDescription();
-            $couponCodeAmount = $displayCurrency ? $order->getDiscountAmount() : $order->getBaseDiscountAmount();
+            $couponCodeAmount = $baseCurrency ? $order->getBaseDiscountAmount() : $order->getDiscountAmount();
             $discountAllItems = $this->discountHandler->allItemsHaveDiscount($order->getAllItems());
             $orderLines = $this->itemOrderLines($couponCodeAmount, $order, $discountAllItems);
             if ($this->orderLines->sendShipment($order) && !empty($order->getShippingMethod(true))) {
@@ -271,10 +271,10 @@ class Gateway implements GatewayInterface
     public function createRequestApplepay($terminalId, $orderId, $providerData)
     {
         $order = $this->order->load($orderId);
-        $displayCurrency = $this->storeConfig->useDisplayCurrency();
+        $baseCurrency = $this->storeConfig->useBaseCurrency();
         if ($order->getId()) {
             $couponCode = $order->getDiscountDescription();
-            $couponCodeAmount = $displayCurrency ? $order->getDiscountAmount() : $order->getBaseDiscountAmount();
+            $couponCodeAmount = $baseCurrency ? $order->getBaseDiscountAmount() : $order->getDiscountAmount();
             $discountAllItems = $this->discountHandler->allItemsHaveDiscount($order->getAllItems());
             $orderLines = $this->itemOrderLines($couponCodeAmount, $order, $discountAllItems);
             if ($this->orderLines->sendShipment($order) && !empty($order->getShippingMethod(true))) {
@@ -350,12 +350,12 @@ class Gateway implements GatewayInterface
     {
         $orderLines = [];
         $storePriceIncTax = $this->storeConfig->storePriceIncTax();
-        $displayCurrency = $this->storeConfig->useDisplayCurrency();
+        $baseCurrency = $this->storeConfig->useBaseCurrency();
         foreach ($order->getAllItems() as $item) {
             $productType = $item->getProductType();
-            $originalPrice = $displayCurrency ? $item->getOriginalPrice() : $item->getBaseOriginalPrice();
+            $originalPrice = $baseCurrency ? $item->getBaseOriginalPrice() : $item->getOriginalPrice();
             $taxPercent = $item->getTaxPercent();
-            $discountAmount = $displayCurrency ? $item->getDiscountAmount() : $item->getBaseDiscountAmount();
+            $discountAmount = $baseCurrency ? $item->getBaseDiscountAmount() : $item->getDiscountAmount();
             $parentItemType = "";
             if ($item->getParentItem()) {
                 $parentItemType = $item->getParentItem()->getProductType();
@@ -363,7 +363,7 @@ class Gateway implements GatewayInterface
             if ($productType != "bundle" && $parentItemType != "configurable") {
 
                 if ($item->getTaxAmount() > 0) {
-                    $originalPrice = $displayCurrency ? $item->getPriceInclTax() : $item->getBasePriceInclTax();
+                    $originalPrice = $baseCurrency ? $item->getBasePriceInclTax() : $item->getPriceInclTax();
                }
 
                 if ($storePriceIncTax) {
@@ -484,7 +484,7 @@ class Gateway implements GatewayInterface
         elseif (isset($post['transaction_id']) && $post['type'] === "verifyCard") {
                 $data = $this->getToken($order->getCustomerId(), null, $post['transaction_id']);
         }
-    
+
         if ($savecardtoken && !empty($data)) {
             $request = new ReservationOfFixedAmount($auth);
             $token   = $data['token'];
@@ -501,9 +501,9 @@ class Gateway implements GatewayInterface
             );
             $isReservation = true;
         }
-        $displayCurrency = $this->storeConfig->useDisplayCurrency();
-        $grandTotal = $displayCurrency ? $order->getGrandTotal() : $order->getBaseGrandTotal();
-        $currencyCode = $displayCurrency ? $order->getOrderCurrencyCode() : $order->getBaseCurrencyCode();
+        $baseCurrency = $this->storeConfig->useBaseCurrency();
+        $grandTotal = $baseCurrency ? $order->getBaseGrandTotal() : $order->getGrandTotal();
+        $currencyCode = $baseCurrency ? $order->getBaseCurrencyCode() : $order->getOrderCurrencyCode();
 
         $request->setTerminal($terminalName)
             ->setShopOrderId($order->getIncrementId())

@@ -18,8 +18,8 @@ class ChargedCurrency implements ArrayInterface
      * @var array
      */
     private static $chargedCurrencyOptions = [
-        'base_currency' => 'Global/Website currency',
-        'display_currency' => 'Display currency'
+        'display_currency' => 'Display currency',
+        'base_currency' => 'Global/Website currency'
     ];
 
     /**

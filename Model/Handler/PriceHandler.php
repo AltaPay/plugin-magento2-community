@@ -54,18 +54,18 @@ class PriceHandler
         $data["catalogDiscount"] = false;
         $taxPercent              = $item->getTaxPercent();
         $quantity                = $item->getQtyOrdered();
-        $displayCurrency         = $this->storeConfig->useDisplayCurrency();
-        $originalPrice           = $displayCurrency ? $item->getOriginalPrice() : $item->getBaseOriginalPrice();
+        $baseCurrency            = $this->storeConfig->useBaseCurrency();
+        $originalPrice           = $baseCurrency ? $item->getBaseOriginalPrice() : $item->getOriginalPrice();
         $data["taxAmount"]       = $this->calculateTaxAmount($unitPrice, $taxPercent, $quantity);
-        $rowTotal                = ($item->getBaseRowTotal()-$item->getBaseDiscountAmount()+$item->getBaseTaxAmount()+$item->getDiscountTaxCompensationAmount());
+        $rowTotal                = ($item->getRowTotal()-$item->getDiscountAmount()+$item->getTaxAmount()+$item->getDiscountTaxCompensationAmount());
 
-        if($displayCurrency ) {
-            $rowTotal            = ($item->getRowTotal()-$item->getDiscountAmount()+$item->getTaxAmount()+$item->getDiscountTaxCompensationAmount());
+        if($baseCurrency) {
+            $rowTotal = ($item->getBaseRowTotal()-$item->getBaseDiscountAmount()+$item->getBaseTaxAmount()+$item->getDiscountTaxCompensationAmount());
         }
         if ($this->storeConfig->storePriceIncTax()) {
-            $price = $displayCurrency ? $item->getPriceInclTax() : $item->getBasePriceInclTax();
+            $price = $baseCurrency ? $item->getBasePriceInclTax() : $item->getPriceInclTax();
         } else {
-            $price = $displayCurrency ? $item->getPrice() : $item->getBasePrice();
+            $price = $baseCurrency ? $item->getBasePrice() : $item->getPrice();
         }
         if ($originalPrice > $price && abs((float)$couponAmount) > 0 && !$discountAllItems) {
             $originalPrice = $originalPrice * $quantity;
@@ -143,10 +143,11 @@ class PriceHandler
         //Discount compensation calculation - Gateway calculation pattern
         $gatewaySubTotal = ($unitPrice * $quantity) + $taxAmount;
         $gatewaySubTotal = $gatewaySubTotal - ($gatewaySubTotal * ($discountedAmount / 100));
-        $displayCurrency = $this->storeConfig->useDisplayCurrency();
-        $cmsSubTotal = $item->getBaseRowTotal() - $item->getBaseDiscountAmount() + $item->getBaseTaxAmount() + $item->getDiscountTaxCompensationAmount();
-        if ($displayCurrency) {
-            $cmsSubTotal = $item->getRowTotal() - $item->getDiscountAmount() + $item->getTaxAmount() + $item->getDiscountTaxCompensationAmount();
+        $baseCurrency = $this->storeConfig->useBaseCurrency();
+        $cmsSubTotal = $item->getRowTotal() - $item->getDiscountAmount() + $item->getTaxAmount() + $item->getDiscountTaxCompensationAmount();
+
+        if ($baseCurrency) {
+            $cmsSubTotal = $item->getBaseRowTotal() - $item->getBaseDiscountAmount() + $item->getBaseTaxAmount() + $item->getDiscountTaxCompensationAmount();
         }
 
         return $cmsSubTotal - $gatewaySubTotal;
