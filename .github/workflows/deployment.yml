@@ -7,7 +7,12 @@ on:
     branches: [ main ]
   pull_request:
     branches: [ main ]
-
+  workflow_dispatch:
+    inputs:
+      run_cypress:
+        description: 'Run Cypress tests too ?'
+        required: false
+        type: boolean
 jobs:
   terraform:
     name: 'Terraform'
@@ -109,9 +114,9 @@ jobs:
     name: 'Cypress'
     runs-on: ubuntu-latest
     needs:   terraform
+    if: ${{ inputs.run_cypress }}
 
     steps:
-
       # Run Cypress tests
       - uses: actions/checkout@v1
         with:
