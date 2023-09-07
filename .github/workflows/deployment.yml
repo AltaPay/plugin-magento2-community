@@ -27,7 +27,7 @@ jobs:
           mask-aws-account-id: true
 
       # Checkout the repository to the GitHub Actions runner
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v4
         with:
           repository: AltaPay/plugin-infrastructure
           token: ${{ secrets.ACCESS_TOKEN }}
@@ -114,7 +114,7 @@ jobs:
     steps:
 
       # Run Cypress tests
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v4
         with:
           repository: AltaPay/plugin-magento2-community
           ref: '${{env.TEST_BRANCH_NAME}}'
