@@ -117,7 +117,6 @@ jobs:
       # Run Cypress tests
       - uses: actions/checkout@v4
         with:
-          repository: AltaPay/plugin-magento2-community
           ref: '${{env.TEST_BRANCH_NAME}}'
 
       - name: Create Cypress fixture config json
