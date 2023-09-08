@@ -40,17 +40,21 @@ class Order {
         cy.get('.button').click().wait(5000)
     }
 
-    cc_payment(CC_TERMINAL_NAME) {        
-        if(CC_TERMINAL_NAME){
+    cc_payment(CC_TERMINAL_NAME) {
+        if (CC_TERMINAL_NAME) {
             cy.contains(CC_TERMINAL_NAME).click({ force: true })
             cy.get('._active > .payment-method-content > :nth-child(5) > div.primary > .action').click().wait(2000)
-        }        
+        }
         cy.get('#creditCardNumberInput').type('4111111111111111')
         cy.get('#emonth').type('01')
         cy.get('#eyear').type('2025')
         cy.get('#cvcInput').type('123')
         cy.get('#cardholderNameInput').type('testname')
-        cy.get('#cardholderEmailInput').type('demo@example.com')
+        cy.get('body').then(($p) => {
+            if ($p.find('#cardholderEmailInput').length) {
+                cy.get('#cardholderEmailInput').type('demo@example.com')
+            }
+        })
         cy.get('#pensioCreditCardPaymentSubmitButton').click().wait(3000)
     }
 
@@ -68,11 +72,11 @@ class Order {
             const continueBtn = $iFrame.contents().find('[id=onContinue]')
             cy.wrap(continueBtn).click().wait(2000)
         })
-        cy.get('[id=klarna-pay-later-fullscreen]').wait(4000).then(function($iFrame){
+        cy.get('[id=klarna-pay-later-fullscreen]').wait(4000).then(function ($iFrame) {
             const otp = $iFrame.contents().find('[id=otp_field]')
             cy.wrap(otp).type('123456').wait(2000)
-        })  
-        cy.get('[id=klarna-pay-later-fullscreen]').wait(2000).then(function($iFrame){
+        })
+        cy.get('[id=klarna-pay-later-fullscreen]').wait(2000).then(function ($iFrame) {
             const contbtn = $iFrame.contents().find('[id=invoice_kp-purchase-review-continue-button]')
             cy.wrap(contbtn).click().wait(2000)
         })
@@ -118,10 +122,10 @@ class Order {
     }
 
     subscription_product() {
-        cy.get('#menu-magento-catalog-catalog > [onclick="return false;"]').click({force:true})
-        cy.get('.item-catalog-products > a > span').click({force:true}).wait(5000)
+        cy.get('#menu-magento-catalog-catalog > [onclick="return false;"]').click({ force: true })
+        cy.get('.item-catalog-products > a > span').click({ force: true }).wait(5000)
         cy.reload()
-        cy.get('#fulltext').first().focus().clear({force:true}).type('Argus All-Weather Tank').type('{enter}').wait(5000)
+        cy.get('#fulltext').first().focus().clear({ force: true }).type('Argus All-Weather Tank').type('{enter}').wait(5000)
         cy.get('[data-repeat-index="5"] > .data-grid-actions-cell > .action-menu-item').click().wait(5000)
         cy.get('[data-index="subscription-settings"] > .fieldset-wrapper-title > .admin__collapsible-title > [data-bind="i18n: label"]').click().wait(5000)
         cy.get('select[name="product[am_recurring_enable]"]').select('global_setting').wait(5000)
@@ -472,7 +476,7 @@ class Order {
     }
 
     change_currency_to_EUR_for_iDEAL() {
-        cy.get('#menu-magento-backend-stores > [onclick="return false;"]').click({force:true})
+        cy.get('#menu-magento-backend-stores > [onclick="return false;"]').click({ force: true })
         cy.get('.item-system-config > a').click()
         cy.contains('Currency Setup').click()
         cy.get('#currency_options-head').then(($cr) => {
@@ -490,7 +494,7 @@ class Order {
             }
         })
         //Flush cache
-        cy.get('#menu-magento-backend-system > [onclick="return false;"]').scrollIntoView().click({force:true})
+        cy.get('#menu-magento-backend-system > [onclick="return false;"]').scrollIntoView().click({ force: true })
         cy.get('.item-system-cache > a').click()
         cy.get('#flush_magento').click()
         cy.get('#flush_system > span').click()
@@ -522,7 +526,7 @@ class Order {
     }
 
     change_currency_to_DKK() {
-        cy.get('#menu-magento-backend-stores > [onclick="return false;"]').click({force:true})
+        cy.get('#menu-magento-backend-stores > [onclick="return false;"]').click({ force: true })
         cy.get('.item-system-config > a').click()
         cy.get('#save').click()
         cy.contains('Currency Setup').click()
@@ -540,7 +544,7 @@ class Order {
                 cy.get('#save').click().wait(2000)
             }
         })
-      
+
         //Flush cache
         cy.get('#menu-magento-backend-system > [onclick="return false;"]').scrollIntoView().click()
         cy.get('.item-system-cache > a').click()
@@ -549,36 +553,36 @@ class Order {
         cy.get('.action-primary > span').click().wait(60000)
     }
 
-    create_customer_and_order(){
+    create_customer_and_order() {
         cy.get('#menu-magento-sales-sales').click()
-                    cy.get('.item-sales-order > a').click()
-                    cy.get('#add').click()
-                    cy.reload().wait(3000)
-                    cy.contains('Create New Customer').focus().click({ force: true }).wait(3000)
-                    cy.reload().wait(3000)
-                    let text = "";
-                    let alphabet = "abcdefghijklmnopqrstuvwxyz123456789"
-                    for (let i = 0; i < 10; i++) {
-                        text += alphabet.charAt(Math.floor(Math.random() * alphabet.length))
-                    }
-                    cy.get('#email').type(text + '@example.com')
-                    cy.get('#order-billing_address_firstname').clear().type('Test')
-                    cy.get('#order-billing_address_lastname').clear().type('Person-dk')
-                    cy.get('#order-billing_address_street0').clear().type('Nygårdsvej 3A')
-                    cy.get('#order-billing_address_city').clear().type('København Ø')
-                    cy.get('#order-billing_address_postcode').clear().type('2100')
-                    cy.get('#order-billing_address_telephone').clear().type('20123456').wait(3000)
-                    cy.get('select[id=order-billing_address_country_id]').select('Denmark')
-                    cy.get('body').then(($a) => {
-                        if ($a.find(".modal-footer > .action-primary > span").length) {
-                            cy.get('.modal-footer > .action-primary > span').click()
-                        }
-                    })
-                    cy.get('#add_products').click()
-                    cy.get('#sales_order_create_search_grid_table > tbody > tr:nth-child(2)').click().wait(5000)
-                    cy.get('#order-search .admin__page-section-title .actions button').focus().trigger('mouseover').click().wait(3000)
-                    cy.contains('Get shipping methods and rates').focus().trigger('mouseover').click({ force: true }).wait(5000)
-                    cy.get('.admin__order-shipment-methods-options-list > li:first').click().wait(3000)
+        cy.get('.item-sales-order > a').click()
+        cy.get('#add').click()
+        cy.reload().wait(3000)
+        cy.contains('Create New Customer').focus().click({ force: true }).wait(3000)
+        cy.reload().wait(3000)
+        let text = "";
+        let alphabet = "abcdefghijklmnopqrstuvwxyz123456789"
+        for (let i = 0; i < 10; i++) {
+            text += alphabet.charAt(Math.floor(Math.random() * alphabet.length))
+        }
+        cy.get('#email').type(text + '@example.com')
+        cy.get('#order-billing_address_firstname').clear().type('Test')
+        cy.get('#order-billing_address_lastname').clear().type('Person-dk')
+        cy.get('#order-billing_address_street0').clear().type('Nygårdsvej 3A')
+        cy.get('#order-billing_address_city').clear().type('København Ø')
+        cy.get('#order-billing_address_postcode').clear().type('2100')
+        cy.get('#order-billing_address_telephone').clear().type('20123456').wait(3000)
+        cy.get('select[id=order-billing_address_country_id]').select('Denmark')
+        cy.get('body').then(($a) => {
+            if ($a.find(".modal-footer > .action-primary > span").length) {
+                cy.get('.modal-footer > .action-primary > span').click()
+            }
+        })
+        cy.get('#add_products').click()
+        cy.get('#sales_order_create_search_grid_table > tbody > tr:nth-child(2)').click().wait(5000)
+        cy.get('#order-search .admin__page-section-title .actions button').focus().trigger('mouseover').click().wait(3000)
+        cy.contains('Get shipping methods and rates').focus().trigger('mouseover').click({ force: true }).wait(5000)
+        cy.get('.admin__order-shipment-methods-options-list > li:first').click().wait(3000)
     }
 }
 
