@@ -119,7 +119,6 @@ jobs:
         with:
           repository: AltaPay/plugin-magento2-community
           ref: '${{env.TEST_BRANCH_NAME}}'
-          path: plugin-magento2-community
 
       - name: Create Cypress fixture config json
         id: create-json-2  # Second ID
