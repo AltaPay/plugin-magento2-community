@@ -141,7 +141,7 @@ class Gateway implements GatewayInterface
      * @var Random
      */
     private $random;
-    
+
     /**
      * Gateway constructor.
      *
@@ -228,8 +228,9 @@ class Gateway implements GatewayInterface
     public function createRequest($terminalId, $orderId)
     {
         $order = $this->order->load($orderId);
-        $baseCurrency = $this->storeConfig->useBaseCurrency();
         if ($order->getId()) {
+            $order->setModuleVersion($this->helper->getModuleVersion());
+            $baseCurrency = $this->storeConfig->useBaseCurrency();
             $couponCode = $order->getDiscountDescription();
             $couponCodeAmount = $baseCurrency ? $order->getBaseDiscountAmount() : $order->getDiscountAmount();
             $discountAllItems = $this->discountHandler->allItemsHaveDiscount($order->getAllItems());

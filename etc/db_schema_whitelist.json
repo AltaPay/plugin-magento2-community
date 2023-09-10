@@ -21,7 +21,8 @@
         "column": {
             "altapay_payment_form_url": true,
             "altapay_price_includes_tax": true,
-            "altapay_order_hash": true
+            "altapay_order_hash": true,
+            "module_version": true
         }
     },
     "altapay_token": {

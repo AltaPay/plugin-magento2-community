@@ -128,10 +128,17 @@ class Config extends AbstractHelper
     /**
      * Check if base currency is enabled
      *
+     * @param string $moduleVersion
      * @return bool
      */
-    public function useBaseCurrency() {
+    public function useBaseCurrency(string $moduleVersion = ''): bool
+    {
         $config = $this->scopeConfig->getValue(self::ALTAPAY_CHARGED_CURRENCY);
-        return ($config === 'base_currency') ? true : false;
+    
+        if (version_compare($moduleVersion, '3.7.0', '>=')) {
+            return $config === 'base_currency';
+        }
+    
+        return false;
     }
 }
