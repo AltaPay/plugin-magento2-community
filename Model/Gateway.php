@@ -229,7 +229,6 @@ class Gateway implements GatewayInterface
     {
         $order = $this->order->load($orderId);
         if ($order->getId()) {
-            $order->setModuleVersion($this->helper->getModuleVersion());
             $baseCurrency = $this->storeConfig->useBaseCurrency();
             $couponCode = $order->getDiscountDescription();
             $couponCodeAmount = $baseCurrency ? $order->getBaseDiscountAmount() : $order->getDiscountAmount();
@@ -606,6 +605,7 @@ class Gateway implements GatewayInterface
             }
             $order->setAltapayPaymentFormUrl($responseUrl);
             $order->setAltapayPriceIncludesTax($this->storeConfig->storePriceIncTax());
+            $order->setModuleVersion($this->helper->getModuleVersion());
             $order->getResource()->save($order);
             //set flag if customer redirect to Altapay
             $this->checkoutSession->setAltapayCustomerRedirect(true);

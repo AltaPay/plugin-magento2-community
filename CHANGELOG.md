@@ -7,8 +7,6 @@ All notable changes to this project will be documented in this file.
 ### Fixed
 - Fix: Amount mismatch issue with Apple Pay.
 
-**Note:** This version contains a breaking change. Please ensure that you capture/refund payment before upgrading to this version.
-
 ## [3.6.13]
 ### Added
 - Add a new design option with a modern look for the Credit Card form.

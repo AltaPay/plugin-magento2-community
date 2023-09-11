@@ -270,7 +270,7 @@ class CreditmemoRefundObserver implements ObserverInterface
      */
     private function sendRefundRequest($memo, $orderLines, $orderObject, $payment, $storeCode)
     {
-        $moduleVersion = $memo->getOrder()->getModuleVersion();
+        $moduleVersion = $memo->getOrder()->getModuleVersion() ? $memo->getOrder()->getModuleVersion() : '';
         $baseCurrency = $this->storeConfig->useBaseCurrency($moduleVersion);
         $grandTotal = $baseCurrency ? $memo->getBaseGrandTotal() : $memo->getGrandTotal();
         $refund = new RefundCapturedReservation($this->systemConfig->getAuth($storeCode));

@@ -294,7 +294,7 @@ class CaptureObserver implements ObserverInterface
      */
     private function sendInvoiceRequest($paymentType, $invoice, $orderLines, $orderObject, $payment, $storeCode)
     {
-        $moduleVersion = $invoice->getOrder()->getModuleVersion();
+        $moduleVersion = $invoice->getOrder()->getModuleVersion() ? $invoice->getOrder()->getModuleVersion() : '';
         $baseCurrency = $this->storeConfig->useBaseCurrency($moduleVersion);
         $grandTotal = $baseCurrency ? (float)$invoice->getBaseGrandTotal() : (float)$invoice->getGrandTotal();
         $payment    = $invoice->getOrder()->getPayment();
