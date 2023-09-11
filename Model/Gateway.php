@@ -362,7 +362,7 @@ class Gateway implements GatewayInterface
             }
             if ($productType != "bundle" && $parentItemType != "configurable") {
 
-                if ($item->getTaxAmount() > 0) {
+                if ($originalPrice == 0) {
                     $originalPrice = $baseCurrency ? $item->getBasePriceInclTax() : $item->getPriceInclTax();
                }
 

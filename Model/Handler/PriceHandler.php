@@ -60,7 +60,7 @@ class PriceHandler
         $rowTotal                = ($item->getRowTotal()-$item->getDiscountAmount()+$item->getTaxAmount()+$item->getDiscountTaxCompensationAmount());
 
         if($baseCurrency) {
-            $rowTotal = ($item->getBaseRowTotal()-$item->getBaseDiscountAmount()+$item->getBaseTaxAmount()+$item->getDiscountTaxCompensationAmount());
+            $rowTotal = ($item->getBaseRowTotal()-$item->getBaseDiscountAmount()+$item->getBaseTaxAmount()+$item->getBaseDiscountTaxCompensationAmount());
         }
         if ($this->storeConfig->storePriceIncTax()) {
             $price = $baseCurrency ? $item->getBasePriceInclTax() : $item->getPriceInclTax();
@@ -147,7 +147,7 @@ class PriceHandler
         $cmsSubTotal = $item->getRowTotal() - $item->getDiscountAmount() + $item->getTaxAmount() + $item->getDiscountTaxCompensationAmount();
 
         if ($baseCurrency) {
-            $cmsSubTotal = $item->getBaseRowTotal() - $item->getBaseDiscountAmount() + $item->getBaseTaxAmount() + $item->getDiscountTaxCompensationAmount();
+            $cmsSubTotal = $item->getBaseRowTotal() - $item->getBaseDiscountAmount() + $item->getBaseTaxAmount() + $item->getBaseDiscountTaxCompensationAmount();
         }
 
         return $cmsSubTotal - $gatewaySubTotal;
