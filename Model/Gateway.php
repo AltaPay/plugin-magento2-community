@@ -295,6 +295,10 @@ class Gateway implements GatewayInterface
             if (!empty($this->fixedProductTax($order))) {
                 $orderLines[] = $this->orderLines->fixedProductTaxOrderLine($this->fixedProductTax($order));
             }
+
+            $order->setModuleVersion($this->helper->getModuleVersion());
+            $order->getResource()->save($order);
+            
             $request = $this->preparePaymentRequest($order, $orderLines, $orderId, $terminalId, $providerData);
             if ($request) {
                 $response = $request->call();
