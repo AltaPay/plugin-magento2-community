@@ -131,11 +131,11 @@ class Config extends AbstractHelper
      * @param string $moduleVersion
      * @return bool
      */
-    public function useBaseCurrency(string $moduleVersion = ''): bool
+    public function useBaseCurrency(string $moduleVersion = null): bool
     {
         $config = $this->scopeConfig->getValue(self::ALTAPAY_CHARGED_CURRENCY);
     
-        if (version_compare($moduleVersion, '3.7.0', '>=')) {
+        if (is_null($moduleVersion) || version_compare($moduleVersion, '3.7.0', '>=')) {
             return $config === 'base_currency';
         }
     
