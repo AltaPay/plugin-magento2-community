@@ -50,15 +50,11 @@ class Order {
         cy.get('#eyear').type('2025')
         cy.get('#cvcInput').type('123')
         cy.get('#cardholderNameInput').type('testname')
-<<<<<<< HEAD
         cy.get('body').then(($p) => {
             if ($p.find('#cardholderEmailInput').length) {
                 cy.get('#cardholderEmailInput').type('demo@example.com')
             }
         })
-=======
-        cy.get('#cardholderEmailInput').type('demo@example.com')
->>>>>>> f4675b6 (Add additional checks for module version)
         cy.get('#pensioCreditCardPaymentSubmitButton').click().wait(3000)
     }
 
