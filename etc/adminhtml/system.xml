@@ -77,8 +77,16 @@
                         <source_model>SDM\Altapay\Model\Config\Source\Authentication</source_model>
                     </field>
                 </group>
-
-                <group id="altapay_config_status" translate="label comment" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                <group id="charged_currency" translate="label comment" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <attribute type="expanded">0</attribute>
+                    <label>Charged currency setting</label>
+                    <comment><![CDATA[]]></comment>
+                    <field id="setting" translate="label" type="select" sortOrder="1" showInDefault="1" showInWebsite="0" showInStore="0">
+                        <label>Charged currency</label>
+                        <source_model>SDM\Altapay\Model\Config\Source\ChargedCurrency</source_model>
+                    </field>
+                </group>
+                <group id="altapay_config_status" translate="label comment" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
                     <attribute type="expanded">0</attribute>
 
                     <label>Order status</label>

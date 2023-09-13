@@ -188,7 +188,8 @@ class DiscountHandler
      * @param $discountAmount
      * @param $quantity
      * @param $discountOnAllItems
-     *
+     * @param $item
+     * @param $taxAmount
      * @return array
      */
     public function getItemDiscountInformation(
@@ -200,20 +201,30 @@ class DiscountHandler
         $item,
         $taxAmount
     ) {
-        $rowTotal = $item->getRowTotal()-$item->getDiscountAmount()+$item->getTaxAmount()+$item->getDiscountTaxCompensationAmount();
         $discount = ['discount' => 0, 'catalogDiscount' => false];
         $originalPriceWithTax = $originalPrice + $taxAmount;
-        if ($discountAmount && $originalPrice == $priceInclTax) {
+
+        if ($originalPrice != 0 && $discountAmount && $originalPrice == $priceInclTax) {
             $discountAmount = ($discountAmount * 100) / ($originalPrice * $quantity);
         } elseif ($originalPrice > 0 && $originalPrice > $priceInclTax && empty($discountAmount)) {
             $discount['catalogDiscount'] = true;
-            $discountAmount      = $this->catalogDiscount($originalPrice, $priceInclTax);
+            $discountAmount = $this->catalogDiscount($originalPrice, $priceInclTax);
         } elseif ($originalPrice > 0 && $originalPrice > $priceInclTax && $discountAmount) {
             $discount['catalogDiscount'] = true;
+            $baseCurrency = $this->storeConfig->useBaseCurrency();
+            $rowTotal = $item->getRowTotal() -
+                $item->getDiscountAmount() +
+                $item->getTaxAmount() +
+                $item->getDiscountTaxCompensationAmount();
+
+            if ($baseCurrency) {
+                $rowTotal = $item->getBaseRowTotal() -
+                    $item->getBaseDiscountAmount() +
+                    $item->getBaseTaxAmount() +
+                    $item->getBaseDiscountTaxCompensationAmount();
+            }
             if (!$this->storeConfig->storePriceIncTax()) {
-                $discountAmount = $originalPriceWithTax - $rowTotal;
-                $discountPercentage = ($discountAmount * 100) / $originalPriceWithTax;
-                $discountAmount = $discountPercentage;
+                $discountAmount = (($originalPriceWithTax - $rowTotal) * 100) / $originalPriceWithTax;
             } else {
                 $discountAmount = $this->combinationDiscount($originalPrice, $rowTotal);
             }
@@ -233,15 +244,16 @@ class DiscountHandler
     public function allItemsHaveDiscount($orderItems)
     {
         $discountOnAllItems = true;
+        $baseCurrency = $this->storeConfig->useBaseCurrency();
         foreach ($orderItems as $item) {
             $appliedRule    = $item->getAppliedRuleIds();
             $productType    = $item->getProductType();
-            $originalPrice  = $item->getBaseOriginalPrice();
+            $originalPrice  = $baseCurrency ? $item->getBaseOriginalPrice() : $item->getOriginalPrice();
             
             if ($this->storeConfig->storePriceIncTax()) {
-                $price = $item->getPriceInclTax();
+                $price = $baseCurrency ? $item->getBasePriceInclTax() : $item->getPriceInclTax();
             } else {
-                $price = $item->getPrice();
+                $price = $baseCurrency ? $item->getBasePrice() : $item->getPrice();
             }        
             if ($originalPrice > $price) {
                 $discountOnAllItems = false;

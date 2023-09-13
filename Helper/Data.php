@@ -281,4 +281,13 @@ class Data extends AbstractHelper
 
         return $latestTransKey;
     }
+
+    /**
+     * @return string
+     */
+    public function getModuleVersion() {
+        $moduleInfo = $this->moduleList->getOne(self::MODULE_CODE);
+        
+        return $moduleInfo['setup_version'] ?? '';
+    }
 }

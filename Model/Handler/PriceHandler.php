@@ -44,23 +44,28 @@ class PriceHandler
     /**
      * @param $item
      * @param $unitPrice
-     * @param $couponCode
+     * @param $couponAmount
      * @param $itemDiscount
-     *
-     * @return mixed
+     * @param $discountAllItems
+     * @return array
      */
     public function dataForPrice($item, $unitPrice, $couponAmount, $itemDiscount, $discountAllItems)
     {
         $data["catalogDiscount"] = false;
         $taxPercent              = $item->getTaxPercent();
         $quantity                = $item->getQtyOrdered();
-        $originalPrice           = $item->getBaseOriginalPrice();
+        $baseCurrency            = $this->storeConfig->useBaseCurrency();
+        $originalPrice           = $baseCurrency ? $item->getBaseOriginalPrice() : $item->getOriginalPrice();
         $data["taxAmount"]       = $this->calculateTaxAmount($unitPrice, $taxPercent, $quantity);
-        $rowTotal = ($item->getRowTotal()-$item->getDiscountAmount()+$item->getTaxAmount()+$item->getDiscountTaxCompensationAmount());
+        $rowTotal                = ($item->getRowTotal()-$item->getDiscountAmount()+$item->getTaxAmount()+$item->getDiscountTaxCompensationAmount());
+
+        if($baseCurrency) {
+            $rowTotal = ($item->getBaseRowTotal()-$item->getBaseDiscountAmount()+$item->getBaseTaxAmount()+$item->getBaseDiscountTaxCompensationAmount());
+        }
         if ($this->storeConfig->storePriceIncTax()) {
-            $price = $item->getPriceInclTax();
+            $price = $baseCurrency ? $item->getBasePriceInclTax() : $item->getPriceInclTax();
         } else {
-            $price = $item->getPrice();
+            $price = $baseCurrency ? $item->getBasePrice() : $item->getPrice();
         }
         if ($originalPrice > $price && abs((float)$couponAmount) > 0 && !$discountAllItems) {
             $originalPrice = $originalPrice * $quantity;
@@ -138,9 +143,13 @@ class PriceHandler
         //Discount compensation calculation - Gateway calculation pattern
         $gatewaySubTotal = ($unitPrice * $quantity) + $taxAmount;
         $gatewaySubTotal = $gatewaySubTotal - ($gatewaySubTotal * ($discountedAmount / 100));
+        $baseCurrency = $this->storeConfig->useBaseCurrency();
         $cmsSubTotal = $item->getRowTotal() - $item->getDiscountAmount() + $item->getTaxAmount() + $item->getDiscountTaxCompensationAmount();
-            $compensation = $cmsSubTotal - $gatewaySubTotal;
 
-        return $compensation;
+        if ($baseCurrency) {
+            $cmsSubTotal = $item->getBaseRowTotal() - $item->getBaseDiscountAmount() + $item->getBaseTaxAmount() + $item->getBaseDiscountTaxCompensationAmount();
+        }
+
+        return $cmsSubTotal - $gatewaySubTotal;
     }
 }

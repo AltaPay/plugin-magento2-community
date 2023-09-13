@@ -149,7 +149,9 @@ class CaptureObserver implements ObserverInterface
     private function processInvoiceOrderLines($invoice)
     {
         $couponCode       = $invoice->getDiscountDescription();
-        $couponCodeAmount = $invoice->getDiscountAmount();
+        $moduleVersion    = $invoice->getOrder()->getModuleVersion() ? $invoice->getOrder()->getModuleVersion() : '';
+        $baseCurrency     = $this->storeConfig->useBaseCurrency($moduleVersion);
+        $couponCodeAmount = $baseCurrency ? $invoice->getBaseDiscountAmount() : $invoice->getDiscountAmount();
         //Return true if discount enabled on all items
         $discountAllItems = $this->discountHandler->allItemsHaveDiscount($invoice->getOrder()->getAllVisibleItems());
         //order lines for items
@@ -172,7 +174,7 @@ class CaptureObserver implements ObserverInterface
                 );
             }
         }
-        if(!empty($this->fixedProductTax($invoice))){
+        if(!empty($this->fixedProductTax($invoice, $baseCurrency))){
             //order lines for FPT
             $orderLines[] = $this->orderLines->fixedProductTaxOrderLine($this->fixedProductTax($invoice));
         }
@@ -192,28 +194,32 @@ class CaptureObserver implements ObserverInterface
         $orderLines       = [];
         $discountAmount   = 0;
         $storePriceIncTax = $this->storeConfig->storePriceIncTax($invoice->getOrder());
+        $moduleVersion    = $invoice->getOrder()->getModuleVersion() ? $invoice->getOrder()->getModuleVersion() : '';
+        $baseCurrency     = $this->storeConfig->useBaseCurrency($moduleVersion);
+
         foreach ($invoice->getAllItems() as $item) {
             $qty         = $item->getQty();
             $taxPercent  = $item->getOrderItem()->getTaxPercent();
             $productType = $item->getOrderItem()->getProductType();
-            if ($qty > 0 && $productType != 'bundle' && $item->getPriceInclTax()) {
-                if($item->getDiscountAmount()) {
-                    $discountAmount = $item->getDiscountAmount();
+            $priceInclTax = $baseCurrency ? $item->getBasePriceInclTax() : $item->getPriceInclTax();
+            if ($qty > 0 && $productType != 'bundle' && $priceInclTax) {
+                if($item->getOrderItem()->getDiscountAmount()) {
+                    $discountAmount = $item->getOrderItem()->getDiscountAmount();
                 }
-                $originalPrice  = $item->getOrderItem()->getOriginalPrice();
+                $originalPrice = $baseCurrency ? $item->getOrderItem()->getBaseOriginalPrice() : $item->getOrderItem()->getOriginalPrice();
                 $totalPrice     = $originalPrice * $qty;
 
                 if ($originalPrice == 0) {
-                    $originalPrice = $item->getPriceInclTax();
+                    $originalPrice = $priceInclTax;
                 }
 
                 if ($storePriceIncTax) {
                     $priceWithoutTax = $this->priceHandler->getPriceWithoutTax($originalPrice, $taxPercent);
-                    $price           = $item->getPriceInclTax();
+                    $price           = $priceInclTax;
                     $unitPrice       = bcdiv($priceWithoutTax, 1, 2);
                     $taxAmount       = $this->priceHandler->calculateTaxAmount($priceWithoutTax, $taxPercent, $qty);
                 } else {
-                    $price           = $item->getPrice();
+                    $price           = $baseCurrency ? $item->getBasePrice() : $item->getPrice();
                     $unitPrice       = $originalPrice;
                     $taxAmount       = $this->priceHandler->calculateTaxAmount($unitPrice, $taxPercent, $qty);
                 }
@@ -291,7 +297,9 @@ class CaptureObserver implements ObserverInterface
      */
     private function sendInvoiceRequest($paymentType, $invoice, $orderLines, $orderObject, $payment, $storeCode)
     {
-        $grandTotal = (float)$invoice->getGrandTotal();
+        $moduleVersion  = $invoice->getOrder()->getModuleVersion() ? $invoice->getOrder()->getModuleVersion() : '';
+        $baseCurrency   = $this->storeConfig->useBaseCurrency($moduleVersion);
+        $grandTotal = $baseCurrency ? (float)$invoice->getBaseGrandTotal() : (float)$invoice->getGrandTotal();
         $payment    = $invoice->getOrder()->getPayment();
         $reconciliationIdentifier  = $this->random->getUniqueHash();
         $agreementDetail = $payment->getAdditionalInformation('agreement_detail');
@@ -375,14 +383,14 @@ class CaptureObserver implements ObserverInterface
 
     /**
      * @param Magento\Sales\Model\Order\Invoice $invoice
-     *
+     * @param $baseCurrency
      * @return float
      */
-    public function fixedProductTax($invoice){
-
+    public function fixedProductTax($invoice, $baseCurrency)
+    {
         $weeTaxAmount = 0.0;
         foreach ($invoice->getAllItems() as $item) {
-            $weeTaxAmount +=  $item->getWeeeTaxAppliedRowAmount();
+            $weeTaxAmount += $baseCurrency ? $item->getBaseWeeeTaxAppliedRowAmount() : $item->getWeeeTaxAppliedRowAmount();
         }
 
         return $weeTaxAmount;

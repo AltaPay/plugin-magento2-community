@@ -141,7 +141,7 @@ class Gateway implements GatewayInterface
      * @var Random
      */
     private $random;
-    
+
     /**
      * Gateway constructor.
      *
@@ -229,8 +229,9 @@ class Gateway implements GatewayInterface
     {
         $order = $this->order->load($orderId);
         if ($order->getId()) {
+            $baseCurrency = $this->storeConfig->useBaseCurrency();
             $couponCode = $order->getDiscountDescription();
-            $couponCodeAmount = $order->getDiscountAmount();
+            $couponCodeAmount = $baseCurrency ? $order->getBaseDiscountAmount() : $order->getDiscountAmount();
             $discountAllItems = $this->discountHandler->allItemsHaveDiscount($order->getAllItems());
             $orderLines = $this->itemOrderLines($couponCodeAmount, $order, $discountAllItems);
             if ($this->orderLines->sendShipment($order) && !empty($order->getShippingMethod(true))) {
@@ -270,9 +271,10 @@ class Gateway implements GatewayInterface
     public function createRequestApplepay($terminalId, $orderId, $providerData)
     {
         $order = $this->order->load($orderId);
+        $baseCurrency = $this->storeConfig->useBaseCurrency();
         if ($order->getId()) {
             $couponCode = $order->getDiscountDescription();
-            $couponCodeAmount = $order->getDiscountAmount();
+            $couponCodeAmount = $baseCurrency ? $order->getBaseDiscountAmount() : $order->getDiscountAmount();
             $discountAllItems = $this->discountHandler->allItemsHaveDiscount($order->getAllItems());
             $orderLines = $this->itemOrderLines($couponCodeAmount, $order, $discountAllItems);
             if ($this->orderLines->sendShipment($order) && !empty($order->getShippingMethod(true))) {
@@ -293,6 +295,10 @@ class Gateway implements GatewayInterface
             if (!empty($this->fixedProductTax($order))) {
                 $orderLines[] = $this->orderLines->fixedProductTaxOrderLine($this->fixedProductTax($order));
             }
+
+            $order->setModuleVersion($this->helper->getModuleVersion());
+            $order->getResource()->save($order);
+            
             $request = $this->preparePaymentRequest($order, $orderLines, $orderId, $terminalId, $providerData);
             if ($request) {
                 $response = $request->call();
@@ -348,12 +354,12 @@ class Gateway implements GatewayInterface
     {
         $orderLines = [];
         $storePriceIncTax = $this->storeConfig->storePriceIncTax();
-
+        $baseCurrency = $this->storeConfig->useBaseCurrency();
         foreach ($order->getAllItems() as $item) {
             $productType = $item->getProductType();
-            $originalPrice = $item->getBaseOriginalPrice();
+            $originalPrice = $baseCurrency ? $item->getBaseOriginalPrice() : $item->getOriginalPrice();
             $taxPercent = $item->getTaxPercent();
-            $discountAmount = $item->getBaseDiscountAmount();
+            $discountAmount = $baseCurrency ? $item->getBaseDiscountAmount() : $item->getDiscountAmount();
             $parentItemType = "";
             if ($item->getParentItem()) {
                 $parentItemType = $item->getParentItem()->getProductType();
@@ -361,8 +367,8 @@ class Gateway implements GatewayInterface
             if ($productType != "bundle" && $parentItemType != "configurable") {
 
                 if ($originalPrice == 0) {
-                    $originalPrice = $item->getPriceInclTax();
-                }
+                    $originalPrice = $baseCurrency ? $item->getBasePriceInclTax() : $item->getPriceInclTax();
+               }
 
                 if ($storePriceIncTax) {
                     $unitPriceWithoutTax = $this->priceHandler->getPriceWithoutTax($originalPrice, $taxPercent);
@@ -402,7 +408,7 @@ class Gateway implements GatewayInterface
                     true
                 );
                 // check if rounding compensation amount, send in the separate orderline
-                if ($roundingCompensation > 0 || $roundingCompensation < 0) {
+                if (!$discountAllItems && ($roundingCompensation > 0 || $roundingCompensation < 0)) {
                     $orderLines[] = $this->orderLines->compensationOrderLine(
                         "Compensation Amount",
                         "comp-" . $item->getItemId(),
@@ -482,7 +488,7 @@ class Gateway implements GatewayInterface
         elseif (isset($post['transaction_id']) && $post['type'] === "verifyCard") {
                 $data = $this->getToken($order->getCustomerId(), null, $post['transaction_id']);
         }
-    
+
         if ($savecardtoken && !empty($data)) {
             $request = new ReservationOfFixedAmount($auth);
             $token   = $data['token'];
@@ -499,11 +505,14 @@ class Gateway implements GatewayInterface
             );
             $isReservation = true;
         }
+        $baseCurrency = $this->storeConfig->useBaseCurrency();
+        $grandTotal = $baseCurrency ? $order->getBaseGrandTotal() : $order->getGrandTotal();
+        $currencyCode = $baseCurrency ? $order->getBaseCurrencyCode() : $order->getOrderCurrencyCode();
 
         $request->setTerminal($terminalName)
             ->setShopOrderId($order->getIncrementId())
-            ->setAmount((float)number_format($order->getGrandTotal(), 2, '.', ''))
-            ->setCurrency($order->getOrderCurrencyCode())
+            ->setAmount((float)number_format($grandTotal, 2, '.', ''))
+            ->setCurrency($currencyCode)
             ->setCustomerInfo($this->customerHandler->setCustomer($order, $isReservation))
             ->setTransactionInfo($transactionDetail)
             ->setCookie($this->request->getServer('HTTP_COOKIE'))
@@ -600,6 +609,7 @@ class Gateway implements GatewayInterface
             }
             $order->setAltapayPaymentFormUrl($responseUrl);
             $order->setAltapayPriceIncludesTax($this->storeConfig->storePriceIncTax());
+            $order->setModuleVersion($this->helper->getModuleVersion());
             $order->getResource()->save($order);
             //set flag if customer redirect to Altapay
             $this->checkoutSession->setAltapayCustomerRedirect(true);
