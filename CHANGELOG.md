@@ -1,6 +1,10 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [3.7.1]
+### Added
+- Make the checkout form style option available to all payment forms.
+
 ## [3.7.0]
 ### Added
 - Add option to select charged currency for AltaPay payment processing.
