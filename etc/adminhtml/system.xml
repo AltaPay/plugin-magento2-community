@@ -131,10 +131,10 @@
                 </group>
                 <group id="cc_form_style" translate="label comment" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="0">
                     <attribute type="expanded">0</attribute>
-                    <label>Credit Card form style</label>
+                    <label>Checkout form style</label>
                     <comment><![CDATA[]]></comment>
                     <field id="cc_form_options" translate="label" type="select" sortOrder="1" showInDefault="1" showInWebsite="0" showInStore="0">
-                        <label>Credit Card form style</label>
+                        <label>Checkout form style</label>
                         <source_model>SDM\Altapay\Model\Config\Source\CreditCardFormStyle</source_model>
                     </field>
                 </group>

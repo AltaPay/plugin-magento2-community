@@ -116,7 +116,7 @@ class Config extends AbstractHelper
     }
 
     /**
-     * Get Credit Card form style value.
+     * Get Checkout form style value.
      *
      * @return string
      */

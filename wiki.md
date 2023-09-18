@@ -165,7 +165,7 @@ Methods
 
 ## Credit Card form styling
 
-Choose one of the below options from `Credit Card form style` dropdown to change the styling of Credit Card form on the checkout page.
+Choose one of the below options from `Checkout form style` dropdown to change the styling of Credit Card form on the checkout page.
 
 ![Credit Card form styling configuration](docs/cc_form_style.jpg)
 
