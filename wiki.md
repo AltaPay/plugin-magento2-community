@@ -26,7 +26,7 @@ We highly recommend gathering all the below information, before starting the ins
 
 [Configure order status](#configure-order-status)
 
-[Credit Card form styling](#credit-card-form-styling)
+[Checkout form styling](#checkout-form-styling)
 
 [Configure fraud detection](#configure-fraud-detection)
 
@@ -163,11 +163,11 @@ Methods
 
 ![order_status_configuration](docs/order_status_configuration.png)
 
-## Credit Card form styling
+## Checkout form styling
 
-Choose one of the below options from `Credit Card form style` dropdown to change the styling of Credit Card form on the checkout page.
+Choose one of the below options from `Checkout form style` dropdown to change the styling of Credit Card form on the checkout page.
 
-![Credit Card form styling configuration](docs/cc_form_style.jpg)
+![Checkout form styling configuration](docs/checkout_form_style.jpg)
 
 - `Legacy` Choose this option if legacy form is enabled from the gateway side.
 
