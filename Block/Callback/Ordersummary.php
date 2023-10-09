@@ -120,16 +120,17 @@ class Ordersummary extends \Magento\Framework\View\Element\Template
     /**
      * Load order
      *
-     * @return string
+     * @return Order|null
      */
     public function getOrder()
     {
         $orderIncrementId = $this->getOrderId();
-        if ($orderIncrementId) {
-            return $this->orderLoader->getOrderByOrderIncrementId($orderIncrementId);
+
+        if (!$orderIncrementId) {
+            return null;
         }
 
-        return '';
+        return $this->orderLoader->getOrderByOrderIncrementId($orderIncrementId);
     }
 
     /**
@@ -140,6 +141,11 @@ class Ordersummary extends \Magento\Framework\View\Element\Template
     public function getFormattedAddress()
     {
         $order = $this->getOrder();
+
+        if(!$order){
+            return '';
+        }
+
         if ($order->getShippingAddress()) {
             return $this->renderer->format($order->getShippingAddress(), 'html');
         } else {
@@ -154,18 +160,22 @@ class Ordersummary extends \Magento\Framework\View\Element\Template
      */
     public function getPaymentMethodtitle()
     {
-        $storeScope = \Magento\Store\Model\ScopeInterface::SCOPE_STORE;
-        $order      = $this->getOrder();
-        $storeId    = $order->getStore()->getId();
-        $payment    = $order->getPayment();
-        $method     = $payment->getMethodInstance();
-        $title      = $method->getConfigData('title', $storeId);
-        $terminalID = $payment->getMethod();
-        if ($title == null) {
-            $terminalTitle = $this->_appConfigScopeConfigInterface
-                ->getValue('payment/' . $terminalID . '/terminalname', $storeScope);
-        } else {
-            $terminalTitle = $title;
+        $order          = $this->getOrder();
+        $terminalTitle  = "";
+        
+        if($order){
+            $storeScope = \Magento\Store\Model\ScopeInterface::SCOPE_STORE;
+            $storeId    = $order->getStore()->getId();
+            $payment    = $order->getPayment();
+            $method     = $payment->getMethodInstance();
+            $title      = $method->getConfigData('title', $storeId);
+            $terminalID = $payment->getMethod();
+            if ($title == null) {
+                $terminalTitle = $this->_appConfigScopeConfigInterface
+                    ->getValue('payment/' . $terminalID . '/terminalname', $storeScope);
+            } else {
+                $terminalTitle = $title;
+            }
         }
 
         return $terminalTitle;
