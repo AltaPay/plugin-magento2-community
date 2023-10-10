@@ -56,6 +56,7 @@ class TerminalLogo
             'mobilepay'             => 'MobilePay - Vertical',
             'mobilepay_horizontal'  => 'MobilePay - Horizontal',
             'paypal'                => 'PayPal',
+            'przelewy24'            => 'Przelewy24',
             'seb'                   => 'SEB',
             'swish'                 => 'Swish - Vertical',
             'swish_horizontal'      => 'Swish - Horizontal',
