@@ -35,10 +35,9 @@ span.terminal-logos {
 
 .terminal-logos>img {
     vertical-align: middle;
-    margin: 0 8px;
     max-width: 40px;
     max-height: 30px;
-    margin: 0 3px;
+    margin: 3px;
 }
 
 .payment-method-title input.radio {
@@ -52,8 +51,14 @@ span.terminal-logos {
 
 @media (min-width: 769px) {
     .terminal-logos>img {
-        max-width: 70px;
+        max-width: 60px;
         max-height: 40px;
-        margin: 0 7px;
+    }
+}
+
+@media (min-width: 993px) {
+    .terminal-logos>img {
+        max-width: 70px;
+        margin: 5px 7px;
     }
 }
