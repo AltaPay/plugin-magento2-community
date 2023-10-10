@@ -3,7 +3,7 @@ All notable changes to this project will be documented in this file.
 
 ## [3.7.2]
 ### Added
-- Add terminal logo for Bancontact & Bank payments.
+- Add terminal logo for Bancontact, Przelewy24 & Bank payments.
 - Add new Klarna's main logo (pink).
 - Add horizontal variation for MobilePay & Swish terminal logos.
 - Updated and resized the checkout terminal logos.
