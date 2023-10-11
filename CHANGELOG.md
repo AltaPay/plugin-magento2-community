@@ -1,6 +1,15 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [3.7.2]
+### Added
+- Add terminal logo for Bancontact, Przelewy24 & Bank payments.
+- Add new Klarna's main logo (pink).
+- Add horizontal variation for MobilePay & Swish terminal logos.
+- Updated and resized the checkout terminal logos.
+### Fixed
+- Fix exception when getOrderId returns a null value on the order summary page.
+
 ## [3.7.1]
 ### Added
 - Make the checkout form style option available to all payment forms.
