@@ -119,6 +119,15 @@
                         <config_path>payment/altapay_status/autocapture</config_path>
                     </field>
                 </group>
+                <group id="layout" translate="label comment" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <attribute type="expanded">0</attribute>
+                    <label>Payment page layout</label>
+                    <comment><![CDATA[]]></comment>
+                    <field id="option" translate="label" type="select" sortOrder="1" showInDefault="1" showInWebsite="0" showInStore="0">
+                        <label>Choose payment page layout</label>
+                        <source_model>SDM\Altapay\Model\Config\Source\PaymentPageLayout</source_model>
+                    </field>
+                </group>
                 <group id="error_message" translate="label comment" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
                     <attribute type="expanded">0</attribute>
                     <label>Error message setting</label>

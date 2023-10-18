@@ -330,15 +330,20 @@ class Gateway implements GatewayInterface
     /**
      * @return Config
      */
-    private function setConfig()
+    private function setConfig($storeScope, $storeCode)
     {
+        $layout = $this->systemConfig->getLayoutConfig('option', $storeScope, $storeCode);
         $config = new Config();
         $config->setCallbackOk($this->urlInterface->getDirectUrl(ConstantConfig::ALTAPAY_OK));
         $config->setCallbackFail($this->urlInterface->getDirectUrl(ConstantConfig::ALTAPAY_FAIL));
         $config->setCallbackRedirect($this->urlInterface->getDirectUrl(ConstantConfig::ALTAPAY_REDIRECT));
         $config->setCallbackOpen($this->urlInterface->getDirectUrl(ConstantConfig::ALTAPAY_OPEN));
         $config->setCallbackNotification($this->urlInterface->getDirectUrl(ConstantConfig::ALTAPAY_NOTIFICATION));
-        $config->setCallbackForm($this->urlInterface->getDirectUrl(ConstantConfig::ALTAPAY_CALLBACK));
+        if($layout === "custom_layout") {
+            $config->setCallbackForm($this->urlInterface->getDirectUrl(ConstantConfig::ALTAPAY_EXTERNAL_CALLBACK));
+        } else {
+            $config->setCallbackForm($this->urlInterface->getDirectUrl(ConstantConfig::ALTAPAY_CALLBACK));
+        }
 
         return $config;
     }
@@ -517,7 +522,7 @@ class Gateway implements GatewayInterface
             ->setTransactionInfo($transactionDetail)
             ->setCookie($this->request->getServer('HTTP_COOKIE'))
             ->setSaleReconciliationIdentifier($this->random->getUniqueHash())
-            ->setConfig($this->setConfig());
+            ->setConfig($this->setConfig($storeScope, $storeCode));
         
         if(!$isReservation) {
             $request->setSalesTax((float)number_format($order->getTaxAmount(), 2, '.', ''));

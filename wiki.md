@@ -26,6 +26,8 @@ We highly recommend gathering all the below information, before starting the ins
 
 [Configure order status](#configure-order-status)
 
+[Payment page layout](#payment-page-layout)
+
 [Checkout form styling](#checkout-form-styling)
 
 [Configure fraud detection](#configure-fraud-detection)
@@ -178,6 +180,19 @@ Choose one of the below options from `Checkout form style` dropdown to change th
     ![Checkout Style](docs/checkout_style.jpg)
 
 - `Custom` This option can be selected to implement custom styling on the payment page. Selecting this option will remove all the styling from the payment page.
+
+## Payment page layout
+Choose one of the below options from `Payment page layout` dropdown to change the styling of Credit Card form on the checkout page.
+
+![Payment page layout configuration](docs/payment_page_styling.png)
+
+- `Default Layout` Choose the setting to display the default layout that is compatible with the luma theme.
+
+    ![Default Layout](docs/checkout_style.jpg)
+
+- `Custom Custom` This option can be selected to implement custom layout on the payment page. This will provide a visually appealing appearance seamlessly, without conflicting with the theme styling.
+
+    ![Custom Custom](docs/custom_payment_pafe_layout.png)
 
 ## Configure fraud detection
 

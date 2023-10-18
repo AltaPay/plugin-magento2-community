@@ -1,6 +1,10 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [3.7.3]
+### Added
+- Support gateway form independent from the plugin
+
 ## [3.7.2]
 ### Added
 - Add terminal logo for Bancontact, Przelewy24 & Bank payments.

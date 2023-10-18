@@ -34,6 +34,7 @@ abstract class ConstantConfig
     const ALTAPAY_OPEN = 'sdmaltapay/index/open';
     const ALTAPAY_NOTIFICATION = 'sdmaltapay/index/notification';
     const ALTAPAY_CALLBACK = 'sdmaltapay/index/callbackform';
+    const ALTAPAY_EXTERNAL_CALLBACK = 'sdmaltapay/external/callbackform';
     const VERIFY_ORDER = 'sdmaltapay/index/verifyorder';
 
     /* error and success message */

@@ -64,21 +64,31 @@ class Ordersummary extends \Magento\Framework\View\Element\Template
      * @var ScopeConfigInterface
      */
     protected $_appConfigScopeConfigInterface;
-
+    /**
+     * @var \Magento\Theme\Block\Html\Header\Logo
+     */
+    protected $_logo;
+    /**
+     * @var \Magento\Framework\UrlInterface
+     */
+    protected $_urlInterface;
     /**
      * Ordersummary constructor.
      *
      * @param \Magento\Framework\View\Element\Template\Context $context
-     * @param OrderLoaderInterface                             $orderLoader
-     * @param \Magento\Framework\App\Request\Http              $request
-     * @param Order\Config                                     $orderConfig
-     * @param \Magento\Checkout\Model\Session                  $checkoutSession
-     * @param \Magento\Framework\App\Http\Context              $httpContext
-     * @param \Magento\Sales\Api\OrderRepositoryInterface      $orderRepository
-     * @param Order\Address\Renderer                           $renderer
-     * @param \Magento\Catalog\Model\ProductRepository         $productRepository
-     * @param \Magento\Framework\Pricing\Helper\Data           $priceHelper
-     * @param array                                            $data
+     * @param OrderLoaderInterface $orderLoader
+     * @param \Magento\Framework\App\Request\Http $request
+     * @param Order\Config $orderConfig
+     * @param \Magento\Checkout\Model\Session $checkoutSession
+     * @param \Magento\Framework\App\Http\Context $httpContext
+     * @param \Magento\Sales\Api\OrderRepositoryInterface $orderRepository
+     * @param Order\Address\Renderer $renderer
+     * @param \Magento\Catalog\Model\ProductRepository $productRepository
+     * @param \Magento\Framework\Pricing\Helper\Data $priceHelper
+     * @param ScopeConfigInterface $appConfigScopeConfigInterface
+     * @param \Magento\Theme\Block\Html\Header\Logo $logo
+     * @param \Magento\Framework\UrlInterface $urlInterface
+     * @param array $data
      */
     public function __construct(
         \Magento\Framework\View\Element\Template\Context $context,
@@ -92,6 +102,8 @@ class Ordersummary extends \Magento\Framework\View\Element\Template
         \Magento\Catalog\Model\ProductRepository $productRepository,
         \Magento\Framework\Pricing\Helper\Data $priceHelper,
         ScopeConfigInterface $appConfigScopeConfigInterface,
+        \Magento\Theme\Block\Html\Header\Logo $logo,
+        \Magento\Framework\UrlInterface $urlInterface,
         array $data = []
     ) {
         parent::__construct($context, $data);
@@ -105,6 +117,8 @@ class Ordersummary extends \Magento\Framework\View\Element\Template
         $this->productRepository              = $productRepository;
         $this->priceHelper                    = $priceHelper;
         $this->_appConfigScopeConfigInterface = $appConfigScopeConfigInterface;
+        $this->_logo                          = $logo;
+        $this->_urlInterface                  = $urlInterface;
     }
 
     /**
@@ -211,5 +225,23 @@ class Ordersummary extends \Magento\Framework\View\Element\Template
     public function getCheckoutSession()
     {
         return $this->checkoutSession;
+    }
+    /**
+     * Get logo image URL
+     *
+     * @return string
+     */
+    public function getLogoSrc()
+    {
+        return $this->_logo->getLogoSrc();
+    }
+
+    /**
+     * Get site URL
+     * @return mixed
+     */
+    public function getCurrentUrl()
+    {
+        return $this->_urlInterface->getUrl();
     }
 }
