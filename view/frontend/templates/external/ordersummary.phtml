@@ -7,13 +7,16 @@
  * file that was distributed with this source code.
  */
 ?>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<link href="https://fonts.googleapis.com/css?family=Open+Sans:400,400i,600,600i,700,700i&display=swap" rel="stylesheet">
 <link rel="stylesheet" type="text/css" href="<?= /* @noEscape */
 $block->getViewFileUrl('SDM_Altapay::css/external/style.css') ?>">
 <?php
 $config = $this->helper('SDM\Altapay\Helper\Config');
 $ccFormStyle = !empty($config->ccFormStyle()) ? $config->ccFormStyle() : 'legacy';
+$order = $block->getOrder();
 ?>
-<?php $order = $block->getOrder(); ?>
 <body class="<?= $ccFormStyle ?>-style">
 <div class="w-full max-w-192 mx-auto flex-grow bg-white">
     <div class="banner-section">
@@ -21,7 +24,6 @@ $ccFormStyle = !empty($config->ccFormStyle()) ? $config->ccFormStyle() : 'legacy
             <a href="<?= $block->getCurrentUrl() ?>"><img src="<?= $block->getLogoSrc(); ?>" class="max-w-header-logo"/></a>
         </div>
     </div>
-
     <div class="flex flex-col sm:flex-row payment-form-page-wrapper">
         <div class="sm:w-1/2 sm:mr-2 md:mr-4 order-2 sm:order-1">
             <div class="mb-8">
@@ -32,7 +34,6 @@ $ccFormStyle = !empty($config->ccFormStyle()) ? $config->ccFormStyle() : 'legacy
         </div>
         <div class="sm:w-1/2 order-details-cnt sm:mb-0 order-1 sm:order-2 text-center alternative-methods-section-right"
              id="AlternativeMethodsContainer">
-            <!--                 Order Item Details-->
             <aside class="modal-custom opc-sidebar opc-summary-wrapper">
                 <div class="opc-block-summary">
                     <span class="title"><?= $block->escapeHtml(__('Order Summary')) ?></span>
@@ -173,25 +174,3 @@ $ccFormStyle = !empty($config->ccFormStyle()) ? $config->ccFormStyle() : 'legacy
     </div>
 </div>
 </body>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

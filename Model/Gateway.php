@@ -328,17 +328,20 @@ class Gateway implements GatewayInterface
     }
 
     /**
+     * @param $storeScope
+     * @param $storeCode
      * @return Config
      */
     private function setConfig($storeScope, $storeCode)
     {
-        $layout = $this->systemConfig->getLayoutConfig('option', $storeScope, $storeCode);
         $config = new Config();
         $config->setCallbackOk($this->urlInterface->getDirectUrl(ConstantConfig::ALTAPAY_OK));
         $config->setCallbackFail($this->urlInterface->getDirectUrl(ConstantConfig::ALTAPAY_FAIL));
         $config->setCallbackRedirect($this->urlInterface->getDirectUrl(ConstantConfig::ALTAPAY_REDIRECT));
         $config->setCallbackOpen($this->urlInterface->getDirectUrl(ConstantConfig::ALTAPAY_OPEN));
         $config->setCallbackNotification($this->urlInterface->getDirectUrl(ConstantConfig::ALTAPAY_NOTIFICATION));
+
+        $layout = $this->systemConfig->getLayoutConfig('option', $storeScope, $storeCode);
         if($layout === "custom_layout") {
             $config->setCallbackForm($this->urlInterface->getDirectUrl(ConstantConfig::ALTAPAY_EXTERNAL_CALLBACK));
         } else {
@@ -654,11 +657,12 @@ class Gateway implements GatewayInterface
     }
     
     /**
+     * @param $payment
      * @param $items
      * @param $baseUrl
      * @param $agreementType
      * @param $agreementId
-     *
+     * @param $unscheduledType
      * @return array
      */
     private function agreementDetail($payment, $items, $baseUrl, $agreementType = null, $agreementId = null, $unscheduledType = null)

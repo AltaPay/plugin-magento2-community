@@ -3,7 +3,7 @@ All notable changes to this project will be documented in this file.
 
 ## [3.7.3]
 ### Added
-- Support gateway form independent from the plugin
+- Add payment page `Custom Layout` option, which is independent of the store styling.
 
 ## [3.7.2]
 ### Added

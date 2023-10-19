@@ -97,12 +97,12 @@ be provided by AltaPay.
      `php bin/magento setup:di:compile` 
 
      `php bin/magento setup:static-content:deploy`
->
-> _Note: If asked for authentication, use your Public Key as the
-> username, and the Private Key as the password. This information can be
-> found in the Secure Keys section of your Magento account:_
+    >
+    > _Note: If asked for authentication, use your Public Key as the
+    > username, and the Private Key as the password. This information can be
+    > found in the Secure Keys section of your Magento account:_
 
-![marketplace_account](docs/marketplace_account.png)
+    ![marketplace_account](docs/marketplace_account.png)
 
 ## Additional Steps
 
@@ -144,19 +144,19 @@ payment methods and configuring payments.
 3. Select the frequency for a scheduler
 4. Set a start time when the scheduler should run
 
-To update all the orders without a scheduler you can click on the "Change status now".
+    To update all the orders without a scheduler you can click on the "Change status now".
 
-![configure-cron-scheduler](docs/cron_schedule.png)
+    ![configure-cron-scheduler](docs/cron_schedule.png)
 
 ## Charged currency setting
 
 You can select currency used for AltaPay payment processing from charged currency setting section.
 
-**Display currency:** The currency visible on the store view or display is used.
+* **Display currency:** The currency visible on the store view or display is used.
 
-**Global/Website currency:** The base currency is used.
+* **Global/Website currency:** The base currency is used.
 
-![charged-currency-setting](docs/charged_currency_setting.png)
+    ![charged-currency-setting](docs/charged_currency_setting.png)
 
 ## Configure order status
 
@@ -182,17 +182,17 @@ Choose one of the below options from `Checkout form style` dropdown to change th
 - `Custom` This option can be selected to implement custom styling on the payment page. Selecting this option will remove all the styling from the payment page.
 
 ## Payment page layout
-Choose one of the below options from `Payment page layout` dropdown to change the styling of Credit Card form on the checkout page.
+Choose one of the below options from `Payment page layout` dropdown to select the layout type for payment page.
 
 ![Payment page layout configuration](docs/payment_page_styling.png)
 
-- `Default Layout` Choose the setting to display the default layout that is compatible with the luma theme.
+- `Default Layout` This will show the payment page based on the store theme styling.
 
-    ![Default Layout](docs/checkout_style.jpg)
+    ![checkout_style](docs/checkout_style.jpg)
 
-- `Custom Custom` This option can be selected to implement custom layout on the payment page. This will provide a visually appealing appearance seamlessly, without conflicting with the theme styling.
+- `Custom Custom` This will show the payment page independent from the theme styling. This will provide a visually appealing appearance seamlessly, without conflicting with the theme styling.
 
-    ![Custom Custom](docs/custom_payment_pafe_layout.png)
+    ![custom_payment_page_layout](docs/custom_payment_page_layout.png)
 
 ## Configure fraud detection
 

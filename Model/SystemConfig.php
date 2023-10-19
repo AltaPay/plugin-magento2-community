@@ -262,7 +262,7 @@ class SystemConfig
      * @param $configKey
      * @param $storeScope
      * @param $storeCode
-     * 
+     *
      * @return mixed
      */
     public function getLayoutConfig($configKey, $storeScope = null, $storeCode = null)
