@@ -4,7 +4,7 @@ AltaPay, headquartered in Denmark, is an internationally focused fintech company
 
 AltaPay’s platform automizes, simplifies, and protects the transaction flow for shop owners and global retail and e-commerce companies, supporting and integrating smoothly into the major ERP systems. AltaPay performs as a Payment Service Provider operating under The Payment Card Industry Data Security Standard (PCI DSS).
 
-# Magento2 Payment plugin installation guide
+## Magento2 Payment plugin installation guide
 
 
 Installing this plugin will enable your website to handle card transactions through AltaPay's gateway.
@@ -46,7 +46,7 @@ We highly recommend gathering all the below information, before starting the ins
 
 [Troubleshooting](#troubleshooting)
 
-# Prerequisites
+## Prerequisites
 
 Before configuring the plugin, you need the below information. These can
 be provided by AltaPay.
@@ -69,9 +69,9 @@ be provided by AltaPay.
 4.  Your private and public keys must be located at 'repo.magento.com'
     when installing the AltaPay module.
 
-# Installation
+## Installation
 
-## Install from zip file
+### Install from zip file
 
 -   Search for "AltaPay Payment Gateway"
 
@@ -85,7 +85,7 @@ be provided by AltaPay.
 
      `php bin/magento setup:static-content:deploy`
 
-## Install via composer (Recommended)
+### Install via composer (Recommended)
 
 -   In Magento root directory run the following commands using the
     command line
@@ -115,7 +115,7 @@ command
 -   Enable the AltaPay module  
     `php bin/magento module:enable SDM_Altapay`
 
-# Configuration
+## Configuration
 
 You can configure the plugin to suit your needs, including adding
 payment methods and configuring payments.
@@ -230,7 +230,7 @@ To synchronize the terminals with the gateway, click on the **Synchronize Termin
 
 _**Note:** Remember to follow Magento's [Cache Management](https://docs.magento.com/user-guide/system/cache-management.html) guidelines to clear the site cache when updating the configurations._
 
-# Save credit cards
+## Save credit cards
 1. To enable save credit cards option for customers follow the bellow steps
     * Navigate to Admin \> Stores \> Configuration \> Sales \> Payment Methods > AltaPay
     * Choose Terminal
@@ -247,7 +247,7 @@ _**Note:** Remember to follow Magento's [Cache Management](https://docs.magento.
 
     ![saved_card_list](docs/saved_card_list.png)
 
-# Pay by link
+## Pay by link
 By performing the below steps a customer receives a payment link on the provided email.
 
 1. Navigate to Admin \> Sales \> Order 
@@ -280,7 +280,7 @@ By performing the below steps a customer receives a payment link on the provided
 
     ![submit_order](docs/submit_order.png)
 
-# Reconcile Orders
+## Reconcile Orders
 In order to reconcile payments on Magento please follow the steps below:
 
 1. Navigate to the Magento **Admin** page.
@@ -300,7 +300,7 @@ In order to reconcile payments on Magento please follow the steps below:
     
 ![funding_list_csv](Docs/funding_list_csv.png)
 
-# Supported versions
+## Supported versions
 
 | 7.4.0         | Magento 2.4 |
 |---------------|-------------|
@@ -310,7 +310,7 @@ _For Magneto 2.2 and below version please install the extension from
 here._  
 <https://packagist.org/packages/altapay/magento2-payment>
 
-# Styling
+## Styling
 
 - You can change/update the **Payment Form Page** by navigating to the below path:
 
@@ -319,6 +319,12 @@ here._
 - Use the below link to apply the **CSS** to the form page:
 
     <https://github.com/AltaPay/plugin-magento2-community/blob/main/view/frontend/web/css/ordersummary.css>
+
+    **Note** If you've selected the `Custom Layout` option for your `Payment page layout` you can modify **Payment Form Page** and **CSS** from below paths respectively.
+
+    **Payment Form Page Path** <https://github.com/AltaPay/plugin-magento2-community/blob/main/view/frontend/templates/external/ordersummary.phtml>
+
+    **CSS Path** <https://github.com/AltaPay/plugin-magento2-community/blob/main/view/frontend/web/css/external/style.css>
 
 - You can update the styling for the Checkout/Terminals page from below file
 
@@ -330,7 +336,7 @@ here._
 >
 >Please visit Magento's official documentation to know more about how to [Override a layout](https://devdocs.magento.com/guides/v2.4/frontend-dev-guide/layouts/layout-override.html).
 
-# Troubleshooting
+## Troubleshooting
 
 **PHP Warning: Input variables exceeded 1000. To increase the limit change max_input_vars in php.ini.**
 
