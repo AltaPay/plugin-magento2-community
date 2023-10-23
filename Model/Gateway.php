@@ -328,9 +328,11 @@ class Gateway implements GatewayInterface
     }
 
     /**
+     * @param $storeScope
+     * @param $storeCode
      * @return Config
      */
-    private function setConfig()
+    private function setConfig($storeScope, $storeCode)
     {
         $config = new Config();
         $config->setCallbackOk($this->urlInterface->getDirectUrl(ConstantConfig::ALTAPAY_OK));
@@ -338,7 +340,13 @@ class Gateway implements GatewayInterface
         $config->setCallbackRedirect($this->urlInterface->getDirectUrl(ConstantConfig::ALTAPAY_REDIRECT));
         $config->setCallbackOpen($this->urlInterface->getDirectUrl(ConstantConfig::ALTAPAY_OPEN));
         $config->setCallbackNotification($this->urlInterface->getDirectUrl(ConstantConfig::ALTAPAY_NOTIFICATION));
-        $config->setCallbackForm($this->urlInterface->getDirectUrl(ConstantConfig::ALTAPAY_CALLBACK));
+
+        $layout = $this->systemConfig->getLayoutConfig('option', $storeScope, $storeCode);
+        if($layout === "custom_layout") {
+            $config->setCallbackForm($this->urlInterface->getDirectUrl(ConstantConfig::ALTAPAY_EXTERNAL_CALLBACK));
+        } else {
+            $config->setCallbackForm($this->urlInterface->getDirectUrl(ConstantConfig::ALTAPAY_CALLBACK));
+        }
 
         return $config;
     }
@@ -517,7 +525,7 @@ class Gateway implements GatewayInterface
             ->setTransactionInfo($transactionDetail)
             ->setCookie($this->request->getServer('HTTP_COOKIE'))
             ->setSaleReconciliationIdentifier($this->random->getUniqueHash())
-            ->setConfig($this->setConfig());
+            ->setConfig($this->setConfig($storeScope, $storeCode));
         
         if(!$isReservation) {
             $request->setSalesTax((float)number_format($order->getTaxAmount(), 2, '.', ''));
@@ -649,11 +657,12 @@ class Gateway implements GatewayInterface
     }
     
     /**
+     * @param $payment
      * @param $items
      * @param $baseUrl
      * @param $agreementType
      * @param $agreementId
-     *
+     * @param $unscheduledType
      * @return array
      */
     private function agreementDetail($payment, $items, $baseUrl, $agreementType = null, $agreementId = null, $unscheduledType = null)

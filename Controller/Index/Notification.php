@@ -66,7 +66,7 @@ class Notification extends Index implements CsrfAwareActionInterface
                 $orderTransactionId     = $payment->getLastTransId();
 
                 // Return if the incoming transaction id is different from order transaction id
-                if($orderTransactionId != $gatewayTransactionId) return;
+                if(!empty($orderTransactionId) && $orderTransactionId != $gatewayTransactionId) return;
 
                 //Set order status, if available from the payment gateway
                 $status        = strtolower($post['status']);

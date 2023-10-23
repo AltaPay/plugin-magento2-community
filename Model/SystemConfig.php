@@ -236,6 +236,7 @@ class SystemConfig
 
         return $storeScope;
     }
+
     /**
      * @param string               $configKey
      * @param ScopeConfigInterface $storeScope
@@ -250,6 +251,27 @@ class SystemConfig
         return $this->scopeConfig->getValue(
             sprintf(
                 'payment/sdm_altapay_config/fraud_setting/%s',
+                $configKey
+            ),
+            $storeScope,
+            $storeCode
+        );
+    }
+
+    /**
+     * @param $configKey
+     * @param $storeScope
+     * @param $storeCode
+     *
+     * @return mixed
+     */
+    public function getLayoutConfig($configKey, $storeScope = null, $storeCode = null)
+    {
+        $storeScope = $this->checkStoreScope($storeScope);
+        
+        return $this->scopeConfig->getValue(
+            sprintf(
+                'payment/sdm_altapay_config/layout/%s',
                 $configKey
             ),
             $storeScope,

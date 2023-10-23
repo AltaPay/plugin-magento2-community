@@ -1,6 +1,12 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [3.7.3]
+### Added
+- Add payment page `Custom Layout` option, which is independent of the store styling.
+### Fixed
+- Order status not updating when plugin receives callback notification only.
+
 ## [3.7.2]
 ### Added
 - Add terminal logo for Bancontact, Przelewy24 & Bank payments.
