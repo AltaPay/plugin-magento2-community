@@ -1,6 +1,11 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [3.7.4]
+### Fixed
+- Fix typo from the wiki doc.
+- Update `Payment page layout` dropdown options. 
+
 ## [3.7.3]
 ### Added
 - Add payment page `Custom Layout` option, which is independent of the store styling.
