@@ -186,11 +186,11 @@ Choose one of the below options from `Payment page layout` dropdown to select th
 
 ![Payment page layout configuration](docs/payment_page_styling.png)
 
-- `Default Layout` This will show the payment page based on the store theme styling.
+- `Default` This will use the styling from the checkout/theme.
 
     ![checkout_style](docs/checkout_style.jpg)
 
-- `Custom Custom` This will show the payment page independent from the theme styling. This will provide a visually appealing appearance seamlessly, without conflicting with the theme styling.
+- `Checkout Independent` This will show the payment page independent from the theme styling. This will provide a visually appealing appearance seamlessly, without conflicting with the theme styling.
 
     ![custom_payment_page_layout](docs/custom_payment_page_layout.png)
 

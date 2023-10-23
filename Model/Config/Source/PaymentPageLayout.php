@@ -16,8 +16,8 @@ class PaymentPageLayout implements ArrayInterface
      * @var array
      */
     private static $layoutOptions = [
-        'default_layout' => 'Default Layout',
-        'custom_layout' => 'Custom Layout'
+        'default_layout' => 'Default',
+        'custom_layout' => 'Checkout Independent'
     ];
 
     /**
