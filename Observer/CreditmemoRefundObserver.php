@@ -72,20 +72,20 @@ class CreditmemoRefundObserver implements ObserverInterface
      * @var Random
      */
     private $random;
-    
+
     /**
      * CreditmemoRefundObserver constructor.
      *
-     * @param SystemConfig                    $systemConfig
-     * @param Logger                          $altapayLogger
-     * @param Order                           $order
-     * @param Data                            $helper
-     * @param storeConfig                     $storeConfig
-     * @param OrderLinesHandler               $orderLines
-     * @param PriceHandler                    $priceHandler
-     * @param DiscountHandler                 $discountHandler
+     * @param SystemConfig $systemConfig
+     * @param Logger $altapayLogger
+     * @param Order $order
+     * @param Data $helper
+     * @param storeConfig $storeConfig
+     * @param OrderLinesHandler $orderLines
+     * @param PriceHandler $priceHandler
+     * @param DiscountHandler $discountHandler
      * @param ReconciliationIdentifierFactory $reconciliation
-     * @param Random                          $random
+     * @param Random $random
      */
     public function __construct(
         SystemConfig $systemConfig,
@@ -313,6 +313,14 @@ class CreditmemoRefundObserver implements ObserverInterface
                 ->setIsCustomerNotified(false);
             $orderObject->getResource()->save($orderObject);
         }
+        if (strtolower($xml->Body->Result) === 'open') {
+            $msg = 'Payment refund is in progress.';
+            $orderObject->addStatusHistoryComment($msg)->setIsCustomerNotified(false);
+            $orderObject->getResource()->save($orderObject);
+
+            throw new \InvalidArgumentException(__('CreditMemo creation is on hold until the gateway completes the refund.'));
+        }
+
         //throw exception if result is not success
         if ($xml->Body->Result != 'Success') {
             throw new \InvalidArgumentException('Could not refund captured reservation');
