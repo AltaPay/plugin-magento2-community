@@ -32,7 +32,7 @@ use Magento\CatalogInventory\Api\StockRegistryInterface;
 use SDM\Altapay\Model\TokenFactory;
 use SDM\Altapay\Helper\Data;
 use SDM\Altapay\Model\ReconciliationIdentifierFactory;
-
+use SDM\Altapay\Model\Handler\CreateCreditMemo;
 /**
  * Class Generator
  * Handle the create payment related functionality.
@@ -131,6 +131,11 @@ class Generator
     protected $reconciliation;
 
     /**
+     * @var CreateCreditMemo
+     */
+    protected $creditMemo;
+
+    /**
      * Generator constructor.
      *
      * @param Quote                           $quote
@@ -152,6 +157,7 @@ class Generator
      * @param TokenFactory                    $dataToken
      * @param Data                            $helper
      * @param ReconciliationIdentifierFactory $reconciliation
+     * @param CreateCreditMemo                $creditMemo
      */
     public function __construct(
         Quote $quote,
@@ -172,7 +178,8 @@ class Generator
         Cart $modelCart,
         TokenFactory $dataToken,
         Data $helper,
-        ReconciliationIdentifierFactory $reconciliation
+        ReconciliationIdentifierFactory $reconciliation,
+        CreateCreditMemo $creditMemo
     ) {
         $this->quote                 = $quote;
         $this->checkoutSession       = $checkoutSession;
@@ -193,6 +200,7 @@ class Generator
         $this->dataToken             = $dataToken;
         $this->helper                = $helper;
         $this->reconciliation        = $reconciliation;
+        $this->creditMemo            = $creditMemo;
     }
 
     /**
@@ -424,6 +432,7 @@ class Generator
             $statusKey               = 'process';
             $status                  = $response->status;
             $order                   = $this->orderLoader->getOrderByOrderIncrementId($response->shopOrderId);
+            $payment                 = $order->getPayment();
             $storeCode               = $order->getStore()->getCode();
             $orderStatusAfterPayment = $this->systemConfig->getStatusConfig('process', $storeScope, $storeCode);
             $orderStatusCapture      = $this->systemConfig->getStatusConfig('autocapture', $storeScope, $storeCode);
@@ -438,6 +447,16 @@ class Generator
 
             if ($paymentStatus === 'released') {
                 $this->handleCancelStatusAction($request, $response->status);
+                return false;
+            }
+            if ($status === 'succeeded' && $paymentStatus === 'bank_payment_refunded'
+                && $transactionId == $payment->getLastTransId()) {
+
+                // Create Credit Memo
+                $this->creditMemo->createCreditMemo($order->getId());
+
+                $this->saveReconciliationData($transaction, $order);
+
                 return false;
             }
 
@@ -505,26 +524,8 @@ class Generator
                         }
                     }
 
-                    $reconciliationData = $transaction->ReconciliationIdentifiers ?? '';
-
-                    if($reconciliationData){
-                        $model = $this->reconciliation->create();
-
-                        foreach($reconciliationData as $key=>$value){
-                            $collection = $this->helper->getReconciliationData($order->getIncrementId(), $value->Id);
-                            if(!$collection->getSize()){
-                                $model->addData([
-                                    "order_id"      => $order->getIncrementId(),
-                                    "identifier"    => $value->Id,
-                                    "type"          => $value->Type
-                                ]);
-                            }
-                        }
-
-                        $model->save();
-                    }
+                    $this->saveReconciliationData($transaction, $order);
                 }
-                $payment = $order->getPayment();
                 $payment->setPaymentId($paymentId);
                 $payment->setLastTransId($transaction->TransactionId);
                 $payment->setCcTransId($response->creditCardToken);
@@ -907,5 +908,31 @@ class Generator
         $response = $callback->call();
         
         return $response->CardHolderErrorMessage ?? null;
+    }
+
+    /**
+     * @param $transaction
+     * @param $order
+     * @return void
+     */
+    public function saveReconciliationData($transaction, $order)
+    {
+        $reconciliationData = $transaction->ReconciliationIdentifiers ?? '';
+
+        if ($reconciliationData && is_array($reconciliationData)) {
+            $model = $this->reconciliation->create();
+
+            foreach ($reconciliationData as $value) {
+                $collection = $this->helper->getReconciliationData($order->getIncrementId(), $value->Id);
+                if (!$collection->getSize()) {
+                    $model->addData([
+                        "order_id" => $order->getIncrementId(),
+                        "identifier" => $value->Id,
+                        "type" => $value->Type
+                    ]);
+                }
+            }
+            $model->save();
+        }
     }
 }

@@ -1,6 +1,10 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [3.7.5]
+### Fixed
+- Add support for Open Banking (Using Finshark)
+
 ## [3.7.4]
 ### Fixed
 - Fix typo from the wiki doc.
