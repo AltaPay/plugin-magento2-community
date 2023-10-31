@@ -11,7 +11,6 @@
             <?php foreach ($method as $method):
                 $code = $method->getCode();
                 $counter++;
-                if (!in_array($code, $helper->getTerminalCodes())):
                 ?>
                 <dt class="admin__field-option">
                     <?php if ($methodsCount > 1): ?>
@@ -47,7 +46,7 @@
                 <dd class="admin__payment-method-wrapper">
                     <?= $block->getChildHtml('payment.method.' . $code) ?>
                 </dd>
-                    <?php endif; endforeach; ?>
+                    <?php endforeach; ?>
         </dl>
     </div>
     <?php $scriptString = <<<script
