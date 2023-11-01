@@ -14,6 +14,12 @@
                 ?>
                 <dt class="admin__field-option">
                     <?php if ($methodsCount > 1): ?>
+                        <?= /* @noEscape */
+                        $secureRenderer->renderEventListenerAsTag(
+                            'onclick',
+                            "payment.switchMethod('" . $block->escapeJs($code) . "')",
+                            'input#p_method_' . $block->escapeJs($code)
+                        ) ?>
                         <input id="p_method_<?= $block->escapeHtmlAttr($code); ?>"
                                value="<?= $block->escapeHtmlAttr($code); ?>"
                                type="radio" name="payment[method]"
@@ -23,12 +29,6 @@
                             <?php endif; ?>
                                data-validate="{'validate-one-required-by-name':true}"
                                class="admin__control-radio"/>
-                        <?= /* @noEscape */
-                        $secureRenderer->renderEventListenerAsTag(
-                            'onclick',
-                            "payment.switchMethod('" . $block->escapeJs($code) . "')",
-                            'input#p_method_' . $block->escapeJs($code)
-                        ) ?>
                     <?php else: ?>
                         <span class="no-display">
                 <input id="p_method_<?= $block->escapeHtmlAttr($code); ?>"
@@ -46,7 +46,7 @@
                 <dd class="admin__payment-method-wrapper">
                     <?= $block->getChildHtml('payment.method.' . $code) ?>
                 </dd>
-                    <?php endforeach; ?>
+            <?php endforeach; ?>
         </dl>
     </div>
     <?php $scriptString = <<<script
