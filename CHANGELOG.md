@@ -1,6 +1,10 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [3.7.6]
+### Added
+- Support re-order functionality from admin panel
+
 ## [3.7.5]
 ### Fixed
 - Add support for Open Banking (Using Finshark)

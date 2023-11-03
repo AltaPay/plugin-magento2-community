@@ -38,6 +38,8 @@ We highly recommend gathering all the below information, before starting the ins
 
 [Pay by link](#pay-by-link)
 
+[Reorder from the admin](#reorder-from-the-admin)
+
 [Reconcile Orders](#reconcile-orders)
 
 [Supported versions](#supported-versions)
@@ -279,6 +281,19 @@ By performing the below steps a customer receives a payment link on the provided
 8. Click on the "Submit Order" button
 
     ![submit_order](docs/submit_order.png)
+
+## Reorder from the admin
+To place an order through the admin, please follow the steps below:
+
+- For re-ordering through the admin, follow the steps outlined in the link:
+<https://experienceleague.adobe.com/docs/commerce-admin/stores-sales/shopper-tools/reorders-allow.html?lang=en/#reorder-from-the-admin>
+
+- Ensure that you select AltaPay payment methods from the available list.
+
+    ![reorder_from_admin](docs/reorder_from_admin.png)
+
+- Once the order is created, an email containing the payment link will be sent to the customer.
+- The admin can also locate the payment link under the **Payment Information** section.
 
 ## Reconcile Orders
 In order to reconcile payments on Magento please follow the steps below:
