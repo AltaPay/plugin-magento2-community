@@ -18,6 +18,7 @@
                 <comment><![CDATA[]]></comment>
                 <attribute type="expanded">1</attribute>
                 <group id="altapay_config_api" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                <group id="altapay_config_api" translate="label" type="text" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
                     <attribute type="expanded">0</attribute>
 
                     <label>API login</label>
