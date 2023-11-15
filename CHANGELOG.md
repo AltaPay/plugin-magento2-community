@@ -1,6 +1,11 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+
+## [unreleased]
+### Added
+- Allow to disable Online Refunds through configuration
+
 ## [3.7.7]
 ### Added
 - Support edit functionality from admin panel.

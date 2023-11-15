@@ -16,5 +16,10 @@
                 <argument name="template" xsi:type="string">SDM_Altapay::order/creditmemo/create/form.phtml</argument>
             </action>
         </referenceBlock>
+        <referenceBlock name="order_items">
+            <action method="setTemplate">
+                <argument name="template" xsi:type="string">SDM_Altapay::order/creditmemo/create/items.phtml</argument>
+            </action>
+        </referenceBlock>
     </body>
 </page>

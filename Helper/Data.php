@@ -25,6 +25,8 @@ use SDM\Altapay\Model\ReconciliationIdentifierFactory;
 class Data extends AbstractHelper
 {
     const MODULE_CODE = 'SDM_Altapay';
+    const CONFIG_PATH = 'payment/sdm_altapay_config/refund_setting/enable';
+
     /**
      * @var moduleList
      */
@@ -98,7 +100,7 @@ class Data extends AbstractHelper
             $versionDetails['ecomPluginVersion'] = $moduleInfo['setup_version'];
             $versionDetails['otherInfo']         = 'websiteName - ' . $websiteName . ', storeName - ' . $storeName;
         }
-        
+
         return $versionDetails;
     }
 
@@ -238,7 +240,7 @@ class Data extends AbstractHelper
 
         return $collection;
     }
-    
+
     /**
      * @param $post
      * @param $secret
@@ -289,5 +291,20 @@ class Data extends AbstractHelper
         $moduleInfo = $this->moduleList->getOne(self::MODULE_CODE);
         
         return $moduleInfo['setup_version'] ?? '';
+    }
+
+    /**
+     * Get the status of the configuration
+     *
+     * @return bool
+     */
+    public function isRefundSettingEnabled()
+    {
+        $isEnabled = $this->scopeConfig->getValue(
+            self::CONFIG_PATH,
+            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+        );
+
+        return (bool) $isEnabled;
     }
 }
