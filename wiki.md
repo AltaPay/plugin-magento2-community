@@ -20,8 +20,6 @@ We highly recommend gathering all the below information, before starting the ins
 
 [Configuration](#configuration)
 
-[Configure cron scheduler](#configure-cron-scheduler)
-
 [Charged currency setting](#charged-currency-setting)
 
 [Configure order status](#configure-order-status)
@@ -37,6 +35,8 @@ We highly recommend gathering all the below information, before starting the ins
 [Save credit cards](#save-credit-cards)
 
 [Pay by link](#pay-by-link)
+
+[Auto-cancelling orders cron settings](#auto-cancelling-orders-cron-settings)
 
 [Reorder from the admin](#reorder-from-the-admin)
 
@@ -139,14 +139,14 @@ payment methods and configuring payments.
 > Once the API details are validated the terminals will be appeared in
 > the terminal's dropdown in each terminal.
 
-## Configure cron scheduler
+## Auto-cancelling orders cron settings
 
 1. Navigate to: Admin > Stores > Configuration > Sales (Tab) > Payment Methods
-2. To enable "Cancel orders with pending payments", choose Yes  
-3. Select the frequency for a scheduler
-4. Set a start time when the scheduler should run
-
-    To update all the orders without a scheduler you can click on the "Change status now".
+2. Scroll to AltaPay section
+3. Open "Auto-cancelling orders cron settings" section and choose "Yes" to enable the configuration
+4. Select the frequency for a scheduler
+5. Set a start time when the scheduler should run
+6. Specify the time duration in hours. The default setting for the field is 24 hours.
 
     ![configure-cron-scheduler](docs/cron_schedule.png)
 

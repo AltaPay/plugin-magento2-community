@@ -8,10 +8,14 @@
  * file that was distributed with this source code.
  */
 -->
-
-<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../Store/etc/config.xsd">
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
     <default>
         <payment>
+            <sdm_altapay_config>
+                <cron_scheduled>
+                    <cancellation_timeframe>24</cancellation_timeframe>
+                </cron_scheduled>
+            </sdm_altapay_config>
             <terminal1>
                 <active>0</active>
                 <title />

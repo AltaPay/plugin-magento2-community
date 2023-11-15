@@ -21,7 +21,7 @@ use Magento\Framework\App\Config\Value;
  {
     const CRON_STRING_PATH = 'crontab/default/jobs/sdm_altapay_cron_job/schedule/cron_expr';
     const CRON_MODEL_PATH = 'crontab/default/jobs/sdm_altapay_cron_job/run/model';
-    const CRON_ENABLED = 'payment/sdm_altapay_config/cronScheduled/enabled';
+    const CRON_ENABLED = 'payment/sdm_altapay_config/cron_scheduled/enabled';
 
      /**
       * @var ValueFactory
@@ -74,8 +74,8 @@ use Magento\Framework\App\Config\Value;
       */
      public function afterSave()
      {
-        $time = $this->getData('groups/sdm_altapay_config/groups/cronScheduled/fields/time/value');
-        $frequency = $this->getData('groups/sdm_altapay_config/groups/cronScheduled/fields/frequency/value');
+        $time = $this->getData('groups/sdm_altapay_config/groups/cron_scheduled/fields/time/value');
+        $frequency = $this->getData('groups/sdm_altapay_config/groups/cron_scheduled/fields/frequency/value');
         $storeScope = \Magento\Store\Model\ScopeInterface::SCOPE_STORE;
         $cronEnabled = $this->scopeConfig->getValue(self::CRON_ENABLED, $storeScope);
          try

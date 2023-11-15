@@ -18,8 +18,8 @@ use Magento\Sales\Model\ResourceModel\Order\CollectionFactory;
 
 class UpdateOrderStatus {
 
-    const CRON_ENABLED = 'payment/sdm_altapay_config/cronScheduled/enabled';
-    const CRON_CANCELLATION_HOURS = 'payment/sdm_altapay_config/cronScheduled/cancellation_timeframe';
+    const CRON_ENABLED = 'payment/sdm_altapay_config/cron_scheduled/enabled';
+    const CRON_CANCELLATION_HOURS = 'payment/sdm_altapay_config/cron_scheduled/cancellation_timeframe';
 
     /**
      * @var LoggerInterface
@@ -78,7 +78,7 @@ class UpdateOrderStatus {
 
         $cancellationTimeframe = $this->scopeConfig->getValue(self::CRON_CANCELLATION_HOURS);
         if(!$cancellationTimeframe) {
-            $cancellationTimeframe = "12";
+            $cancellationTimeframe = 24;
         }
         $cutoffTime = strtotime("-$cancellationTimeframe hours");
 
