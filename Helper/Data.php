@@ -295,21 +295,6 @@ class Data extends AbstractHelper
     }
 
     /**
-     * Get the status of the configuration
-     *
-     * @return bool
-     */
-    public function isRefundSettingEnabled()
-    {
-        $isEnabled = $this->scopeConfig->getValue(
-            self::CONFIG_PATH,
-            ScopeInterface::SCOPE_STORE
-        );
-
-        return (bool) $isEnabled;
-    }
-
-    /**
      * @return string
      */
     public function getTemplate()
