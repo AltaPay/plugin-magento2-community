@@ -146,7 +146,9 @@ payment methods and configuring payments.
 3. Open "Auto-cancelling orders cron settings" section and choose "Yes" to enable the configuration
 4. Select the frequency for a scheduler
 5. Set a start time when the scheduler should run
-6. Specify the time duration in hours. The default setting for the field is 24 hours.
+6. Cancellation timeframe runs from from the moment the order is generated.
+
+    **Note** Specify the time duration in hours; for instance, 2 days equals 48 hours with a default field setting of 24 hours.
 
     ![configure-cron-scheduler](docs/cron_schedule.png)
 
