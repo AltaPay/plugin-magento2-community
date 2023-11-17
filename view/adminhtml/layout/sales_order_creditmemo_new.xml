@@ -18,7 +18,7 @@
         </referenceBlock>
         <referenceBlock name="order_items">
             <action method="setTemplate">
-                <argument name="template" xsi:type="string">SDM_Altapay::order/creditmemo/create/items.phtml</argument>
+                <argument name="template" xsi:type="helper" helper="SDM\Altapay\Helper\Data::getTemplate"></argument>
             </action>
         </referenceBlock>
     </body>

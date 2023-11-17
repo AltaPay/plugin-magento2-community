@@ -2,7 +2,7 @@
 All notable changes to this project will be documented in this file.
 
 
-## [unreleased]
+## [3.7.8]
 ### Added
 - Allow to disable Online Refunds through configuration
 

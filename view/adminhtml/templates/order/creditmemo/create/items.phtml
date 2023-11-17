@@ -14,7 +14,6 @@ $viewModel = $block->getData('viewModel');
 $itemsToRenderViewModel = $block->getData('itemsToRenderViewModel');
 $_items = $itemsToRenderViewModel->getItems();
 $commentText = $block->getCreditmemo()->getCommentText();
-$helper = $this->helper('SDM\Altapay\Helper\Data');
 ?>
 
 <section class="admin__page-section">
@@ -136,9 +135,6 @@ $helper = $this->helper('SDM\Altapay\Helper\Data');
                 <?= $block->getChildHtml('submit_before') ?>
                 <div class="actions">
                     <?= $block->getChildHtml('submit_offline') ?>
-                    <?php if (!$helper->isRefundSettingEnabled()): ?>
-                        <?= $block->getChildHtml('submit_button'); ?>
-                    <?php endif; ?>
                     <?= $block->getChildHtml('submit_after') ?>
                 </div>
             </div>

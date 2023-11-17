@@ -17,6 +17,7 @@ use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Sales\Model\ResourceModel\Order\Tax\Item;
 use Magento\Quote\Model\Quote\Item\AbstractItem;
 use Magento\Framework\DataObject;
+use Magento\Store\Model\ScopeInterface;
 use SDM\Altapay\Model\ReconciliationIdentifierFactory;
 
 /**
@@ -111,7 +112,7 @@ class Data extends AbstractHelper
      */
     public function getPaymentTitleTerminal($orderId)
     {
-        $storeScope = \Magento\Store\Model\ScopeInterface::SCOPE_STORE;
+        $storeScope = ScopeInterface::SCOPE_STORE;
         $order      = $this->order->load($orderId);
         $storeCode  = $order->getStore()->getCode();
         $storeId    = $order->getStore()->getId();
@@ -302,9 +303,23 @@ class Data extends AbstractHelper
     {
         $isEnabled = $this->scopeConfig->getValue(
             self::CONFIG_PATH,
-            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+            ScopeInterface::SCOPE_STORE
         );
 
         return (bool) $isEnabled;
+    }
+
+    /**
+     * @return string
+     */
+    public function getTemplate()
+    {
+        if ($this->scopeConfig->getValue(self::CONFIG_PATH, ScopeInterface::SCOPE_STORE)) {
+            $template =  'SDM_Altapay::order/creditmemo/create/items.phtml';
+        } else {
+            $template = 'Magento_Sales::order/creditmemo/create/items.phtml';
+        }
+
+        return $template;
     }
 }
