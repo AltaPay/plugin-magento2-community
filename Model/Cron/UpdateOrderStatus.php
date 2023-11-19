@@ -10,6 +10,7 @@
 namespace SDM\Altapay\Model\Cron;
 
 use Magento\Sales\Api\OrderRepositoryInterface;
+use Magento\Store\Model\ScopeInterface;
 use Psr\Log\LoggerInterface;
 use Magento\Framework\Api\SearchCriteriaBuilder;
 use Magento\Framework\App\Config\ScopeConfigInterface;
@@ -17,7 +18,8 @@ use Magento\Sales\Model\ResourceModel\Order\CollectionFactory;
 
 class UpdateOrderStatus {
 
-    const CRON_ENABLED = 'payment/sdm_altapay_config/cronScheduled/enabled';
+    const CRON_ENABLED = 'payment/sdm_altapay_config/cron_scheduled/enabled';
+    const CRON_CANCELLATION_HOURS = 'payment/sdm_altapay_config/cron_scheduled/cancellation_timeframe';
 
     /**
      * @var LoggerInterface
@@ -71,8 +73,15 @@ class UpdateOrderStatus {
     public function execute()
     {
         $completeStatus = 'canceled';
-        $storeScope = \Magento\Store\Model\ScopeInterface::SCOPE_STORE;
+        $storeScope = ScopeInterface::SCOPE_STORE;
         $cronEnabled = $this->scopeConfig->getValue(self::CRON_ENABLED, $storeScope);
+
+        $cancellationTimeframe = $this->scopeConfig->getValue(self::CRON_CANCELLATION_HOURS);
+        if(!$cancellationTimeframe) {
+            $cancellationTimeframe = 24;
+        }
+        $cutoffTime = strtotime("-$cancellationTimeframe hours");
+
         try
         {
             if (!$cronEnabled){
@@ -80,7 +89,8 @@ class UpdateOrderStatus {
                 return;
             }
             $orderCollection = $this->orderCollection->create();
-            $orderCollection->addAttributeToFilter('status','pending')
+            $orderCollection->addFieldToFilter('created_at', ['lt' => date('Y-m-d H:i:s', $cutoffTime)])
+                            ->addAttributeToFilter('status','pending')
                             ->addAttributeToFilter('altapay_payment_form_url', ['neq' => 'NULL']);
 
             if (array_filter($orderCollection->getData())) {
