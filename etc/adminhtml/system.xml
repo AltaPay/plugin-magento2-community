@@ -193,7 +193,6 @@
                         <comment>Cancellation timeframe runs from the moment the order is generated. Specify the time duration in hours; for instance, 2 days equals 48 hours with a default field setting of 24 hours.</comment>
                     </field>
                 </group>
-                </group>
                 <include path="SDM_Altapay::system/terminal1.xml"/>
                 <include path="SDM_Altapay::system/terminal2.xml"/>
                 <include path="SDM_Altapay::system/terminal3.xml"/>

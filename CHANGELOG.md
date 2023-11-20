@@ -1,6 +1,9 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [3.7.9]
+### Fixed
+- Fix the compilation issue caused by a syntax error in the system XML.
 
 ## [3.7.8]
 ### Added
