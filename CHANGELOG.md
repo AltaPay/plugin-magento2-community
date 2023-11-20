@@ -1,6 +1,12 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+
+## [3.7.8]
+### Added
+- Allow to disable Online Refunds through configuration
+- Support defining time for auto-cancelling orders
+
 ## [3.7.7]
 ### Added
 - Support edit functionality from admin panel.

@@ -17,6 +17,7 @@ use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Sales\Model\ResourceModel\Order\Tax\Item;
 use Magento\Quote\Model\Quote\Item\AbstractItem;
 use Magento\Framework\DataObject;
+use Magento\Store\Model\ScopeInterface;
 use SDM\Altapay\Model\ReconciliationIdentifierFactory;
 
 /**
@@ -25,6 +26,8 @@ use SDM\Altapay\Model\ReconciliationIdentifierFactory;
 class Data extends AbstractHelper
 {
     const MODULE_CODE = 'SDM_Altapay';
+    const CONFIG_PATH = 'payment/sdm_altapay_config/refund_setting/enable';
+
     /**
      * @var moduleList
      */
@@ -98,7 +101,7 @@ class Data extends AbstractHelper
             $versionDetails['ecomPluginVersion'] = $moduleInfo['setup_version'];
             $versionDetails['otherInfo']         = 'websiteName - ' . $websiteName . ', storeName - ' . $storeName;
         }
-        
+
         return $versionDetails;
     }
 
@@ -109,7 +112,7 @@ class Data extends AbstractHelper
      */
     public function getPaymentTitleTerminal($orderId)
     {
-        $storeScope = \Magento\Store\Model\ScopeInterface::SCOPE_STORE;
+        $storeScope = ScopeInterface::SCOPE_STORE;
         $order      = $this->order->load($orderId);
         $storeCode  = $order->getStore()->getCode();
         $storeId    = $order->getStore()->getId();
@@ -238,7 +241,7 @@ class Data extends AbstractHelper
 
         return $collection;
     }
-    
+
     /**
      * @param $post
      * @param $secret
@@ -289,5 +292,19 @@ class Data extends AbstractHelper
         $moduleInfo = $this->moduleList->getOne(self::MODULE_CODE);
         
         return $moduleInfo['setup_version'] ?? '';
+    }
+
+    /**
+     * @return string
+     */
+    public function getTemplate()
+    {
+        if ($this->scopeConfig->getValue(self::CONFIG_PATH, ScopeInterface::SCOPE_STORE)) {
+            $template =  'SDM_Altapay::order/creditmemo/create/items.phtml';
+        } else {
+            $template = 'Magento_Sales::order/creditmemo/create/items.phtml';
+        }
+
+        return $template;
     }
 }
