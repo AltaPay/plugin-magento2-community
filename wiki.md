@@ -355,16 +355,22 @@ here._
 
 ## Troubleshooting
 
-**PHP Warning: Input variables exceeded 1000. To increase the limit change max_input_vars in php.ini.**
+* **Callbacks 403 error**
 
-For orders that contain too many products, this PHP warning may be issued. You will need to:
+    - If you are getting 403 forbidden error in "Magento Commerce Cloud". It can be caused by **Fastly**, which blocks our callbacks. In this case, please contact **Fastly** support.
+    - Make sure AltaPay's outgoing IPs are whitelisted. You can find the details for callback settings [here](https://documentation.altapay.com/Content/Ecom/Payment%20Pages/Payment%20Page%20Form%20Setup.htm).
 
-- Open your php.ini file
-- Edit the max_input_vars variable. This specifies the maximum number of variables that can be sent in a request. The default is 1000. Increase it to, say, 3000.
-- Restart your server.
+* **PHP Warning: Input variables exceeded 1000. To increase the limit change max_input_vars in php.ini.**
 
-**Parameters: description/unitPrice/quantity are required for each orderline, but was not set for line: xxxx**
-> The same problem as above. The request is being truncated because the number of variables are exceeding the max_input_vars limit.
+    For orders that contain too many products, this PHP warning may be issued. You will need to:
+
+    - Open your php.ini file
+    - Edit the max_input_vars variable. This specifies the maximum number of variables that can be sent in a request. The default is 1000. Increase it to, say, 3000.
+    - Restart your server.
+
+* **Parameters: description/unitPrice/quantity are required for each orderline, but was not set for line: xxxx**
+    
+    The same problem as above. The request is being truncated because the number of variables are exceeding the max_input_vars limit.
 
 
 ## Providing error logs to support team
