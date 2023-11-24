@@ -573,6 +573,7 @@ class Order {
         cy.get('#order-billing_address_postcode').clear().type('2100')
         cy.get('#order-billing_address_telephone').clear().type('20123456').wait(3000)
         cy.get('select[id=order-billing_address_country_id]').select('Denmark')
+        cy.get('select[id=order-billing_address_region_id]').select('Hovedstaden')
         cy.get('body').then(($a) => {
             if ($a.find(".modal-footer > .action-primary > span").length) {
                 cy.get('.modal-footer > .action-primary > span').click()

@@ -2,7 +2,50 @@ import Order from '../PageObjects/objects.cy'
 
 describe('Payments', function () {
 
+    it('Termianls settings', function(){
+        const ord = new Order()
+        ord.clrcookies()
+        ord.admin()
+        cy.get('#menu-magento-backend-stores > [onclick="return false;"]').click({ force: true })
+        cy.get('.item-system-config > a').click()
+        cy.get(':nth-child(5) > .admin__page-nav-title').click().wait(3000)
+        cy.get(':nth-child(10) > .admin__page-nav-link').click({force:true})
 
+        //terminal-1
+        cy.get('#payment_us_sdm_altapay_config_terminal1-head').click().wait(3000)
+        cy.get('select[name="groups[sdm_altapay_config][groups][terminal1][fields][active][value]"]').select('Yes')
+        cy.get('#payment_us_sdm_altapay_config_terminal1_title').clear().type('EmbraceIT Integration Test Terminal')
+        cy.get('select[name="groups[sdm_altapay_config][groups][terminal1][fields][terminalname][value]"]').select('EmbraceIT Integration Test Terminal')
+        //terminal-2
+        cy.get('#payment_us_sdm_altapay_config_terminal2-head').click().wait(3000)
+        cy.get('select[name="groups[sdm_altapay_config][groups][terminal2][fields][active][value]"]').select('Yes')
+        cy.get('#payment_us_sdm_altapay_config_terminal2_title').clear().type('EmbraceIT iDEAL Integration Test Terminal')
+        cy.get('select[name="groups[sdm_altapay_config][groups][terminal2][fields][terminalname][value]"]').select('EmbraceIT iDEAL Integration Test Terminal')
+        //terminal-3
+        cy.get('#payment_us_sdm_altapay_config_terminal3-head').click().wait(3000)
+        cy.get('select[name="groups[sdm_altapay_config][groups][terminal3][fields][active][value]"]').select('Yes')
+        cy.get('#payment_us_sdm_altapay_config_terminal3_title').clear().type('EmbraceIT Klarna Integration Test Terminal')
+        cy.get('select[name="groups[sdm_altapay_config][groups][terminal3][fields][terminalname][value]"]').select('EmbraceIT Klarna Integration Test Terminal')
+        //terminal-4
+        cy.get('#payment_us_sdm_altapay_config_terminal4-head').click().wait(3000)
+        cy.get('select[name="groups[sdm_altapay_config][groups][terminal4][fields][active][value]"]').select('Yes')
+        cy.get('#payment_us_sdm_altapay_config_terminal4_title').clear().type('EmbraceIT MobilePay Integration Test Terminal')
+        cy.get('select[name="groups[sdm_altapay_config][groups][terminal4][fields][terminalname][value]"]').select('EmbraceIT MobilePay Integration Test Terminal')
+        //terminal-5
+        cy.get('#payment_us_sdm_altapay_config_terminal5-head').click().wait(3000)
+        cy.get('select[name="groups[sdm_altapay_config][groups][terminal5][fields][active][value]"]').select('Yes')
+        cy.get('#payment_us_sdm_altapay_config_terminal5_title').clear().type('Credit Card for Subscription')
+        cy.get('select[name="groups[sdm_altapay_config][groups][terminal5][fields][terminalname][value]"]').select('EmbraceIT Integration Test Terminal')
+        //terminal-6
+        cy.get('#payment_us_sdm_altapay_config_terminal6-head').click().wait(3000)
+        cy.get('select[name="groups[sdm_altapay_config][groups][terminal6][fields][active][value]"]').select('Yes')
+        cy.get('#payment_us_sdm_altapay_config_terminal6_title').clear().type('EmbraceIT BanContact Integration Test Terminal')
+        cy.get('select[name="groups[sdm_altapay_config][groups][terminal6][fields][terminalname][value]"]').select('EmbraceIT BanContact Integration Test Terminal')
+
+        cy.get('#save').click().wait(3000)
+
+
+    })
 
     it('CC full capture and refund', function () {
         const ord = new Order()
@@ -39,7 +82,6 @@ describe('Payments', function () {
             })
         })
     })
-
 
     it('Klarna full capture and refund', function () {
         const ord = new Order()
@@ -308,8 +350,8 @@ describe('Payments', function () {
 
         })
     })
-//todo: skipping this test as it is not working as expected
-    it.skip('CC Pay by link', function () {
+
+    it('CC Pay by link', function () {
         const ord = new Order()
         ord.clrcookies()
 
@@ -333,7 +375,6 @@ describe('Payments', function () {
                             cy.get('#eyear').type('2023')
                             cy.get('#cvcInput').type('123')
                             cy.get('#cardholderNameInput').type('testname')
-                            cy.get('#cardholderEmailInput').type('demo@example.com').wait(3000)
                             cy.get('#pensioCreditCardPaymentSubmitButton').click().wait(3000)
                         })
 
@@ -347,8 +388,8 @@ describe('Payments', function () {
             })
         })
     })
-//todo: skipping this test as it is not working as expected
-    it.skip('Klarna Pay by link', function () {
+
+    it('Klarna Pay by link', function () {
 
         const ord = new Order()
         ord.clrcookies()
