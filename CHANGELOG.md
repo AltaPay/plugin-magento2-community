@@ -1,11 +1,11 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
-
 ## [3.7.8]
 ### Added
 - Allow to disable Online Refunds through configuration
 - Support defining time for auto-cancelling orders
+- Fix minor styling issues on the checkout page.
 
 ## [3.7.7]
 ### Added
