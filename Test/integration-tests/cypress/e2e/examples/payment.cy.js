@@ -2,47 +2,71 @@ import Order from '../PageObjects/objects.cy'
 
 describe('Payments', function () {
 
-    it('Termianls settings', function(){
+    it('Termianls settings', function () {
         const ord = new Order()
         ord.clrcookies()
         ord.admin()
         cy.get('#menu-magento-backend-stores > [onclick="return false;"]').click({ force: true })
         cy.get('.item-system-config > a').click()
         cy.get(':nth-child(5) > .admin__page-nav-title').click().wait(3000)
-        cy.get(':nth-child(10) > .admin__page-nav-link').click({force:true})
+        cy.get(':nth-child(10) > .admin__page-nav-link').click({ force: true })
 
         //terminal-1
-        cy.get('#payment_us_sdm_altapay_config_terminal1-head').click().wait(3000)
-        cy.get('select[name="groups[sdm_altapay_config][groups][terminal1][fields][active][value]"]').select('Yes')
-        cy.get('#payment_us_sdm_altapay_config_terminal1_title').clear().type('EmbraceIT Integration Test Terminal')
-        cy.get('select[name="groups[sdm_altapay_config][groups][terminal1][fields][terminalname][value]"]').select('EmbraceIT Integration Test Terminal')
+        cy.fixture('config').then((admin) => {
+            if (admin.CC_TERMINAL_NAME != "") {
+                cy.get('#payment_us_sdm_altapay_config_terminal1-head').click().wait(3000)
+                cy.get('select[name="groups[sdm_altapay_config][groups][terminal1][fields][active][value]"]').select('Yes')
+                cy.get('#payment_us_sdm_altapay_config_terminal1_title').clear().type(admin.CC_TERMINAL_NAME)
+                cy.get('select[name="groups[sdm_altapay_config][groups][terminal1][fields][terminalname][value]"]').select(admin.CC_TERMINAL_NAME).wait(3000)
+            }
+        })
         //terminal-2
-        cy.get('#payment_us_sdm_altapay_config_terminal2-head').click().wait(3000)
-        cy.get('select[name="groups[sdm_altapay_config][groups][terminal2][fields][active][value]"]').select('Yes')
-        cy.get('#payment_us_sdm_altapay_config_terminal2_title').clear().type('EmbraceIT iDEAL Integration Test Terminal')
-        cy.get('select[name="groups[sdm_altapay_config][groups][terminal2][fields][terminalname][value]"]').select('EmbraceIT iDEAL Integration Test Terminal')
+        cy.fixture('config').then((admin) => {
+            if (admin.iDEAL_EUR_TERMINAL != "") {
+                cy.get('#payment_us_sdm_altapay_config_terminal2-head').click().wait(3000)
+                cy.get('select[name="groups[sdm_altapay_config][groups][terminal2][fields][active][value]"]').select('Yes')
+                cy.get('#payment_us_sdm_altapay_config_terminal2_title').clear().type(admin.iDEAL_EUR_TERMINAL)
+                cy.get('select[name="groups[sdm_altapay_config][groups][terminal2][fields][terminalname][value]"]').select(admin.iDEAL_EUR_TERMINAL)
+            }
+        })
         //terminal-3
-        cy.get('#payment_us_sdm_altapay_config_terminal3-head').click().wait(3000)
-        cy.get('select[name="groups[sdm_altapay_config][groups][terminal3][fields][active][value]"]').select('Yes')
-        cy.get('#payment_us_sdm_altapay_config_terminal3_title').clear().type('EmbraceIT Klarna Integration Test Terminal')
-        cy.get('select[name="groups[sdm_altapay_config][groups][terminal3][fields][terminalname][value]"]').select('EmbraceIT Klarna Integration Test Terminal')
+        cy.fixture('config').then((admin) => {
+            if (admin.KLARNA_DKK_TERMINAL_NAME != "") {
+                cy.get('#payment_us_sdm_altapay_config_terminal3-head').click().wait(3000)
+                cy.get('select[name="groups[sdm_altapay_config][groups][terminal3][fields][active][value]"]').select('Yes')
+                cy.get('#payment_us_sdm_altapay_config_terminal3_title').clear().type(admin.KLARNA_DKK_TERMINAL_NAME)
+                cy.get('select[name="groups[sdm_altapay_config][groups][terminal3][fields][terminalname][value]"]').select(admin.KLARNA_DKK_TERMINAL_NAME)
+            }
+        })
         //terminal-4
-        cy.get('#payment_us_sdm_altapay_config_terminal4-head').click().wait(3000)
-        cy.get('select[name="groups[sdm_altapay_config][groups][terminal4][fields][active][value]"]').select('Yes')
-        cy.get('#payment_us_sdm_altapay_config_terminal4_title').clear().type('EmbraceIT MobilePay Integration Test Terminal')
-        cy.get('select[name="groups[sdm_altapay_config][groups][terminal4][fields][terminalname][value]"]').select('EmbraceIT MobilePay Integration Test Terminal')
+        cy.fixture('config').then((admin) => {
+            if (admin.MOBILEPAY_TERMINAL_NAME != "") {
+                cy.get('#payment_us_sdm_altapay_config_terminal4-head').click().wait(3000)
+                cy.get('select[name="groups[sdm_altapay_config][groups][terminal4][fields][active][value]"]').select('Yes')
+                cy.get('#payment_us_sdm_altapay_config_terminal4_title').clear().type(admin.MOBILEPAY_TERMINAL_NAME)
+                cy.get('select[name="groups[sdm_altapay_config][groups][terminal4][fields][terminalname][value]"]').select(admin.MOBILEPAY_TERMINAL_NAME)
+            }
+        })
         //terminal-5
-        cy.get('#payment_us_sdm_altapay_config_terminal5-head').click().wait(3000)
-        cy.get('select[name="groups[sdm_altapay_config][groups][terminal5][fields][active][value]"]').select('Yes')
-        cy.get('#payment_us_sdm_altapay_config_terminal5_title').clear().type('Credit Card for Subscription')
-        cy.get('select[name="groups[sdm_altapay_config][groups][terminal5][fields][terminalname][value]"]').select('EmbraceIT Integration Test Terminal')
+        cy.fixture('config').then((admin) => {
+            if (admin.CC_TERMINAL_NAME != "" && admin.SUBSCRIPTION_TERMINAL_NAME != "") {
+                cy.get('#payment_us_sdm_altapay_config_terminal5-head').click().wait(3000)
+                cy.get('select[name="groups[sdm_altapay_config][groups][terminal5][fields][active][value]"]').select('Yes')
+                cy.get('#payment_us_sdm_altapay_config_terminal5_title').clear().type(admin.SUBSCRIPTION_TERMINAL_NAME)
+                cy.get('select[name="groups[sdm_altapay_config][groups][terminal5][fields][terminalname][value]"]').select(admin.CC_TERMINAL_NAME)
+            }
+        })
         //terminal-6
-        cy.get('#payment_us_sdm_altapay_config_terminal6-head').click().wait(3000)
-        cy.get('select[name="groups[sdm_altapay_config][groups][terminal6][fields][active][value]"]').select('Yes')
-        cy.get('#payment_us_sdm_altapay_config_terminal6_title').clear().type('EmbraceIT BanContact Integration Test Terminal')
-        cy.get('select[name="groups[sdm_altapay_config][groups][terminal6][fields][terminalname][value]"]').select('EmbraceIT BanContact Integration Test Terminal')
+        cy.fixture('config').then((admin) => {
+            if (admin.BANCONTACT_TERMINAL_NAME != "") {
+                cy.get('#payment_us_sdm_altapay_config_terminal6-head').click().wait(3000)
+                cy.get('select[name="groups[sdm_altapay_config][groups][terminal6][fields][active][value]"]').select('Yes')
+                cy.get('#payment_us_sdm_altapay_config_terminal6_title').clear().type(admin.BANCONTACT_TERMINAL_NAME)
+                cy.get('select[name="groups[sdm_altapay_config][groups][terminal6][fields][terminalname][value]"]').select(admin.BANCONTACT_TERMINAL_NAME)
 
-        cy.get('#save').click().wait(3000)
+                cy.get('#save').click().wait(3000)
+            }
+        })
 
 
     })
