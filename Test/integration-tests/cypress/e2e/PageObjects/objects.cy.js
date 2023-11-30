@@ -560,11 +560,7 @@ class Order {
         cy.reload().wait(3000)
         cy.contains('Create New Customer').focus().click({ force: true }).wait(3000)
         cy.reload().wait(3000)
-        let text = "";
-        let alphabet = "abcdefghijklmnopqrstuvwxyz123456789"
-        for (let i = 0; i < 10; i++) {
-            text += alphabet.charAt(Math.floor(Math.random() * alphabet.length))
-        }
+        var text = this.generateRandomString(8);
         cy.get('#email').type(text + '@example.com')
         cy.get('#order-billing_address_firstname').clear().type('Test')
         cy.get('#order-billing_address_lastname').clear().type('Person-dk')
@@ -584,6 +580,15 @@ class Order {
         cy.get('#order-search .admin__page-section-title .actions button').focus().trigger('mouseover').click().wait(3000)
         cy.contains('Get shipping methods and rates').focus().trigger('mouseover').click({ force: true }).wait(5000)
         cy.get('.admin__order-shipment-methods-options-list > li:first').click().wait(3000)
+    }
+
+    generateRandomString(n){
+        let text = "";
+        let alphabet = "aBcDeFgHiJkLmNoPqRsTuVwXyZ1234567890"
+        for (let i = 0; i < n; i++) {
+            text += alphabet.charAt(Math.floor(Math.random() * alphabet.length))
+        }
+        return text;
     }
 }
 

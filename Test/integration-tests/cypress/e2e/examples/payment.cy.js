@@ -477,6 +477,15 @@ describe('Payments', function () {
                 if (admin.SUBSCRIPTION_TERMINAL_NAME != "") {
                     ord.subscription_product()
                     ord.visit()
+                    cy.contains('Create an Account').click().wait(3000)
+                    cy.get('#firstname').type('Test')
+                    cy.get('#lastname').type('Test Person')
+                    var text = ord.generateRandomString(8);
+                    cy.get('#email_address').type(text + '@example.com')
+                    cy.get('#password').type(text + '@')
+                    cy.get('#password-confirmation').type(text + '@')
+                    cy.get('#send2').click().wait(3000)
+                    cy.get('img').click()
                     cy.contains('Argus All-Weather Tank').click()
                     cy.get('#option-label-size-144-item-166').click().wait(2000)
                     cy.get('#option-label-color-93-item-52').click().wait(2000)
@@ -484,9 +493,19 @@ describe('Payments', function () {
                     cy.get('#product-addtocart-button').click().wait(3000)
                     cy.get('.showcart').click().wait(5000)
                     cy.get('#top-cart-btn-checkout').click().wait(3000)
-                    cy.get('#customer-email').type('demo@example.com')
-                    cy.get('#pass').type('admin@1234')
-                    cy.get('#send2').click().wait(15000)
+                    cy.get('input[name=firstname]').type('Testperson-dk')
+                    cy.get('input[name=lastname]').type('Approved')
+                    cy.get('select[name=country_id]').select('Denmark')
+                    cy.get('body').then(($p) => {
+                        if ($p.find('select[name=region_id]').length) {
+                            cy.get('select[name=region_id]').select('Hovedstaden')
+                        }
+                    })
+                    cy.get('input[name="street[0]"]').type('Sæffleberggate 56,1 mf')
+                    cy.get('input[name=city]').type('Varde')
+                    cy.get('input[name=postcode]').type('6800')
+                    cy.get('input[name=telephone]').type('20123456')
+                    cy.wait(5000)
                     cy.get('.button').click().wait(5000)
                     cy.get('body').then(($a) => {
                         if ($a.find("label:contains('" + admin.SUBSCRIPTION_TERMINAL_NAME + "')").length) {
