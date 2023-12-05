@@ -395,8 +395,8 @@ describe('Payments', function () {
                         cy.origin('https://testgateway.pensio.com', { args: { payment_link } }, ({ payment_link }) => {
                             cy.visit(payment_link)
                             cy.get('#creditCardNumberInput').type('4111111111111111')
-                            cy.get('#emonth').type('01')
-                            cy.get('#eyear').type('2023')
+                            cy.get('#emonth').select('12')
+                            cy.get('#eyear').select('2025')
                             cy.get('#cvcInput').type('123')
                             cy.get('#cardholderNameInput').type('testname')
                             cy.get('#pensioCreditCardPaymentSubmitButton').click().wait(3000)
@@ -464,7 +464,7 @@ describe('Payments', function () {
         })
     })
 
-    it('Subscription Payment', function () {
+    it('Subscription payment', function () {
         const ord = new Order()
         ord.clrcookies()
         ord.visit()
@@ -528,7 +528,7 @@ describe('Payments', function () {
         })
     })
 
-    it('MobilePay Pyament ', function () {
+    it('MobilePay payment ', function () {
         const ord = new Order()
         ord.clrcookies()
         ord.visit()
