@@ -11,7 +11,7 @@ describe('Payments', function () {
         cy.get(':nth-child(5) > .admin__page-nav-title').click().wait(3000)
         cy.get(':nth-child(10) > .admin__page-nav-link').click({ force: true })
 
-        //terminal-1
+        //Setting terminal-1 to Credit Card payment method
         cy.fixture('config').then((admin) => {
             if (admin.CC_TERMINAL_NAME != "") {
                 cy.get('#payment_us_sdm_altapay_config_terminal1-head').click().wait(3000)
@@ -20,7 +20,7 @@ describe('Payments', function () {
                 cy.get('select[name="groups[sdm_altapay_config][groups][terminal1][fields][terminalname][value]"]').select(admin.CC_TERMINAL_NAME).wait(3000)
             }
         })
-        //terminal-2
+        //Setting terminal-2 to iDEAL payment method
         cy.fixture('config').then((admin) => {
             if (admin.iDEAL_EUR_TERMINAL != "") {
                 cy.get('#payment_us_sdm_altapay_config_terminal2-head').click().wait(3000)
@@ -29,7 +29,7 @@ describe('Payments', function () {
                 cy.get('select[name="groups[sdm_altapay_config][groups][terminal2][fields][terminalname][value]"]').select(admin.iDEAL_EUR_TERMINAL)
             }
         })
-        //terminal-3
+        //Setting terminal-3 to Klarna payment method
         cy.fixture('config').then((admin) => {
             if (admin.KLARNA_DKK_TERMINAL_NAME != "") {
                 cy.get('#payment_us_sdm_altapay_config_terminal3-head').click().wait(3000)
@@ -38,7 +38,7 @@ describe('Payments', function () {
                 cy.get('select[name="groups[sdm_altapay_config][groups][terminal3][fields][terminalname][value]"]').select(admin.KLARNA_DKK_TERMINAL_NAME)
             }
         })
-        //terminal-4
+        //Setting terminal-4 to MobilePay payment method
         cy.fixture('config').then((admin) => {
             if (admin.MOBILEPAY_TERMINAL_NAME != "") {
                 cy.get('#payment_us_sdm_altapay_config_terminal4-head').click().wait(3000)
@@ -47,7 +47,7 @@ describe('Payments', function () {
                 cy.get('select[name="groups[sdm_altapay_config][groups][terminal4][fields][terminalname][value]"]').select(admin.MOBILEPAY_TERMINAL_NAME)
             }
         })
-        //terminal-5
+        //Setting terminal-5 to Subscription payment method
         cy.fixture('config').then((admin) => {
             if (admin.CC_TERMINAL_NAME != "" && admin.SUBSCRIPTION_TERMINAL_NAME != "") {
                 cy.get('#payment_us_sdm_altapay_config_terminal5-head').click().wait(3000)
@@ -56,7 +56,7 @@ describe('Payments', function () {
                 cy.get('select[name="groups[sdm_altapay_config][groups][terminal5][fields][terminalname][value]"]').select(admin.CC_TERMINAL_NAME)
             }
         })
-        //terminal-6
+        //Setting terminal-6 to BanContact payment method
         cy.fixture('config').then((admin) => {
             if (admin.BANCONTACT_TERMINAL_NAME != "") {
                 cy.get('#payment_us_sdm_altapay_config_terminal6-head').click().wait(3000)
@@ -64,9 +64,11 @@ describe('Payments', function () {
                 cy.get('#payment_us_sdm_altapay_config_terminal6_title').clear().type(admin.BANCONTACT_TERMINAL_NAME)
                 cy.get('select[name="groups[sdm_altapay_config][groups][terminal6][fields][terminalname][value]"]').select(admin.BANCONTACT_TERMINAL_NAME)
 
-                cy.get('#save').click().wait(3000)
+
             }
         })
+
+        cy.get('#save').click().wait(3000)
 
 
     })
