@@ -46,8 +46,8 @@ class Order {
             cy.get('._active > .payment-method-content > :nth-child(5) > div.primary > .action').click().wait(2000)
         }
         cy.get('#creditCardNumberInput').type('4111111111111111')
-        cy.get('#emonth').select('12')
-        cy.get('#eyear').select('2025')
+        cy.get('#emonth').type('01')
+        cy.get('#eyear').type('2025')
         cy.get('#cvcInput').type('123')
         cy.get('#cardholderNameInput').type('testname')
         cy.get('body').then(($p) => {
