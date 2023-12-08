@@ -1,6 +1,12 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [unreleased]
+### Added
+- Run the cron on an hourly basis when the auto-cancel functionality is enabled.
+- Remove daily, weekly and monthly cron scheduler to minimize the complexity
+- Add configuration to exclude admin orders from the auto-cancel cron scheduler.
+
 ## [3.7.8]
 ### Added
 - Allow to disable Online Refunds through configuration
