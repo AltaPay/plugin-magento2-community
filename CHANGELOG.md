@@ -1,7 +1,7 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
-## [3.7.9]
+## [unreleased]
 ### Added
 - Support Fooman OrderFees functionlaity with Altapay extension.
 - Run the cron on an hourly basis when the auto-cancel functionality is enabled.
