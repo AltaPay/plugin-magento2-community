@@ -1,52 +1,52 @@
 <?php
 namespace SDM\Altapay\Plugin\Checkout\Controller\Onepage;
 
-use Magento\Sales\Model\Order;
-use Magento\Sales\Model\ResourceModel\Order\CollectionFactory as OrderColl;
+use Magento\Sales\Model\OrderFactory;
+use Magento\Sales\Model\ResourceModel\Order\CollectionFactory;
 use Magento\Checkout\Model\Session;
 use Magento\Framework\Registry;
 
 class Success
 {
     /**
-     * @var \Magento\Framework\Registry
+     * @var Registry
      */
     protected $coreRegistry;
 
     /**
-     * @var \Magento\Checkout\Model\Session
+     * @var Session
      */
     protected $checkoutSession;
 
     /**
-     * @var \Magento\Sales\Model\OrderFactory
+     * @var OrderFactory
      */
     protected $orderFactory;
 
     /**
-     * @var \Magento\Sales\Model\Order
+     * @var CollectionFactory
      */
-    protected $orderColl;
+    protected $salesOrderCollection;
 
     public static $table = 'sales_order';
 
     /**
      * Success constructor.
-     * @param \Magento\Framework\Registry $coreRegistry
-     * @param \Magento\Checkout\Model\Session $checkoutSession
-     * @param \Magento\Sales\Model\Order $orderFactory
-     * @param \Magento\Sales\Model\ResourceModel\Order\CollectionFactory $OrderColl
+     * @param Registry $coreRegistry
+     * @param Session $checkoutSession
+     * @param OrderFactory $orderFactory
+     * @param CollectionFactory $salesOrderCollection
      */
     public function __construct(
         Registry $coreRegistry,
         Session $checkoutSession,
-        Order $orderFactory,
-        OrderColl $orderColl
+        OrderFactory $orderFactory,
+        CollectionFactory $salesOrderCollection
     ) {
         $this->coreRegistry = $coreRegistry;
         $this->checkoutSession = $checkoutSession;
         $this->orderFactory = $orderFactory;
-        $this->orderColl = $orderColl;
+        $this->salesOrderCollection = $salesOrderCollection;
     }
 
     /**
@@ -58,7 +58,7 @@ class Success
         if (!$hash) {
             return;
         }
-        $collectionData = $this->orderColl->create()->addFieldToSelect(
+        $collectionData = $this->salesOrderCollection->create()->addFieldToSelect(
             'increment_id'
         )->addFieldToFilter(
             'altapay_order_hash',
@@ -67,8 +67,8 @@ class Success
         $collectionInfo = $collectionData->getData();
         foreach ($collectionInfo as $data) {
             $orderId = $data['increment_id'];
-            if ($orderId && is_numeric($orderId)) {
-                $order = $this->orderFactory->loadByIncrementId($orderId);
+            if ($orderId) {
+                $order = $this->orderFactory->create()->loadByIncrementId($orderId);
                 if ($order && $order->getId() && $order->getAltapayOrderHash() !== null) { 
                     $this->checkoutSession->setLastQuoteId($order->getQuoteId());
                     $this->checkoutSession->setLastSuccessQuoteId($order->getQuoteId());
