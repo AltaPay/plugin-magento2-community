@@ -16,9 +16,10 @@ use Magento\Framework\Api\SearchCriteriaBuilder;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Sales\Model\ResourceModel\Order\CollectionFactory;
 
-class UpdateOrderStatus {
-
+class UpdateOrderStatus 
+{
     const CRON_ENABLED = 'payment/sdm_altapay_config/cron_scheduled/enabled';
+    const EXCLUDE_ADMIN_ORDER = 'payment/sdm_altapay_config/cron_scheduled/exclude_orders';
     const CRON_CANCELLATION_HOURS = 'payment/sdm_altapay_config/cron_scheduled/cancellation_timeframe';
 
     /**
@@ -92,7 +93,11 @@ class UpdateOrderStatus {
             $orderCollection->addFieldToFilter('created_at', ['lt' => date('Y-m-d H:i:s', $cutoffTime)])
                             ->addAttributeToFilter('status','pending')
                             ->addAttributeToFilter('altapay_payment_form_url', ['neq' => 'NULL']);
-
+            
+            if ($this->scopeConfig->getValue(self::EXCLUDE_ADMIN_ORDER, $storeScope)) {
+                $orderCollection->addFieldToFilter('remote_ip', ['neq' => null]);
+            }
+            
             if (array_filter($orderCollection->getData())) {
                 foreach ($orderCollection as $order) {
 

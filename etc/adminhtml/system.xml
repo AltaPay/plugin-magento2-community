@@ -173,18 +173,12 @@
                     <field id="enabled" translate="label" type="select" sortOrder="1" showInDefault="1" showInWebsite="0" showInStore="0">
                         <label>Enable</label>
                         <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-                        <comment>This will cancel orders with pending payments</comment>
+                        <comment>This cron job, triggered hourly, will automatically cancel orders that have pending payments.</comment>
                     </field>
-                    <field id="frequency" translate="label" type="select" sortOrder="2" showInDefault="2" showInWebsite="1"
-                        showInStore="1">
-                        <label>Frequency</label>
-                        <source_model>Magento\Cron\Model\Config\Source\Frequency</source_model>
-                        <backend_model>SDM\Altapay\Model\Config\CronConfig</backend_model>
-                        <comment>Check form orders with pending payments</comment>
-                    </field>
-                    <field id="time" translate="label comment" sortOrder="3" type="time" showInDefault="3" showInWebsite="1"
-                        showInStore="1">
-                        <label>Start Time</label>
+                    <field id="exclude_orders" translate="label" type="select" sortOrder="1" showInDefault="1" showInWebsite="0" showInStore="0">
+                        <label>Exclude admin orders</label>
+                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                        <comment>If this option is enabled, orders placed from Magento admin will be excluded from the auto-cancel cron scheduler.</comment>
                     </field>
                     <field id="cancellation_timeframe" translate="label comment" type="text" sortOrder="4" showInDefault="1" showInWebsite="1" showInStore="1">
                         <label>Cancellation Timeframe (in hours)</label>
