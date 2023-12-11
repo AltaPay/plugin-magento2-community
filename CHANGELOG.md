@@ -1,6 +1,12 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [3.8.0]
+### Added
+- Fix: Multi-currency issue with Pay by link payment form.
+- Fix: Billing address selection missing from terminal slot 6 to 10.
+- Fix: Payment form link in the email is not working.
+
 ## [3.7.9]
 ### Added
 - Support Fooman OrderFees functionlaity with Altapay extension.
