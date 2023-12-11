@@ -46,8 +46,8 @@ class Order {
             cy.get('._active > .payment-method-content > :nth-child(5) > div.primary > .action').click().wait(2000)
         }
         cy.get('#creditCardNumberInput').type('4111111111111111')
-        cy.get('#emonth').type('01')
-        cy.get('#eyear').type('2025')
+        cy.get('#emonth').select('12')
+        cy.get('#eyear').select('2025')
         cy.get('#cvcInput').type('123')
         cy.get('#cardholderNameInput').type('testname')
         cy.get('body').then(($p) => {
@@ -560,11 +560,7 @@ class Order {
         cy.reload().wait(3000)
         cy.contains('Create New Customer').focus().click({ force: true }).wait(3000)
         cy.reload().wait(3000)
-        let text = "";
-        let alphabet = "abcdefghijklmnopqrstuvwxyz123456789"
-        for (let i = 0; i < 10; i++) {
-            text += alphabet.charAt(Math.floor(Math.random() * alphabet.length))
-        }
+        var text = this.generateRandomString(8);
         cy.get('#email').type(text + '@example.com')
         cy.get('#order-billing_address_firstname').clear().type('Test')
         cy.get('#order-billing_address_lastname').clear().type('Person-dk')
@@ -573,6 +569,7 @@ class Order {
         cy.get('#order-billing_address_postcode').clear().type('2100')
         cy.get('#order-billing_address_telephone').clear().type('20123456').wait(3000)
         cy.get('select[id=order-billing_address_country_id]').select('Denmark')
+        cy.get('select[id=order-billing_address_region_id]').select('Hovedstaden')
         cy.get('body').then(($a) => {
             if ($a.find(".modal-footer > .action-primary > span").length) {
                 cy.get('.modal-footer > .action-primary > span').click()
@@ -583,6 +580,15 @@ class Order {
         cy.get('#order-search .admin__page-section-title .actions button').focus().trigger('mouseover').click().wait(3000)
         cy.contains('Get shipping methods and rates').focus().trigger('mouseover').click({ force: true }).wait(5000)
         cy.get('.admin__order-shipment-methods-options-list > li:first').click().wait(3000)
+    }
+
+    generateRandomString(n){
+        let text = "";
+        let alphabet = "aBcDeFgHiJkLmNoPqRsTuVwXyZ1234567890"
+        for (let i = 0; i < n; i++) {
+            text += alphabet.charAt(Math.floor(Math.random() * alphabet.length))
+        }
+        return text;
     }
 }
 

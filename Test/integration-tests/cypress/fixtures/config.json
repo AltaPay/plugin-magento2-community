@@ -9,5 +9,6 @@
   "SUBSCRIPTION_TERMINAL_NAME": "Your subscription terminal name",
   "MOBILEPAY_TERMINAL_NAME": "Your MobilePay terminal name",
   "MOBILEPAY_TEST_PHONE_COUNTRY_CODE": "Your MobilePay phone's 2 digit country code prefixing +",
-  "MOBILEPAY_TEST_PHONE": "Your MobilePay phone number"
+  "MOBILEPAY_TEST_PHONE": "Your MobilePay phone number",
+  "BANCONTACT_TERMINAL_NAME": "Your BanContact terminal name"
 }

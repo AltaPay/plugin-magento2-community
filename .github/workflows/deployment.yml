@@ -11,7 +11,7 @@ on:
 jobs:
   terraform:
     name: 'Terraform'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     outputs:
       ip: ${{ steps.expose_ip.outputs.ip}}
 
@@ -122,7 +122,7 @@ jobs:
         uses: jsdaniell/create-json@v1.2.2
         with:
           name: "config.json"
-          json: '{"shopURL": "http://${{ needs.terraform.outputs.ip }}","adminURL": "http://${{ needs.terraform.outputs.ip }}/admin","adminUsername": "${{secrets.CMS_ADMIN_USER}}","adminPass": "${{secrets.CMS_ADMIN_PASS}}", "CC_TERMINAL_NAME": "${{secrets.CC_TERMINAL_NAME}}", "KLARNA_DKK_TERMINAL_NAME": "${{secrets.KLARNA_DKK_TERMINAL_NAME}}", "SUBSCRIPTION_TERMINAL_NAME": "${{secrets.SUBSCRIPTION_TERMINAL_NAME}}", "iDEAL_EUR_TERMINAL": "${{secrets.IDEAL_EUR_TERMINAL_NAME}}", "MOBILEPAY_TERMINAL_NAME": "${{secrets.MOBILEPAY_TERMINAL_NAME}}", "MOBILEPAY_TEST_PHONE": "${{secrets.MOBILEPAY_TEST_PHONE}}", "MOBILEPAY_TEST_PHONE_COUNTRY_CODE": "${{secrets.MOBILEPAY_TEST_PHONE_COUNTRY_CODE}}"}'
+          json: '{"shopURL": "http://${{ needs.terraform.outputs.ip }}","adminURL": "http://${{ needs.terraform.outputs.ip }}/admin","adminUsername": "${{secrets.CMS_ADMIN_USER}}","adminPass": "${{secrets.CMS_ADMIN_PASS}}", "CC_TERMINAL_NAME": "${{secrets.CC_TERMINAL_NAME}}", "KLARNA_DKK_TERMINAL_NAME": "${{secrets.KLARNA_DKK_TERMINAL_NAME}}", "SUBSCRIPTION_TERMINAL_NAME": "${{secrets.SUBSCRIPTION_TERMINAL_NAME}}", "iDEAL_EUR_TERMINAL": "${{secrets.IDEAL_EUR_TERMINAL_NAME}}", "MOBILEPAY_TERMINAL_NAME": "${{secrets.MOBILEPAY_TERMINAL_NAME}}", "MOBILEPAY_TEST_PHONE": "${{secrets.MOBILEPAY_TEST_PHONE}}", "MOBILEPAY_TEST_PHONE_COUNTRY_CODE": "${{secrets.MOBILEPAY_TEST_PHONE_COUNTRY_CODE}}", "BANCONTACT_TERMINAL_NAME": "${{secrets.BANCONTACT_TERMINAL_NAME}}"}'
           dir: Test/integration-tests/cypress/fixtures/
 
       - name: Install Cypress Dependencies
