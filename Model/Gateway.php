@@ -43,6 +43,7 @@ use Magento\Sales\Model\Order\Invoice;
 use Magento\Framework\DB\TransactionFactory;
 use Magento\Sales\Model\Service\InvoiceService;
 use Altapay\Api\Others\Terminals;
+use Magento\Framework\Event\ManagerInterface;
 
 /**
  * Class Gateway
@@ -143,6 +144,10 @@ class Gateway implements GatewayInterface
     private $random;
 
     /**
+     * @var ManagerInterface
+     */
+    protected $_eventManager;
+    /**
      * Gateway constructor.
      *
      * @param Session                          $checkoutSession
@@ -167,6 +172,7 @@ class Gateway implements GatewayInterface
      * @param TransactionRepositoryInterface   $transactionRepository
      * @param TransactionFactory               $transactionFactory
      * @param InvoiceService                   $invoiceService
+     * @param ManagerInterface                 $_eventManager
      */
     public function __construct(
         Session $checkoutSession,
@@ -190,7 +196,8 @@ class Gateway implements GatewayInterface
         Random $random,
         TransactionRepositoryInterface $transactionRepository,
         TransactionFactory $transactionFactory,
-        InvoiceService $invoiceService
+        InvoiceService $invoiceService,
+        ManagerInterface $eventManager
     )
     {
         $this->checkoutSession       = $checkoutSession;
@@ -215,6 +222,7 @@ class Gateway implements GatewayInterface
         $this->transactionRepository = $transactionRepository;
         $this->transactionFactory    = $transactionFactory;
         $this->invoiceService        = $invoiceService;
+        $this->_eventManager         = $eventManager;
     }
 
     /**
@@ -252,6 +260,13 @@ class Gateway implements GatewayInterface
             if (!empty($this->fixedProductTax($order))) {
                 $orderLines[] = $this->orderLines->fixedProductTaxOrderLine($this->fixedProductTax($order));
             }
+
+            $this->_eventManager->dispatch('additional_orderline_event_observer',
+                [
+                    'order_lines'   => &$orderLines,
+                    'quote_id'  => $order->getQuoteId()
+                ]
+            );
             $request = $this->preparePaymentRequest($order, $orderLines, $orderId, $terminalId, null);
             if ($request) {
                 return $this->sendPaymentRequest($order, $request);
