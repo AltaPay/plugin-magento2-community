@@ -376,8 +376,8 @@ describe('Payments', function () {
 
         })
     })
-    //skipping this test
-    it.skip('CC Pay by link', function () {
+    
+    it('CC Pay by link', function () {
         const ord = new Order()
         ord.clrcookies()
 
@@ -414,8 +414,8 @@ describe('Payments', function () {
             })
         })
     })
-    //skipping this test
-    it.skip('Klarna Pay by link', function () {
+    
+    it('Klarna Pay by link', function () {
 
         const ord = new Order()
         ord.clrcookies()
