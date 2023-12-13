@@ -72,8 +72,14 @@ class Ordersummary extends \Magento\Framework\View\Element\Template
      * @var \Magento\Framework\UrlInterface
      */
     protected $_urlInterface;
+
     /**
-     * Ordersummary constructor.
+     * @var \Magento\Framework\Pricing\PriceCurrencyInterface
+     */
+    protected $priceCurrency;
+
+    /**
+     * Order summary constructor.
      *
      * @param \Magento\Framework\View\Element\Template\Context $context
      * @param OrderLoaderInterface $orderLoader
@@ -88,6 +94,7 @@ class Ordersummary extends \Magento\Framework\View\Element\Template
      * @param ScopeConfigInterface $appConfigScopeConfigInterface
      * @param \Magento\Theme\Block\Html\Header\Logo $logo
      * @param \Magento\Framework\UrlInterface $urlInterface
+     * @param \Magento\Framework\Pricing\PriceCurrencyInterface $priceCurrency
      * @param array $data
      */
     public function __construct(
@@ -104,6 +111,7 @@ class Ordersummary extends \Magento\Framework\View\Element\Template
         ScopeConfigInterface $appConfigScopeConfigInterface,
         \Magento\Theme\Block\Html\Header\Logo $logo,
         \Magento\Framework\UrlInterface $urlInterface,
+        \Magento\Framework\Pricing\PriceCurrencyInterface $priceCurrency,
         array $data = []
     ) {
         parent::__construct($context, $data);
@@ -119,10 +127,11 @@ class Ordersummary extends \Magento\Framework\View\Element\Template
         $this->_appConfigScopeConfigInterface = $appConfigScopeConfigInterface;
         $this->_logo                          = $logo;
         $this->_urlInterface                  = $urlInterface;
+        $this->priceCurrency                  = $priceCurrency;
     }
 
     /**
-     * Get orderif from param
+     * Get order id from param
      *
      * @return mixed
      */
@@ -208,7 +217,7 @@ class Ordersummary extends \Magento\Framework\View\Element\Template
     }
 
     /**
-     * Get Formated Price
+     * Get Formatted Price
      *
      * @param string $price
      *
@@ -216,7 +225,14 @@ class Ordersummary extends \Magento\Framework\View\Element\Template
      */
     public function getFormatedPrice($price = '')
     {
-        return $this->priceHelper->currency($price, true, false);
+        $order          = $this->getOrder();
+        $currencyCode   = null;
+
+        if($order){
+            $currencyCode = $order->getOrderCurrencyCode();
+        }
+
+        return $this->priceCurrency->format($price, false, 2, null, $currencyCode);
     }
 
     /**

@@ -376,7 +376,7 @@ describe('Payments', function () {
 
         })
     })
-
+    
     it('CC Pay by link', function () {
         const ord = new Order()
         ord.clrcookies()
@@ -414,7 +414,7 @@ describe('Payments', function () {
             })
         })
     })
-
+    
     it('Klarna Pay by link', function () {
 
         const ord = new Order()

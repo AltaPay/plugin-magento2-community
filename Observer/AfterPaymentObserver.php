@@ -108,7 +108,7 @@ class AfterPaymentObserver implements ObserverInterface
                 $templateVars = array(
                                     'store' => $this->storeManager->getStore(),
                                     'customer_name' => $order->getCustomerName(),
-                                    'message'    => $params['formurl']
+                                    'formurl'    => $params['formurl']
                                 );
                 $from = array('email' => $email, 'name' => $name);
                 $this->inlineTranslation->suspend();
