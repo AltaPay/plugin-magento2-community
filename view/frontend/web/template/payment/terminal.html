@@ -66,6 +66,7 @@
         <p style="display: none;" id="altapay-error-message" class="message-error error message"></p>
         <div class="actions-toolbar">
             <div class="primary">
+                <!-- ko ifnot: isApplePay() -->
                 <button class="action primary btn checkout"
                         type="submit"
                         data-bind="
@@ -77,6 +78,20 @@
                         disabled>
                     <span data-bind="i18n: 'Place Order'"></span>
                 </button>
+                <!--/ko-->
+                <!-- ko if: isApplePay() -->
+                <button class="action primary btn checkout"
+                        type="submit"
+                        data-bind="
+                        click: placeOrderApplePay,
+                        attr: {title: $t('Place Order')},
+                        css: {disabled: !isPlaceOrderActionAllowed()},
+                        enable: (getCode() == isChecked())
+                        "
+                        disabled>
+                    <span data-bind="i18n: 'Place Order'"></span>
+                </button>
+                <!--/ko-->
             </div>
         </div>
     </div>
