@@ -36,6 +36,8 @@ We highly recommend gathering all the below information, before starting the ins
 
 [Pay by link](#pay-by-link)
 
+* [Pay by link email template](#pay-by-link-email-template)
+
 [Auto-cancelling orders cron settings](#auto-cancelling-orders-cron-settings)
 
 [Reorder from the admin](#reorder-from-the-admin)
@@ -283,6 +285,11 @@ By performing the below steps a customer receives a payment link on the provided
 8. Click on the "Submit Order" button
 
     ![submit_order](docs/submit_order.png)
+
+### Pay by link email template
+You can create a custom email template by following the link below and change the template from the dropdown: https://developer.adobe.com/commerce/frontend-core/guide/templates/email/
+
+ ![change_email_template](docs/change_email_template.png)
 
 ## Reorder from the admin
 To place an order through the admin, please follow the steps below:
