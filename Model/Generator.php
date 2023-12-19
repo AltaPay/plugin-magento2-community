@@ -331,7 +331,7 @@ class Generator
         $callback = new Callback($request->getPostValue());
         $response = $callback->call();
         if ($response) {
-            $transactionStatus = ["invoice_initialised", "bank_payment_finalised", "captured", "preauth", "card_verified", "recurring_confirmed"];
+            $transactionStatus = ["invoice_initialized", "bank_payment_finalized", "captured", "preauth", "card_verified", "recurring_confirmed"];
             // Check if payment status is in the transaction list and status is "error"
             if ($response->status === "error" && in_array($response->paymentStatus, $transactionStatus)) {
                 return;
