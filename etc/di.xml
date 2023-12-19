@@ -33,4 +33,9 @@
     <type name="Magento\Checkout\Controller\Index\Index">
         <plugin name="restrictcheckout" type="SDM\Altapay\Model\Plugin\Checkout\Controller\Restrict"/>
     </type>
+    <type name="SDM\Altapay\Helper\VersionNotification">
+        <arguments>
+            <argument name="authSession" xsi:type="object">Magento\Backend\Model\Auth\Session\Proxy</argument>
+        </arguments>
+    </type>
 </config>
