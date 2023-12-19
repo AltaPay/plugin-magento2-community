@@ -312,7 +312,7 @@ In order to reconcile payments on Magento please follow the steps below:
 3. Select the order you want to view.
 4. Copy the Reconciliation Identifier from the **Reconciliation Details** section.
  
-   ![magento_order_view](Docs/magento_order_view.png)
+   ![magento_order_view](docs/magento_order_view.png)
  
 5. Navigate to AltaPay Gateway dashboard
 6. Click on **FUNDING FILES** under **FINANCES** menu
@@ -322,7 +322,7 @@ In order to reconcile payments on Magento please follow the steps below:
 
 **Sample AltaPay Gateway CSV:**
     
-![funding_list_csv](Docs/funding_list_csv.png)
+![funding_list_csv](docs/funding_list_csv.png)
 
 ## Supported versions
 
