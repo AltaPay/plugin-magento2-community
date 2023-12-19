@@ -1,6 +1,10 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [3.8.1]
+### Added
+- Fix: Do not release the payment if the plugin receives a fail callback from the gateway, even though the payment is in a successful state.
+
 ## [3.8.0]
 ### Added
 - Fix: Multi-currency issue with Pay by link payment form.

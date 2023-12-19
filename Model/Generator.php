@@ -16,6 +16,7 @@ use Magento\Checkout\Model\Session;
 use Magento\Framework\App\Request\Http;
 use Magento\Framework\App\RequestInterface;
 use Magento\Sales\Model\Order\Invoice;
+use Magento\Store\Model\ScopeInterface;
 use SDM\Altapay\Logger\Logger;
 use Magento\Quote\Model\Quote;
 use Magento\Sales\Model\Order;
@@ -278,7 +279,7 @@ class Generator
             //check if order status set in configuration
             $statusKey         = Order::STATE_CANCELED;
             $storeCode         = $order->getStore()->getCode();
-            $storeScope        = \Magento\Store\Model\ScopeInterface::SCOPE_STORE;
+            $storeScope        = ScopeInterface::SCOPE_STORE;
 
             $orderStatusCancel = $this->systemConfig->getStatusConfig('cancel', $storeScope, $storeCode);
             
@@ -330,14 +331,18 @@ class Generator
         $callback = new Callback($request->getPostValue());
         $response = $callback->call();
         if ($response) {
+            $transactionStatus = ["invoice_initialised", "bank_payment_finalised", "captured", "preauth", "card_verified", "recurring_confirmed"];
+            // Check if payment status is in the transaction list and status is "error"
+            if ($response->status === "error" && in_array($response->paymentStatus, $transactionStatus)) {
+                return;
+            }
+
             $order             = $this->loadOrderFromCallback($response);
-            $payment           = $order->getPayment();
-            $lastTransactionId = $payment->getLastTransId();
             $transInfo = $this->getTransactionInfoFromResponse($response);
             //check if order status set in configuration
             $statusKey         = Order::STATE_CANCELED;
             $storeCode         = $order->getStore()->getCode();
-            $storeScope        = \Magento\Store\Model\ScopeInterface::SCOPE_STORE;
+            $storeScope        = ScopeInterface::SCOPE_STORE;
             $orderStatusCancel = $this->systemConfig->getStatusConfig('cancel', $storeScope, $storeCode);
 
             if ($orderStatusCancel) {
@@ -417,7 +422,7 @@ class Generator
         $expires        = '';
         $setOrderStatus = true;
         $unscheduledType = null;
-        $storeScope     = \Magento\Store\Model\ScopeInterface::SCOPE_STORE;
+        $storeScope     = ScopeInterface::SCOPE_STORE;
         $callback       = new Callback($request->getPostValue());
         try {
             $response                = $callback->call();
@@ -659,7 +664,7 @@ class Generator
         $response           = $callback->call();
         if ($response) {
             $order                 = $this->loadOrderFromCallback($response);
-            $storeScope            = \Magento\Store\Model\ScopeInterface::SCOPE_STORE;
+            $storeScope            = ScopeInterface::SCOPE_STORE;
             $storeCode             = $order->getStore()->getCode();
             $transInfo             = $this->getTransactionInfoFromResponse($response);
             $isAvsEnabled          = $this->terminalConfiguration($response, $storeCode, $storeScope, 'avscontrol');
@@ -874,7 +879,7 @@ class Generator
 
         if ($response) {
             $order                 = $this->loadOrderFromCallback($response);
-            $storeScope            = \Magento\Store\Model\ScopeInterface::SCOPE_STORE;
+            $storeScope            = ScopeInterface::SCOPE_STORE;
             $storeCode             = $order->getStore()->getCode();
             $fraudConfig           = $this->systemConfig->getFraudConfig('enable_fraud', $storeScope, $storeCode);
             $enableReleaseRefund   = $this->systemConfig->getFraudConfig('enable_release_refund', $storeScope, $storeCode);
