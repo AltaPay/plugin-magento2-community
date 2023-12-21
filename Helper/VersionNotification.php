@@ -50,6 +50,8 @@ class VersionNotification implements MessageInterface
         $this->moduleList   = $moduleList;
     }
 
+    const MESSAGE_IDENTITY = 'AltaPay extension new version message';
+
     /**
      * Retrieve unique system message identity
      *
@@ -57,7 +59,7 @@ class VersionNotification implements MessageInterface
      */
     public function getIdentity()
     {
-        return 'AltaPay extension new version message';
+        return self::MESSAGE_IDENTITY;
     }
 
     /**
@@ -68,10 +70,10 @@ class VersionNotification implements MessageInterface
     public function isDisplayed()
     {
         try {
-            if ($this->authSession->isFirstPageAfterLogin()) {
+            $githubContent = $this->getLatestTagInformationFromGithub();
 
-                $githubContent  = $this->getDecodedContentFromGithub();
-                $moduleInfo     = $this->moduleList->getOne(self::MODULE_CODE);
+            if($githubContent){
+                $moduleInfo = $this->moduleList->getOne(self::MODULE_CODE);
 
                 $this->setSessionData("AltaPayPluginVersionGithub", $githubContent);
                 $title = "AltaPay Magento 2 community new version " . $githubContent['tag_name'] . " is now available.";
@@ -80,17 +82,13 @@ class VersionNotification implements MessageInterface
                     'date_added' => $githubContent['published_at'],
                     'title' => $title,
                     'description' => $githubContent['body'],
-                    'url' => $githubContent['html_url'],
-                    'is_read' => !$this->isNewVersionAvailable()
+                    'url' => $githubContent['html_url']
                 ];
 
                 $this->inboxFactory->create()->parse(array_reverse($versionData));
-                
-                 if ($moduleInfo['setup_version'] != $githubContent['tag_name']) {
-                     return true;
-                 }
-            } elseif ($this->request->getModuleName() === 'mui' && $this->isNewVersionAvailable()) {
-                return true;
+                if ($moduleInfo['setup_version'] != $githubContent['tag_name']) {
+                    return true;
+                }
             }
         } catch (\Exception $e) {
             return false;
@@ -134,17 +132,21 @@ class VersionNotification implements MessageInterface
         return self::SEVERITY_MAJOR;
     }
 
-    public function getDecodedContentFromGithub()
+    public function getLatestTagInformationFromGithub()
     {
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, 'https://api.github.com/repos/AltaPay/plugin-magento2-community/releases/latest');
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 1);
-        curl_setopt($ch, CURLOPT_USERAGENT, 'magento');
-        $content = curl_exec($ch);
-        curl_close($ch);
-        $json = json_decode($content, true);
-        return $json;
+        $data = [];
+
+        try {
+            $client = new \GuzzleHttp\Client();
+            $request = new \GuzzleHttp\Psr7\Request('GET', 'https://api.github.com/repos/AltaPay/plugin-magento2-community/releases/latest');
+            $res = $client->sendAsync($request)->wait();
+            $body = $res->getBody();
+            $data =  json_decode($body, true);
+        } catch (\GuzzleHttp\Exception\ClientException $e) {
+            return [];
+        }
+
+        return $data;
     }
 
     /**
