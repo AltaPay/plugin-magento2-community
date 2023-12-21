@@ -71,10 +71,7 @@ class VersionNotification implements MessageInterface
     {
         try {
             $githubContent = $this->getLatestTagInformationFromGithub();
-
-            if($githubContent){
-                $moduleInfo = $this->moduleList->getOne(self::MODULE_CODE);
-
+            if($githubContent && $this->isNewVersionAvailable()){
                 $this->setSessionData("AltaPayPluginVersionGithub", $githubContent);
                 $title = "AltaPay Magento 2 community new version " . $githubContent['tag_name'] . " is now available.";
                 $versionData[] = [
@@ -86,9 +83,7 @@ class VersionNotification implements MessageInterface
                 ];
 
                 $this->inboxFactory->create()->parse(array_reverse($versionData));
-                if ($moduleInfo['setup_version'] != $githubContent['tag_name']) {
-                    return true;
-                }
+                return true;
             }
         } catch (\Exception $e) {
             return false;
@@ -174,7 +169,7 @@ class VersionNotification implements MessageInterface
 
         if (isset($githubContent)) {
             $moduleInfo = $this->moduleList->getOne(self::MODULE_CODE);
-            return $moduleInfo['setup_version'] !== $githubContent['tag_name'];
+            return $moduleInfo['setup_version'] != $githubContent['tag_name'];
         }
     }
 }
