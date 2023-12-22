@@ -10,7 +10,7 @@
 namespace SDM\Altapay\Helper;
 
 use Magento\AdminNotification\Model\InboxFactory;
-use Magento\Backend\Model\Auth\Session;
+use Magento\Backend\Model\Session;
 use Magento\Framework\App\RequestInterface;
 use Magento\Framework\Notification\MessageInterface;
 use Magento\Framework\Module\ModuleListInterface;
@@ -18,15 +18,16 @@ use Magento\Framework\Module\ModuleListInterface;
 class VersionNotification implements MessageInterface
 {
     const MODULE_CODE = 'SDM_Altapay';
-    /**
-     * @var Session
-     */
-    protected $authSession;
 
     /**
      * @var InboxFactory
      */
     protected $inboxFactory;
+
+    /**
+     * @var Session
+     */
+    protected $backendSession;
 
     /**
      * @var RequestInterface
@@ -39,15 +40,15 @@ class VersionNotification implements MessageInterface
     protected $moduleList;
 
     public function __construct(
-        Session             $authSession,
         InboxFactory        $inboxFactory,
+        Session             $backendSession,
         RequestInterface    $request,
         ModuleListInterface $moduleList
     ) {
-        $this->authSession  = $authSession;
-        $this->inboxFactory = $inboxFactory;
-        $this->request      = $request;
-        $this->moduleList   = $moduleList;
+        $this->inboxFactory     = $inboxFactory;
+        $this->backendSession   = $backendSession;
+        $this->request          = $request;
+        $this->moduleList       = $moduleList;
     }
 
     const MESSAGE_IDENTITY = 'AltaPay extension new version message';
@@ -71,8 +72,10 @@ class VersionNotification implements MessageInterface
     {
         try {
             $githubContent = $this->getLatestTagInformationFromGithub();
-            if($githubContent && $this->isNewVersionAvailable()){
-                $this->setSessionData("AltaPayPluginVersionGithub", $githubContent);
+            
+            $this->backendSession->setAltaPayPluginVersionGithub($githubContent);
+
+            if(!$this->backendSession->getAltaPayNotificationCheck() && $githubContent && $this->isNewVersionAvailable()){
                 $title = "AltaPay Magento 2 community new version " . $githubContent['tag_name'] . " is now available.";
                 $versionData[] = [
                     'severity' => self::SEVERITY_NOTICE,
@@ -83,6 +86,7 @@ class VersionNotification implements MessageInterface
                 ];
 
                 $this->inboxFactory->create()->parse(array_reverse($versionData));
+                $this->backendSession->getAltaPayNotificationCheck(true);
                 return true;
             }
         } catch (\Exception $e) {
@@ -99,7 +103,7 @@ class VersionNotification implements MessageInterface
      */
     public function getText()
     {
-        $githubContent = $this->getSessionData("AltaPayPluginVersionGithub");
+        $githubContent = $this->backendSession->getAltaPayPluginVersionGithub();
         $moduleInfo = $this->moduleList->getOne(self::MODULE_CODE);
         $message = __("AltaPay Magento 2 community new version is now available.");
 
@@ -145,27 +149,11 @@ class VersionNotification implements MessageInterface
     }
 
     /**
-     * Set the current value for the backend session
-     */
-    public function setSessionData($key, $value)
-    {
-        return $this->authSession->setData($key, $value);
-    }
-
-    /**
-     * Retrieve the session value
-     */
-    public function getSessionData($key, $remove = false)
-    {
-        return $this->authSession->getData($key, $remove);
-    }
-
-    /**
      * @return bool
      */
     private function isNewVersionAvailable()
     {
-        $githubContent = $this->getSessionData("AltaPayPluginVersionGithub");
+        $githubContent = $this->backendSession->getAltaPayPluginVersionGithub();
 
         if (isset($githubContent)) {
             $moduleInfo = $this->moduleList->getOne(self::MODULE_CODE);
