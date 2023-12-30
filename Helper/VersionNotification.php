@@ -86,7 +86,8 @@ class VersionNotification implements MessageInterface
                 ];
 
                 $this->inboxFactory->create()->parse(array_reverse($versionData));
-                $this->backendSession->getAltaPayNotificationCheck(true);
+                $this->backendSession->setAltaPayNotificationCheck(true);
+
                 return true;
             }
         } catch (\Exception $e) {
@@ -131,6 +132,9 @@ class VersionNotification implements MessageInterface
         return self::SEVERITY_MAJOR;
     }
 
+    /**
+     * @return array|mixed
+     */
     public function getLatestTagInformationFromGithub()
     {
         $data = [];
@@ -149,7 +153,7 @@ class VersionNotification implements MessageInterface
     }
 
     /**
-     * @return bool
+     * @return bool|void
      */
     private function isNewVersionAvailable()
     {
@@ -159,5 +163,7 @@ class VersionNotification implements MessageInterface
             $moduleInfo = $this->moduleList->getOne(self::MODULE_CODE);
             return $moduleInfo['setup_version'] != $githubContent['tag_name'];
         }
+
+        return false;
     }
 }
