@@ -13,6 +13,7 @@ use Magento\Customer\Model\Context;
 use Magento\Sales\Model\Order;
 use SDM\Altapay\Api\OrderLoaderInterface;
 use Magento\Framework\App\Config\ScopeConfigInterface;
+use SDM\Altapay\Model\SystemConfig;
 
 class Ordersummary extends \Magento\Framework\View\Element\Template
 {
@@ -79,6 +80,11 @@ class Ordersummary extends \Magento\Framework\View\Element\Template
     protected $priceCurrency;
 
     /**
+     * @var SystemConfig
+     */
+    private $systemConfig;
+
+    /**
      * Order summary constructor.
      *
      * @param \Magento\Framework\View\Element\Template\Context $context
@@ -95,6 +101,7 @@ class Ordersummary extends \Magento\Framework\View\Element\Template
      * @param \Magento\Theme\Block\Html\Header\Logo $logo
      * @param \Magento\Framework\UrlInterface $urlInterface
      * @param \Magento\Framework\Pricing\PriceCurrencyInterface $priceCurrency
+     * @param SystemConfig $systemConfig
      * @param array $data
      */
     public function __construct(
@@ -112,6 +119,7 @@ class Ordersummary extends \Magento\Framework\View\Element\Template
         \Magento\Theme\Block\Html\Header\Logo $logo,
         \Magento\Framework\UrlInterface $urlInterface,
         \Magento\Framework\Pricing\PriceCurrencyInterface $priceCurrency,
+        SystemConfig $systemConfig,
         array $data = []
     ) {
         parent::__construct($context, $data);
@@ -128,6 +136,7 @@ class Ordersummary extends \Magento\Framework\View\Element\Template
         $this->_logo                          = $logo;
         $this->_urlInterface                  = $urlInterface;
         $this->priceCurrency                  = $priceCurrency;
+        $this->systemConfig                   = $systemConfig;
     }
 
     /**
@@ -242,6 +251,7 @@ class Ordersummary extends \Magento\Framework\View\Element\Template
     {
         return $this->checkoutSession;
     }
+    
     /**
      * Get logo image URL
      *
@@ -249,6 +259,15 @@ class Ordersummary extends \Magento\Framework\View\Element\Template
      */
     public function getLogoSrc()
     {
+        $logoFile = $this->systemConfig->getLayoutConfig('logo_checkout');
+        $path = 'sales/store/logo_checkout';
+
+
+        if (!empty($logoFile)) {
+            return $this->_urlInterface
+                    ->getBaseUrl(['_type' => \Magento\Framework\UrlInterface::URL_TYPE_MEDIA]) . $path . '/' . $logoFile;
+        }
+
         return $this->_logo->getLogoSrc();
     }
 

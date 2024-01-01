@@ -106,6 +106,15 @@
                         <comment>Default option based on the theme styling and custom option will show the payment page independent from theme styling.</comment>
                         <source_model>SDM\Altapay\Model\Config\Source\PaymentPageLayout</source_model>
                     </field>
+                    <field id="logo_checkout" translate="label comment" type="image" sortOrder="3"  showInDefault="1" showInWebsite="0" showInStore="0">
+                        <label>Checkout Page Logo</label>
+                        <backend_model>Magento\Config\Model\Config\Backend\Image</backend_model>
+                        <upload_dir config="system/filesystem/media" scope_info="1">sales/store/logo_checkout</upload_dir>
+                        <base_url type="media" scope_info="1">sales/store/logo_checkout</base_url>
+                        <comment>
+                            <![CDATA[This logo will be displayed on the checkout page when the 'Checkout Independent' option is selected. If left empty, the default store logo will be used.<br />(jpg, jpeg, gif, png)]]>
+                        </comment>
+                    </field>
                 </group>
                 <group id="cc_form_style" translate="label comment" sortOrder="50" showInDefault="1" showInWebsite="1" showInStore="0">
                     <attribute type="expanded">0</attribute>
@@ -169,7 +178,7 @@
                 </group>
                 <group id="cron_scheduled" translate="label" type="text" sortOrder="95" showInDefault="1" showInWebsite="1"
                     showInStore="1">
-                    <label>Auto-cancelling orders cron settings</label>
+                    <label>Auto-cancelling orders with pending payment</label>
                     <field id="enabled" translate="label" type="select" sortOrder="1" showInDefault="1" showInWebsite="0" showInStore="0">
                         <label>Enable</label>
                         <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
