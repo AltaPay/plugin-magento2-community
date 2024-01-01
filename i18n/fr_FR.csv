@@ -84,3 +84,4 @@ Le statut sur la commande avant paiement (si l'utilisateur ferme le navigateur √
 "Could not authenticate with API","Could not authenticate with API"
 "error occured","error occured"
 "Payment failed due to the browser back button usage!","Payment failed due to the browser back button usage!"
+"Please click on the link to complete the payment </br> <a href=""%formurl"">%formurl</a>","Veuillez cliquer sur le lien pour compl√©ter le paiement </br> <a href=""%formurl"">%formurl</a>"

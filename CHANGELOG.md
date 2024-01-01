@@ -1,6 +1,10 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [unreleased]
+### Added
+- Add translations for the "Pay by link" email template.
+
 ## [3.8.1]
 ### Added
 - Fix: Do not release the payment when receiving a fail callback if the payment is in a successful state
