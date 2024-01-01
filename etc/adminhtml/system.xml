@@ -106,6 +106,13 @@
                         <comment>Default option based on the theme styling and custom option will show the payment page independent from theme styling.</comment>
                         <source_model>SDM\Altapay\Model\Config\Source\PaymentPageLayout</source_model>
                     </field>
+                    <field id="order_summery_incl_tax" translate="label comment" type="select" sortOrder="2" showInDefault="1" showInWebsite="0" showInStore="0">
+                        <label>Show order summary including tax?</label>
+                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                        <comment>
+                            <![CDATA[Enabling this option will display prices for subtotal, shipping, and item price, including taxes, on the order summary grid.]]>
+                        </comment>
+                    </field>
                     <field id="logo_checkout" translate="label comment" type="image" sortOrder="3"  showInDefault="1" showInWebsite="0" showInStore="0">
                         <label>Checkout Page Logo</label>
                         <backend_model>Magento\Config\Model\Config\Backend\Image</backend_model>
