@@ -10,6 +10,10 @@ All notable changes to this project will be documented in this file.
 ### Fixed
 - Fix styling issues for the order summary section.
 
+## [3.8.2]
+### Added
+- Show notification for a plugin upgrade in the admin interface when a new extension version is available.
+
 ## [3.8.1]
 ### Added
 - Fix: Do not release the payment when receiving a fail callback if the payment is in a successful state
