@@ -270,6 +270,17 @@ class Ordersummary extends \Magento\Framework\View\Element\Template
 
         return $this->_logo->getLogoSrc();
     }
+    
+    /**
+     * Check if order summery prices includes tax
+     *
+     * @return string
+     */
+    public function orderSummeryInclTax()
+    {
+        
+        return $this->systemConfig->getLayoutConfig('order_summery_incl_tax');
+    }
 
     /**
      * Get site URL
