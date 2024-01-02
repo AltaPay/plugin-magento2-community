@@ -151,7 +151,7 @@ describe('Payments', function () {
                 ord.admin()
                 ord.change_currency_to_EUR_for_iDEAL()
             }
-            //ord.clrcookies()
+            ord.clrcookies()
             ord.visit()
             ord.addproduct()
             cy.fixture('config').then((admin) => {
