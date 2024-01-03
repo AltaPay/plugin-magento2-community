@@ -261,8 +261,7 @@ class Ordersummary extends \Magento\Framework\View\Element\Template
     {
         $logoFile = $this->systemConfig->getLayoutConfig('logo_checkout');
         $path = 'sales/store/logo_checkout';
-
-
+        
         if (!empty($logoFile)) {
             return $this->_urlInterface
                     ->getBaseUrl(['_type' => \Magento\Framework\UrlInterface::URL_TYPE_MEDIA]) . $path . '/' . $logoFile;
