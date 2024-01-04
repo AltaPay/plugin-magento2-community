@@ -90,8 +90,10 @@ class UpdateOrderStatus
                 return;
             }
             $orderCollection = $this->orderCollection->create();
-            $orderCollection->addFieldToFilter('created_at', ['lt' => date('Y-m-d H:i:s', $cutoffTime)])
+            $orderCollection->addFieldToSelect('entity_id')
+                            ->addFieldToFilter('created_at', ['lt' => date('Y-m-d H:i:s', $cutoffTime)])
                             ->addAttributeToFilter('status','pending')
+                            ->addAttributeToFilter('state','new')
                             ->addAttributeToFilter('altapay_payment_form_url', ['neq' => 'NULL']);
             
             if ($this->scopeConfig->getValue(self::EXCLUDE_ADMIN_ORDER, $storeScope)) {

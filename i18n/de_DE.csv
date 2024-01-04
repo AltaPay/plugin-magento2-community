@@ -86,3 +86,4 @@ Wenn Sie nur Download-Produkte verkaufen, die sofort geliefert werden, können S
 "Could not authenticate with API","Could not authenticate with API"
 "error occured","error occured"
 "Payment failed due to the browser back button usage!","Payment failed due to the browser back button usage!"
+"Please click on the link to complete the payment </br> <a href=""%formurl"">%formurl</a>","Bitte klicken Sie auf den Link, um die Zahlung abzuschließen </br> <a href=""%formurl"">%formurl</a>"

@@ -1,6 +1,15 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [3.8.3]
+### Added
+- Add translations for the "Pay by link" email template.
+- Add an option to change the logo for the checkout form page.
+- Add configuration to display prices on the order summary, including tax.
+
+### Fixed
+- Fix styling issues for the order summary section.
+
 ## [3.8.2]
 ### Added
 - Show notification for a plugin upgrade in the admin interface when a new extension version is available.

@@ -83,3 +83,4 @@
 "Could not authenticate with API","API: lla ei voitu todentaa"
 "error occured","tapahtui virhe"
 "Payment failed due to the browser back button usage!","Maksu epäonnistui selainpainikkeen käytön takia!"
+"Please click on the link to complete the payment </br> <a href=""%formurl"">%formurl</a>","Klikkaa linkkiä suorittaaksesi maksun loppuun </br> <a href=""%formurl"">%formurl</a>"

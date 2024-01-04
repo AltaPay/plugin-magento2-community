@@ -82,3 +82,4 @@
 "Could not authenticate with API","Could not authenticate with API"
 "error occured","error occured"
 "Payment failed due to the browser back button usage!","Payment failed due to the browser back button usage!"
+"Please click on the link to complete the payment </br> <a href=""%formurl"">%formurl</a>","Please click on the link to complete the payment </br> <a href=""%formurl"">%formurl</a>"
