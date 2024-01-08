@@ -578,8 +578,8 @@ class Order {
         cy.get('#add_products').click()
         cy.get('#sales_order_create_search_grid_table > tbody > tr:nth-child(2)').click().wait(5000)
         cy.get('#order-search .admin__page-section-title .actions button').focus().trigger('mouseover').click().wait(3000)
-        cy.get('#order-shipping-method-summary > .action-default > span').click().wait(3000)
-        cy.get('.admin__order-shipment-methods-options-list > li:first').click().wait(3000)
+        cy.get('#order-shipping-method-summary > .action-default').click().wait(3000)
+        cy.get('#s_method_flatrate_flatrate').click().wait(3000)
     }
 
     generateRandomString(n){

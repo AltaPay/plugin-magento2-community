@@ -426,36 +426,44 @@ describe('Payments', function () {
                 ord.change_currency_to_DKK()
             }
             cy.fixture('config').then((admin) => {
-                if (admin.CC_TERMINAL_NAME != "") {
+                if (admin.KLARNA_DKK_TERMINAL_NAME != "") {
                     ord.create_customer_and_order();
-                    cy.contains(admin.KLARNA_DKK_TERMINAL_NAME).click().wait(3000)
-                    cy.get('#submit_order_top_button').click().wait(2000)
-                    cy.get('.payment_link > code').then(($a) => {
-                        const payment_link = $a.text();
-                        cy.origin('https://testgateway.pensio.com', { args: { payment_link } }, ({ payment_link }) => {
-                            cy.visit(payment_link).wait(3000)
-                            cy.get('#radio_pay_later').click().wait(3000)
-                            cy.get('[id=submitbutton]').click().wait(5000)
-                            cy.wait(5000)
-                            cy.get('[id=klarna-pay-later-fullscreen]').then(function ($iFrame) {
-                                const mobileNum = $iFrame.contents().find('[id=email_or_phone]')
-                                cy.wrap(mobileNum).type('20222222')
-                                const continueBtn = $iFrame.contents().find('[id=onContinue]')
-                                cy.wrap(continueBtn).click().wait(2000)
-                            })
-                            cy.get('[id=klarna-pay-later-fullscreen]').wait(4000).then(function ($iFrame) {
-                                const otp = $iFrame.contents().find('[id=otp_field]')
-                                cy.wrap(otp).type('123456').wait(2000)
-                            })
-                            cy.get('[id=klarna-pay-later-fullscreen]').wait(2000).then(function ($iFrame) {
-                                const contbtn = $iFrame.contents().find('[id=invoice_kp-purchase-review-continue-button]')
-                                cy.wrap(contbtn).click().wait(2000)
-                            })
+                    cy.get('body').then(($a) => {
+                        if ($a.find("label:contains('" + admin.KLARNA_DKK_TERMINAL_NAME + "')").length) {
+                            cy.contains(admin.KLARNA_DKK_TERMINAL_NAME).click().wait(3000)
+                            cy.get('#submit_order_top_button').click().wait(2000)
+                            cy.get('.payment_link > code').then(($a) => {
+                                const payment_link = $a.text();
+                                cy.origin('https://testgateway.pensio.com', { args: { payment_link } }, ({ payment_link }) => {
+                                    cy.visit(payment_link).wait(3000)
+                                    cy.get('#radio_pay_later').click().wait(3000)
+                                    cy.get('[id=submitbutton]').click().wait(5000)
+                                    cy.wait(5000)
+                                    cy.get('[id=klarna-pay-later-fullscreen]').then(function ($iFrame) {
+                                        const mobileNum = $iFrame.contents().find('[id=email_or_phone]')
+                                        cy.wrap(mobileNum).type('20222222')
+                                        const continueBtn = $iFrame.contents().find('[id=onContinue]')
+                                        cy.wrap(continueBtn).click().wait(2000)
+                                    })
+                                    cy.get('[id=klarna-pay-later-fullscreen]').wait(4000).then(function ($iFrame) {
+                                        const otp = $iFrame.contents().find('[id=otp_field]')
+                                        cy.wrap(otp).type('123456').wait(2000)
+                                    })
+                                    cy.get('[id=klarna-pay-later-fullscreen]').wait(2000).then(function ($iFrame) {
+                                        const contbtn = $iFrame.contents().find('[id=invoice_kp-purchase-review-continue-button]')
+                                        cy.wrap(contbtn).click().wait(2000)
+                                    })
 
-                        })
+                                })
 
+                            })
+                            cy.get('.page-title > span').should('have.text', 'Thank you for your purchase!')
+                        }else{
+                            cy.log(admin.KLARNA_DKK_TERMINAL_NAME+' skipped')
+                            this.skip()
+
+                        }
                     })
-                    cy.get('.page-title > span').should('have.text', 'Thank you for your purchase!')
                 }
                 else {
                     cy.log('KLARNA_DKK_TERMINAL_NAME skipped')
