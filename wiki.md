@@ -52,6 +52,8 @@ We highly recommend gathering all the below information, before starting the ins
 
 [Styling](#styling)
 
+[Plugin updates](#plugin-updates)
+
 [Troubleshooting](#troubleshooting)
 
 ## Prerequisites
@@ -330,7 +332,7 @@ In order to reconcile payments on Magento please follow the steps below:
 3. Select the order you want to view.
 4. Copy the Reconciliation Identifier from the **Reconciliation Details** section.
  
-   ![magento_order_view](Docs/magento_order_view.png)
+   ![magento_order_view](docs/magento_order_view.png)
  
 5. Navigate to AltaPay Gateway dashboard
 6. Click on **FUNDING FILES** under **FINANCES** menu
@@ -340,7 +342,7 @@ In order to reconcile payments on Magento please follow the steps below:
 
 **Sample AltaPay Gateway CSV:**
     
-![funding_list_csv](Docs/funding_list_csv.png)
+![funding_list_csv](docs/funding_list_csv.png)
 
 ## Supported versions
 
@@ -377,6 +379,12 @@ here._
 ><https://github.com/AltaPay/plugin-magento2-community/blob/main/view/frontend/layout/sdmaltapay_index_callbackform.xml>
 >
 >Please visit Magento's official documentation to know more about how to [Override a layout](https://devdocs.magento.com/guides/v2.4/frontend-dev-guide/layouts/layout-override.html).
+
+## Plugin updates
+
+From version 3.8.2 onwards, you will receive a notification in Magento 2 admin when a new version of the plugin is available for installation. We recommend to update the plugin regularly upon receiving such notifications to ensure optimal performance and access to the latest features.
+
+![plugin_update](docs/plugin_update.png)
 
 ## Troubleshooting
 
