@@ -80,7 +80,7 @@ Run the following commands in Magento 2 root folder:
 These modules are tested and known to be working with the AltaPay Payment extension:
 
 - Amasty Subscriptions & Recurring Payments
-- Aamsty One Step Checkout Pro
+- Amasty One Step Checkout Pro
 - Fooman OrderFees
 
 ## Changelog
