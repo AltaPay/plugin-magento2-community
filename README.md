@@ -74,7 +74,15 @@ Run the following commands in Magento 2 root folder:
 * Run cypress
 
         ./node_modules/.bin/cypress open
-        
+
+## Compatible modules
+
+These modules are tested and known to be working with the AltaPay Payment extension:
+
+- Amasty Subscriptions & Recurring Payments
+- Aamsty One Step Checkout Pro
+- Fooman OrderFees
+
 ## Changelog
 
 See [Changelog](CHANGELOG.md) for all the release notes.
