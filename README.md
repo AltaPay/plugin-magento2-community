@@ -55,6 +55,20 @@ Run the following commands in Magento 2 root folder:
     php bin/magento setup:di:compile
     php bin/magento setup:static-content:deploy
 
+## Additional modules
+
+We have created several supplementary modules to enhance the features of AltaPay for Magento2 Community.
+
+- [AltaPay for Magento 2 Recurring Payments](https://github.com/AltaPay/plugin-magento2-subscriptions) - Enable subscription and recurring payment processing on your Magento 2 online store. This module ensures seamless integration with Amasty Subscriptions & Recurring Payments.
+- [Fooman Order Fees extension integration](https://github.com/AltaPay/plugin-magento2-fooman) - Charge Magento customers extra fees and order upgrades at checkout time.
+
+## Supported Extensions
+
+The AltaPay Payment extension has been tested and confirmed to be compatible with the following modules:
+
+- [Amasty Subscriptions & Recurring Payments](https://amasty.com/subscriptions-recurring-payments-for-magento-2.html)
+- [Amasty One Step Checkout Pro](https://amasty.com/one-step-checkout-for-magento-2.html)
+- [Fooman Order Fees](https://fooman.com/magento-extension-order-fees-m2.html)
 
 ## How to run cypress tests
 
@@ -74,7 +88,7 @@ Run the following commands in Magento 2 root folder:
 * Run cypress
 
         ./node_modules/.bin/cypress open
-        
+
 ## Changelog
 
 See [Changelog](CHANGELOG.md) for all the release notes.
