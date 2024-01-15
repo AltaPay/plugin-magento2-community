@@ -91,9 +91,10 @@ class AfterPaymentObserver implements ObserverInterface
     public function execute(Observer $observer)
     {
         $order = $observer->getEvent()->getOrder();
+        $storeId = $order->getStoreId();
         $storeScope = ScopeInterface::SCOPE_STORE;
-        $email = $this->scopeConfig->getValue('trans_email/ident_sales/email',$storeScope);
-        $name  = $this->scopeConfig->getValue('trans_email/ident_sales/name',$storeScope);
+        $email = $this->scopeConfig->getValue('trans_email/ident_sales/email', $storeScope);
+        $name  = $this->scopeConfig->getValue('trans_email/ident_sales/name', $storeScope);
         $payment = $order->getPayment();
         $method = $payment->getMethodInstance();
         $terminalCode = $method->getCode();
@@ -104,7 +105,7 @@ class AfterPaymentObserver implements ObserverInterface
             );
 
             if($params['result'] === 'success') {
-                $templateOptions = array('area' => \Magento\Framework\App\Area::AREA_FRONTEND, 'store' => $this->storeManager->getStore()->getId());
+                $templateOptions = array('area' => \Magento\Framework\App\Area::AREA_FRONTEND, 'store' => $storeId);
                 $templateVars = array(
                                     'store' => $this->storeManager->getStore(),
                                     'customer_name' => $order->getCustomerName(),
