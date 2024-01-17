@@ -107,7 +107,7 @@ class AfterPaymentObserver implements ObserverInterface
             if($params['result'] === 'success') {
                 $templateOptions = array('area' => \Magento\Framework\App\Area::AREA_FRONTEND, 'store' => $storeId);
                 $templateVars = array(
-                                    'store' => $this->storeManager->getStore(),
+                                    'store' => $order->getStore(),
                                     'customer_name' => $order->getCustomerName(),
                                     'formurl'    => $params['formurl']
                                 );
