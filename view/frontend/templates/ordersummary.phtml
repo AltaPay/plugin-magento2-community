@@ -62,7 +62,7 @@ $block->getViewFileUrl('SDM_Altapay::css/ordersummary.css') ?>">
                     </span>
                 </td>
             </tr>
-            <?php if ($order->getDiscountAmount() !== 0) { ?>
+            <?php if ($order->getDiscountAmount() != 0) { ?>
                 <tr class="totals discount">
                     <th class="mark">
                         <span class="title"><?= $block->escapeHtml(__('Discount')) ?></span>
