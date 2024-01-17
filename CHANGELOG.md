@@ -3,7 +3,7 @@ All notable changes to this project will be documented in this file.
 
 ## [3.8.4]
 ### Fixed
-- Fix: Issue with email template in a multi-store website.
+- Fix: Translation issue with email template in a multi-store website.
 
 ## [3.8.3]
 ### Added
