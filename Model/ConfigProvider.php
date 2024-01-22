@@ -29,6 +29,7 @@ use Magento\Store\Model\StoreManagerInterface;
 use \Exception;
 use SDM\Altapay\Logger\Logger;
 use Magento\Checkout\Model\Cart;
+use SDM\Altapay\Helper\Config as storeConfig;
 
 class ConfigProvider implements ConfigProviderInterface
 {
@@ -85,7 +86,10 @@ class ConfigProvider implements ConfigProviderInterface
      * @var Logger
      */
     private $altapayLogger;
-    
+    /**
+     * @var Helper Config
+     */
+    private $storeConfig;
     
     /**
      * ConfigProvider constructor.
@@ -119,7 +123,8 @@ class ConfigProvider implements ConfigProviderInterface
         Logger $altapayLogger,
         StoreManagerInterface $storeManager,
         Helper $helper,
-        Cart $cart
+        Cart $cart,
+        storeConfig $storeConfig
     )
     {
         $this->data             = $data;
@@ -136,6 +141,7 @@ class ConfigProvider implements ConfigProviderInterface
         $this->altapayLogger    = $altapayLogger;
         $this->helper           = $helper;
         $this->cart             = $cart;
+        $this->storeConfig      = $storeConfig;
     }
 
     /**
@@ -148,11 +154,14 @@ class ConfigProvider implements ConfigProviderInterface
         $store               = null;
         $activePaymentMethod = $this->getActivePaymentMethod();
         $getCurrentQuote     = $this->_checkoutSession->getQuote();
-        $config                     = [];
-        $baseUrl                    = $this->_storeManager->getStore()->getBaseUrl();
-
-        $countryCode                = $this->scopeConfig->getValue('general/country/default',
+        $config              = [];
+        $baseUrl             = $this->_storeManager->getStore()->getBaseUrl();
+        $baseCurrency        = $this->storeConfig->useBaseCurrency();
+        $grandTotal          = $baseCurrency ? $getCurrentQuote->getBaseGrandTotal() : $getCurrentQuote->getGrandTotal();
+        $currenncyCode       = $baseCurrency ? $this->_storeManager->getStore()->getBaseCurrencyCode() : $this->_storeManager->getStore()->getCurrentCurrencyCode();
+        $countryCode         = $this->scopeConfig->getValue('general/country/default',
         \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
+
         return [
             'payment' => [
                 self::CODE => [
@@ -162,9 +171,10 @@ class ConfigProvider implements ConfigProviderInterface
                     'auth'         => $this->checkAuth(),
                     'connection'   => $this->checkConn(),
                     'terminaldata' => $activePaymentMethod,
-                    'countryCode' => $countryCode,
-                    'currencyCode' => $this->_storeManager->getStore()->getBaseCurrencyCode(),
-                    'baseUrl' => $baseUrl
+                    'countryCode'  => $countryCode,
+                    'currencyCode' => $currenncyCode,
+                    'baseUrl'      => $baseUrl,
+                    'grandTotal'   => $grandTotal
                 ]
             ]
         ];

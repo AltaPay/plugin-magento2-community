@@ -158,7 +158,7 @@ define(
                     "total": {
                         "label": applePayLabel,
                         "type": "final",
-                        "amount": quote.totals().base_grand_total
+                        "amount": configData.grandTotal
                     }
                 };
                 
@@ -187,7 +187,7 @@ define(
                     let total = {
                         "label": applePayLabel,
                         "type": "final",
-                        "amount": quote.totals().base_grand_total
+                        "amount": configData.grandTotal
                     }
             
                     const update = { "newTotal": total };

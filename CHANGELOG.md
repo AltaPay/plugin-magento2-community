@@ -1,6 +1,10 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [3.8.6]
+### Fixed
+- Fix: ApplePay issue with multi-store website.
+
 ## [3.8.5]
 ### Fixed
 - Remove discount line if discount amount is 0 from the order summary screen.
