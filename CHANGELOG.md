@@ -2,6 +2,9 @@
 All notable changes to this project will be documented in this file.
 
 ## [3.8.6]
+### Added
+- ApplePay support with oneStepCheckout extension
+
 ### Fixed
 - Fix: ApplePay issue with multi-store website.
 

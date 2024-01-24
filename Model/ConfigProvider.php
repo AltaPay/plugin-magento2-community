@@ -157,7 +157,6 @@ class ConfigProvider implements ConfigProviderInterface
         $config              = [];
         $baseUrl             = $this->_storeManager->getStore()->getBaseUrl();
         $baseCurrency        = $this->storeConfig->useBaseCurrency();
-        $grandTotal          = $baseCurrency ? $getCurrentQuote->getBaseGrandTotal() : $getCurrentQuote->getGrandTotal();
         $currenncyCode       = $baseCurrency ? $this->_storeManager->getStore()->getBaseCurrencyCode() : $this->_storeManager->getStore()->getCurrentCurrencyCode();
         $countryCode         = $this->scopeConfig->getValue('general/country/default',
         \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
@@ -174,7 +173,7 @@ class ConfigProvider implements ConfigProviderInterface
                     'countryCode'  => $countryCode,
                     'currencyCode' => $currenncyCode,
                     'baseUrl'      => $baseUrl,
-                    'grandTotal'   => $grandTotal
+                    'currencyConfig'   => $baseCurrency
                 ]
             ]
         ];
