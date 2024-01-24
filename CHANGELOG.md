@@ -3,10 +3,10 @@ All notable changes to this project will be documented in this file.
 
 ## [3.8.6]
 ### Added
-- ApplePay support with oneStepCheckout extension
+- Add Apple Pay support for oneStepCheckout extension.
 
 ### Fixed
-- Fix: ApplePay issue with multi-store website.
+- Fix: Apple Pay amount mis-match issue with multi-store website.
 
 ## [3.8.5]
 ### Fixed

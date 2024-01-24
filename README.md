@@ -68,6 +68,7 @@ The AltaPay Payment extension has been tested and confirmed to be compatible wit
 
 - [Amasty Subscriptions & Recurring Payments](https://amasty.com/subscriptions-recurring-payments-for-magento-2.html)
 - [Amasty One Step Checkout Pro](https://amasty.com/one-step-checkout-for-magento-2.html)
+- [OneStepCheckout](https://www.onestepcheckout.com/magento-2)
 - [Fooman Order Fees](https://fooman.com/magento-extension-order-fees-m2.html)
 
 ## How to run cypress tests

@@ -94,20 +94,21 @@ class ConfigProvider implements ConfigProviderInterface
     /**
      * ConfigProvider constructor.
      *
-     * @param Data                            $data
-     * @param Escaper                         $escaper
-     * @param Allmethods                      $allPaymentMethod
-     * @param UrlInterface                    $urlInterface
-     * @param SystemConfig                    $systemConfig
-     * @param ScopeConfigInterface            $scopeConfig
-     * @param Repository                      $assetRepository
+     * @param Data $data
+     * @param Escaper $escaper
+     * @param Allmethods $allPaymentMethod
+     * @param UrlInterface $urlInterface
+     * @param SystemConfig $systemConfig
+     * @param ScopeConfigInterface $scopeConfig
+     * @param Repository $assetRepository
      * @param TokenFactory $dataToken
-     * @param Session                         $customerSession
-     * @param CheckoutSession                 $checkoutSession
-     * @param Logger                          $altapayLogger
-     * @param StoreManagerInterface           $storeManager
-     * @param Helper                          $helper
-     * @param Cart                            $cart
+     * @param Session $customerSession
+     * @param CheckoutSession $checkoutSession
+     * @param Logger $altapayLogger
+     * @param StoreManagerInterface $storeManager
+     * @param Helper $helper
+     * @param Cart $cart
+     * @param storeConfig $storeConfig
      */
     public function __construct(
         Data $data,
@@ -151,13 +152,10 @@ class ConfigProvider implements ConfigProviderInterface
      */
     public function getConfig()
     {
-        $store               = null;
         $activePaymentMethod = $this->getActivePaymentMethod();
-        $getCurrentQuote     = $this->_checkoutSession->getQuote();
-        $config              = [];
         $baseUrl             = $this->_storeManager->getStore()->getBaseUrl();
         $baseCurrency        = $this->storeConfig->useBaseCurrency();
-        $currenncyCode       = $baseCurrency ? $this->_storeManager->getStore()->getBaseCurrencyCode() : $this->_storeManager->getStore()->getCurrentCurrencyCode();
+        $currencyCode       = $baseCurrency ? $this->_storeManager->getStore()->getBaseCurrencyCode() : $this->_storeManager->getStore()->getCurrentCurrencyCode();
         $countryCode         = $this->scopeConfig->getValue('general/country/default',
         \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
 
@@ -167,13 +165,13 @@ class ConfigProvider implements ConfigProviderInterface
                     'url'          => $this->urlInterface->getDirectUrl(
                         $this->getData()->getConfigData('place_order_url')
                     ),
-                    'auth'         => $this->checkAuth(),
-                    'connection'   => $this->checkConn(),
-                    'terminaldata' => $activePaymentMethod,
-                    'countryCode'  => $countryCode,
-                    'currencyCode' => $currenncyCode,
-                    'baseUrl'      => $baseUrl,
-                    'currencyConfig'   => $baseCurrency
+                    'auth'              => $this->checkAuth(),
+                    'connection'        => $this->checkConn(),
+                    'terminaldata'      => $activePaymentMethod,
+                    'countryCode'       => $countryCode,
+                    'currencyCode'      => $currencyCode,
+                    'baseUrl'           => $baseUrl,
+                    'currencyConfig'    => $baseCurrency
                 ]
             ]
         ];
@@ -182,7 +180,6 @@ class ConfigProvider implements ConfigProviderInterface
     public function getActivePaymentMethod()
     {
         $storeScope        = \Magento\Store\Model\ScopeInterface::SCOPE_STORE;
-        $quote             = $this->cart->getQuote();
         $storeCode         = $this->systemConfig->resolveCurrentStoreCode();
         $methods           = [];
         $allPaymentMethod  = $this->data->getPaymentMethods();
