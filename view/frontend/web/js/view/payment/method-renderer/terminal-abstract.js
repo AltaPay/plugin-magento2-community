@@ -16,9 +16,10 @@ define(
         'Magento_Customer/js/customer-data',
         'SDM_Altapay/js/action/set-payment',
         'Magento_Checkout/js/action/redirect-on-success',
-        'Magento_Checkout/js/model/quote'
+        'Magento_Checkout/js/model/quote',
+        'Magento_Checkout/js/model/totals'
     ],
-    function ($, Component, storage, Action, redirectOnSuccessAction, quote) {
+    function ($, Component, storage, Action, redirectOnSuccessAction, quote, totals) {
         'use strict';
 
         return Component.extend({
@@ -141,6 +142,8 @@ define(
                 if (!ApplePaySession) {
                     return;
                 }
+                var total = totals.getSegment('grand_total').value; 
+                var grandTotal = configData.currencyConfig ? quote.totals().base_grand_total : total;
 
                 // Define ApplePayPaymentRequest
                 const request = {
@@ -158,7 +161,7 @@ define(
                     "total": {
                         "label": applePayLabel,
                         "type": "final",
-                        "amount": quote.totals().base_grand_total
+                        "amount": grandTotal
                     }
                 };
                 
@@ -187,7 +190,7 @@ define(
                     let total = {
                         "label": applePayLabel,
                         "type": "final",
-                        "amount": quote.totals().base_grand_total
+                        "amount": grandTotal
                     }
             
                     const update = { "newTotal": total };

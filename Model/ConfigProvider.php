@@ -29,6 +29,7 @@ use Magento\Store\Model\StoreManagerInterface;
 use \Exception;
 use SDM\Altapay\Logger\Logger;
 use Magento\Checkout\Model\Cart;
+use SDM\Altapay\Helper\Config as storeConfig;
 
 class ConfigProvider implements ConfigProviderInterface
 {
@@ -85,25 +86,29 @@ class ConfigProvider implements ConfigProviderInterface
      * @var Logger
      */
     private $altapayLogger;
-    
+    /**
+     * @var Helper Config
+     */
+    private $storeConfig;
     
     /**
      * ConfigProvider constructor.
      *
-     * @param Data                            $data
-     * @param Escaper                         $escaper
-     * @param Allmethods                      $allPaymentMethod
-     * @param UrlInterface                    $urlInterface
-     * @param SystemConfig                    $systemConfig
-     * @param ScopeConfigInterface            $scopeConfig
-     * @param Repository                      $assetRepository
+     * @param Data $data
+     * @param Escaper $escaper
+     * @param Allmethods $allPaymentMethod
+     * @param UrlInterface $urlInterface
+     * @param SystemConfig $systemConfig
+     * @param ScopeConfigInterface $scopeConfig
+     * @param Repository $assetRepository
      * @param TokenFactory $dataToken
-     * @param Session                         $customerSession
-     * @param CheckoutSession                 $checkoutSession
-     * @param Logger                          $altapayLogger
-     * @param StoreManagerInterface           $storeManager
-     * @param Helper                          $helper
-     * @param Cart                            $cart
+     * @param Session $customerSession
+     * @param CheckoutSession $checkoutSession
+     * @param Logger $altapayLogger
+     * @param StoreManagerInterface $storeManager
+     * @param Helper $helper
+     * @param Cart $cart
+     * @param storeConfig $storeConfig
      */
     public function __construct(
         Data $data,
@@ -119,7 +124,8 @@ class ConfigProvider implements ConfigProviderInterface
         Logger $altapayLogger,
         StoreManagerInterface $storeManager,
         Helper $helper,
-        Cart $cart
+        Cart $cart,
+        storeConfig $storeConfig
     )
     {
         $this->data             = $data;
@@ -136,6 +142,7 @@ class ConfigProvider implements ConfigProviderInterface
         $this->altapayLogger    = $altapayLogger;
         $this->helper           = $helper;
         $this->cart             = $cart;
+        $this->storeConfig      = $storeConfig;
     }
 
     /**
@@ -145,26 +152,26 @@ class ConfigProvider implements ConfigProviderInterface
      */
     public function getConfig()
     {
-        $store               = null;
         $activePaymentMethod = $this->getActivePaymentMethod();
-        $getCurrentQuote     = $this->_checkoutSession->getQuote();
-        $config                     = [];
-        $baseUrl                    = $this->_storeManager->getStore()->getBaseUrl();
-
-        $countryCode                = $this->scopeConfig->getValue('general/country/default',
+        $baseUrl             = $this->_storeManager->getStore()->getBaseUrl();
+        $baseCurrency        = $this->storeConfig->useBaseCurrency();
+        $currencyCode       = $baseCurrency ? $this->_storeManager->getStore()->getBaseCurrencyCode() : $this->_storeManager->getStore()->getCurrentCurrencyCode();
+        $countryCode         = $this->scopeConfig->getValue('general/country/default',
         \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
+
         return [
             'payment' => [
                 self::CODE => [
                     'url'          => $this->urlInterface->getDirectUrl(
                         $this->getData()->getConfigData('place_order_url')
                     ),
-                    'auth'         => $this->checkAuth(),
-                    'connection'   => $this->checkConn(),
-                    'terminaldata' => $activePaymentMethod,
-                    'countryCode' => $countryCode,
-                    'currencyCode' => $this->_storeManager->getStore()->getBaseCurrencyCode(),
-                    'baseUrl' => $baseUrl
+                    'auth'              => $this->checkAuth(),
+                    'connection'        => $this->checkConn(),
+                    'terminaldata'      => $activePaymentMethod,
+                    'countryCode'       => $countryCode,
+                    'currencyCode'      => $currencyCode,
+                    'baseUrl'           => $baseUrl,
+                    'currencyConfig'    => $baseCurrency
                 ]
             ]
         ];
@@ -173,7 +180,6 @@ class ConfigProvider implements ConfigProviderInterface
     public function getActivePaymentMethod()
     {
         $storeScope        = \Magento\Store\Model\ScopeInterface::SCOPE_STORE;
-        $quote             = $this->cart->getQuote();
         $storeCode         = $this->systemConfig->resolveCurrentStoreCode();
         $methods           = [];
         $allPaymentMethod  = $this->data->getPaymentMethods();
