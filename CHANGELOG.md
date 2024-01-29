@@ -1,6 +1,10 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [3.8.7]
+### Added
+- Add support for Twint payment method.
+
 ## [3.8.6]
 ### Added
 - Add Apple Pay support for oneStepCheckout extension.
