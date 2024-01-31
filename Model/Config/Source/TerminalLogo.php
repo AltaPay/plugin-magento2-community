@@ -60,6 +60,7 @@ class TerminalLogo
             'seb'                   => 'SEB',
             'swish'                 => 'Swish - Vertical',
             'swish_horizontal'      => 'Swish - Horizontal',
+            'twint'                 => 'Twint',
             'viabill'               => 'ViaBill',
             'vipps'                 => 'Vipps',
             'visa'                  => 'Visa',
