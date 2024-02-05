@@ -16,9 +16,10 @@ define(
         'Magento_Customer/js/customer-data',
         'SDM_Altapay/js/action/set-payment',
         'Magento_Checkout/js/action/redirect-on-success',
-        'Magento_Checkout/js/model/quote'
+        'Magento_Checkout/js/model/quote',
+        'Magento_Checkout/js/model/totals'
     ],
-    function ($, Component, storage, Action, redirectOnSuccessAction, quote) {
+    function ($, Component, storage, Action, redirectOnSuccessAction, quote, totals) {
         'use strict';
 
         return Component.extend({
@@ -28,7 +29,6 @@ define(
             },
             configData: null,
             baseUrl: null,
-            grandTotal: null,
             applePayLabel: 'Apple Pay',
             applePayTerminal: null,
             redirectAfterPlaceOrder: false,
@@ -36,7 +36,6 @@ define(
                 this._super();
                 this.configData = window.checkoutConfig.payment[this.getDefaultCode()];
                 this.baseUrl = this.configData.baseUrl;
-                this.grandTotal = quote.totals().base_grand_total;
 
                 return this;
             },
@@ -140,6 +139,8 @@ define(
                 if (!ApplePaySession) {
                     return;
                 }
+                var total = totals.getSegment('grand_total').value; 
+                var grandTotal = this.configData.currencyConfig ? quote.totals().base_grand_total : total;
 
                 // Define ApplePayPaymentRequest
                 const request = {
@@ -157,7 +158,7 @@ define(
                     "total": {
                         "label": this.applePayLabel,
                         "type": "final",
-                        "amount": this.grandTotal
+                        "amount": grandTotal
                     }
                 };
                 
@@ -186,7 +187,7 @@ define(
                     let total = {
                         "label": this.applePayLabel,
                         "type": "final",
-                        "amount": this.grandTotal
+                        "amount": grandTotal
                     }
             
                     const update = { "newTotal": total };
