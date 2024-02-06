@@ -1,6 +1,13 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [3.8.8]
+### Fixed
+- Fix: Missing cart dependency from the ApplePayOrder class
+
+### Added
+- Populate Card Holder name in the payment form
+
 ## [3.8.7]
 ### Added
 - Add support for Twint payment method.
