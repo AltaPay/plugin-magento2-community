@@ -1,6 +1,10 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [3.8.8]
+### Fixed
+- Handle payments that are released even though the payment is successful.
+
 ## [3.8.7]
 ### Added
 - Add support for Twint payment method.
