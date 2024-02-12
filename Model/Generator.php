@@ -273,10 +273,6 @@ class Generator
         $callback = new Callback($request->getPostValue());
         $response = $callback->call();
         if ($response) {
-            $reservationAmount = $this->getReservationAmount($response);
-            if ($reservationAmount > 0) {
-                return;
-            }
             
             $order             = $this->loadOrderFromCallback($response);
             //check if order status set in configuration
@@ -339,9 +335,8 @@ class Generator
                 return;
             }
 
-            $transactionStatus = ["invoice_initialized", "bank_payment_finalized", "captured", "preauth", "card_verified", "recurring_confirmed"];
-            // Check if payment status is in the transaction list and status is "error"
-            if ($response->status === "error" && in_array($response->paymentStatus, $transactionStatus)) {
+            // Check if the payment status is "error" and if the reservation amount is greater than 0.
+            if ($response->status === "error" && $reservationAmount > 0) {
                 return;
             }
 

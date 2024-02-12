@@ -3,7 +3,7 @@ All notable changes to this project will be documented in this file.
 
 ## [3.8.8]
 ### Fixed
-- Handle payments that are released even though the payment is successful.
+- Do not release the order in case of an error and when the reservation amount is greater than 0.
 
 ## [3.8.7]
 ### Added
