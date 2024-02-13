@@ -273,7 +273,6 @@ class Generator
         $callback = new Callback($request->getPostValue());
         $response = $callback->call();
         if ($response) {
-            
             $order             = $this->loadOrderFromCallback($response);
             //check if order status set in configuration
             $statusKey         = Order::STATE_CANCELED;
@@ -330,11 +329,7 @@ class Generator
         $callback = new Callback($request->getPostValue());
         $response = $callback->call();
         if ($response) {
-            $reservationAmount = $this->getReservationAmount($response);
-            if ($reservationAmount > 0) {
-                return;
-            }
-
+            $reservationAmount = $this->getReservedAmount($response);
             // Check if the payment status is "error" and if the reservation amount is greater than 0.
             if ($response->status === "error" && $reservationAmount > 0) {
                 return;
@@ -945,10 +940,12 @@ class Generator
     }
 
     /**
+     * Retrieves the reserved amount from the response object.
+     *
      * @param $response
      * @return mixed
      */
-    private function getReservationAmount($response) {
+    private function getReservedAmount($response) {
         $latestTransKey = $this->helper->getLatestTransaction($response->Transactions);
         $transaction    = $response->Transactions[$latestTransKey];
 
