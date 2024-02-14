@@ -1,7 +1,7 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
-## [3.8.8]
+## [released]
 ### Added
 - Populate the cardholder name in the payment form based on the billing information
  
