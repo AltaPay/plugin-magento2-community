@@ -58,6 +58,7 @@ class TerminalLogo
             'paypal'                => 'PayPal',
             'przelewy24'            => 'Przelewy24',
             'seb'                   => 'SEB',
+            'sepa'                  => 'SEPA',
             'swish'                 => 'Swish - Vertical',
             'swish_horizontal'      => 'Swish - Horizontal',
             'twint'                 => 'Twint',
