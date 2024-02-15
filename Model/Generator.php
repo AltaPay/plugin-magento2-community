@@ -274,8 +274,6 @@ class Generator
         $response = $callback->call();
         if ($response) {
             $order             = $this->loadOrderFromCallback($response);
-            $payment           = $order->getPayment();
-            $lastTransactionId = $payment->getLastTransId();
             //check if order status set in configuration
             $statusKey         = Order::STATE_CANCELED;
             $storeCode         = $order->getStore()->getCode();
@@ -331,9 +329,9 @@ class Generator
         $callback = new Callback($request->getPostValue());
         $response = $callback->call();
         if ($response) {
-            $transactionStatus = ["invoice_initialized", "bank_payment_finalized", "captured", "preauth", "card_verified", "recurring_confirmed"];
-            // Check if payment status is in the transaction list and status is "error"
-            if ($response->status === "error" && in_array($response->paymentStatus, $transactionStatus)) {
+            $reservationAmount = $this->getReservedAmount($response);
+            // Check if the payment status is "error" and if the reservation amount is greater than 0.
+            if ($response->status === "error" && $reservationAmount > 0) {
                 return;
             }
 
@@ -939,5 +937,18 @@ class Generator
             }
             $model->save();
         }
+    }
+
+    /**
+     * Retrieves the reserved amount from the response object.
+     *
+     * @param $response
+     * @return mixed
+     */
+    private function getReservedAmount($response) {
+        $latestTransKey = $this->helper->getLatestTransaction($response->Transactions);
+        $transaction    = $response->Transactions[$latestTransKey];
+
+        return $transaction->ReservedAmount;
     }
 }

@@ -856,6 +856,28 @@ label.flex.justify-between.text-sm.px-5.py-3.bg-gray-500.border-gray-600 {
    padding: 10px 15px !important;
 }
 
+.payment-form-wrapper #klarna_options {
+   padding-top: 20px;
+}
+
+#EPayment .pensio_payment_form_label_cell {
+   display: table-cell !important;
+   font-weight: bold;
+}
+
+#EPayment .pensio_payment_submit_button button {
+   background-color: #6195f0;
+   border-color: #4a85ee;
+   color: #ffffff;
+   margin-top: 16px;
+   border-radius: 0.25rem;
+   cursor: pointer;
+   font-weight: 600;
+   line-height: 1.25;
+   padding: 0.5rem 1rem;
+   text-align: center;
+}
+
 @media (min-width:768px) {
 
    div.pensio_payment_form_outer,
