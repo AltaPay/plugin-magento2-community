@@ -21,6 +21,7 @@ use SDM\Altapay\Model\Handler\CreatePaymentHandler;
 use Magento\Framework\DB\TransactionFactory;
 use Magento\Sales\Model\Order\Email\Sender\OrderSender;
 use SDM\Altapay\Helper\Data;
+use Magento\Checkout\Model\Cart;
 
 class ApplePayOrder {
 
@@ -79,6 +80,12 @@ class ApplePayOrder {
      */
     protected $helper;
 
+
+    /**
+     * @var Cart
+     */
+    private $modelCart;
+
     /**
      * @param OrderLoaderInterface $orderLoader
      * @param Session $checkoutSession
@@ -91,6 +98,7 @@ class ApplePayOrder {
      * @param TransactionFactory $transactionFactory
      * @param OrderSender $orderSender
      * @param Data $helper
+     * @param Cart modelCart
      */
     public function __construct(
         OrderLoaderInterface $orderLoader,
@@ -103,7 +111,8 @@ class ApplePayOrder {
         CreatePaymentHandler $paymentHandler,
         TransactionFactory $transactionFactory,
         OrderSender $orderSender,
-        Data $helper
+        Data $helper,
+        Cart $modelCart
     ) {
         $this->orderLoader           = $orderLoader;
         $this->checkoutSession       = $checkoutSession;
@@ -116,6 +125,7 @@ class ApplePayOrder {
         $this->transactionFactory    = $transactionFactory;
         $this->orderSender           = $orderSender;
         $this->helper                = $helper;
+        $this->modelCart             = $modelCart;
     }
 
     /**

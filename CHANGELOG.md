@@ -4,9 +4,11 @@ All notable changes to this project will be documented in this file.
 ## [3.8.8]
 ### Added
 - Add support for SEPA payment method.
+- Populate the cardholder name in the payment form based on the billing information
 
 ### Fixed
 - Do not release the order in case of an error and when the reservation amount is greater than 0.
+- Fix: Missing cart dependency from the ApplePayOrder class
 
 ## [3.8.7]
 ### Added

@@ -73,12 +73,14 @@ class CustomerHandler
         $address       = new Address();
         $customerEmail = '';
         $customerPhone = '';
+        $customerName = '';
 
         if ($order->getBillingAddress()) {
             $billingAddress = $order->getBillingAddress()->convertToArray();
             $address        = $this->createAddressObject($billingAddress, $address);
             $customerEmail  = $order->getBillingAddress()->getEmail();
             $customerPhone  = $order->getBillingAddress()->getTelephone();
+            $customerName = $order->getBillingAddress()->getFirstName().' '.$order->getBillingAddress()->getLastName();
         }
         $customer = new Customer($address);
 
@@ -93,8 +95,9 @@ class CustomerHandler
         if (!$order->getBillingAddress() && $order->getShippingAddress()) {
             $customerEmail = $order->getShippingAddress()->getEmail();
             $customerPhone = $order->getShippingAddress()->getTelephone();
+            $customerName = $order->getShippingAddress()->getFirstName().' '.$order->getShippingAddress()->getLastName();
         }
-
+        $customer->setCardHolderName($customerName);
         $customer->setEmail($customerEmail);
         $customer->setPhone(str_replace(' ', '', $customerPhone));
         if(!$isReservation) {
