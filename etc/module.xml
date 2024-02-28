@@ -10,6 +10,6 @@
 -->
 
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Module/etc/module.xsd">
-  <module name="SDM_Altapay" setup_version="3.8.8">
+  <module name="SDM_Altapay" setup_version="3.8.9">
   </module>
 </config>

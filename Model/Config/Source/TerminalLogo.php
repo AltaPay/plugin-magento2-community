@@ -61,6 +61,7 @@ class TerminalLogo
             'sepa'                  => 'SEPA',
             'swish'                 => 'Swish - Vertical',
             'swish_horizontal'      => 'Swish - Horizontal',
+            'trustly'       => 'Trustly',
             'twint'                 => 'Twint',
             'viabill'               => 'ViaBill',
             'vipps'                 => 'Vipps',

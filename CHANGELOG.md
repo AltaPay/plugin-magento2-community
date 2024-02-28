@@ -1,6 +1,10 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [3.8.9]
+### Added
+- Add support for Trustly payment method.
+
 ## [3.8.8]
 ### Added
 - Add support for SEPA payment method.
