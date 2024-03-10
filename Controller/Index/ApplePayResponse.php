@@ -84,17 +84,23 @@ class ApplePayResponse extends Action implements CsrfAwareActionInterface
     public function execute()
     {
         $orderId = $this->_checkoutSession->getLastOrderId();
+
+        if (empty($orderId)) {
+            $result = ['status' => 'error', 'message' => 'Invalid order ID'];
+
+            return $this->createJsonResponse($result);
+        }
+
         if ($this->checkPost()) {
             $params = $this->gateway->createRequestApplepay(
                 $this->getRequest()->getParam('paytype'),
                 $orderId,
                 $this->getRequest()->getParam('providerData')
             );
-            $response = $this->resultFactory
-            ->create(\Magento\Framework\Controller\ResultFactory::TYPE_JSON)
-            ->setData($params);
-            
-            return $response;
+
+            $status = isset($params->Result) ? strtolower($params->Result) : 'error';
+
+            return $this->createJsonResponse(['status' => $status]);
         }
     }
 
@@ -106,4 +112,12 @@ class ApplePayResponse extends Action implements CsrfAwareActionInterface
         return $this->getRequest()->isPost();
     }
 
+    /**
+     * @param $data
+     * @return mixed
+     */
+    private function createJsonResponse($data)
+    {
+        return $this->resultFactory->create(ResultFactory::TYPE_JSON)->setData($data);
+    }
 }
