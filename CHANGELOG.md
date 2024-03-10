@@ -1,6 +1,55 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [3.8.9]
+### Added
+- Add support for Trustly payment method.
+
+## [3.8.8]
+### Added
+- Add support for SEPA payment method.
+- Populate the cardholder name in the payment form based on the billing information
+
+### Fixed
+- Do not release the order in case of an error and when the reservation amount is greater than 0.
+- Fix: Missing cart dependency from the ApplePayOrder class
+
+## [3.8.7]
+### Added
+- Add support for Twint payment method.
+
+## [3.8.6]
+### Added
+- Add Apple Pay support for oneStepCheckout extension.
+
+### Fixed
+- Fix: Apple Pay amount mis-match issue with multi-store website.
+
+## [3.8.5]
+### Fixed
+- Remove discount line if discount amount is 0 from the order summary screen.
+
+## [3.8.4]
+### Fixed
+- Fix: Translation issue with email template in a multi-store website.
+
+## [3.8.3]
+### Added
+- Add translations for the "Pay by link" email template.
+- Add an option to change the logo for the checkout form page.
+- Add configuration to display prices on the order summary, including tax.
+
+### Fixed
+- Fix styling issues for the order summary section.
+
+## [3.8.2]
+### Added
+- Show notification for a plugin upgrade in the admin interface when a new extension version is available.
+
+## [3.8.1]
+### Added
+- Fix: Do not release the payment when receiving a fail callback if the payment is in a successful state
+
 ## [3.8.0]
 ### Added
 - Fix: Multi-currency issue with Pay by link payment form.

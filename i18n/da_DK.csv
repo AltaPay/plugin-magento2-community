@@ -83,3 +83,4 @@
 "Could not authenticate with API","Kunne ikke godkendes med API"
 "error occured","fejl opstod"
 "Payment failed due to the browser back button usage!","Betaling mislykkedes på grund af brug af browserns tilbageknap!"
+"Please click on the link to complete the payment </br> <a href=""%formurl"">%formurl</a>","Klik venligst på linket for at gennemføre betalingen </br> <a href=""%formurl"">%formurl</a>"

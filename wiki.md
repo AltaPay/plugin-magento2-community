@@ -26,6 +26,10 @@ We highly recommend gathering all the below information, before starting the ins
 
 [Payment page layout](#payment-page-layout)
 
+* [Order summary settings](#order-summary-settings)
+
+* [Checkout Page Logo](#checkout-page-logo)
+
 [Checkout form styling](#checkout-form-styling)
 
 [Configure fraud detection](#configure-fraud-detection)
@@ -36,7 +40,9 @@ We highly recommend gathering all the below information, before starting the ins
 
 [Pay by link](#pay-by-link)
 
-[Auto-cancelling orders cron settings](#auto-cancelling-orders-cron-settings)
+* [Pay by link email template](#pay-by-link-email-template)
+
+[Auto-cancelling orders with pending payment](#auto-cancelling-orders-with-pending-payment)
 
 [Reorder from the admin](#reorder-from-the-admin)
 
@@ -45,6 +51,8 @@ We highly recommend gathering all the below information, before starting the ins
 [Supported versions](#supported-versions)
 
 [Styling](#styling)
+
+[Plugin updates](#plugin-updates)
 
 [Troubleshooting](#troubleshooting)
 
@@ -139,19 +147,6 @@ payment methods and configuring payments.
 > Once the API details are validated the terminals will be appeared in
 > the terminal's dropdown in each terminal.
 
-## Auto-cancelling orders cron settings
-
-1. Navigate to: Admin > Stores > Configuration > Sales (Tab) > Payment Methods
-2. Scroll to AltaPay section
-3. Open "Auto-cancelling orders cron settings" section and choose "Yes" to enable the configuration
-4. Select the frequency for a scheduler
-5. Set a start time when the scheduler should run
-6. Cancellation timeframe runs from from the moment the order is generated.
-
-    **Note** Specify the time duration in hours; for instance, 2 days equals 48 hours with a default field setting of 24 hours.
-
-    ![configure-cron-scheduler](docs/cron_schedule.png)
-
 ## Charged currency setting
 
 You can select currency used for AltaPay payment processing from charged currency setting section.
@@ -169,6 +164,34 @@ Methods
 
 ![order_status_configuration](docs/order_status_configuration.png)
 
+## Payment page layout
+
+### Choose payment page layout
+
+Choose one of the below options from `Payment page layout` dropdown to select the layout type for payment page.
+
+![Payment page layout configuration](docs/checkout_form_style.jpg)
+
+- `Default` This will use the styling from the checkout/theme.
+
+    ![checkout_style](docs/checkout_style.jpg)
+
+- `Checkout Independent` This will show the payment page independent from the theme styling. This will provide a visually appealing appearance seamlessly, without conflicting with the theme styling.
+
+    ![custom_payment_page_layout](docs/custom_payment_page_layout.png)
+
+### Order summary settings
+
+Enabling this option will display prices for subtotal, shipping, and item price, including taxes, on the order summary grid.
+
+### Checkout Page Logo
+
+This logo will be displayed on the checkout page when the **Checkout Independent** option is selected. If left empty, the default store logo will be used.
+(jpg, jpeg, gif, png)
+
+![checkout_independent_logo](docs/checkout_independent_logo.png)
+
+
 ## Checkout form styling
 
 Choose one of the below options from `Checkout form style` dropdown to change the styling of Credit Card form on the checkout page.
@@ -184,19 +207,6 @@ Choose one of the below options from `Checkout form style` dropdown to change th
     ![Checkout Style](docs/checkout_style.jpg)
 
 - `Custom` This option can be selected to implement custom styling on the payment page. Selecting this option will remove all the styling from the payment page.
-
-## Payment page layout
-Choose one of the below options from `Payment page layout` dropdown to select the layout type for payment page.
-
-![Payment page layout configuration](docs/payment_page_styling.png)
-
-- `Default` This will use the styling from the checkout/theme.
-
-    ![checkout_style](docs/checkout_style.jpg)
-
-- `Checkout Independent` This will show the payment page independent from the theme styling. This will provide a visually appealing appearance seamlessly, without conflicting with the theme styling.
-
-    ![custom_payment_page_layout](docs/custom_payment_page_layout.png)
 
 ## Configure fraud detection
 
@@ -284,6 +294,23 @@ By performing the below steps a customer receives a payment link on the provided
 
     ![submit_order](docs/submit_order.png)
 
+### Pay by link email template
+You can create a custom email template by following the link below and change the template from the dropdown: https://developer.adobe.com/commerce/frontend-core/guide/templates/email/
+
+ ![change_email_template](docs/change_email_template.png)
+
+## Auto-cancelling orders with pending payment
+
+1. Navigate to: **Admin** > **Stores** > **Configuration** > **Sales (Tab)** > **Payment Methods**
+2. Scroll to **AltaPay** section
+3. Open **Auto-cancelling orders with pending payment** section and choose **Yes** to enable the configuration.
+4. Choose **Exclude admin orders** option if you want to exclude order created from the admin panel.
+5. Cancellation timeframe runs from the moment the order is generated.
+
+    **Note** Specify the time duration in hours; for instance, 2 days equals 48 hours with a default field setting of 24 hours.
+
+    ![auto-cancel-order-with-pending-payment](docs/auto_cancel_order_with_pending_payment.png)
+
 ## Reorder from the admin
 To place an order through the admin, please follow the steps below:
 
@@ -305,7 +332,7 @@ In order to reconcile payments on Magento please follow the steps below:
 3. Select the order you want to view.
 4. Copy the Reconciliation Identifier from the **Reconciliation Details** section.
  
-   ![magento_order_view](Docs/magento_order_view.png)
+   ![magento_order_view](docs/magento_order_view.png)
  
 5. Navigate to AltaPay Gateway dashboard
 6. Click on **FUNDING FILES** under **FINANCES** menu
@@ -315,7 +342,7 @@ In order to reconcile payments on Magento please follow the steps below:
 
 **Sample AltaPay Gateway CSV:**
     
-![funding_list_csv](Docs/funding_list_csv.png)
+![funding_list_csv](docs/funding_list_csv.png)
 
 ## Supported versions
 
@@ -352,6 +379,12 @@ here._
 ><https://github.com/AltaPay/plugin-magento2-community/blob/main/view/frontend/layout/sdmaltapay_index_callbackform.xml>
 >
 >Please visit Magento's official documentation to know more about how to [Override a layout](https://devdocs.magento.com/guides/v2.4/frontend-dev-guide/layouts/layout-override.html).
+
+## Plugin updates
+
+From version 3.8.2 onwards, you will receive a notification in Magento 2 admin when a new version of the plugin is available for installation. We recommend to update the plugin regularly upon receiving such notifications to ensure optimal performance and access to the latest features.
+
+![plugin_update](docs/plugin_update.png)
 
 ## Troubleshooting
 

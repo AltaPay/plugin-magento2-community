@@ -856,6 +856,28 @@ label.flex.justify-between.text-sm.px-5.py-3.bg-gray-500.border-gray-600 {
    padding: 10px 15px !important;
 }
 
+.payment-form-wrapper #klarna_options {
+   padding-top: 20px;
+}
+
+#EPayment .pensio_payment_form_label_cell {
+   display: table-cell !important;
+   font-weight: bold;
+}
+
+#EPayment .pensio_payment_submit_button button {
+   background-color: #6195f0;
+   border-color: #4a85ee;
+   color: #ffffff;
+   margin-top: 16px;
+   border-radius: 0.25rem;
+   cursor: pointer;
+   font-weight: 600;
+   line-height: 1.25;
+   padding: 0.5rem 1rem;
+   text-align: center;
+}
+
 @media (min-width:768px) {
 
    div.pensio_payment_form_outer,
@@ -1735,7 +1757,7 @@ table.AltaPayMobileInputOptionOr tr td {
 .opc-block-summary {
    background: #f5f5f5;
    margin: 0 0 50px;
-   padding: 20px 25px 20px 25px;
+   padding: 25px;
    border-radius: 10px;
 }
 
@@ -1810,6 +1832,15 @@ tr {
    white-space: nowrap;
 }
 
+.opc-block-summary .table-totals tbody .totals-tax .mark,
+.opc-block-summary .table-totals tbody .totals-tax .amount {
+   padding-bottom: 12px;
+}
+.opc-block-summary .table-totals tbody .totals.sub .mark,
+.opc-block-summary .table-totals tbody .totals.sub .amount {
+   padding-top: 12px;
+}
+
 .opc-block-summary .mark .value {
    color: #666666;
    display: block;
@@ -1830,7 +1861,7 @@ table th {
 .cart-totals .grand td,
 .opc-block-summary .table-totals .grand th,
 .opc-block-summary .table-totals .grand td {
-   padding: 11px 0;
+   padding: 15px 0 20px;
 }
 
 .cart-totals .grand .amount,
@@ -1958,7 +1989,6 @@ table th {
    position: absolute;
    right: 0;
    top: 0;
-   height: 75px;
 }
 
 .minicart-items .product-item-details {

@@ -52,21 +52,29 @@ $block->getViewFileUrl('SDM_Altapay::css/ordersummary.css') ?>">
                 <th class="mark" scope="row"><?= $block->escapeHtml(__('Cart Subtotal')) ?></th>
                 <td class="amount">
                     <span class="price" data-th="Cart Subtotal">
-                    <?= $block->escapeHtml($block->getFormatedPrice($order->getSubtotal())); ?>
+                    <?php
+                    if ($block->orderSummeryInclTax()) {
+                        echo $block->escapeHtml($block->getFormatedPrice($order->getSubtotalInclTax()));
+                    } else {
+                        echo $block->escapeHtml($block->getFormatedPrice($order->getSubtotal()));
+                    }
+                    ?>
                     </span>
                 </td>
             </tr>
-            <tr class="totals discount">
-                <th class="mark">
-                    <span class="title"><?= $block->escapeHtml(__('Discount')) ?></span>
-                    <span class="discount coupon"><?= $block->escapeHtml($order->getCouponCode()); ?></span>
-                </th>
-                <td class="amount">
-                    <span class="price">
-                        -<?= $block->escapeHtml($block->getFormatedPrice($order->getDiscountAmount())); ?>
-                    </span>
-                </td>
-            </tr>
+            <?php if ($order->getDiscountAmount() != 0) { ?>
+                <tr class="totals discount">
+                    <th class="mark">
+                        <span class="title"><?= $block->escapeHtml(__('Discount')) ?></span>
+                        <span class="discount coupon"><?= $block->escapeHtml($order->getCouponCode()); ?></span>
+                    </th>
+                    <td class="amount">
+                        <span class="price">
+                            <?= $block->escapeHtml($block->getFormatedPrice($order->getDiscountAmount())); ?>
+                        </span>
+                    </td>
+                </tr>
+            <?php } ?>
             <tr class="totals shipping excl">
                 <th class="mark" scope="row">
                     <span class="label"><?= $block->escapeHtml(__('Shipping')) ?></span>
@@ -74,7 +82,13 @@ $block->getViewFileUrl('SDM_Altapay::css/ordersummary.css') ?>">
                 </th>
                 <td class="amount">
                     <span class="price" data-th="Shipping">
-                        <?= $block->escapeHtml($block->getFormatedPrice($order->getShippingAmount())); ?>
+                        <?php
+                        if ($block->orderSummeryInclTax()) {
+                            echo $block->escapeHtml($block->getFormatedPrice($order->getShippingInclTax()));
+                        } else {
+                            echo $block->escapeHtml($block->getFormatedPrice($order->getShippingAmount()));
+                        }
+                        ?>
                     </span>
                 </td>
             </tr>
@@ -142,7 +156,13 @@ $block->getViewFileUrl('SDM_Altapay::css/ordersummary.css') ?>">
                                             <span class="price-excluding-tax">
                                                 <span class="cart-price">
                                                     <span class="price">
-                                                        <?= $block->escapeHtml($block->getFormatedPrice($item->getRowTotal())); ?>
+                                                    <?php
+                                                    if ($block->orderSummeryInclTax()) {
+                                                        echo $block->escapeHtml($block->getFormatedPrice($item->getRowTotalInclTax()));
+                                                    } else{
+                                                        echo $block->escapeHtml($block->getFormatedPrice($item->getRowTotal()));
+                                                    }
+                                                    ?>
                                                     </span>
                                                 </span>
                                             </span>
