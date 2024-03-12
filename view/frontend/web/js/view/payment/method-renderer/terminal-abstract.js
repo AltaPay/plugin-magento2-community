@@ -17,9 +17,10 @@ define(
         'SDM_Altapay/js/action/set-payment',
         'Magento_Checkout/js/action/redirect-on-success',
         'Magento_Checkout/js/model/quote',
-        'Magento_Checkout/js/model/totals'
+        'Magento_Checkout/js/model/totals',
+        'Magento_Checkout/js/model/payment/additional-validators'
     ],
-    function ($, Component, storage, Action, redirectOnSuccessAction, quote, totals) {
+    function ($, Component, storage, Action, redirectOnSuccessAction, quote, totals, additionalValidators) {
         'use strict';
 
         return Component.extend({
@@ -50,9 +51,15 @@ define(
                 return this;
             },
             placeOrder: function() {
+                var self = this;
+                if (!self.validate() || !additionalValidators.validate()) {
+                    return;
+                }
+
                 if (this.configData.terminaldata[this.getCode()].isapplepay === '1') {
                     this.onApplePayButtonClicked();
                 }
+
                 $('#altapay-error-message').text('');
                 var auth = window.checkoutConfig.payment[this.getDefaultCode()].auth;
                 var connection = window.checkoutConfig.payment[this.getDefaultCode()].connection;
@@ -62,14 +69,11 @@ define(
                     return false;
                 }
 
-                var self = this;
-                if (self.validate()) {
-                    self.selectPaymentMethod();
-                    Action(
-                        this.messageContainer,
-                        this.terminal
-                    );
-                }
+                self.selectPaymentMethod();
+                Action(
+                    this.messageContainer,
+                    this.terminal
+                );
             },
             terminalName: function () {
                 var self = this;
