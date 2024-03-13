@@ -51,12 +51,8 @@ define(
                 return this;
             },
             placeOrder: function() {
-                var self = this;
-                if (!self.validate() || !additionalValidators.validate()) {
-                    return;
-                }
 
-                if (this.configData.terminaldata[this.getCode()].isapplepay === '1') {
+                if (this.configData.terminaldata[this.getCode()].isapplepay === '1' && additionalValidators.validate()) {
                     this.onApplePayButtonClicked();
                 }
 
@@ -69,11 +65,14 @@ define(
                     return false;
                 }
 
-                self.selectPaymentMethod();
-                Action(
-                    this.messageContainer,
-                    this.terminal
-                );
+                var self = this;
+                if (self.validate()) {
+                    self.selectPaymentMethod();
+                    Action(
+                        this.messageContainer,
+                        this.terminal
+                    );
+                }
             },
             terminalName: function () {
                 var self = this;
