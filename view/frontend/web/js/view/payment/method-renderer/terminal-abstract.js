@@ -51,8 +51,10 @@ define(
                 return this;
             },
             placeOrder: function() {
-
-                if (this.configData.terminaldata[this.getCode()].isapplepay === '1' && additionalValidators.validate()) {
+                if (this.configData.terminaldata[this.getCode()].isapplepay === '1') {
+                    if(!additionalValidators.validate()){
+                        return;
+                    }
                     this.onApplePayButtonClicked();
                 }
 

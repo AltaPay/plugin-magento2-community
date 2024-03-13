@@ -1,6 +1,10 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [3.9.0]
+### Added
+- Add support for `Fire Checkout - One Page Checkout` extension.
+
 ## [3.8.9]
 ### Added
 - Add support for Trustly payment method.
