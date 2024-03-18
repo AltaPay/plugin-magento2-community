@@ -17,9 +17,10 @@ define(
         'SDM_Altapay/js/action/set-payment',
         'Magento_Checkout/js/action/redirect-on-success',
         'Magento_Checkout/js/model/quote',
-        'Magento_Checkout/js/model/totals'
+        'Magento_Checkout/js/model/totals',
+        'Magento_Checkout/js/model/payment/additional-validators'
     ],
-    function ($, Component, storage, Action, redirectOnSuccessAction, quote, totals) {
+    function ($, Component, storage, Action, redirectOnSuccessAction, quote, totals, additionalValidators) {
         'use strict';
 
         return Component.extend({
@@ -27,19 +28,36 @@ define(
                 template: 'SDM_Altapay/payment/terminal',
                 terminal: '1'
             },
-
+            configData: null,
             redirectAfterPlaceOrder: false,
-
-            placeOrder: function () {
-                var self = this;
-                var paymentMethod = window.checkoutConfig.payment['sdm_altapay'].terminaldata;
-                for (var obj in paymentMethod) {
-                    if (obj === self.getCode()) {
-                        if(paymentMethod[obj].isapplepay === '1' ) {
-                            this.onApplePayButtonClicked();
+            initialized: false,
+            initialize() {
+                this._super();
+                this.configData = window.checkoutConfig.payment[this.getDefaultCode()];
+                if (this.configData.terminaldata[this.getCode()].isapplepay === '1' && !this.initialized) {
+                    let self = this;
+                    this.initialized = true;
+                    $('body').on('fc:placeOrderBefore', function() {
+                        let paymentMethod = window.checkoutConfig.payment['sdm_altapay'].terminaldata,
+                            selectedTerminal = $('input[name="payment[method]"]:checked').attr('id');
+                        for (let method in paymentMethod) {
+                            if (method === selectedTerminal && paymentMethod[method].isapplepay === '1') {
+                                self.placeOrder();
+                                break;
+                            }
                         }
-                    }
+                    });
                 }
+                return this;
+            },
+            placeOrder: function() {
+                if (this.configData.terminaldata[this.getCode()].isapplepay === '1') {
+                    if(!additionalValidators.validate()){
+                        return;
+                    }
+                    this.onApplePayButtonClicked();
+                }
+
                 $('#altapay-error-message').text('');
                 var auth = window.checkoutConfig.payment[this.getDefaultCode()].auth;
                 var connection = window.checkoutConfig.payment[this.getDefaultCode()].connection;
@@ -57,27 +75,6 @@ define(
                         this.terminal
                     );
                 }
-            },
-            termnialId: function () {
-                var self = this;
-                var terminalname;
-                var terminalinfo = [];
-                var paymentMethod = window.checkoutConfig.payment[this.getDefaultCode()].terminaldata;
-                var isSafari = (/^((?!chrome|android).)*safari/i.test(navigator.userAgent));
-                for (var obj in paymentMethod) {
-                    if (obj === self.getCode()) {
-                        if (paymentMethod[obj].isapplepay == 1 && isSafari === false) {
-                            terminalname = "";
-                        } else {
-                            if (paymentMethod[obj].terminalname != " ") {
-                                terminalname = paymentMethod[obj].terminalname;
-                            }
-                        }
-                    }
-                }
-                terminalinfo.push(terminalname, paymentMethod[obj].applepaylabel);
-                
-                return terminalinfo;
             },
             terminalName: function () {
                 var self = this;
@@ -111,7 +108,7 @@ define(
                     if (obj === self.getCode()) {
                         if (paymentMethod[obj].terminalmessage != "" && paymentMethod[obj].terminalmessage != null) {
                             terminalmessage = paymentMethod[obj].terminalmessage
-                       }
+                        }
                     }
                 }
                 return terminalmessage;
@@ -132,23 +129,21 @@ define(
 
             },
             onApplePayButtonClicked: function() {
-                var terminalinfo = this.termnialId();
-                var applePayLabel = 'AltaPay ApplePay Charge';
-                var configData = window.checkoutConfig.payment[this.getDefaultCode()];
-                var baseurl = configData.baseUrl;
-                if (terminalinfo[1] !== null) {
-                    applePayLabel = terminalinfo[1];
-                }
                 if (!ApplePaySession) {
                     return;
                 }
-                var total = totals.getSegment('grand_total').value; 
-                var grandTotal = configData.currencyConfig ? quote.totals().base_grand_total : total;
+                var total = totals.getSegment('grand_total').value;
+                var grandTotal = this.configData.currencyConfig ? quote.totals().base_grand_total : total;
+                var applePayLabel = 'Apple Pay';
+
+                if(this.configData.terminaldata[this.getCode()].applepaylabel !== null){
+                    applePayLabel = this.configData.terminaldata[this.getCode()].applepaylabel;
+                }
 
                 // Define ApplePayPaymentRequest
                 const request = {
-                    "countryCode": configData.countryCode,
-                    "currencyCode": configData.currencyCode,
+                    "countryCode": this.configData.countryCode,
+                    "currencyCode": this.configData.currencyCode,
                     "merchantCapabilities": [
                         "supports3DS"
                     ],
@@ -164,55 +159,56 @@ define(
                         "amount": grandTotal
                     }
                 };
-                
+
                 // Create ApplePaySession
                 const session = new ApplePaySession(3, request);
 
                 session.onvalidatemerchant = async event => {
-                    var url = baseurl+"sdmaltapay/index/applepay";
-                    // Call your own server to request a new merchant session.            
+                    var url = this.configData.baseUrl + "sdmaltapay/index/applepay";
+                    // Call your own server to request a new merchant session.
                     $.ajax({
                         url: url,
                         data: {
                             validationUrl: event.validationURL,
-                            termminalid: terminalinfo[0]
+                            termminalid: this.configData.terminaldata[this.getCode()].terminalname
                         },
                         type: 'post',
                         dataType: 'JSON',
                         success: function(response) {
-                                var responsedata = jQuery.parseJSON(response);
-                                session.completeMerchantValidation(responsedata);
+                            var responsedata = jQuery.parseJSON(response);
+                            session.completeMerchantValidation(responsedata);
                         }
                     });
                 };
-                
+
                 session.onpaymentmethodselected = event => {
                     let total = {
                         "label": applePayLabel,
                         "type": "final",
                         "amount": grandTotal
                     }
-            
+
                     const update = { "newTotal": total };
                     session.completePaymentMethodSelection(update);
                 };
-                
+
                 session.onshippingmethodselected = event => {
                     // Define ApplePayShippingMethodUpdate based on the selected shipping method.
-                    // No updates or errors are needed, pass an empty object. 
+                    // No updates or errors are needed, pass an empty object.
                     const update = {};
                     session.completeShippingMethodSelection(update);
                 };
-                
+
                 session.onshippingcontactselected = event => {
                     // Define ApplePayShippingContactUpdate based on the selected shipping contact.
                     const update = {};
                     session.completeShippingContactSelection(update);
                 };
-                
+
                 session.onpaymentauthorized = event => {
                     var method = this.terminal.substr(this.terminal.indexOf(" ") + 1);
-                    var url = baseurl + "sdmaltapay/index/applepayresponse";    
+                    var url = this.configData.baseUrl + "sdmaltapay/index/applepayresponse";
+
                     $.ajax({
                         url: url,
                         data: {
@@ -223,8 +219,7 @@ define(
                         dataType: 'JSON',
                         complete: function(response) {
                             var status;
-                            var responsestatus = response.responseJSON.Result.toLowerCase();
-                            if (responsestatus === 'success') {
+                            if (response.status === 200 && response.statusText === "OK" && response.responseJSON.status === 'success') {
                                 status = ApplePaySession.STATUS_SUCCESS;
                                 session.completePayment(status);
                                 redirectOnSuccessAction.execute();
@@ -233,20 +228,12 @@ define(
                                 session.completePayment(status);
                             }
                         }
-                    });        
+                    });
                 };
                 session.oncancel = event => {
-                    var url = baseurl + "sdmaltapay/index/cancel";
-                    $.ajax({
-                        url: url,
-                        type: 'post',
-                        success: function(data, status, xhr) {
-                            window.location.reload();
-                        }
-                    });
-
+                    window.location.reload();
                 };
-                
+
                 session.begin();
             },
             getDefaultCode: function () {
@@ -282,7 +269,7 @@ define(
                 }
                 return savedtokenlist;
             },
-            
+
             savedTokenPrimaryOption: function () {
                 var self = this;
                 var savedtokenprimaryoption;
