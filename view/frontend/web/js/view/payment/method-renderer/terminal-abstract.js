@@ -231,7 +231,14 @@ define(
                     });
                 };
                 session.oncancel = event => {
-                    window.location.reload();
+                    var url = this.configData.baseUrl + "sdmaltapay/index/cancel";
+                    $.ajax({
+                        url: url,
+                        type: 'post',
+                        success: function(data, status, xhr) {
+                            window.location.reload();
+                        }
+                    });
                 };
 
                 session.begin();
