@@ -100,7 +100,9 @@ class CustomerHandler
         $customer->setCardHolderName($customerName);
         $customer->setEmail($customerEmail);
         $customer->setUsername($customerEmail);
-        $customer->setPhone(str_replace(' ', '', $customerPhone));
+        if(!empty($customerPhone)){
+            $customer->setPhone(str_replace(' ', '', $customerPhone));
+        }
         if(!$isReservation) {
             $customer->setClientIP($this->request->getServer('REMOTE_ADDR'));
             $customer->setClientAcceptLanguage(substr($this->request->getServer('HTTP_ACCEPT_LANGUAGE'), 0, 2));
