@@ -73,7 +73,7 @@ class DiscountHandler
         if (!$newOrder) {
             $orderId = $order->getOrder()->getId();
         }
-        $compAmount         = $order->getShippingDiscountTaxCompensationAmount();
+        $compAmount         = !empty($order->getShippingDiscountTaxCompensationAmount()) ? $order->getShippingDiscountTaxCompensationAmount() : 0;
         $shippingTaxPercent = $this->helper->getOrderShippingTax($orderId);
         if (!empty($compAmount) && $compAmount > 0) {
             if (!$discountAllItems) {
