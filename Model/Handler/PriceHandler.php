@@ -117,15 +117,11 @@ class PriceHandler
     /**
      * @param $item
      * @param $unitPrice
-     * @param $unitPriceWithoutTax
      * @param $taxAmount
      * @param $discountedAmount
-     * @param $couponCodeAmount
-     * @param $catalogDiscountCheck
-     * @param $storePriceIncTax
      * @param $newOrder
      *
-     * @return float|int
+     * @return float
      */
     public function compensationAmountCal(
         $item,
@@ -150,6 +146,6 @@ class PriceHandler
             $cmsSubTotal = $item->getBaseRowTotal() - $item->getBaseDiscountAmount() + $item->getBaseTaxAmount() + $item->getBaseDiscountTaxCompensationAmount();
         }
 
-        return $cmsSubTotal - $gatewaySubTotal;
+        return round(($cmsSubTotal - $gatewaySubTotal), 3);
     }
 }

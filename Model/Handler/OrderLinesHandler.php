@@ -78,8 +78,9 @@ class OrderLinesHandler
         $orderLine             = new OrderLine($description, $itemId, 1, $compensationAmount);
         $orderLine->taxAmount  = 0.00;
         $orderLine->taxPercent = 0.00;
-        $orderLine->unitCode   = "unit";
+        $orderLine->unitCode   = 'unit';
         $orderLine->discount   = 0.00;
+        $orderLine->setGoodsType('handling');
 
         return $orderLine;
     }

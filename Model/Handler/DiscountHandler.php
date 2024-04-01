@@ -65,12 +65,12 @@ class DiscountHandler
      * @param $discountAllItems
      * @param $newOrder
      *
-     * @return float|int
+     * @return float
      */
     public function hiddenTaxDiscountCompensation($order, $discountAllItems, $newOrder)
     {
         $orderId = $order->getId();
-        if ($newOrder == false) {
+        if (!$newOrder) {
             $orderId = $order->getOrder()->getId();
         }
         $compAmount         = $order->getShippingDiscountTaxCompensationAmount();
@@ -81,7 +81,7 @@ class DiscountHandler
             }
         }
 
-        return $compAmount;
+        return round($compAmount, 3);
     }
 
     /**
