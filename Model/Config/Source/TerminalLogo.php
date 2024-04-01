@@ -55,6 +55,7 @@ class TerminalLogo
             'mastercard'            => 'Mastercard',
             'mobilepay'             => 'MobilePay - Vertical',
             'mobilepay_horizontal'  => 'MobilePay - Horizontal',
+            'payconiq'              => 'Payconiq',
             'paypal'                => 'PayPal',
             'przelewy24'            => 'Przelewy24',
             'seb'                   => 'SEB',
