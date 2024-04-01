@@ -4,6 +4,8 @@ All notable changes to this project will be documented in this file.
 ## [3.9.1]
 ### Fixed
 - Restore cart items in case of Apple Pay cancel operation.
+- Fix: Round off unit price in order line to 3 decimal digits.
+- Fix: Getting deprecated error when paying without phone number.
 
 ## [3.9.0]
 ### Added
