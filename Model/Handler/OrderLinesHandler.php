@@ -78,8 +78,9 @@ class OrderLinesHandler
         $orderLine             = new OrderLine($description, $itemId, 1, $compensationAmount);
         $orderLine->taxAmount  = 0.00;
         $orderLine->taxPercent = 0.00;
-        $orderLine->unitCode   = "unit";
+        $orderLine->unitCode   = 'unit';
         $orderLine->discount   = 0.00;
+        $orderLine->setGoodsType('handling');
 
         return $orderLine;
     }
@@ -196,13 +197,13 @@ class OrderLinesHandler
         $shippingAmount = $order->getShippingAmount();
         $orderId        = $order->getId();
         $shipping       = $order->getShippingMethod(true);
-        if ($newOrder == false) {
+        if (!$newOrder) {
             $orderId  = $order->getOrder()->getId();
             $shipping = $order->getOrder()->getShippingMethod(true);
         }
         $taxPercent   = $this->helper->getOrderShippingTax($orderId);
-        $method       = isset($shipping['method']) ? $shipping['method'] : '';
-        $carrier_code = isset($shipping['carrier_code']) ? $shipping['carrier_code'] : '';
+        $method       = $shipping['method'] ?? '';
+        $carrier_code = $shipping['carrier_code'] ?? '';
         if ($discountOnAllItems) {
             $discount = 0;
         } else {
@@ -213,7 +214,7 @@ class OrderLinesHandler
 
         if ($taxPercent > 0) {
             $shippingTax = $shippingAmount * ($taxPercent / 100);
-            $shippingTax = number_format($shippingTax, 2, '.', '');
+            $shippingTax = round($shippingTax, 2);
         }
 
         return $this->shippingOrderLine($shippingAmount, $method, $carrier_code, $shippingTax, $taxPercent, $discount);

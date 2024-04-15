@@ -65,7 +65,7 @@ class OrderCancelObserver implements ObserverInterface
         if (in_array($payment->getMethod(), SystemConfig::getTerminalCodes()) && $payment->getLastTransId()) {
             if ($payment->getAdditionalInformation('payment_type') === "paymentAndCapture") {
                 $api = new RefundCapturedReservation($this->systemConfig->getAuth($order->getStore()->getCode()));
-                $api->setAmount((float)number_format($grandTotal, 2, '.', ''));
+                $api->setAmount(round($grandTotal, 2));
             } else {
                 $api = new ReleaseReservation($this->systemConfig->getAuth($order->getStore()->getCode()));
             }
