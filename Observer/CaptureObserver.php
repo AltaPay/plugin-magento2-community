@@ -166,7 +166,7 @@ class CaptureObserver implements ObserverInterface
             $orderLines[] = $this->orderLines->handleShipping($invoice, $discountAllItems, false);
             //Shipping Discount Tax Compensation Amount
             $compAmount = $this->discountHandler->hiddenTaxDiscountCompensation($invoice, $discountAllItems, false);
-            if ($compAmount > 0 && $discountAllItems == false) {
+            if ($compAmount > 0 || $compAmount < 0) {
                 $orderLines[] = $this->orderLines->compensationOrderLine(
                     "Shipping compensation",
                     "comp-ship",
@@ -174,7 +174,7 @@ class CaptureObserver implements ObserverInterface
                 );
             }
         }
-        if(!empty($this->fixedProductTax($invoice, $baseCurrency))){
+        if (!empty($this->fixedProductTax($invoice, $baseCurrency))) {
             //order lines for FPT
             $orderLines[] = $this->orderLines->fixedProductTaxOrderLine($this->fixedProductTax($invoice));
         }
@@ -321,6 +321,16 @@ class CaptureObserver implements ObserverInterface
             if ($invoice->getTransactionId()) {
                 $api->setInvoiceNumber($invoice->getTransactionId());
             }
+
+            $totalCompensationAmount = $this->priceHandler->totalCompensationAmount($orderLines, $grandTotal);
+            if ($totalCompensationAmount > 0 || $totalCompensationAmount < 0) {
+                $orderLines[] = $this->orderLines->compensationOrderLine(
+                    "Total compensation",
+                    "comp-total",
+                    $totalCompensationAmount
+                );
+            }
+
             $api->setOrderLines($orderLines);
             $shippingTrackingInfo = $this->shippingTrackingInfo($invoice);
             // Send shipping tracking info

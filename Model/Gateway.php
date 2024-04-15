@@ -226,7 +226,7 @@ class Gateway implements GatewayInterface
     }
 
     /**
-     * createRequest to altapay
+     * createRequest to AltaPay
      *
      * @param int $terminalId
      * @param string $orderId
@@ -246,7 +246,7 @@ class Gateway implements GatewayInterface
                 $orderLines[] = $this->orderLines->handleShipping($order, $discountAllItems, true);
                 //Shipping Discount Tax Compensation Amount
                 $compAmount = $this->discountHandler->hiddenTaxDiscountCompensation($order, $discountAllItems, true);
-                if ($compAmount > 0 && $discountAllItems == false) {
+                if ($compAmount > 0 || $compAmount < 0) {
                     $orderLines[] = $this->orderLines->compensationOrderLine(
                         "Shipping compensation",
                         "comp-ship",
@@ -296,7 +296,7 @@ class Gateway implements GatewayInterface
                 $orderLines[] = $this->orderLines->handleShipping($order, $discountAllItems, true);
                 //Shipping Discount Tax Compensation Amount
                 $compAmount = $this->discountHandler->hiddenTaxDiscountCompensation($order, $discountAllItems, true);
-                if ($compAmount > 0 && $discountAllItems == false) {
+                if ($compAmount > 0 || $compAmount < 0) {
                     $orderLines[] = $this->orderLines->compensationOrderLine(
                         "Shipping compensation",
                         "comp-ship",
@@ -431,7 +431,7 @@ class Gateway implements GatewayInterface
                     true
                 );
                 // check if rounding compensation amount, send in the separate orderline
-                if (!$discountAllItems && ($roundingCompensation > 0 || $roundingCompensation < 0)) {
+                if ($roundingCompensation > 0 || $roundingCompensation < 0) {
                     $orderLines[] = $this->orderLines->compensationOrderLine(
                         "Compensation Amount",
                         "comp-" . $item->getItemId(),
@@ -534,7 +534,7 @@ class Gateway implements GatewayInterface
 
         $request->setTerminal($terminalName)
             ->setShopOrderId($order->getIncrementId())
-            ->setAmount((float)number_format($grandTotal, 2, '.', ''))
+            ->setAmount(round($grandTotal, 2))
             ->setCurrency($currencyCode)
             ->setCustomerInfo($this->customerHandler->setCustomer($order, $isReservation))
             ->setTransactionInfo($transactionDetail)
@@ -543,7 +543,7 @@ class Gateway implements GatewayInterface
             ->setConfig($this->setConfig($storeScope, $storeCode));
         
         if(!$isReservation) {
-            $request->setSalesTax((float)number_format($order->getTaxAmount(), 2, '.', ''));
+            $request->setSalesTax(round($order->getTaxAmount(), 2));
         }
         if ($fraud = $this->systemConfig->getTerminalConfig($terminalId, 'fraud', $storeScope, $storeCode)) {
             $request->setFraudService($fraud);
@@ -582,6 +582,16 @@ class Gateway implements GatewayInterface
             }
         }
 
+        $totalCompensationAmount = $this->priceHandler->totalCompensationAmount($orderLines, $grandTotal);
+
+        if ($totalCompensationAmount > 0 || $totalCompensationAmount < 0) {
+            $orderLines[] = $this->orderLines->compensationOrderLine(
+                "Total compensation",
+                "comp-total",
+                $totalCompensationAmount
+            );
+        }
+
         //set orderlines to the request
         $request->setOrderLines($orderLines);
 
@@ -589,7 +599,7 @@ class Gateway implements GatewayInterface
     }
 
     /**
-     * Send payment request to the altapay.
+     * Send payment request to the AltaPay.
      *
      * @param $order
      * @param $request

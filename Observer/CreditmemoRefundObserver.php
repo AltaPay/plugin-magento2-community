@@ -162,7 +162,7 @@ class CreditmemoRefundObserver implements ObserverInterface
             $orderLines[] = $this->orderLines->handleShipping($memo, $discountAllItems, false);
             //Shipping Discount Tax Compensation Amount
             $compAmount = $this->discountHandler->hiddenTaxDiscountCompensation($memo, $discountAllItems, false);
-            if ($compAmount > 0 && $discountAllItems == false) {
+            if ($compAmount > 0 || $compAmount < 0) {
                 $orderLines[] = $this->orderLines->compensationOrderLine(
                     "Shipping compensation",
                     "comp-ship",
@@ -281,7 +281,17 @@ class CreditmemoRefundObserver implements ObserverInterface
         if ($memo->getTransactionId()) {
             $refund->setTransaction($payment->getLastTransId());
         }
-        $refund->setAmount((float)number_format($grandTotal, 2, '.', ''));
+        $refund->setAmount(round($grandTotal, 2));
+
+        $totalCompensationAmount = $this->priceHandler->totalCompensationAmount($orderLines, $grandTotal);
+        if ($totalCompensationAmount > 0 || $totalCompensationAmount < 0) {
+            $orderLines[] = $this->orderLines->compensationOrderLine(
+                "Total compensation",
+                "comp-total",
+                $totalCompensationAmount
+            );
+        }
+
         $refund->setOrderLines($orderLines);
         $refund->setReconciliationIdentifier($reconciliationIdentifier);
         try {

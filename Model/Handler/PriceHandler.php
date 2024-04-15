@@ -93,13 +93,13 @@ class PriceHandler
      * @param $taxPercent
      * @param $quantity
      *
-     * @return string
+     * @return float
      */
     public function calculateTaxAmount($unitPrice, $taxPercent, $quantity)
     {
         $taxAmount = ($unitPrice * ($taxPercent / 100)) * $quantity;
 
-        return number_format($taxAmount, 2, '.', '');
+        return round($taxAmount, 2);
     }
 
     /**
@@ -147,5 +147,21 @@ class PriceHandler
         }
 
         return round(($cmsSubTotal - $gatewaySubTotal), 3);
+    }
+
+    /**
+     * @param $orderLines
+     * @param $total
+     * @return float
+     */
+    public function totalCompensationAmount($orderLines,$total)
+    {
+        $orderLinesTotal = 0;
+        foreach ($orderLines as $orderLine) {
+            $orderLinePriceWithTax = ($orderLine->unitPrice * $orderLine->quantity) + $orderLine->taxAmount;
+            $orderLinesTotal += $orderLinePriceWithTax - ($orderLinePriceWithTax * ($orderLine->discount / 100));
+        }
+
+        return round(($total - $orderLinesTotal), 3);
     }
 }

@@ -75,10 +75,8 @@ class DiscountHandler
         }
         $compAmount         = !empty($order->getShippingDiscountTaxCompensationAmount()) ? $order->getShippingDiscountTaxCompensationAmount() : 0;
         $shippingTaxPercent = $this->helper->getOrderShippingTax($orderId);
-        if (!empty($compAmount) && $compAmount > 0) {
-            if (!$discountAllItems) {
-                $compAmount = $compAmount + ($compAmount * ($shippingTaxPercent / 100));
-            }
+        if ($compAmount > 0 || $compAmount < 0) {
+            $compAmount = $compAmount + ($compAmount * ($shippingTaxPercent / 100));
         }
 
         return round($compAmount, 3);
@@ -113,7 +111,7 @@ class DiscountHandler
      * @param $discount
      * @param $catalogDiscount
      *
-     * @return int|string
+     * @return float
      */
     public function orderLineDiscount($discountOnAllItems, $discount, $catalogDiscount)
     {
@@ -121,7 +119,7 @@ class DiscountHandler
             $discount = 0;
         }
 
-        return number_format($discount, 2, '.', '');
+        return round($discount, 2);
     }
 
     /**
@@ -157,13 +155,13 @@ class DiscountHandler
      * @param $originalPrice
      * @param $discountedPrice
      *
-     * @return float|int
+     * @return float
      */
     public function catalogDiscount($originalPrice, $discountedPrice)
     {
         $discountAmount = (($originalPrice - $discountedPrice) / $originalPrice) * 100;
 
-        return number_format($discountAmount, 2, '.', '');
+        return round($discountAmount, 2);
     }
 
     /**
@@ -172,14 +170,14 @@ class DiscountHandler
      * @param $originalPrice
      * @param $rowTotal
      *
-     * @return float|int
+     * @return float
      */
     public function combinationDiscount($originalPrice, $rowTotal)
     {
         $discountAmount = $originalPrice - $rowTotal;
         $discountPercentage = ($discountAmount / $originalPrice) * 100;
 
-        return number_format($discountPercentage, 2, '.', '');
+        return round($discountPercentage, 2);
     }
 
     /**
@@ -254,7 +252,12 @@ class DiscountHandler
                 $price = $baseCurrency ? $item->getBasePriceInclTax() : $item->getPriceInclTax();
             } else {
                 $price = $baseCurrency ? $item->getBasePrice() : $item->getPrice();
-            }        
+            }
+
+            if($price === null){
+               $price = 0;
+            }
+
             if ($originalPrice > $price) {
                 $discountOnAllItems = false;
             } elseif (!empty($appliedRule)) {
