@@ -246,11 +246,12 @@ class RestoreQuote
                         foreach ($items as $item) {
                             $productId  = $item->getProductId();
                             $product    = $this->product->create()->load($productId);
-                            $options    = $item->getProduct()->getTypeInstance(true)->getOrderOptions($item->getProduct());
-                            $info       = $options['info_buyRequest'];
-                            $request    = new \Magento\Framework\DataObject();
-                            $request->setData($info);
-
+                            $qty        = $item->getQty(); // Retrieve quantity from the quote item
+                            // Prepare request with product and quantity
+                            $request = new \Magento\Framework\DataObject([
+                                'product' => $product->getId(),
+                                'qty' => $qty,
+                            ]);
                             // Add products to the cart
                             $this->cart->addProduct($product, $request);
                         }
