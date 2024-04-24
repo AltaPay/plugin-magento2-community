@@ -69,7 +69,6 @@ define(
 
                 var self = this;
                 if (self.validate()) {
-                    self.selectPaymentMethod();
                     Action(
                         this.messageContainer,
                         this.terminal

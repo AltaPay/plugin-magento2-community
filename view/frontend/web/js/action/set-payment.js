@@ -14,12 +14,30 @@ define(
         'mage/storage',
         'Magento_Checkout/js/model/error-processor',
         'Magento_Customer/js/model/customer',
-        'Magento_Checkout/js/model/full-screen-loader'
+        'Magento_Checkout/js/model/full-screen-loader',
+        'underscore'
     ],
-    function ($, quote, urlBuilder, storage, errorProcessor, customer, fullScreenLoader) {
+    function ($, quote, urlBuilder, storage, errorProcessor, customer, fullScreenLoader, _) {
         'use strict';
         var agreementIds = [];
         var enableAgreements = window.checkoutConfig.checkoutAgreements;
+
+        /**
+         * Filter template data.
+         *
+         * @param {Object|Array} data
+         */
+        var filterTemplateData = function (data) {
+            return _.each(data, function (value, key, list) {
+                if (_.isArray(value) || _.isObject(value)) {
+                    list[key] = filterTemplateData(value);
+                }
+                if (key === '__disableTmpl' || key === 'title') {
+                    delete list[key];
+                }
+            });
+        };
+
         return function (messageContainer, method) {
 
             var serviceUrl,
@@ -33,21 +51,18 @@ define(
                 payload = {
                     cartId: quote.getQuoteId(),
                     email: quote.guestEmail,
-                    paymentMethod: paymentData,
+                    paymentMethod: filterTemplateData(paymentData),
                     shippingAddress: quote.billingAddress()
                 };
             } else {
                 serviceUrl = urlBuilder.createUrl('/carts/mine/payment-information', {});
                 payload = {
                     cartId: quote.getQuoteId(),
-                    paymentMethod: paymentData,
+                    paymentMethod: filterTemplateData(paymentData),
                     billingAddress: quote.billingAddress()
                 };
             }
-
-            if (Object.prototype.hasOwnProperty.call(paymentData, '__disableTmpl')) {
-                delete paymentData.__disableTmpl;
-            }
+                        
             var agreementsConfig = (window.checkoutConfig.checkoutAgreements && window.checkoutConfig.checkoutAgreements.agreements) ? window.checkoutConfig.checkoutAgreements.agreements : [];
             for (var i = 0; i < agreementsConfig.length; i++) {
                 agreementIds[i] = agreementsConfig[i].agreementId;
