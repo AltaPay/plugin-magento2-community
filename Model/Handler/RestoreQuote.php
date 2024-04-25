@@ -26,6 +26,8 @@ use Magento\Catalog\Model\Indexer\Product\Price\Processor;
 use Altapay\Api\Ecommerce\Callback;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Store\Model\StoreManagerInterface;
+use Magento\Checkout\Model\Cart;
+use Magento\Catalog\Model\ProductFactory;
 
 class RestoreQuote
 {
@@ -100,7 +102,16 @@ class RestoreQuote
      * @var Processor
      */
     protected $priceIndexer;
-    
+
+    /**
+     * @var Cart
+     */
+    protected $cart;
+
+    /**
+     * @var ProductFactory
+     */
+    protected $product;
     
     /**
      * RestoreQuote Constructor
@@ -134,7 +145,9 @@ class RestoreQuote
         Logger $altapayLogger,
         Processor $priceIndexer,
         ScopeConfigInterface $scopeConfig,
-        StoreManagerInterface $storeManager
+        StoreManagerInterface $storeManager,
+        Cart $cart,
+        ProductFactory $product
     ) {
         $this->checkoutSession = $checkoutSession;
         $this->orderFactory    = $orderFactory;
@@ -150,6 +163,8 @@ class RestoreQuote
         $this->priceIndexer    = $priceIndexer;
         $this->scopeConfig     = $scopeConfig;
         $this->storeManager    = $storeManager;
+        $this->cart            = $cart;
+        $this->product         = $product;
     }
 
     /**
@@ -168,7 +183,6 @@ class RestoreQuote
 
             //Default history and message
             $history        = __(ConstantConfig::BROWSER_BK_BUTTON_COMMENT);
-            $message        = __(ConstantConfig::BROWSER_BK_BUTTON_MSG);
             $browserBackBtn = false;
 
             //get transaction details if failure and redirect to cart
@@ -194,6 +208,8 @@ class RestoreQuote
                 } elseif ($cardholderErrorMessage && ($shouldShowCardholderMessage || $cardErrorMsgConfig)) {
                     $message = $cardholderErrorMessage;
                 }
+                //show fail message
+                $this->messageManager->addErrorMessage($message);
             } else {
                 $browserBackBtn = true;
             }
@@ -204,10 +220,6 @@ class RestoreQuote
 
             //if quote id exist and order status is from config
             if ($quote->getId() && $this->verifyOrderStatus($statusBefore, $order->getStatus(), $statusCancel)) {
-                //get quote Id from order and set as active
-                $quote->setIsActive(1)->setReservedOrderId(null)->save();
-                $this->checkoutSession->replaceQuote($quote)->unsLastRealOrderId();
-
                 if (empty($statusCancel)) {
                     $statusCancel = Order::STATE_CANCELED;
                 }
@@ -223,8 +235,33 @@ class RestoreQuote
                 //revert quantity when cancel order
                 $this->revertOrderQty($order);
                 $order->getResource()->save($order);
-                //show fail message
-                $this->messageManager->addErrorMessage($message);
+
+                // Create new quote from the existing one 
+                try {
+                    $quoteId = $quote->getId();
+                    if ($quoteId > 0) {
+                        $quote = $this->quoteFactory->create()->load($quoteId);
+                        $items = $quote->getAllVisibleItems();
+
+                        foreach ($items as $item) {
+                            $productId  = $item->getProductId();
+                            $product    = $this->product->create()->load($productId);
+                            $qty        = $item->getQty(); // Retrieve quantity from the quote item
+                            // Prepare request with product and quantity
+                            $request = new \Magento\Framework\DataObject([
+                                'product' => $product->getId(),
+                                'qty' => $qty,
+                            ]);
+                            // Add products to the cart
+                            $this->cart->addProduct($product, $request);
+                        }
+
+                        // Restore cart 
+                        $this->cart->save();
+                    }
+                } catch (\Exception $e) {
+                    $this->messageManager->addErrorMessage(__($e->getMessage()));
+                }
             }
             $this->checkoutSession->unsAltapayCustomerRedirect();
         }

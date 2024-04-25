@@ -1,6 +1,11 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [3.9.2]
+### Fixed
+- Release stock in the event of a browser back operation being executed.
+- Fix: `Current customer does not have an active cart` when redirecting to the payment page.
+
 ## [3.9.1]
 ### Added
 - Add terminal logo for Payconiq.
