@@ -157,7 +157,10 @@ class Button extends Action
 
         foreach ($response->Terminals as $terminal) {
             if ($terminal->Country == $currentCurrency) {
-                $identifier = $terminal->PrimaryMethod->Identifier;
+                $identifier = '';
+                if (isset($terminal->PrimaryMethod->Identifier)) {
+                    $identifier = $terminal->PrimaryMethod->Identifier;
+                }
                 $logo = null;
                 foreach ($terminalLogoList as $option) {
                     if ($option['label'] === $identifier) {
@@ -165,12 +168,10 @@ class Button extends Action
                         break;
                     }
                 }
-                if ($logo !== null) {
-                    $terminals[] = [
-                        'title' => $terminal->Title,
-                        'identifier' => $logo
-                    ];
-                }
+                $terminals[] = [
+                    'title' => $terminal->Title,
+                    'identifier' => $logo
+                ];
             }
         }
 
