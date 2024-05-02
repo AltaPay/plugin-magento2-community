@@ -216,14 +216,14 @@ class Button extends Action
 
             $this->resourceConfig->saveConfig(
                 'payment/terminal' . ($i + 1) . '/terminallogo',
-                isset($terminal['identifier']) ? $terminal['identifier'] : '',
+                $terminal['identifier'] ?? '',
                 $scopeCode,
                 $currentStoreID
             );
 
             $this->resourceConfig->saveConfig(
                 'payment/terminal' . ($i + 1) . '/showlogoandtitle',
-                0,
+                1,
                 $scopeCode,
                 $currentStoreID
             );
