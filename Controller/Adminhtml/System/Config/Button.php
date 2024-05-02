@@ -25,6 +25,7 @@ use Magento\Framework\App\Response\Http as ResponseHttp;
 use Magento\Framework\App\Cache\TypeListInterface;
 use Magento\Framework\App\Cache\Type\Config as cacheConfig;
 use Magento\Framework\App\Area;
+use SDM\Altapay\Model\Config\Source\TerminalLogo;
 
 class Button extends Action
 {
@@ -54,6 +55,10 @@ class Button extends Action
     private $storeConfig;
 
     /**
+     * @var TerminalLogo
+     */
+    private $terminalLogo;
+    /**
      * @param Context               $context
      * @param SystemConfig          $systemConfig
      * @param Config                $resourceConfig
@@ -75,7 +80,8 @@ class Button extends Action
         JsonFactory $resultJsonFactory,
         State $state,
         StoreManagerInterface $storeManager,
-        ResourceConnection $resource
+        ResourceConnection $resource,
+        TerminalLogo $terminalLogo
     ) {
         $this->resultJsonFactory = $resultJsonFactory;
         $this->systemConfig      = $systemConfig;
@@ -86,6 +92,7 @@ class Button extends Action
         $this->storeManager      = $storeManager;
         $this->_state            = $state;
         $this->_resource         = $resource;
+        $this->terminalLogo      = $terminalLogo;
         parent::__construct($context);
     }
 
@@ -113,8 +120,7 @@ class Button extends Action
             $response     = $call->call();
             $terminalList = $this->getTerminal($response, $currentCurrency);
 
-            if (!empty($terminalList) && count($terminalList) <= 5) {
-
+            if (!empty($terminalList)) {
                 if ($this->checkConfigAlreadyExist($terminalList, $scopeCode, $currentStoreID)) {
                     $message = __('Terminals are already configured, please check the dropdown manually.');
                 } else {
@@ -147,9 +153,24 @@ class Button extends Action
     public function getTerminal($response, $currentCurrency)
     {
         $terminals = [];
+        $optionsArray = $this->terminalLogo->toOptionArray();
+
         foreach ($response->Terminals as $terminal) {
             if ($terminal->Country == $currentCurrency) {
-                $terminals[] = $terminal->Title;
+                $identifier = $terminal->PrimaryMethod->Identifier;
+                $value = null;
+                foreach ($optionsArray as $option) {
+                    if ($option['label'] === $identifier) {
+                        $value = $option['value'];
+                        break;
+                    }
+                }
+                if ($value !== null) {
+                    $terminals[] = [
+                        'title' => $terminal->Title,
+                        'identifier' => $value
+                    ];
+                }
             }
         }
 
@@ -163,97 +184,97 @@ class Button extends Action
      */
     public function saveTerminalConfig($terminals, $currentStoreID, $scopeCode)
     {
-        $i = 1;
-        foreach ($terminals as $terminal) {
+        foreach (array_slice($terminals, 0, 10) as $i => $terminal) {
             $this->resourceConfig->saveConfig(
-                'payment/terminal' . $i . '/active',
+                'payment/terminal' . ($i + 1) . '/active',
                 1,
                 $scopeCode,
                 $currentStoreID
             );
 
             $this->resourceConfig->saveConfig(
-                'payment/terminal' . $i . '/title',
-                $terminal,
+                'payment/terminal' . ($i + 1) . '/title',
+                $terminal['title'],
                 $scopeCode,
                 $currentStoreID
             );
 
             $this->resourceConfig->saveConfig(
-                'payment/terminal' . $i . '/language',
+                'payment/terminal' . ($i + 1) . '/language',
                 null,
                 $scopeCode,
                 $currentStoreID
             );
 
             $this->resourceConfig->saveConfig(
-                'payment/terminal' . $i . '/capture',
+                'payment/terminal' . ($i + 1) . '/capture',
                 0,
                 $scopeCode,
                 $currentStoreID
             );
 
             $this->resourceConfig->saveConfig(
-                'payment/terminal' . $i . '/terminallogo',
-                '',
+                'payment/terminal' . ($i + 1) . '/terminallogo',
+                isset($terminal['identifier']) ? $terminal['identifier'] : '',
                 $scopeCode,
                 $currentStoreID
             );
 
             $this->resourceConfig->saveConfig(
-                'payment/terminal' . $i . '/showlogoandtitle',
+                'payment/terminal' . ($i + 1) . '/showlogoandtitle',
                 0,
                 $scopeCode,
                 $currentStoreID
             );
 
             $this->resourceConfig->saveConfig(
-                'payment/terminal' . $i . '/savecardtoken',
+                'payment/terminal' . ($i + 1) . '/savecardtoken',
                 0,
                 $scopeCode,
                 $currentStoreID
             );
 
             $this->resourceConfig->saveConfig(
-                'payment/terminal' . $i . '/avscontrol',
+                'payment/terminal' . ($i + 1) . '/avscontrol',
                 0,
                 $scopeCode,
                 $currentStoreID
             );
 
             $this->resourceConfig->saveConfig(
-                'payment/terminal' . $i . '/enforceavs',
+                'payment/terminal' . ($i + 1) . '/enforceavs',
                 0,
                 $scopeCode,
                 $currentStoreID
             );
 
             $this->resourceConfig->saveConfig(
-                'payment/terminal' . $i . '/avs_acceptance',
+                'payment/terminal' . ($i + 1) . '/avs_acceptance',
                 0,
                 $scopeCode,
                 $currentStoreID
             );
 
             $this->resourceConfig->saveConfig(
-                'payment/terminal' . $i . '/sort_order',
+                'payment/terminal' . ($i + 1) . '/sort_order',
                 0,
                 $scopeCode,
                 $currentStoreID
             );
 
             $this->resourceConfig->saveConfig(
-                'payment/terminal' . $i . '/terminalname',
-                $terminal,
+                'payment/terminal' . ($i + 1) . '/terminalname',
+                $terminal['title'],
                 $scopeCode,
                 $currentStoreID
             );
-
-            $i++;
         }
     }
 
+
     /**
+     *  Check if a terminal configuration exists with a value of '1'.
+     *
      * @param $terminalList array
      * @param $scopeCode    string
      *
@@ -261,36 +282,36 @@ class Button extends Action
      */
     public function checkConfigAlreadyExist($terminalList, $scopeCode, $scopeID)
     {
-        $i                  = 1;
-        $terminalConfigured = false;
         $tableName          = $this->_resource->getTableName('core_config_data');
-        foreach ($terminalList as $terminal) {
+
+        foreach ($terminalList as $i => $terminal) {
             //Initiate Connection
             $connection = $this->_resource->getConnection();
-            $path       = 'payment/terminal' . $i . '/active';
+            $path       = 'payment/terminal' . ($i + 1) . '/active'; // Increment the terminal index
             $scope      = $scopeCode;
             $scopeId    = $scopeID;
-            $select     = $connection->select()
-                                     ->from(
-                                        ['c' => $tableName],
-                                        ['config_id']
-                                     )
-                                     ->where(
-                                        "c.path = :path"
-                                     )->where(
-                                        "c.scope = :scope"
-                                    )->where(
-                                        "c.scope_id = :scope_id"
-                                    );
-            $bind       = ['path' => $path, 'scope' => $scope, 'scope_id' => $scopeId];
 
-            if ($connection->fetchOne($select, $bind)) {
-                $terminalConfigured = true;
-                break;
+            $select = $connection->select()
+                ->from(
+                    ['c' => $tableName],
+                    ['config_id', 'value']
+                )
+                ->where(
+                    "c.path = :path"
+                )->where(
+                    "c.scope = :scope"
+                )->where(
+                    "c.scope_id = :scope_id"
+                );
+            $bind   = ['path' => $path, 'scope' => $scope, 'scope_id' => $scopeId];
+
+            $result = $connection->fetchRow($select, $bind);
+            if ($result && $result['value'] === '1') {
+                return true; // Break the loop and return true
             }
-            $i++;
         }
 
-        return $terminalConfigured;
+        return false;
     }
+
 }
