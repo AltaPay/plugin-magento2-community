@@ -214,13 +214,6 @@ class DiscountHandler
             $discountAmount = ($discountAmount * 100) / ($originalPrice * $quantity);
         } elseif ($originalPrice > 0 && $originalPrice > $priceInclTax && empty($discountAmount)) {
             $discount['catalogDiscount'] = true;
-
-            $writer = new \Zend_Log_Writer_Stream(BP . '/var/log/altapay.log');
-            $logger = new \Zend_Log();
-            $logger->addWriter($writer);
-            $logger->info("originalPrice".print_r($originalPrice, true));
-            $logger->info("priceInclTax".print_r($priceInclTax, true));
-
             $discountAmount = $this->catalogDiscount($originalPrice, $priceInclTax);
         } elseif ($originalPrice > 0 && $originalPrice > $priceInclTax && $discountAmount) {
             $discount['catalogDiscount'] = true;
