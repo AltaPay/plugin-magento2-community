@@ -9,6 +9,7 @@
 
 namespace SDM\Altapay\Model;
 
+use Magento\Bundle\Model\Product\Price;
 use SDM\Altapay\Api\GatewayInterface;
 use SDM\Altapay\Api\OrderLoaderInterface;
 use Altapay\Api\Payments\CardWalletAuthorize;
@@ -387,10 +388,18 @@ class Gateway implements GatewayInterface
             if ($item->getParentItem()) {
                 $parentItemType = $item->getParentItem()->getProductType();
             }
-            if ($productType != "bundle" && $parentItemType != "configurable") {
 
+            if (
+                ($productType != "bundle" &&
+                    $parentItemType != "configurable") ||
+                ($productType === "bundle" && $item->getProduct()->getPriceType() == Price::PRICE_TYPE_FIXED)
+            ) {
                 if ($originalPrice == 0) {
-                    $originalPrice = $baseCurrency ? $item->getBasePriceInclTax() : $item->getPriceInclTax();
+                    if($baseCurrency){
+                        $originalPrice = $item->getBasePriceInclTax() !== null ? $item->getBasePriceInclTax() : 0;
+                    }else{
+                        $originalPrice = $item->getPriceInclTax() !== null ? $item->getPriceInclTax() : 0;
+                    }
                }
 
                 if ($storePriceIncTax) {

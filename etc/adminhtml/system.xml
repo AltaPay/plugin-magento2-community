@@ -157,7 +157,7 @@
                 </group>
                 <group id="altapay_config_terminalsync" translate="label comment" sortOrder="80" showInDefault="1" showInWebsite="1" showInStore="1">
                     <attribute type="expanded">0</attribute>
-                    <label>Terminal Synchronize</label>
+                    <label>Synchronize Terminals</label>
                     <comment><![CDATA[]]></comment>
                     <field id="sync_terminal" translate="label" type="button" sortOrder="7" showInDefault="1" showInWebsite="1" showInStore="1">
                         <label>Synchronize payment methods</label>

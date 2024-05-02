@@ -155,10 +155,14 @@ class DiscountHandler
      * @param $originalPrice
      * @param $discountedPrice
      *
-     * @return float
+     * @return float|int
      */
     public function catalogDiscount($originalPrice, $discountedPrice)
     {
+        if ($originalPrice == 0) {
+            return 0;
+        }
+
         $discountAmount = (($originalPrice - $discountedPrice) / $originalPrice) * 100;
 
         return round($discountAmount, 2);
@@ -170,10 +174,14 @@ class DiscountHandler
      * @param $originalPrice
      * @param $rowTotal
      *
-     * @return float
+     * @return float|int
      */
     public function combinationDiscount($originalPrice, $rowTotal)
     {
+        if ($originalPrice == 0) {
+            return 0;
+        }
+
         $discountAmount = $originalPrice - $rowTotal;
         $discountPercentage = ($discountAmount / $originalPrice) * 100;
 
@@ -206,6 +214,13 @@ class DiscountHandler
             $discountAmount = ($discountAmount * 100) / ($originalPrice * $quantity);
         } elseif ($originalPrice > 0 && $originalPrice > $priceInclTax && empty($discountAmount)) {
             $discount['catalogDiscount'] = true;
+
+            $writer = new \Zend_Log_Writer_Stream(BP . '/var/log/altapay.log');
+            $logger = new \Zend_Log();
+            $logger->addWriter($writer);
+            $logger->info("originalPrice".print_r($originalPrice, true));
+            $logger->info("priceInclTax".print_r($priceInclTax, true));
+
             $discountAmount = $this->catalogDiscount($originalPrice, $priceInclTax);
         } elseif ($originalPrice > 0 && $originalPrice > $priceInclTax && $discountAmount) {
             $discount['catalogDiscount'] = true;

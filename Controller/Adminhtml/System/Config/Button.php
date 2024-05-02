@@ -153,22 +153,22 @@ class Button extends Action
     public function getTerminal($response, $currentCurrency)
     {
         $terminals = [];
-        $optionsArray = $this->terminalLogo->toOptionArray();
+        $terminalLogoList = $this->terminalLogo->toOptionArray();
 
         foreach ($response->Terminals as $terminal) {
             if ($terminal->Country == $currentCurrency) {
                 $identifier = $terminal->PrimaryMethod->Identifier;
-                $value = null;
-                foreach ($optionsArray as $option) {
+                $logo = null;
+                foreach ($terminalLogoList as $option) {
                     if ($option['label'] === $identifier) {
-                        $value = $option['value'];
+                        $logo = $option['value'];
                         break;
                     }
                 }
-                if ($value !== null) {
+                if ($logo !== null) {
                     $terminals[] = [
                         'title' => $terminal->Title,
-                        'identifier' => $value
+                        'identifier' => $logo
                     ];
                 }
             }
