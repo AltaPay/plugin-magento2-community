@@ -1,6 +1,11 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [3.9.3]
+### Added
+- Add support for fixed price bundle products.
+- Configure terminal logo automatically.
+
 ## [3.9.2]
 ### Fixed
 - Release stock in the event of a browser back operation being executed.

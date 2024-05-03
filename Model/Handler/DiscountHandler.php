@@ -155,10 +155,14 @@ class DiscountHandler
      * @param $originalPrice
      * @param $discountedPrice
      *
-     * @return float
+     * @return float|int
      */
     public function catalogDiscount($originalPrice, $discountedPrice)
     {
+        if ($originalPrice == 0) {
+            return 0;
+        }
+
         $discountAmount = (($originalPrice - $discountedPrice) / $originalPrice) * 100;
 
         return round($discountAmount, 2);
@@ -170,10 +174,14 @@ class DiscountHandler
      * @param $originalPrice
      * @param $rowTotal
      *
-     * @return float
+     * @return float|int
      */
     public function combinationDiscount($originalPrice, $rowTotal)
     {
+        if ($originalPrice == 0) {
+            return 0;
+        }
+
         $discountAmount = $originalPrice - $rowTotal;
         $discountPercentage = ($discountAmount / $originalPrice) * 100;
 

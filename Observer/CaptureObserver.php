@@ -9,6 +9,7 @@
 
 namespace SDM\Altapay\Observer;
 
+use Magento\Bundle\Model\Product\Price;
 use Magento\Sales\Model\Order\Invoice;
 use Magento\Sales\Model\Order\Payment;
 use Altapay\Api\Payments\CaptureReservation;
@@ -202,7 +203,10 @@ class CaptureObserver implements ObserverInterface
             $taxPercent  = $item->getOrderItem()->getTaxPercent();
             $productType = $item->getOrderItem()->getProductType();
             $priceInclTax = $baseCurrency ? $item->getBasePriceInclTax() : $item->getPriceInclTax();
-            if ($qty > 0 && $productType != 'bundle' && $priceInclTax) {
+            if (
+                ($qty > 0 && $productType != 'bundle' && $priceInclTax) ||
+                ($productType === "bundle" && $item->getOrderItem()->getProduct()->getPriceType() == Price::PRICE_TYPE_FIXED)
+            ) {
                 if($item->getOrderItem()->getDiscountAmount()) {
                     $discountAmount = $item->getOrderItem()->getDiscountAmount();
                 }

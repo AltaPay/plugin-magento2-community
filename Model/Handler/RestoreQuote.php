@@ -88,12 +88,12 @@ class RestoreQuote
      * @var Logger
      */
     protected $altapayLogger;
-    
+
     /**
      * @var ScopeConfigInterface
      */
     protected $scopeConfig;
-    
+
     /**
      * @var StoreManagerInterface
      */
@@ -112,7 +112,7 @@ class RestoreQuote
      * @var ProductFactory
      */
     protected $product;
-    
+
     /**
      * RestoreQuote Constructor
      *
@@ -187,7 +187,7 @@ class RestoreQuote
 
             //get transaction details if failure and redirect to cart
             $getTransactionData = $this->getTransactionData($orderId);
-    
+
             //if fail set message and history
             if (!empty($getTransactionData)) {
                 $shouldShowCardholderMessage = false;
@@ -235,33 +235,8 @@ class RestoreQuote
                 //revert quantity when cancel order
                 $this->revertOrderQty($order);
                 $order->getResource()->save($order);
-
-                // Create new quote from the existing one 
-                try {
-                    $quoteId = $quote->getId();
-                    if ($quoteId > 0) {
-                        $quote = $this->quoteFactory->create()->load($quoteId);
-                        $items = $quote->getAllVisibleItems();
-
-                        foreach ($items as $item) {
-                            $productId  = $item->getProductId();
-                            $product    = $this->product->create()->load($productId);
-                            $qty        = $item->getQty(); // Retrieve quantity from the quote item
-                            // Prepare request with product and quantity
-                            $request = new \Magento\Framework\DataObject([
-                                'product' => $product->getId(),
-                                'qty' => $qty,
-                            ]);
-                            // Add products to the cart
-                            $this->cart->addProduct($product, $request);
-                        }
-
-                        // Restore cart 
-                        $this->cart->save();
-                    }
-                } catch (\Exception $e) {
-                    $this->messageManager->addErrorMessage(__($e->getMessage()));
-                }
+                // Restore quote to load cart items
+                $this->checkoutSession->restoreQuote();
             }
             $this->checkoutSession->unsAltapayCustomerRedirect();
         }
