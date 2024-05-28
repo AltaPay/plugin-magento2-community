@@ -50,6 +50,12 @@ span.terminal-logos {
     margin-bottom: 14px;
 }
 
+.one-step-checkout-wrapper .payment-method [type=radio] + label.terminal-cnt:after,
+.one-step-checkout-wrapper .payment-method [type=radio] + label.terminal-cnt:before {
+    top: 50%;
+    margin-top: -9px;
+}
+
 @media (min-width: 769px) {
     .terminal-logos>img {
         max-width: 60px;
@@ -59,7 +65,7 @@ span.terminal-logos {
 
 @media (min-width: 993px) {
     .terminal-logos>img {
-        max-width: 70px;
-        margin: 5px 7px;
+        max-width: 65px;
+        margin: 5px 3px;
     }
 }

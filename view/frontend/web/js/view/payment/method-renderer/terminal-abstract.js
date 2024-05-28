@@ -18,9 +18,10 @@ define(
         'Magento_Checkout/js/action/redirect-on-success',
         'Magento_Checkout/js/model/quote',
         'Magento_Checkout/js/model/totals',
-        'Magento_Checkout/js/model/payment/additional-validators'
+        'Magento_Checkout/js/model/payment/additional-validators',
+        'mage/translate'
     ],
-    function ($, Component, storage, Action, redirectOnSuccessAction, quote, totals, additionalValidators) {
+    function ($, Component, storage, Action, redirectOnSuccessAction, quote, totals, additionalValidators, $t) {
         'use strict';
 
         return Component.extend({
@@ -58,17 +59,17 @@ define(
                     this.onApplePayButtonClicked();
                 }
 
-                $('#altapay-error-message').text('');
                 var auth = window.checkoutConfig.payment[this.getDefaultCode()].auth;
                 var connection = window.checkoutConfig.payment[this.getDefaultCode()].connection;
                 if (!auth || !connection) {
-                    $(".payment-method._active").find('#altapay-error-message').css('display', 'block');
-                    $(".payment-method._active").find('#altapay-error-message').text('Could not authenticate with API');
+                    this.messageContainer.addErrorMessage({
+                        message: $t('Could not authenticate with API')
+                    });
                     return false;
                 }
 
                 var self = this;
-                if (self.validate()) {
+                if (self.validate() && additionalValidators.validate()) {
                     Action(
                         this.messageContainer,
                         this.terminal
