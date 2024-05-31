@@ -265,6 +265,9 @@ class ConfigProvider implements ConfigProviderInterface
         $path = [];
         $terminalLogo   = explode(",",$name);
         foreach ($terminalLogo as $logoName) {
+            if(empty($logoName)){
+                continue;
+            }
             $fileId = 'SDM_Altapay::images/' . $logoName . '.png';
             $params = ['area' => 'frontend'];
             $asset  = $this->assetRepository->createAsset($fileId, $params);

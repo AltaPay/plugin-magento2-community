@@ -1,6 +1,12 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [3.9.4]
+### Added
+- Support for Mageplaza One Step Checkout extension.
+### Fixed
+- Fix: Issue with multiple terms and conditions being enabled.
+
 ## [3.9.3]
 ### Added
 - Add support for fixed price bundle products.

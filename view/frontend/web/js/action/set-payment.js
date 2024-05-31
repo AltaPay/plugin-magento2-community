@@ -20,7 +20,7 @@ define(
     function ($, quote, urlBuilder, storage, errorProcessor, customer, fullScreenLoader, _) {
         'use strict';
         var agreementIds = [];
-        var enableAgreements = window.checkoutConfig.checkoutAgreements;
+        var checkoutConfig = window.checkoutConfig;
 
         /**
          * Filter template data.
@@ -62,18 +62,14 @@ define(
                     billingAddress: quote.billingAddress()
                 };
             }
-                        
-            var agreementsConfig = (window.checkoutConfig.checkoutAgreements && window.checkoutConfig.checkoutAgreements.agreements) ? window.checkoutConfig.checkoutAgreements.agreements : [];
-            for (var i = 0; i < agreementsConfig.length; i++) {
-                agreementIds[i] = agreementsConfig[i].agreementId;
-            }
 
-            if (enableAgreements.isEnabled) {
-                if (jQuery(".payment-method._active .checkout-agreements input[type='checkbox']:checked").length == 0) {
-                    paymentData.extension_attributes = {agreement_ids: [""]};
-                } else {
-                    paymentData.extension_attributes = {agreement_ids: agreementIds};
+            var agreementsConfig = checkoutConfig.checkoutAgreements;
+            if (agreementsConfig.isEnabled) {
+                var checkoutAgreements = (agreementsConfig && agreementsConfig.agreements) ? agreementsConfig.agreements : [];
+                for (let i = 0; i < checkoutAgreements.length; i++) {
+                    agreementIds[i] = checkoutAgreements[i].agreementId;
                 }
+                paymentData.extension_attributes = {agreement_ids: agreementIds};
             }
 
             fullScreenLoader.startLoader();
@@ -88,13 +84,13 @@ define(
                 if ($(".payment-method._active input[name='savecard']").prop("checked") == true) {
                     savecard  = 1;
                 }
-                var paymentMethod = window.checkoutConfig.payment['sdm_altapay'].terminaldata;
+                var paymentMethod = checkoutConfig.payment['sdm_altapay'].terminaldata;
                 for (var obj in paymentMethod) {
                     if (obj === paymentData.method) {
                         if(paymentMethod[obj].isapplepay !== '1' ) {
                             $.ajax({
                                 method: "POST",
-                                url: window.checkoutConfig.payment['sdm_altapay'].url,
+                                url: checkoutConfig.payment['sdm_altapay'].url,
                                 data: {
                                     paytype: method,
                                     cartid: quote.getQuoteId(),
