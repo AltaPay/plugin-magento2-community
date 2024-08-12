@@ -224,7 +224,7 @@ class CaptureObserver implements ObserverInterface
                     $taxAmount       = $this->priceHandler->calculateTaxAmount($priceWithoutTax, $taxPercent, $qty);
                 } else {
                     $price           = $baseCurrency ? $item->getBasePrice() : $item->getPrice();
-                    $unitPrice       = $originalPrice;
+                    $unitPrice       = bcdiv($originalPrice, 1, 2);
                     $taxAmount       = $this->priceHandler->calculateTaxAmount($unitPrice, $taxPercent, $qty);
                 }
                 $itemDiscountInformation = $this->discountHandler->getItemDiscountInformation(

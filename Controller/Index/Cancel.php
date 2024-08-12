@@ -9,7 +9,6 @@
 
 namespace SDM\Altapay\Controller\Index;
 
-use SDM\Altapay\Model\Handler\CreatePaymentHandler;
 use Magento\Framework\App\CsrfAwareActionInterface;
 use Magento\Framework\App\RequestInterface;
 use Magento\Framework\App\Request\InvalidRequestException;
@@ -18,6 +17,8 @@ use Magento\Checkout\Model\Session;
 use Magento\Framework\App\Action\Action;
 use Magento\Sales\Model\Order;
 use Magento\Quote\Model\QuoteFactory;
+use Magento\Sales\Api\OrderManagementInterface;
+use Magento\Sales\Api\OrderRepositoryInterface;
 
 class Cancel extends Action implements CsrfAwareActionInterface
 {
@@ -30,13 +31,18 @@ class Cancel extends Action implements CsrfAwareActionInterface
      */
     protected $order;
     /**
-     * @var CreatePaymentHandler
-     */
-    protected $paymentHandler;
-    /**
      * @var QuoteFactory
      */
     protected $_quoteFactory;
+
+    /**
+     * @var OrderManagementInterface
+     */
+    protected $orderManagement;
+    /**
+     * @var OrderRepositoryInterface
+     */
+    protected $_orderRepository;
 
     /**
      *  ApplePayResponse constructor.
@@ -44,21 +50,23 @@ class Cancel extends Action implements CsrfAwareActionInterface
      * @param Context $context
      * @param Session $checkoutSession
      * @param Order $order
-     * @param CreatePaymentHandler $paymentHandler
      * @param QuoteFactory $quoteFactory
+     * @param OrderManagementInterface $orderManagement
      */
     public function __construct(
         Context $context,
         Session $checkoutSession,
         Order $order,
-        CreatePaymentHandler $paymentHandler,
-        QuoteFactory $quoteFactory
+        QuoteFactory $quoteFactory,
+        OrderManagementInterface $orderManagement,
+        OrderRepositoryInterface $orderRepository
     ) {
         parent::__construct($context);
         $this->_checkoutSession = $checkoutSession;
         $this->order            = $order;
-        $this->paymentHandler   = $paymentHandler;
         $this->_quoteFactory   = $quoteFactory;
+        $this->orderManagement = $orderManagement;
+        $this->_orderRepository = $orderRepository;
     }
 
     /**
@@ -83,12 +91,13 @@ class Cancel extends Action implements CsrfAwareActionInterface
      */
     public function execute()
     {
-        $order = $this->_checkoutSession->getLastRealOrder();
-        $this->paymentHandler->setCustomOrderStatus($order, Order::STATE_CANCELED, 'cancel');
-        $order->addStatusHistoryComment("ApplePay payment status - ". $order->getStatus());
+        $orderId = $this->_checkoutSession->getLastOrderId();
+        $order = $this->_orderRepository->get($orderId);
+        $order->setStatus('cancel');
+        $this->orderManagement->cancel($order->getId());
+        $order->addStatusHistoryComment("Apple Pay payment status - " . $order->getStatus());
         $order->setIsNotified(false);
         $order->getResource()->save($order);
-
         $quote = $this->_quoteFactory->create()->loadByIdWithoutStore($order->getQuoteId());
         if ($quote->getId()) {
             $quote->setIsActive(1)->setReservedOrderId(null)->save();
