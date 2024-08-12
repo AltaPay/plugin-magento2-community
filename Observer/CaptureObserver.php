@@ -177,7 +177,7 @@ class CaptureObserver implements ObserverInterface
         }
         if (!empty($this->fixedProductTax($invoice, $baseCurrency))) {
             //order lines for FPT
-            $orderLines[] = $this->orderLines->fixedProductTaxOrderLine($this->fixedProductTax($invoice));
+            $orderLines[] = $this->orderLines->fixedProductTaxOrderLine($this->fixedProductTax($invoice, $baseCurrency));
         }
 
         return $orderLines;

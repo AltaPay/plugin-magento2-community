@@ -173,7 +173,7 @@ class CreditmemoRefundObserver implements ObserverInterface
         }
         if(!empty($this->fixedProductTax($memo, $baseCurrency))){
             //order lines for FPT
-            $orderLines[] = $this->orderLines->fixedProductTaxOrderLine($this->fixedProductTax($memo));
+            $orderLines[] = $this->orderLines->fixedProductTaxOrderLine($this->fixedProductTax($memo, $baseCurrency));
         }
 
         return $orderLines;
