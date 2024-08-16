@@ -115,7 +115,7 @@ class DiscountHandler
      */
     public function orderLineDiscount($discountOnAllItems, $discount, $catalogDiscount)
     {
-        if ($discountOnAllItems && !$catalogDiscount) {
+        if (($discountOnAllItems && !$catalogDiscount) || $discount < 0) {
             $discount = 0;
         }
 

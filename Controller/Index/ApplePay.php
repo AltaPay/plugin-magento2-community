@@ -39,12 +39,18 @@ class ApplePay extends Action implements CsrfAwareActionInterface
     private $_storeManager;
 
     /**
-     * ApplePay constructor.
+     * @var UrlInterface
+     */
+    private $_urlInterface;
+
+    /**
+     * Apple Pay constructor.
      *
-     * @param Context               $context
-     * @param storeConfig           $storeConfig
-     * @param SystemConfig          $systemConfig
+     * @param Context $context
+     * @param storeConfig $storeConfig
+     * @param SystemConfig $systemConfig
      * @param StoreManagerInterface $storeManager
+     * @param UrlInterface $urlInterface
      */
     public function __construct(
         Context $context,

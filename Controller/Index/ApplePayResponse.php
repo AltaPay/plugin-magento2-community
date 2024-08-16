@@ -21,6 +21,7 @@ use Magento\Framework\App\Action\Context;
 use Magento\Sales\Model\Order;
 use Magento\Framework\Controller\Result\RedirectFactory;
 use Magento\Framework\Math\Random;
+use Magento\Sales\Api\OrderRepositoryInterface;
 
 class ApplePayResponse extends Action implements CsrfAwareActionInterface
 {
@@ -30,20 +31,45 @@ class ApplePayResponse extends Action implements CsrfAwareActionInterface
     protected $order;
 
     /**
+     * @var Session
+     */
+    protected $_checkoutSession;
+
+    /**
+     * @var RedirectFactory
+     */
+    protected $redirectFactory;
+
+    /**
+     * @var Random
+     */
+    protected $random;
+
+    /**
+     * @var OrderRepositoryInterface
+     */
+    protected $_orderRepository;
+
+    /**
+     * @var Gateway
+     */
+    protected $gateway;
+
+    /**
      * ApplePayResponse constructor.
      *
-     * @param Context         $context
-     * @param Session         $checkoutSession
-     * @param Order           $orderRepository
-     * @param Gateway         $gateway
+     * @param Context $context
+     * @param Session $checkoutSession
+     * @param OrderRepositoryInterface $orderRepository
+     * @param Gateway $gateway
      * @param RedirectFactory $redirectFactory
-     * @param Order           $order
-     * @param Random          $random
+     * @param Order $order
+     * @param Random $random
      */
     public function __construct(
         Context $context,
         Session $checkoutSession,
-        Order $orderRepository,
+        OrderRepositoryInterface $orderRepository,
         Gateway $gateway,
         RedirectFactory $redirectFactory,
         Order $order,
@@ -99,6 +125,13 @@ class ApplePayResponse extends Action implements CsrfAwareActionInterface
             );
 
             $status = isset($params->Result) ? strtolower($params->Result) : 'error';
+
+            if ($status === 'error') {
+                $order = $this->_orderRepository->get($orderId);
+                $order->addStatusHistoryComment($params['message']);
+                $order->setIsNotified(false);
+                $order->getResource()->save($order);
+            }
 
             return $this->createJsonResponse(['status' => $status]);
         }
