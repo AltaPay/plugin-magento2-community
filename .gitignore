@@ -6,3 +6,13 @@ Test/integration-tests/node_modules/
 Test/integration-tests/cypress/screenshots/
 Test/integration-tests/cypress/videos/
 .idea/
+.DS_Store
+Test/integration-tests/min/node_modules/
+Test/integration-tests/min/cypress/screenshots/
+Test/integration-tests/min/cypress/videos/
+Test/integration-tests/min/.DS_Store
+Test/integration-tests/max/node_modules/
+Test/integration-tests/max/cypress/screenshots/
+Test/integration-tests/max/cypress/videos/
+Test/integration-tests/max/.DS_Store
+Test/integration-tests/max/.DS_Store

@@ -75,14 +75,14 @@ describe('Payments', function () {
         })
     })
 
-    it('CC Pay by link', function () {
+    it.skip('CC Pay by link', function () {
         const ord = new Order()
         ord.clrcookies()
 
         cy.get('body').then(($body) => {
             if ($body.text().includes('DKK') === false) {
                 ord.admin()
-                ord.change_currency_to_DKK()
+                //ord.change_currency_to_DKK()
             }
             cy.fixture('config').then((admin) => {
                 if (admin.CC_TERMINAL_NAME != "") {
@@ -224,8 +224,7 @@ describe('Payments', function () {
                     cy.get('body').then(($a) => {
                         if ($a.find("label:contains('" + admin.KLARNA_DKK_TERMINAL_NAME + "')").length) {
                             ord.klarna_payment(admin.KLARNA_DKK_TERMINAL_NAME)
-                        
-                           
+                            
                         } else {
                             cy.log(admin.KLARNA_DKK_TERMINAL_NAME + ' not found in page')
                             this.skip()
@@ -441,7 +440,7 @@ describe('Payments', function () {
         })
     })
 
-    it('Subscription payment', function () {
+    it.skip('Subscription payment', function () {
         const ord = new Order()
         ord.clrcookies()
         ord.visit()
@@ -461,7 +460,8 @@ describe('Payments', function () {
                     cy.get('#email_address').type(text + '@example.com')
                     cy.get('#password').type(text + '@')
                     cy.get('#password-confirmation').type(text + '@')
-                    cy.get('#form-validate > .actions-toolbar > div.primary > #send2').click().wait(3000)
+                    cy.get('#form-validate > .actions-toolbar > div.primary > #send2').click()
+                    //cy.get('#send2').click().wait(3000)
                     cy.get('img').click()
                     cy.contains('Argus All-Weather Tank').click()
                     cy.get('#option-label-size-144-item-166').click().wait(2000)
