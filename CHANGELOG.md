@@ -1,6 +1,10 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [3.9.6]
+### Fixed
+- Improve the handling of Apple Pay responses.
+
 ## [3.9.5]
 ### Added
 - Add support for PHP 8.2
@@ -10,7 +14,7 @@ All notable changes to this project will be documented in this file.
 
 ## [3.9.4]
 ### Added
-- Support for Mageplaza One Step Checkout extension.
+- Support for Mageplaza One-Step Checkout extension.
 ### Fixed
 - Fix: Issue with multiple terms and conditions being enabled.
 

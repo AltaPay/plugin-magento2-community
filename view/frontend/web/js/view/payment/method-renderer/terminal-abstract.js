@@ -218,18 +218,20 @@ define(
                         },
                         type: 'post',
                         dataType: 'JSON',
-                        complete: function(response) {
-                            var status;
-                            if (response.status === 200 && response.statusText === "OK" && response.responseJSON.status === 'success') {
-                                status = ApplePaySession.STATUS_SUCCESS;
-                                session.completePayment(status);
+                        success: function (response) {
+                            if (response && response.status === "success") {
+                                session.completePayment(ApplePaySession.STATUS_SUCCESS);
                                 redirectOnSuccessAction.execute();
                             } else {
-                                status = ApplePaySession.STATUS_FAILURE;
-                                session.completePayment(status);
+                                session.completePayment(ApplePaySession.STATUS_FAILURE);
                                 fullScreenLoader.stopLoader();
                                 $(".payment-method._active").find('#altapay-error-message').text($t('error occured')).show().delay(5000).fadeOut();
                             }
+                        },
+                        error: function () {
+                            session.completePayment(ApplePaySession.STATUS_FAILURE);
+                            fullScreenLoader.stopLoader();
+                            $(".payment-method._active").find('#altapay-error-message').text($t('error occured')).show().delay(5000).fadeOut();
                         }
                     });
                 };
