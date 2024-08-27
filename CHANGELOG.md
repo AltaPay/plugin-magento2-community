@@ -1,6 +1,13 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [3.9.5]
+### Added
+- Add support for PHP 8.2
+### Fixed
+- Fix: Round off unit price in order line to 3 decimal digits for tax exclusive configurations.
+- Log Apple Pay error in the order history.
+
 ## [3.9.4]
 ### Added
 - Support for Mageplaza One Step Checkout extension.

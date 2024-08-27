@@ -317,8 +317,16 @@ class Gateway implements GatewayInterface
             
             $request = $this->preparePaymentRequest($order, $orderLines, $orderId, $terminalId, $providerData);
             if ($request) {
-                $response = $request->call();
-                $this->applePayOrder->handleCardWalletPayment($response, $order);
+                try {
+                    $response = $request->call();
+                    $this->applePayOrder->handleCardWalletPayment($response, $order);
+                } catch (ClientException $e) {
+                    $response['result']  = ConstantConfig::ERROR;
+                    $response['message'] = $e->getResponse()->getBody();
+                } catch (\Exception $e) {
+                    $response['result']  = ConstantConfig::ERROR;
+                    $response['message'] = $e->getMessage();
+                }
 
                 return $response;
             }
@@ -406,7 +414,7 @@ class Gateway implements GatewayInterface
                     $unitPriceWithoutTax = $this->priceHandler->getPriceWithoutTax($originalPrice, $taxPercent);
                     $unitPrice = bcdiv($unitPriceWithoutTax, 1, 2);
                 } else {
-                    $unitPrice = $originalPrice;
+                    $unitPrice = bcdiv($originalPrice, 1, 2);
                 }
                 $dataForPrice = $this->priceHandler->dataForPrice(
                     $item,

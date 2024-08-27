@@ -97,7 +97,7 @@ class OrderLinesHandler
             $couponCode = 'Cart Price Rule';
         }
         // Handling price reductions
-        $orderLine = new OrderLine($couponCode, 'discount', 1, $couponAmount);
+        $orderLine = new OrderLine($couponCode, 'discount', 1, round($couponAmount, 3));
         $orderLine->setGoodsType('handling');
 
         return $orderLine;
@@ -217,6 +217,8 @@ class OrderLinesHandler
             $shippingTax = round($shippingTax, 2);
         }
 
+        $shippingAmount = round($shippingAmount, 3);
+
         return $this->shippingOrderLine($shippingAmount, $method, $carrier_code, $shippingTax, $taxPercent, $discount);
     }
 
@@ -242,7 +244,7 @@ class OrderLinesHandler
      */
     public function fixedProductTaxOrderLine($fixedTaxAmount)
     {
-        $orderLine = new OrderLine('FPT', 'FPT', 1, $fixedTaxAmount);
+        $orderLine = new OrderLine('FPT', 'FPT', 1, round($fixedTaxAmount, 3));
         $orderLine->setGoodsType('handling');
  
         return $orderLine;

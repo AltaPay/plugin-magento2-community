@@ -173,7 +173,7 @@ class CreditmemoRefundObserver implements ObserverInterface
         }
         if(!empty($this->fixedProductTax($memo, $baseCurrency))){
             //order lines for FPT
-            $orderLines[] = $this->orderLines->fixedProductTaxOrderLine($this->fixedProductTax($memo));
+            $orderLines[] = $this->orderLines->fixedProductTaxOrderLine($this->fixedProductTax($memo, $baseCurrency));
         }
 
         return $orderLines;
@@ -220,7 +220,7 @@ class CreditmemoRefundObserver implements ObserverInterface
                     $taxAmount       = $this->priceHandler->calculateTaxAmount($priceWithoutTax, $taxPercent, $qty);
                 } else {
                     $price           = $baseCurrency ? $item->getBasePrice() : $item->getPrice();
-                    $unitPrice       = $originalPrice;
+                    $unitPrice       = bcdiv($originalPrice, 1, 2);
                     $taxAmount       = $this->priceHandler->calculateTaxAmount($unitPrice, $taxPercent, $qty);
                 }
                 $itemDiscountInformation = $this->discountHandler->getItemDiscountInformation(
@@ -234,7 +234,6 @@ class CreditmemoRefundObserver implements ObserverInterface
                 );
                 if ($item->getPriceInclTax()) {
                     $discountedAmount = $itemDiscountInformation['discount'];
-                    $catalogDiscount  = $itemDiscountInformation['catalogDiscount'];
                     $orderLines[]     = $this->orderLines->itemOrderLine(
                         $item,
                         $unitPrice,

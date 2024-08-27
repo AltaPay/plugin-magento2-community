@@ -19,9 +19,10 @@ define(
         'Magento_Checkout/js/model/quote',
         'Magento_Checkout/js/model/totals',
         'Magento_Checkout/js/model/payment/additional-validators',
-        'mage/translate'
+        'mage/translate',
+        'Magento_Checkout/js/model/full-screen-loader',
     ],
-    function ($, Component, storage, Action, redirectOnSuccessAction, quote, totals, additionalValidators, $t) {
+    function ($, Component, storage, Action, redirectOnSuccessAction, quote, totals, additionalValidators, $t, fullScreenLoader) {
         'use strict';
 
         return Component.extend({
@@ -226,6 +227,8 @@ define(
                             } else {
                                 status = ApplePaySession.STATUS_FAILURE;
                                 session.completePayment(status);
+                                fullScreenLoader.stopLoader();
+                                $(".payment-method._active").find('#altapay-error-message').text($t('error occured')).show().delay(5000).fadeOut();
                             }
                         }
                     });
@@ -236,7 +239,7 @@ define(
                         url: url,
                         type: 'post',
                         success: function(data, status, xhr) {
-                            window.location.reload();
+                            fullScreenLoader.stopLoader();
                         }
                     });
                 };
