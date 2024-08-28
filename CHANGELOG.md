@@ -4,6 +4,7 @@ All notable changes to this project will be documented in this file.
 ## [3.9.6]
 ### Fixed
 - Improve the handling of Apple Pay responses.
+- Change the order status from Pending to Cancelled if the Apple Pay payment fails.
 
 ## [3.9.5]
 ### Added
