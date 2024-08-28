@@ -82,7 +82,7 @@ describe('Payments', function () {
         cy.get('body').then(($body) => {
             if ($body.text().includes('DKK') === false) {
                 ord.admin()
-                //ord.change_currency_to_DKK()
+                ord.change_currency_to_DKK()
             }
             cy.fixture('config').then((admin) => {
                 if (admin.CC_TERMINAL_NAME != "") {
@@ -461,7 +461,6 @@ describe('Payments', function () {
                     cy.get('#password').type(text + '@')
                     cy.get('#password-confirmation').type(text + '@')
                     cy.get('#form-validate > .actions-toolbar > div.primary > #send2').click()
-                    //cy.get('#send2').click().wait(3000)
                     cy.get('img').click()
                     cy.contains('Argus All-Weather Tank').click()
                     cy.get('#option-label-size-144-item-166').click().wait(2000)

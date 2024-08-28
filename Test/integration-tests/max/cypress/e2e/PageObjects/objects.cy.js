@@ -505,7 +505,6 @@ class Order {
         cy.get('.data-grid-actions-cell > .action-menu-item').click().wait(2000)
         cy.get('#credit-memo > span').click({force: true}).wait(2000)
         cy.xpath('/html/body/div[2]/main/div[2]/div/div/form/div[2]/section[2]/div[2]/div[2]/div[3]/div[3]/button[2]/span').click()
-        //cy.xpath('/html/body/div[2]/main/div[2]/div/div/form/div[2]/section[2]/div[2]/div[2]/div[3]/div[3]/button[2]/span').click()
         cy.wait(3000)
         cy.get(':nth-child(1) > .note-list-comment').should('include.text', 'We refunded')
     }
