@@ -21,17 +21,14 @@ class Order {
         cy.get('#customer-email-fieldset input[name=username]#customer-email').type('demo@example.com')
         cy.get('input[name=firstname]').type('Testperson-dk')
         cy.get('input[name=lastname]').type('Approved')
-        cy.get('select[name=country_id]').select('Denmark')
-        cy.get('body').then(($p) => {
-            if ($p.find('select[name=region_id]').length) {
-                cy.get('select[name=region_id]').select('Hovedstaden')
-            }
-        })
         cy.get('input[name="street[0]"]').type('Sæffleberggate 56,1 mf')
-        cy.get('input[name=city]').type('Varde')
+        cy.get('input[name=city]').type('Varde').wait(3000)
+        cy.get('select[name=country_id]').select('Denmark').wait(3000)
+        cy.get('select[name=region_id]').select('Hovedstaden')
         cy.get('input[name=postcode]').type('6800')
         cy.get('input[name=telephone]').type('20123456')
         cy.wait(5000)
+
         cy.get('body').then(($p) => {
             if ($p.find('.radio').length) {
                 cy.get('.radio').click({ multiple: true }).wait(2000)
@@ -66,7 +63,7 @@ class Order {
         cy.get('#radio_pay_later').click().wait(8000)
         cy.get('[id=submitbutton]').click().wait(5000)
         cy.wait(5000)
-    
+      
     }
 
     admin() {

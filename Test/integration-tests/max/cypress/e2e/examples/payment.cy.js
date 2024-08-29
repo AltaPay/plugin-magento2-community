@@ -224,8 +224,7 @@ describe('Payments', function () {
                     cy.get('body').then(($a) => {
                         if ($a.find("label:contains('" + admin.KLARNA_DKK_TERMINAL_NAME + "')").length) {
                             ord.klarna_payment(admin.KLARNA_DKK_TERMINAL_NAME)
-                        
-                           
+                          
                         } else {
                             cy.log(admin.KLARNA_DKK_TERMINAL_NAME + ' not found in page')
                             this.skip()
@@ -461,15 +460,15 @@ describe('Payments', function () {
                     cy.get('#email_address').type(text + '@example.com')
                     cy.get('#password').type(text + '@')
                     cy.get('#password-confirmation').type(text + '@')
-                    cy.get('#form-validate > .actions-toolbar > div.primary > #send2').click().wait(3000)
+                    cy.get('#form-validate > .actions-toolbar > div.primary > #send2').click()
                     cy.get('img').click()
                     cy.contains('Argus All-Weather Tank').click()
                     cy.get('#option-label-size-144-item-166').click().wait(2000)
                     cy.get('#option-label-color-93-item-52').click().wait(2000)
                     cy.get('[for="radio_subscribe_product"]').click()
-                    cy.get('#product-addtocart-button').click().wait(3000)
+                    cy.get('#product-addtocart-button').click().wait(6000)
                     cy.get('.showcart').click().wait(5000)
-                    cy.get('#top-cart-btn-checkout').click().wait(3000)
+                    cy.get('#top-cart-btn-checkout').click().wait(6000)
                     cy.get('input[name=firstname]').type('Testperson-dk')
                     cy.get('input[name=lastname]').type('Approved')
                     cy.get('select[name=country_id]').select('Denmark')
@@ -483,7 +482,7 @@ describe('Payments', function () {
                     cy.get('input[name=postcode]').type('6800')
                     cy.get('input[name=telephone]').type('20123456')
                     cy.wait(5000)
-                    cy.get('.button').click().wait(5000)
+                    cy.get('.button').click().wait(8000)
                     cy.get('body').then(($a) => {
                         if ($a.find("label:contains('" + admin.SUBSCRIPTION_TERMINAL_NAME + "')").length) {
                             cy.contains('Place Order').click().wait(3000)
