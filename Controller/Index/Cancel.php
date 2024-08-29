@@ -19,6 +19,7 @@ use Magento\Sales\Model\Order;
 use Magento\Quote\Model\QuoteFactory;
 use Magento\Sales\Api\OrderManagementInterface;
 use Magento\Sales\Api\OrderRepositoryInterface;
+use SDM\Altapay\Logger\Logger;
 
 class Cancel extends Action implements CsrfAwareActionInterface
 {
@@ -43,6 +44,11 @@ class Cancel extends Action implements CsrfAwareActionInterface
      * @var OrderRepositoryInterface
      */
     protected $_orderRepository;
+    
+    /**
+     * @var Logger
+     */
+    private $altapayLogger;
 
     /**
      *  ApplePayResponse constructor.
@@ -52,6 +58,7 @@ class Cancel extends Action implements CsrfAwareActionInterface
      * @param Order $order
      * @param QuoteFactory $quoteFactory
      * @param OrderManagementInterface $orderManagement
+     * @param Logger $altapayLogger
      */
     public function __construct(
         Context $context,
@@ -59,7 +66,8 @@ class Cancel extends Action implements CsrfAwareActionInterface
         Order $order,
         QuoteFactory $quoteFactory,
         OrderManagementInterface $orderManagement,
-        OrderRepositoryInterface $orderRepository
+        OrderRepositoryInterface $orderRepository,
+        Logger $altapayLogger
     ) {
         parent::__construct($context);
         $this->_checkoutSession = $checkoutSession;
@@ -67,6 +75,7 @@ class Cancel extends Action implements CsrfAwareActionInterface
         $this->_quoteFactory   = $quoteFactory;
         $this->orderManagement = $orderManagement;
         $this->_orderRepository = $orderRepository;
+        $this->altapayLogger = $altapayLogger;
     }
 
     /**
@@ -92,19 +101,23 @@ class Cancel extends Action implements CsrfAwareActionInterface
     public function execute()
     {
         $orderId = $this->_checkoutSession->getLastOrderId();
-        $order = $this->_orderRepository->get($orderId);
-        $order->setStatus('cancel');
-        $this->orderManagement->cancel($order->getId());
-        $order->addStatusHistoryComment("Apple Pay payment status - " . $order->getStatus());
-        $order->setIsNotified(false);
-        $order->getResource()->save($order);
-        $quote = $this->_quoteFactory->create()->loadByIdWithoutStore($order->getQuoteId());
-        if ($quote->getId()) {
-            $quote->setIsActive(1)->setReservedOrderId(null)->save();
-            $this->_checkoutSession->replaceQuote($quote);
-            $resultRedirect = $this->resultRedirectFactory->create();
-            $resultRedirect->setPath('checkout/cart');
-            return $resultRedirect;
+        if ($orderId) {
+            $order = $this->_orderRepository->get($orderId);
+            $order->setStatus('cancel');
+            $this->orderManagement->cancel($order->getId());
+            $order->addStatusHistoryComment("Apple Pay payment status - " . $order->getStatus());
+            $order->setIsNotified(false);
+            $order->getResource()->save($order);
+            $quote = $this->_quoteFactory->create()->loadByIdWithoutStore($order->getQuoteId());
+            if ($quote->getId()) {
+                $quote->setIsActive(1)->setReservedOrderId(null)->save();
+                $this->_checkoutSession->replaceQuote($quote);
+                $resultRedirect = $this->resultRedirectFactory->create();
+                $resultRedirect->setPath('checkout/cart');
+                return $resultRedirect;
+            }
+        } else {
+            $this->altapayLogger->addDebugLog('Exception', 'OrderId does not exist'); 
         }
     }
 }

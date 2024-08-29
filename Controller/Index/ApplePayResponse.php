@@ -22,6 +22,7 @@ use Magento\Sales\Model\Order;
 use Magento\Framework\Controller\Result\RedirectFactory;
 use Magento\Framework\Math\Random;
 use Magento\Sales\Api\OrderRepositoryInterface;
+use Magento\Quote\Model\QuoteFactory;
 
 class ApplePayResponse extends Action implements CsrfAwareActionInterface
 {
@@ -54,6 +55,10 @@ class ApplePayResponse extends Action implements CsrfAwareActionInterface
      * @var Gateway
      */
     protected $gateway;
+    /**
+     * @var QuoteFactory
+     */
+    protected $_quoteFactory;
 
     /**
      * ApplePayResponse constructor.
@@ -65,6 +70,7 @@ class ApplePayResponse extends Action implements CsrfAwareActionInterface
      * @param RedirectFactory $redirectFactory
      * @param Order $order
      * @param Random $random
+     * @param QuoteFactory $quoteFactory
      */
     public function __construct(
         Context $context,
@@ -73,6 +79,7 @@ class ApplePayResponse extends Action implements CsrfAwareActionInterface
         Gateway $gateway,
         RedirectFactory $redirectFactory,
         Order $order,
+        QuoteFactory $quoteFactory,
         Random $random
     ) {
         parent::__construct($context);
@@ -82,6 +89,7 @@ class ApplePayResponse extends Action implements CsrfAwareActionInterface
         $this->order            = $order;
         $this->random           = $random;
         $this->_orderRepository = $orderRepository;
+        $this->_quoteFactory   = $quoteFactory;
     }
 
     /**
@@ -127,10 +135,21 @@ class ApplePayResponse extends Action implements CsrfAwareActionInterface
             $status = isset($params->Result) ? strtolower($params->Result) : 'error';
 
             if ($status === 'error') {
+                $message = (is_array($params) && isset($params['message'])) ? $params['message'] : 'error occured';
                 $order = $this->_orderRepository->get($orderId);
-                $order->addStatusHistoryComment($params['message']);
+                $orderStatus = Order::STATE_CANCELED;
+                $order->setState($orderStatus)->setStatus($orderStatus);
+                $order->addStatusHistoryComment($message);
                 $order->setIsNotified(false);
                 $order->getResource()->save($order);
+                $quote = $this->_quoteFactory->create()->loadByIdWithoutStore($order->getQuoteId());
+                if ($quote->getId()) {
+                    $quote->setIsActive(1)->setReservedOrderId(null)->save();
+                    $this->_checkoutSession->replaceQuote($quote);
+                    $resultRedirect = $this->resultRedirectFactory->create();
+                    $resultRedirect->setPath('checkout/cart');
+                    return $resultRedirect;
+                }
             }
 
             return $this->createJsonResponse(['status' => $status]);
