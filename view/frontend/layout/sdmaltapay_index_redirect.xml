@@ -10,6 +10,10 @@
 -->
 
 <page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" layout="1column" xsi:noNamespaceSchemaLocation="../../../../../../../lib/internal/Magento/Framework/View/Layout/etc/page_configuration.xsd">
+    <referenceContainer name="header.container" remove="true"/>
+    <referenceContainer name="page.header" remove="true"/>
+    <referenceContainer name="page.top" remove="true"/>
+
     <referenceBlock name="content">
         <block
             template="callback_redirect.phtml"
@@ -17,4 +21,8 @@
             name="sdm_altapay_callback_redirect"
         />
     </referenceBlock>
+
+    <referenceContainer name="footer-container" remove="true"/>
+    <referenceContainer name="page.footer" remove="true"/>
+    <referenceBlock name="breadcrumbs" remove="true"/>
 </page>
