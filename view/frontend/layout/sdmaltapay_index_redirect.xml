@@ -24,5 +24,6 @@
 
     <referenceContainer name="footer-container" remove="true"/>
     <referenceContainer name="page.footer" remove="true"/>
+    <referenceBlock name="copyright" remove="true"/>
     <referenceBlock name="breadcrumbs" remove="true"/>
 </page>
