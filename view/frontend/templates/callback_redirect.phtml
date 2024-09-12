@@ -1,10 +1,24 @@
 <?php
 /**
- * Altapay Module for Magento 2.x.
+ * AltaPay Module for Magento 2.x.
  *
- * Copyright © 2018 Altapay. All rights reserved.
+ * Copyright © 2018 AltaPay. All rights reserved.
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
 ?>
-<div id="PensioRedirectForm"></div>
+<style>
+    .body.redirect-page {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
+    }
+    header, .nav-sections {
+        display: none;
+    }
+</style>
+<div class="body redirect-page">
+    <div id="PensioRedirectForm"></div>
+</div>

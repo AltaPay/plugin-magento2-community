@@ -1,6 +1,10 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [3.9.7]
+### Fixed
+- Re-style callback redirect page.
+
 ## [3.9.6]
 ### Fixed
 - Improve the handling of Apple Pay responses.
