@@ -72,6 +72,7 @@ The AltaPay Payment extension has been tested and confirmed to be compatible wit
 - [Fooman Order Fees](https://fooman.com/magento-extension-order-fees-m2.html)
 - [Fire Checkout - One Page Checkout](https://www.firecheckout.net/)
 - [Mageplaza OneStepCheckout](https://www.mageplaza.com/magento-2-one-step-checkout-extension/)
+- [Amasty Mass Order Actions](https://amasty.com/mass-order-actions-for-magento-2.html)
 
 ## How to run cypress tests
 
