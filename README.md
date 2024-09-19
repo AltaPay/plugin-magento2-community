@@ -2,9 +2,9 @@
 
 AltaPay has made it much easier for you as merchant/developer to receive secure payments in your Magento2 web shop.
 
-[![Latest Stable Version](http://poser.pugx.org/altapay/magento2-community/v)](https://packagist.org/packages/altapay/magento2-community)
-[![Total Downloads](http://poser.pugx.org/altapay/magento2-community/downloads)](https://packagist.org/packages/altapay/magento2-community)
-[![License](http://poser.pugx.org/altapay/magento2-community/license)](https://packagist.org/packages/altapay/magento2-community)
+[![Latest Stable Version](https://poser.pugx.org/altapay/magento2-community/v)](https://packagist.org/packages/altapay/magento2-community)
+[![Total Downloads](https://poser.pugx.org/altapay/magento2-community/downloads)](https://packagist.org/packages/altapay/magento2-community)
+[![License](https://poser.pugx.org/altapay/magento2-community/license)](https://packagist.org/packages/altapay/magento2-community)
 
 ## Supported Payment Methods & Functionalities
 <table>
