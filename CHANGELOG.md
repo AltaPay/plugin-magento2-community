@@ -1,10 +1,6 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
-## [3.9.8]
-### Added
-- Support Amasty Mass Order Actions functionlaity with Altapay extension.
-
 ## [3.9.7]
 ### Fixed
 - Re-style callback redirect page.
