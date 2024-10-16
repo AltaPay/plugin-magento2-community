@@ -672,7 +672,7 @@ class Generator
             if ($isAvsEnabled) {
                 if ($isAvsEnforced && empty($avsCode)) {
                     $checkRejectionCase = true;
-                } elseif (stripos($getAcceptedAvsResults, $avsCode) === false) {
+                } elseif (stripos($getAcceptedAvsResults ?? '', $avsCode) === false) {
                     $checkRejectionCase = true;
                 }
             }
