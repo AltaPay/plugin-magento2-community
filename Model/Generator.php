@@ -629,6 +629,8 @@ class Generator
     }
 
     /**
+     * Send order confirmation email if not already sent.
+     *
      * @param $order
      */
     private function sendOrderConfirmationEmail($order)
