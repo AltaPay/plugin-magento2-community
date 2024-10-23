@@ -1,6 +1,10 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [3.9.9]
+### Fixed
+- Customer not recieving order confirmation email when only `notification_callback` is triggered.
+
 ## [3.9.8]
 ### Fixed
 - Fix issue with the empty AVS code.
