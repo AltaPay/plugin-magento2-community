@@ -540,7 +540,7 @@ class Generator
                 $payment->setAdditionalInformation('require_capture', $response->requireCapture);
                 $payment->save();
                 //send order confirmation email
-                $this->sendOrderConfirmationEmail($comment, $order);
+                $this->sendOrderConfirmationEmail($order);
                 //unset redirect if success
                 $this->checkoutSession->unsAltapayCustomerRedirect();
                 //save transaction data
@@ -629,23 +629,17 @@ class Generator
     }
 
     /**
-     * @param $comment
+     * Send order confirmation email if not already sent.
+     *
      * @param $order
      */
-    private function sendOrderConfirmationEmail($comment, $order)
+    private function sendOrderConfirmationEmail($order)
     {
-        $currentStatus        = $order->getStatus();
-        $orderHistories       = $order->getStatusHistories();
-        $latestHistoryComment = array_pop($orderHistories);
-        $prevStatus           = $latestHistoryComment->getStatus();
-
-        $sendMail = true;
-        if (strpos($comment, ConstantConfig::NOTIFICATION_CALLBACK) !== false && $currentStatus == $prevStatus) {
-            $sendMail = false;
+        if ($order->getEmailSent()) {
+            return;
         }
-        if (!$order->getEmailSent() && $sendMail == true) {
-            $this->orderSender->send($order);
-        }
+        
+        $this->orderSender->send($order);
     }
 
     /**
