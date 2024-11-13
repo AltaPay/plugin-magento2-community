@@ -385,6 +385,8 @@ class Generator
             $order = $this->loadOrderFromCallback($response);
             if ($orderStatus === 'canceled') {
                 $order->cancel();
+            } else {
+                $this->checkoutSession->setAltapayCustomerRedirect(true);
             }
             $order->setState($orderState);
             $order->setIsNotified(false);

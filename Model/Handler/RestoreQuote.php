@@ -14,16 +14,10 @@ use Magento\Sales\Model\Order;
 use Magento\Sales\Model\OrderFactory;
 use Magento\Framework\Message\ManagerInterface;
 use Magento\Quote\Model\QuoteFactory;
-use SDM\Altapay\Model\ConstantConfig;
-use Magento\SalesRule\Model\Coupon;
-use Magento\SalesRule\Model\ResourceModel\Coupon\Usage as CouponUsage;
 use SDM\Altapay\Api\OrderLoaderInterface;
-use Magento\CatalogInventory\Api\StockManagementInterface;
 use SDM\Altapay\Model\SystemConfig;
 use Magento\Framework\App\ResourceConnection;
 use SDM\Altapay\Logger\Logger;
-use Magento\Catalog\Model\Indexer\Product\Price\Processor;
-use Altapay\Api\Ecommerce\Callback;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Store\Model\StoreManagerInterface;
 use Magento\Checkout\Model\Cart;
@@ -56,23 +50,9 @@ class RestoreQuote
     protected $messageManager;
 
     /**
-     * @var Coupon
-     */
-    private $coupon;
-    /**
-     * @var CouponUsage
-     */
-    private $couponUsage;
-
-    /**
      * @var OrderLoaderInterface
      */
     private $orderLoader;
-
-    /**
-     * @var StockManagementInterface
-     */
-    protected $stockManagement;
 
     /**
      * @var SystemConfig
@@ -98,10 +78,6 @@ class RestoreQuote
      * @var StoreManagerInterface
      */
     protected $storeManager;
-    /**
-     * @var Processor
-     */
-    protected $priceIndexer;
 
     /**
      * @var Cart
@@ -116,34 +92,28 @@ class RestoreQuote
     /**
      * RestoreQuote Constructor
      *
-     * @param Session                  $checkoutSession
-     * @param OrderFactory             $orderFactory
-     * @param QuoteFactory             $quoteFactory
-     * @param ManagerInterface         $messageManager
-     * @param Coupon                   $coupon
-     * @param CouponUsage              $couponUsage
-     * @param OrderLoaderInterface     $orderLoader
-     * @param StockManagementInterface $stockManagement
-     * @param SystemConfig             $systemConfig
-     * @param ResourceConnection       $modelResource
-     * @param Logger                   $altapayLogger
-     * @param Processor                $priceIndexer
-     * @param ScopeConfigInterface     $scopeConfig
-     * @param StoreManagerInterface    $storeManager
+     * @param Session               $checkoutSession
+     * @param OrderFactory          $orderFactory
+     * @param QuoteFactory          $quoteFactory
+     * @param ManagerInterface      $messageManager
+     * @param OrderLoaderInterface  $orderLoader
+     * @param SystemConfig          $systemConfig
+     * @param ResourceConnection    $modelResource
+     * @param Logger                $altapayLogger
+     * @param ScopeConfigInterface  $scopeConfig
+     * @param StoreManagerInterface $storeManager
+     * @param Cart                  $cart
+     * @param ProductFactory        $product
      */
     public function __construct(
         Session $checkoutSession,
         OrderFactory $orderFactory,
         QuoteFactory $quoteFactory,
         ManagerInterface $messageManager,
-        Coupon $coupon,
-        CouponUsage $couponUsage,
         OrderLoaderInterface $orderLoader,
-        StockManagementInterface $stockManagement,
         SystemConfig $systemConfig,
         ResourceConnection $modelResource,
         Logger $altapayLogger,
-        Processor $priceIndexer,
         ScopeConfigInterface $scopeConfig,
         StoreManagerInterface $storeManager,
         Cart $cart,
@@ -153,14 +123,10 @@ class RestoreQuote
         $this->orderFactory    = $orderFactory;
         $this->quoteFactory    = $quoteFactory;
         $this->messageManager  = $messageManager;
-        $this->coupon          = $coupon;
-        $this->couponUsage     = $couponUsage;
         $this->orderLoader     = $orderLoader;
-        $this->stockManagement = $stockManagement;
         $this->systemConfig    = $systemConfig;
         $this->modelResource   = $modelResource;
         $this->altapayLogger   = $altapayLogger;
-        $this->priceIndexer    = $priceIndexer;
         $this->scopeConfig     = $scopeConfig;
         $this->storeManager    = $storeManager;
         $this->cart            = $cart;
@@ -181,37 +147,31 @@ class RestoreQuote
             $storeScope = \Magento\Store\Model\ScopeInterface::SCOPE_STORE;
             $storeCode  = $order->getStore()->getCode();
 
-            //Default history and message
-            $history        = __(ConstantConfig::BROWSER_BK_BUTTON_COMMENT);
-            $browserBackBtn = false;
-
             //get transaction details if failure and redirect to cart
-            $getTransactionData = $this->getTransactionData($orderId);
+            $transactionDataJson = $this->getTransactionData($orderId);
 
             //if fail set message and history
-            if (!empty($getTransactionData)) {
+            if (!empty($transactionDataJson)) {
                 $shouldShowCardholderMessage = false;
                 $message = "Error with the Payment.";
-                $getTransactionDataDecode = json_decode($getTransactionData);
-                $xml = simplexml_load_string($getTransactionDataDecode->xml);
+                $transactionData = json_decode($transactionDataJson);
+                $xml = simplexml_load_string($transactionData->xml);
                 $cardholderErrorMessage = $xml->Body->CardHolderErrorMessage;
-                if (isset($getTransactionDataDecode->cardholder_message_must_be_shown)) {
-                    $shouldShowCardholderMessage = (bool)($getTransactionDataDecode->cardholder_message_must_be_shown === "true");
+                if (isset($transactionData->cardholder_message_must_be_shown)) {
+                    $shouldShowCardholderMessage = (bool)($transactionData->cardholder_message_must_be_shown === "true");
                 }
                 $cardErrorMsgConfig = (bool)$this->scopeConfig->getValue(
                     'payment/sdm_altapay_config/error_message/enable',
                     \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
                     $this->storeManager->getStore()->getCode()
                 );
-                if (isset($getTransactionDataDecode->error_message) && empty($cardholderErrorMessage)) {
-                    $message = $getTransactionDataDecode->error_message;
+                if (isset($transactionData->error_message) && empty($cardholderErrorMessage)) {
+                    $message = $transactionData->error_message;
                 } elseif ($cardholderErrorMessage && ($shouldShowCardholderMessage || $cardErrorMsgConfig)) {
                     $message = $cardholderErrorMessage;
                 }
                 //show fail message
                 $this->messageManager->addErrorMessage($message);
-            } else {
-                $browserBackBtn = true;
             }
 
             //set before state set in admin configuration
@@ -220,45 +180,10 @@ class RestoreQuote
 
             //if quote id exist and order status is from config
             if ($quote->getId() && $this->verifyOrderStatus($statusBefore, $order->getStatus(), $statusCancel)) {
-                if (empty($statusCancel)) {
-                    $statusCancel = Order::STATE_CANCELED;
-                }
-
-                //set order status and comments
-                $order->setState(Order::STATE_CANCELED);
-                $order->setIsNotified(false);
-                if ($browserBackBtn) {
-                    $order->addStatusHistoryComment($history, $statusCancel);
-                }
-                //if coupon applied revert it
-                $this->resetCouponAfterCancellation($order);
-                //revert quantity when cancel order
-                $this->revertOrderQty($order);
-                $order->getResource()->save($order);
                 // Restore quote to load cart items
                 $this->checkoutSession->restoreQuote();
             }
             $this->checkoutSession->unsAltapayCustomerRedirect();
-        }
-    }
-
-    /**
-     * Reset the coupon usage when canceled.
-     *
-     * @param $order
-     */
-    public function resetCouponAfterCancellation($order)
-    {
-        if ($order->getCouponCode()) {
-            $this->coupon->load($order->getCouponCode(), 'code');
-            if ($this->coupon->getId()) {
-                $this->coupon->setTimesUsed($this->coupon->getTimesUsed() - 1);
-                $this->coupon->save();
-                $customerId = $order->getCustomerId();
-                if ($customerId) {
-                    $this->couponUsage->updateCustomerCouponTimesUsed($customerId, $this->coupon->getId(), false);
-                }
-            }
         }
     }
 
@@ -272,8 +197,8 @@ class RestoreQuote
         $connection = $this->modelResource->getConnection();
         $table      = $this->modelResource->getTableName('sdm_altapay');
         $sql        = $connection->select()
-                                 ->from($table, ['parametersdata'])
-                                 ->where('orderid = ?', $orderId);
+            ->from($table, ['parametersdata'])
+            ->where('orderid = ?', $orderId);
 
         return $connection->fetchOne($sql);
     }
@@ -294,23 +219,5 @@ class RestoreQuote
         }
 
         return false;
-    }
-
-    /**
-     * @param $order
-     *
-     * @return void
-     */
-    public function revertOrderQty($order)
-    {
-        foreach ($order->getAllItems() as $item) {
-            $qty = $item->getQtyOrdered() - max($item->getQtyShipped(), $item->getQtyInvoiced()) - $item->getQtyCanceled();
-            if ($item->getId() && $item->getProductId() && empty($item->getChildrenItems()) && $qty) {
-                $this->stockManagement->backItemQty($item->getProductId(), $qty, $item->getStore()->getWebsiteId());
-            }
-            $item->setQtyCanceled($item['qty_ordered']);
-            $item->save();
-            $this->priceIndexer->reindexRow($item->getProductId());
-        }
     }
 }
