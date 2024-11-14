@@ -34,4 +34,8 @@
         <observer name="SDM_Altapay_Checkout_Cart_Index" instance="SDM\Altapay\Observer\CheckoutCartIndex" />
     </event>
 
+    <event name="controller_action_postdispatch_sdmaltapay_index_callbackform">
+        <observer name="SDM_Altapay_Checkout_Cart_Index" instance="SDM\Altapay\Observer\CheckoutCartIndex" />
+    </event>
+
 </config>

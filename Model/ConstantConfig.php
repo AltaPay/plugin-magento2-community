@@ -25,7 +25,6 @@ abstract class ConstantConfig
     const PAYMENT_COMPLETE = 'Payment is completed';
     const OK_CALLBACK = 'OK callback from Altapay';
     const CARDWALLET_CALLBACK = 'CardWallet callback from Altapay';
-    const BROWSER_BK_BUTTON_COMMENT = 'Payment failed! Consumer has pressed the back button from the payment page.';
 
     /* config url */
     const ALTAPAY_OK = 'sdmaltapay/index/ok';
@@ -43,7 +42,6 @@ abstract class ConstantConfig
     const SUCCESS = 'success';
     const AUTH_MESSAGE = 'Could not authenticate with API';
     const ERROR_MESSAGE = 'error occured';
-    const BROWSER_BK_BUTTON_MSG = 'Payment failed due to the browser back button usage!';
     const UNKNOWN_PAYMENT_STATUS_CONSUMER = 'An error has occured! Please contact the shop!';
     const UNKNOWN_PAYMENT_STATUS_MERCHANT = 'Unknown payment status. Please contact Altapay!';
 }

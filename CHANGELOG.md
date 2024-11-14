@@ -1,6 +1,10 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [4.0.0]
+### Fixed
+- Prevent order cancellation when the browser's back button is used.
+
 ## [3.9.9]
 ### Fixed
 - Customer not recieving order confirmation email when only `notification_callback` is triggered.
