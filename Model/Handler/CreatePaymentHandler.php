@@ -43,20 +43,32 @@ class CreatePaymentHandler
     }
 
     /**
-     * @param Order $order
-     * @param       $state
-     * @param       $statusKey
+     * @param Order  $order
+     * @param string $state
+     * @param string $statusKey
      *
      * @throws AlreadyExistsException
      */
-    public function setCustomOrderStatus(Order $order, $state, $statusKey)
+    public function setCustomOrderStatus(Order $order, string $state, string $statusKey)
     {
-        $order->setState($state);
         $storeScope = \Magento\Store\Model\ScopeInterface::SCOPE_STORE;
         $storeCode  = $order->getStore()->getCode();
-        if ($status = $this->systemConfig->getStatusConfig($statusKey, $storeScope, $storeCode)) {
-            $order->setStatus($status);
+        $status     = $this->systemConfig->getStatusConfig($statusKey, $storeScope, $storeCode);
+        $saveOrder  = false;
+
+        if ($order->getState() !== $state) {
+            $order->setState($state);
+            $saveOrder = true;
         }
-        $order->getResource()->save($order);
+
+        if ($status && $order->getStatus() !== $status) {
+            $order->setStatus($status);
+            $saveOrder = true;
+        }
+
+
+        if ($saveOrder) {
+            $order->getResource()->save($order);
+        }
     }
 }
