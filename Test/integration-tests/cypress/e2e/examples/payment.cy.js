@@ -464,7 +464,7 @@ describe('Payments', function () {
                     cy.get('#form-validate > .actions-toolbar > div.primary > #send2').click().wait(3000)
                     cy.get('img').click()
                     cy.contains('Argus All-Weather Tank').click()
-                    cy.get('#option-label-size-144-item-166').click().wait(2000)
+                    cy.get('div.swatch-option.text').first().click().wait(2000)
                     cy.get('#option-label-color-93-item-52').click().wait(2000)
                     cy.get('[for="radio_subscribe_product"]').click()
                     cy.get('#product-addtocart-button').click().wait(3000)
