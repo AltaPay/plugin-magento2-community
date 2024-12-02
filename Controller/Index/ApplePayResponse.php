@@ -63,14 +63,14 @@ class ApplePayResponse extends Action implements CsrfAwareActionInterface
     /**
      * ApplePayResponse constructor.
      *
-     * @param Context $context
-     * @param Session $checkoutSession
+     * @param Context                  $context
+     * @param Session                  $checkoutSession
      * @param OrderRepositoryInterface $orderRepository
-     * @param Gateway $gateway
-     * @param RedirectFactory $redirectFactory
-     * @param Order $order
-     * @param Random $random
-     * @param QuoteFactory $quoteFactory
+     * @param Gateway                  $gateway
+     * @param RedirectFactory          $redirectFactory
+     * @param Order                    $order
+     * @param Random                   $random
+     * @param QuoteFactory             $quoteFactory
      */
     public function __construct(
         Context $context,
@@ -89,7 +89,7 @@ class ApplePayResponse extends Action implements CsrfAwareActionInterface
         $this->order            = $order;
         $this->random           = $random;
         $this->_orderRepository = $orderRepository;
-        $this->_quoteFactory   = $quoteFactory;
+        $this->_quoteFactory    = $quoteFactory;
     }
 
     /**
@@ -117,42 +117,45 @@ class ApplePayResponse extends Action implements CsrfAwareActionInterface
 
     public function execute()
     {
-        $orderId = $this->_checkoutSession->getLastOrderId();
+        try {
+            if ($this->checkPost()) {
+                $orderId = $this->getRequest()->getParam('orderid');
+                $params  = $this->gateway->createRequestApplepay(
+                    $this->getRequest()->getParam('paytype'),
+                    $orderId,
+                    $this->getRequest()->getParam('providerData')
+                );
 
-        if (empty($orderId)) {
-            $result = ['status' => 'error', 'message' => 'Invalid order ID'];
+                $status = isset($params->Result) ? strtolower($params->Result) : 'error';
+
+                if ($status === 'error') {
+                    $message     = (is_array($params) && isset($params['message'])) ? $params['message'] : 'error occured';
+                    $order       = $this->_orderRepository->get($orderId);
+                    $orderStatus = Order::STATE_CANCELED;
+                    $order->setState($orderStatus)->setStatus($orderStatus);
+                    $order->addStatusHistoryComment($message);
+                    $order->setIsNotified(false);
+                    $order->getResource()->save($order);
+                    $quote = $this->_quoteFactory->create()->loadByIdWithoutStore($order->getQuoteId());
+                    if ($quote->getId()) {
+                        $quote->setIsActive(1)->setReservedOrderId(null)->save();
+                        $this->_checkoutSession->replaceQuote($quote);
+                        $resultRedirect = $this->resultRedirectFactory->create();
+                        $resultRedirect->setPath('checkout/cart');
+                        return $resultRedirect;
+                    }
+                }
+
+                return $this->createJsonResponse(['status' => $status]);
+            } else {
+                $result = ['status' => 'error', 'message' => 'Invalid request.'];
+
+                return $this->createJsonResponse($result);
+            }
+        } catch (\Exception $e) {
+            $result = ['status' => 'error', 'message' => 'Exception with the response ' . $e->getMessage()];
 
             return $this->createJsonResponse($result);
-        }
-
-        if ($this->checkPost()) {
-            $params = $this->gateway->createRequestApplepay(
-                $this->getRequest()->getParam('paytype'),
-                $orderId,
-                $this->getRequest()->getParam('providerData')
-            );
-
-            $status = isset($params->Result) ? strtolower($params->Result) : 'error';
-
-            if ($status === 'error') {
-                $message = (is_array($params) && isset($params['message'])) ? $params['message'] : 'error occured';
-                $order = $this->_orderRepository->get($orderId);
-                $orderStatus = Order::STATE_CANCELED;
-                $order->setState($orderStatus)->setStatus($orderStatus);
-                $order->addStatusHistoryComment($message);
-                $order->setIsNotified(false);
-                $order->getResource()->save($order);
-                $quote = $this->_quoteFactory->create()->loadByIdWithoutStore($order->getQuoteId());
-                if ($quote->getId()) {
-                    $quote->setIsActive(1)->setReservedOrderId(null)->save();
-                    $this->_checkoutSession->replaceQuote($quote);
-                    $resultRedirect = $this->resultRedirectFactory->create();
-                    $resultRedirect->setPath('checkout/cart');
-                    return $resultRedirect;
-                }
-            }
-
-            return $this->createJsonResponse(['status' => $status]);
         }
     }
 

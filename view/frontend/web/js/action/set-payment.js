@@ -15,9 +15,10 @@ define(
         'Magento_Checkout/js/model/error-processor',
         'Magento_Customer/js/model/customer',
         'Magento_Checkout/js/model/full-screen-loader',
+        'Magento_Checkout/js/action/redirect-on-success',
         'underscore'
     ],
-    function ($, quote, urlBuilder, storage, errorProcessor, customer, fullScreenLoader, _) {
+    function ($, quote, urlBuilder, storage, errorProcessor, customer, fullScreenLoader, redirectOnSuccessAction, _) {
         'use strict';
         var agreementIds = [];
         var checkoutConfig = window.checkoutConfig;
@@ -38,29 +39,26 @@ define(
             });
         };
 
-        return function (messageContainer, method) {
+        return function (messageContainer, method, applePay) {
 
             var serviceUrl,
                 payload,
                 paymentData = quote.paymentMethod();
 
+            payload = {
+                cartId: quote.getQuoteId(),
+                paymentMethod: filterTemplateData(paymentData)
+            };
+
             if (!customer.isLoggedIn()) {
                 serviceUrl = urlBuilder.createUrl('/guest-carts/:quoteId/payment-information', {
                     quoteId: quote.getQuoteId()
                 });
-                payload = {
-                    cartId: quote.getQuoteId(),
-                    email: quote.guestEmail,
-                    paymentMethod: filterTemplateData(paymentData),
-                    shippingAddress: quote.billingAddress()
-                };
+                payload.email = quote.guestEmail;
+                payload.shippingAddress = quote.billingAddress();
             } else {
                 serviceUrl = urlBuilder.createUrl('/carts/mine/payment-information', {});
-                payload = {
-                    cartId: quote.getQuoteId(),
-                    paymentMethod: filterTemplateData(paymentData),
-                    billingAddress: quote.billingAddress()
-                };
+                payload.billingAddress = quote.billingAddress();
             }
 
             var agreementsConfig = checkoutConfig.checkoutAgreements;
@@ -75,44 +73,68 @@ define(
             fullScreenLoader.startLoader();
 
             return storage.post(serviceUrl, JSON.stringify(payload)).done(function (data) {
-                $('#altapay-error-message').text('');
-                var tokenId = '';
-                var savecard = 0;
-                if ($(".payment-method._active select[name='ccToken']").length == 1) {
-                    tokenId = $(".payment-method._active select[name='ccToken']").val();
-                }
-                if ($(".payment-method._active input[name='savecard']").prop("checked") == true) {
-                    savecard  = 1;
-                }
-                var paymentMethod = checkoutConfig.payment['sdm_altapay'].terminaldata;
-                for (var obj in paymentMethod) {
-                    if (obj === paymentData.method) {
-                        if(paymentMethod[obj].isapplepay !== '1' ) {
-                            $.ajax({
-                                method: "POST",
-                                url: checkoutConfig.payment['sdm_altapay'].url,
-                                data: {
-                                    paytype: method,
-                                    cartid: quote.getQuoteId(),
-                                    orderid: data,
-                                    tokenid: tokenId,
-                                    savecard: savecard
-                                },
-                                dataType: 'json'
-                            }).done(function (jsonResponse) {
-                                if (jsonResponse.result == 'success') {
-                                    window.location.href = jsonResponse.formurl;
-                                } else {
-                                    fullScreenLoader.stopLoader();
-                                    $(".payment-method._active").find('#altapay-error-message').css('display', 'block');
-                                    $(".payment-method._active").find('#altapay-error-message').text(jsonResponse.message);
-                                    return false;
-                                }
-                            });
+                if (applePay) {
+                    $.ajax({
+                        url: applePay.url,
+                        data: {
+                            providerData: applePay.providerData,
+                            paytype: applePay.method,
+                            orderid: data
+                        },
+                        type: 'post',
+                        dataType: 'JSON',
+                        success: function (response) {
+                            if (response && response.status === "success") {
+                                applePay.session.completePayment(ApplePaySession.STATUS_SUCCESS);
+                                redirectOnSuccessAction.execute();
+                            } else {
+                                applePay.session.completePayment(ApplePaySession.STATUS_FAILURE);
+                                fullScreenLoader.stopLoader();
+                                $(".payment-method._active").find('#altapay-error-message').text(applePay.mag_trans('error occured')).show().delay(5000).fadeOut();
+                            }
+                        },
+                        error: function () {
+                            applePay.session.completePayment(ApplePaySession.STATUS_FAILURE);
+                            fullScreenLoader.stopLoader();
+                            $(".payment-method._active").find('#altapay-error-message').text(applePay.mag_trans('error occured')).show().delay(5000).fadeOut();
                         }
+                    });
+                } else {
+                    var tokenId = '';
+                    var savecard = 0;
+                    if ($(".payment-method._active select[name='ccToken']").length == 1) {
+                        tokenId = $(".payment-method._active select[name='ccToken']").val();
                     }
+                    if ($(".payment-method._active input[name='savecard']").prop("checked") == true) {
+                        savecard = 1;
+                    }
+
+                    $.ajax({
+                        method: "POST",
+                        url: checkoutConfig.payment['sdm_altapay'].url,
+                        data: {
+                            paytype: method,
+                            cartid: quote.getQuoteId(),
+                            orderid: data,
+                            tokenid: tokenId,
+                            savecard: savecard
+                        },
+                        dataType: 'json'
+                    }).done(function (jsonResponse) {
+                        if (jsonResponse.result == 'success') {
+                            window.location.href = jsonResponse.formurl;
+                        } else {
+                            fullScreenLoader.stopLoader();
+                            $(".payment-method._active").find('#altapay-error-message').css('display', 'block');
+                            $(".payment-method._active").find('#altapay-error-message').text(jsonResponse.message);
+                            return false;
+                        }
+                    });
                 }
             }).fail(function (response) {
+                if (applePay) {
+                    applePay.session.completePayment(ApplePaySession.STATUS_FAILURE);
+                }
                 errorProcessor.process(response, messageContainer);
                 fullScreenLoader.stopLoader();
             });

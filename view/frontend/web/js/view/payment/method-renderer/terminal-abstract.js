@@ -15,14 +15,13 @@ define(
         'Magento_Checkout/js/view/payment/default',
         'Magento_Customer/js/customer-data',
         'SDM_Altapay/js/action/set-payment',
-        'Magento_Checkout/js/action/redirect-on-success',
         'Magento_Checkout/js/model/quote',
         'Magento_Checkout/js/model/totals',
         'Magento_Checkout/js/model/payment/additional-validators',
         'mage/translate',
         'Magento_Checkout/js/model/full-screen-loader',
     ],
-    function ($, Component, storage, Action, redirectOnSuccessAction, quote, totals, additionalValidators, $t, fullScreenLoader) {
+    function ($, Component, storage, Action, quote, totals, additionalValidators, $t, fullScreenLoader) {
         'use strict';
 
         return Component.extend({
@@ -39,12 +38,12 @@ define(
                 if (this.configData.terminaldata[this.getCode()].isapplepay === '1' && !this.initialized) {
                     let self = this;
                     this.initialized = true;
-                    $('body').on('fc:placeOrderBefore', function() {
+                    $('body').off('fc:placeOrderBefore.altapayHandler').on('fc:placeOrderBefore.altapayHandler', function() {
                         let paymentMethod = window.checkoutConfig.payment['sdm_altapay'].terminaldata,
                             selectedTerminal = $('input[name="payment[method]"]:checked').attr('id');
                         for (let method in paymentMethod) {
-                            if (method === selectedTerminal && paymentMethod[method].isapplepay === '1') {
-                                self.placeOrder();
+                            if (method === selectedTerminal && paymentMethod[method].isapplepay === '1' && self.validate() && additionalValidators.validate()) {
+                                self.onApplePayButtonClicked();
                                 break;
                             }
                         }
@@ -53,11 +52,8 @@ define(
                 return this;
             },
             placeOrder: function() {
-                if (this.configData.terminaldata[this.getCode()].isapplepay === '1') {
-                    if(!additionalValidators.validate()){
-                        return;
-                    }
-                    this.onApplePayButtonClicked();
+                if(quote.firecheckout && this.configData.terminaldata[this.getCode()].isapplepay === '1'){
+                    return;
                 }
 
                 var auth = window.checkoutConfig.payment[this.getDefaultCode()].auth;
@@ -71,10 +67,15 @@ define(
 
                 var self = this;
                 if (self.validate() && additionalValidators.validate()) {
-                    Action(
-                        this.messageContainer,
-                        this.terminal
-                    );
+                    if (this.configData.terminaldata[this.getCode()].isapplepay === '1') {
+                       this.onApplePayButtonClicked();
+                    } else {
+                        Action(
+                            this.messageContainer,
+                            this.terminal,
+                            false
+                        );
+                    }
                 }
             },
             terminalName: function () {
@@ -129,7 +130,7 @@ define(
                 }
 
             },
-            onApplePayButtonClicked: function() {
+            onApplePayButtonClicked: function(terminal = null) {
                 if (!ApplePaySession) {
                     return;
                 }
@@ -171,7 +172,7 @@ define(
                         url: url,
                         data: {
                             validationUrl: event.validationURL,
-                            termminalid: this.configData.terminaldata[this.getCode()].terminalname
+                            termminalid: terminal ? terminal : this.configData.terminaldata[this.getCode()].terminalname
                         },
                         type: 'post',
                         dataType: 'JSON',
@@ -207,33 +208,19 @@ define(
                 };
 
                 session.onpaymentauthorized = event => {
-                    var method = this.terminal.substr(this.terminal.indexOf(" ") + 1);
-                    var url = this.configData.baseUrl + "sdmaltapay/index/applepayresponse";
+                    var applePayData = {
+                        providerData: JSON.stringify(event.payment.token),
+                        method: this.terminal.substr(this.terminal.indexOf(" ") + 1),
+                        url: this.configData.baseUrl + "sdmaltapay/index/applepayresponse",
+                        session: session,
+                        mag_trans: $t
+                    }
 
-                    $.ajax({
-                        url: url,
-                        data: {
-                            providerData: JSON.stringify(event.payment.token),
-                            paytype: method
-                        },
-                        type: 'post',
-                        dataType: 'JSON',
-                        success: function (response) {
-                            if (response && response.status === "success") {
-                                session.completePayment(ApplePaySession.STATUS_SUCCESS);
-                                redirectOnSuccessAction.execute();
-                            } else {
-                                session.completePayment(ApplePaySession.STATUS_FAILURE);
-                                fullScreenLoader.stopLoader();
-                                $(".payment-method._active").find('#altapay-error-message').text($t('error occured')).show().delay(5000).fadeOut();
-                            }
-                        },
-                        error: function () {
-                            session.completePayment(ApplePaySession.STATUS_FAILURE);
-                            fullScreenLoader.stopLoader();
-                            $(".payment-method._active").find('#altapay-error-message').text($t('error occured')).show().delay(5000).fadeOut();
-                        }
-                    });
+                    Action(
+                        this.messageContainer,
+                        this.terminal,
+                        applePayData
+                    );
                 };
                 session.oncancel = event => {
                     var url = this.configData.baseUrl + "sdmaltapay/index/cancel";
