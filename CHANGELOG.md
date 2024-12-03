@@ -1,6 +1,10 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [4.0.2]
+### Fixed
+- Fix: Do not update the order if the stored transactionID is not equal to the incoming transactionID.
+
 ## [4.0.1]
 ### Fixed
 - Fix: Order status updated twice.

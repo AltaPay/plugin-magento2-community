@@ -8,6 +8,7 @@
  */
 
 namespace SDM\Altapay\Api;
+use SDM\Altapay\Api\Data\TransactionInterface;
 
 interface TransactionRepositoryInterface
 {
@@ -21,4 +22,11 @@ interface TransactionRepositoryInterface
      * @param string $parametersdata
      */
     public function addTransactionData($orderid, $transactionid, $paymentid, $transactiondata, $parametersdata);
+
+    /**
+     * Get transaction by Order ID
+     *
+     * @param string $orderId
+     */
+    public function getTransactionDataByOrderId($orderId);
 }
