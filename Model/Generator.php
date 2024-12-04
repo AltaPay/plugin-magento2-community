@@ -610,10 +610,8 @@ class Generator
     private function getTransactionInfoFromResponse($response)
     {
         return sprintf(
-            "Transaction ID: %s - Payment ID: %s - Credit card token: %s",
-            $response->transactionId,
-            $response->paymentId,
-            $response->creditCardToken
+            "Transaction ID: %s",
+            $response->transactionId
         );
     }
 
