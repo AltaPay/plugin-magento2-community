@@ -78,18 +78,16 @@ class TransactionRepository implements TransactionRepositoryInterface
      * Get transaction by Order ID
      *
      * @param string $orderId
-     * @return TransactionInterface
+     * @return $transactionId
      */
     public function getTransactionDataByOrderId($orderId)
     {
         $collection = $this->transactionCollectionFactory->create()
-            ->addFieldToSelect(TransactionInterface::TRANSACTION_ID) // Only select the transaction ID
+            ->addFieldToSelect(TransactionInterface::TRANSACTION_ID)
             ->addFieldToFilter(TransactionInterface::ORDER_ID, $orderId);
 
-        // Fetch the result
         $transactionId = $collection->getFirstItem()->getData(TransactionInterface::TRANSACTION_ID);
 
-        // Return the transaction ID
         return $transactionId;
     }
 }

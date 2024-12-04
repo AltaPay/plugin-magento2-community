@@ -3,7 +3,8 @@ All notable changes to this project will be documented in this file.
 
 ## [4.0.2]
 ### Fixed
-- Fix: Do not update the order if the stored transactionID is not equal to the incoming transactionID.
+- Fix: Duplicate transactions are being created on the gateway with the same order ID.
+- Fix: Prevent order status update if the incoming transaction ID is different from the existing transaction ID.
 
 ## [4.0.1]
 ### Fixed
