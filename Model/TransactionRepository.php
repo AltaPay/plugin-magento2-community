@@ -12,6 +12,8 @@ namespace SDM\Altapay\Model;
 use Magento\Store\Model\StoreManagerInterface;
 use SDM\Altapay\Api\TransactionRepositoryInterface;
 use SDM\Altapay\Model\TransactionFactory;
+use SDM\Altapay\Api\Data\TransactionInterface;
+use SDM\Altapay\Model\ResourceModel\Transaction\CollectionFactory as TransactionCollectionFactory;
 
 /**
  * Class TransactionRepository
@@ -30,17 +32,25 @@ class TransactionRepository implements TransactionRepositoryInterface
     private $storeManager;
 
     /**
+     * @var TransactionCollectionFactory
+     */
+    protected $transactionCollectionFactory;
+
+    /**
      * TransactionRepository constructor.
      *
      * @param TransactionFactory    $transactionFactory
      * @param StoreManagerInterface $storeManager
+     * @param TransactionCollectionFactory $transactionCollectionFactory
      */
     public function __construct(
         TransactionFactory $transactionFactory,
-        StoreManagerInterface $storeManager
+        StoreManagerInterface $storeManager,
+        TransactionCollectionFactory $transactionCollectionFactory
     ) {
         $this->transactionFactory = $transactionFactory;
         $this->storeManager       = $storeManager;
+        $this->transactionCollectionFactory = $transactionCollectionFactory;
     }
 
     /**
@@ -62,5 +72,22 @@ class TransactionRepository implements TransactionRepositoryInterface
         $transaction->setTransactiondata($transactiondata);
         $transaction->setParametersdata($parametersdata);
         $transaction->getResource()->save($transaction);
+    }
+
+    /**
+     * Get transaction by Order ID
+     *
+     * @param string $orderId
+     * @return $transactionId
+     */
+    public function getTransactionDataByOrderId($orderId)
+    {
+        $collection = $this->transactionCollectionFactory->create()
+            ->addFieldToSelect(TransactionInterface::TRANSACTION_ID)
+            ->addFieldToFilter(TransactionInterface::ORDER_ID, $orderId);
+
+        $transactionId = $collection->getFirstItem()->getData(TransactionInterface::TRANSACTION_ID);
+
+        return $transactionId;
     }
 }

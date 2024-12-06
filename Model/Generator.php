@@ -279,6 +279,10 @@ class Generator
             $storeCode         = $order->getStore()->getCode();
             $storeScope        = ScopeInterface::SCOPE_STORE;
 
+            if (!$this->validateTransactionId($response->shopOrderId, $response->transactionId)) {
+                return false;
+            }
+
             $orderStatusCancel = $this->systemConfig->getStatusConfig('cancel', $storeScope, $storeCode);
             
             if ($orderStatusCancel) {
@@ -330,6 +334,11 @@ class Generator
         $response = $callback->call();
         if ($response) {
             $reservationAmount = $this->getReservedAmount($response);
+
+            if (!$this->validateTransactionId($response->shopOrderId, $response->transactionId)) {
+                return false;
+            }
+
             // Check if the payment status is "error" and if the reservation amount is greater than 0.
             if ($response->status === "error" && $reservationAmount > 0) {
                 return;
@@ -383,6 +392,11 @@ class Generator
         $response = $callback->call();
         if ($response) {
             $order = $this->loadOrderFromCallback($response);
+
+            if (!$this->validateTransactionId($response->shopOrderId, $response->transactionId)) {
+                return false;
+            }
+
             if ($orderStatus === 'canceled') {
                 $order->cancel();
             } else {
@@ -436,7 +450,8 @@ class Generator
             $orderState              = Order::STATE_PROCESSING;
             $statusKey               = 'process';
             $status                  = $response->status;
-            $order                   = $this->orderLoader->getOrderByOrderIncrementId($response->shopOrderId);
+            $shopOrderId             = $response->shopOrderId;
+            $order                   = $this->orderLoader->getOrderByOrderIncrementId($shopOrderId);
             $payment                 = $order->getPayment();
             $storeCode               = $order->getStore()->getCode();
             $orderStatusAfterPayment = $this->systemConfig->getStatusConfig('process', $storeScope, $storeCode);
@@ -449,6 +464,9 @@ class Generator
 
             $latestTransKey = $this->helper->getLatestTransaction($response->Transactions);
             $transaction    = $response->Transactions[$latestTransKey];
+            if (!$this->validateTransactionId($shopOrderId, $transactionId)) {
+                return false;
+            }
 
             if ($paymentStatus === 'released') {
                 $this->handleCancelStatusAction($request, $response->status);
@@ -592,10 +610,8 @@ class Generator
     private function getTransactionInfoFromResponse($response)
     {
         return sprintf(
-            "Transaction ID: %s - Payment ID: %s - Credit card token: %s",
-            $response->transactionId,
-            $response->paymentId,
-            $response->creditCardToken
+            "Transaction ID: %s",
+            $response->transactionId
         );
     }
 
@@ -947,4 +963,24 @@ class Generator
 
         return $transaction->ReservedAmount;
     }
+
+    /**
+     * Compare stored transaction ID with the incoming transaction ID.
+     *
+     * @param string $shopOrderId
+     * @param string $incomingTransactionId
+     * @return bool
+     */
+    public function validateTransactionId($shopOrderId, $incomingTransactionId)
+    {
+        $storedTransactionId = $this->transactionRepository->getTransactionDataByOrderId($shopOrderId);
+
+        // Check if the stored transaction ID is not null and matches the incoming transaction ID
+        if (!empty($storedTransactionId) && $storedTransactionId !== $incomingTransactionId) {
+            return false;
+        }
+
+        return true;
+    }
+
 }
