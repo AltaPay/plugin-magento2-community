@@ -236,8 +236,10 @@ class Gateway implements GatewayInterface
      */
     public function createRequest($terminalId, $orderId)
     {
+        $orderLinesTotal = 0;
         $order = $this->order->load($orderId);
         if ($order->getId()) {
+            $total = $order->getGrandTotal();
             $baseCurrency = $this->storeConfig->useBaseCurrency();
             $couponCode = $order->getDiscountDescription();
             $couponCodeAmount = $baseCurrency ? $order->getBaseDiscountAmount() : $order->getDiscountAmount();
@@ -255,13 +257,20 @@ class Gateway implements GatewayInterface
                     );
                 }
             }
-            if ($discountAllItems && abs($couponCodeAmount) > 0) {
+            if (abs($couponCodeAmount) > 0) {
                 $orderLines[] = $this->orderLines->discountOrderLine($couponCodeAmount, $couponCode);
             }
             if (!empty($this->fixedProductTax($order))) {
                 $orderLines[] = $this->orderLines->fixedProductTaxOrderLine($this->fixedProductTax($order));
             }
-
+            $totalCompensationAmount = $this->priceHandler->totalCompensationAmount($orderLines, $total);
+            if ($totalCompensationAmount > 0 || $totalCompensationAmount < 0) {
+                $orderLines[] = $this->orderLines->compensationOrderLine(
+                    "Total compensation",
+                    "comp-total",
+                    $totalCompensationAmount
+                );
+            }
             $this->_eventManager->dispatch('additional_orderline_event_observer',
                 [
                     'order_lines'   => &$orderLines,
@@ -289,6 +298,7 @@ class Gateway implements GatewayInterface
         $order = $this->order->load($orderId);
         $baseCurrency = $this->storeConfig->useBaseCurrency();
         if ($order->getId()) {
+            $total = $order->getGrandTotal();
             $couponCode = $order->getDiscountDescription();
             $couponCodeAmount = $baseCurrency ? $order->getBaseDiscountAmount() : $order->getDiscountAmount();
             $discountAllItems = $this->discountHandler->allItemsHaveDiscount($order->getAllItems());
@@ -305,13 +315,20 @@ class Gateway implements GatewayInterface
                     );
                 }
             }
-            if ($discountAllItems && abs($couponCodeAmount) > 0) {
+            if (abs($couponCodeAmount) > 0) {
                 $orderLines[] = $this->orderLines->discountOrderLine($couponCodeAmount, $couponCode);
             }
             if (!empty($this->fixedProductTax($order))) {
                 $orderLines[] = $this->orderLines->fixedProductTaxOrderLine($this->fixedProductTax($order));
             }
-
+            $totalCompensationAmount = $this->priceHandler->totalCompensationAmount($orderLines, $total);
+            if ($totalCompensationAmount > 0 || $totalCompensationAmount < 0) {
+                $orderLines[] = $this->orderLines->compensationOrderLine(
+                    "Total compensation",
+                    "comp-total",
+                    $totalCompensationAmount
+                );
+            }
             $order->setModuleVersion($this->helper->getModuleVersion());
             $order->getResource()->save($order);
             
@@ -385,13 +402,9 @@ class Gateway implements GatewayInterface
     private function itemOrderLines($couponCodeAmount, $order, $discountAllItems)
     {
         $orderLines = [];
-        $storePriceIncTax = $this->storeConfig->storePriceIncTax();
         $baseCurrency = $this->storeConfig->useBaseCurrency();
         foreach ($order->getAllItems() as $item) {
             $productType = $item->getProductType();
-            $originalPrice = $baseCurrency ? $item->getBaseOriginalPrice() : $item->getOriginalPrice();
-            $taxPercent = $item->getTaxPercent();
-            $discountAmount = $baseCurrency ? $item->getBaseDiscountAmount() : $item->getDiscountAmount();
             $parentItemType = "";
             if ($item->getParentItem()) {
                 $parentItemType = $item->getParentItem()->getProductType();
@@ -402,59 +415,20 @@ class Gateway implements GatewayInterface
                     $parentItemType != "configurable") ||
                 ($productType === "bundle" && $item->getProduct()->getPriceType() == Price::PRICE_TYPE_FIXED)
             ) {
-                if ($originalPrice == 0) {
-                    if($baseCurrency){
-                        $originalPrice = $item->getBasePriceInclTax() !== null ? $item->getBasePriceInclTax() : 0;
-                    }else{
-                        $originalPrice = $item->getPriceInclTax() !== null ? $item->getPriceInclTax() : 0;
-                    }
-               }
-
-                if ($storePriceIncTax) {
-                    $unitPriceWithoutTax = $this->priceHandler->getPriceWithoutTax($originalPrice, $taxPercent);
-                    $unitPrice = bcdiv($unitPriceWithoutTax, 1, 2);
+                if ($baseCurrency) {
+                    $unitPrice = $item->getBasePrice() !== null ? $item->getBasePrice() : 0;
                 } else {
-                    $unitPrice = bcdiv($originalPrice, 1, 2);
+                    $unitPrice = $item->getPrice() !== null ? $item->getPrice() : 0;
                 }
-                $dataForPrice = $this->priceHandler->dataForPrice(
-                    $item,
-                    $unitPrice,
-                    $couponCodeAmount,
-                    $this->discountHandler->getItemDiscount($discountAmount, $originalPrice, $item->getQtyOrdered()),
-                    $discountAllItems
-                );
-                $taxAmount = $dataForPrice["taxAmount"];
-                $catalogDiscount = $dataForPrice["catalogDiscount"];
-                $discount = $this->discountHandler->orderLineDiscount(
-                    $discountAllItems,
-                    $dataForPrice["discount"],
-                    $catalogDiscount
-                );
-
-                $itemTaxAmount = $taxAmount;
+                $taxAmount = $item->getTaxAmount();
                 $orderLines[] = $this->orderLines->itemOrderLine(
                     $item,
                     $unitPrice,
-                    $discount,
-                    $itemTaxAmount,
+                    0,
+                    $taxAmount,
                     $order,
                     true
                 );
-                $roundingCompensation = $this->priceHandler->compensationAmountCal(
-                    $item,
-                    $unitPrice,
-                    $taxAmount,
-                    $discount,
-                    true
-                );
-                // check if rounding compensation amount, send in the separate orderline
-                if ($roundingCompensation > 0 || $roundingCompensation < 0) {
-                    $orderLines[] = $this->orderLines->compensationOrderLine(
-                        "Compensation Amount",
-                        "comp-" . $item->getItemId(),
-                        $roundingCompensation
-                    );
-                }
             }
         }
 

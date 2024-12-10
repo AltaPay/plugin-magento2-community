@@ -77,7 +77,6 @@ class OrderLinesHandler
     {
         $orderLine             = new OrderLine($description, $itemId, 1, $compensationAmount);
         $orderLine->taxAmount  = 0.00;
-        $orderLine->taxPercent = 0.00;
         $orderLine->unitCode   = 'unit';
         $orderLine->discount   = 0.00;
         $orderLine->setGoodsType('handling');
@@ -98,6 +97,7 @@ class OrderLinesHandler
         }
         // Handling price reductions
         $orderLine = new OrderLine($couponCode, 'discount', 1, round($couponAmount, 3));
+        $orderLine->taxAmount = 0;
         $orderLine->setGoodsType('handling');
 
         return $orderLine;
@@ -118,7 +118,6 @@ class OrderLinesHandler
         $orderLine             = new OrderLine($method, $carrier_code, 1, $shippingAmount);
         $orderLine->taxAmount  = $taxAmount;
         $orderLine->discount   = $discount;
-        $orderLine->taxPercent = $taxPercent;
         $orderLine->setGoodsType('shipment');
 
         return $orderLine;
@@ -149,14 +148,12 @@ class OrderLinesHandler
             $itemId       = $item->getItemId();
             $productUrl   = $item->getProduct()->getProductUrl();
             $productThumb = $item->getProduct()->getThumbnail();
-            $taxPercent   = $item->getTaxPercent();
             $options      = $item->getData('product_options');
         } else {
             $quantity     = $item->getQty();
             $itemId       = $item->getOrderItem()->getItemId();
             $productUrl   = $item->getOrderItem()->getProduct()->getProductUrl();
             $productThumb = $item->getOrderItem()->getProduct()->getThumbnail();
-            $taxPercent   = $item->getOrderItem()->getTaxPercent();
             $options      = $item->getOrderItem()->getData('product_options');
         }
 
@@ -167,7 +164,6 @@ class OrderLinesHandler
         $orderLine             = new OrderLine($itemName, $itemId, $quantity, $unitPrice);
         $orderLine->discount   = $discount;
         $orderLine->taxAmount  = $taxAmount;
-        $orderLine->taxPercent = $taxPercent;
         $orderLine->productUrl = $productUrl;
         if (!empty($productThumb) && $productThumb !== 'no_selection') {
             $orderLine->imageUrl = $this->storeConfig->getProductImageUrl($order, $productThumb);

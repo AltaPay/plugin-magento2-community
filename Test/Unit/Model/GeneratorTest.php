@@ -228,7 +228,6 @@ XML
         );
         $orderline->setGoodsType('item');
         $orderline->taxAmount  = $taxAmount;
-        $orderline->taxPercent = $taxPercent;
         $orderline->productUrl = $productUrl;
         $orderline->imageUrl   = $imageUrl;
         $orderline->unitCode   = $unitCode;

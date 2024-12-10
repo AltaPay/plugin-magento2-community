@@ -154,7 +154,7 @@ class CreditmemoRefundObserver implements ObserverInterface
         //order lines for items
         $orderLines = $this->itemOrderLines($couponCodeAmount, $discountAllItems, $memo);
         //send the discount into separate orderline if discount applied to all items
-        if ($discountAllItems == true && abs($couponCodeAmount) > 0) {
+        if (abs($couponCodeAmount) > 0) {
             //order lines for discounts
             $orderLines[] = $this->orderLines->discountOrderLine($couponCodeAmount, $couponCode);
         }
@@ -189,75 +189,33 @@ class CreditmemoRefundObserver implements ObserverInterface
     private function itemOrderLines($couponCodeAmount, $discountAllItems, $memo)
     {
         $orderLines       = [];
-        $discountAmount   = 0;
-        $storePriceIncTax = $this->storeConfig->storePriceIncTax($memo->getOrder());
         $moduleVersion    = $memo->getOrder()->getModuleVersion() ? $memo->getOrder()->getModuleVersion() : '';
         $baseCurrency     = $this->storeConfig->useBaseCurrency($moduleVersion);
         
         foreach ($memo->getAllItems() as $item) {
             $qty         = $item->getQty();
-            $taxPercent  = $item->getOrderItem()->getTaxPercent();
             $productType = $item->getOrderItem()->getProductType();
             $priceInclTax = $baseCurrency ? $item->getBasePriceInclTax() : $item->getPriceInclTax();
             if (
                 ($qty > 0 && $productType != 'bundle' && $priceInclTax) ||
                 ($productType === "bundle" && $item->getOrderItem()->getProduct()->getPriceType() == Price::PRICE_TYPE_FIXED)
             ) {
-                if($item->getOrderItem()->getDiscountAmount()) {
-                    $discountAmount = $item->getOrderItem()->getDiscountAmount();
-                }
-                $originalPrice = $baseCurrency ? $item->getOrderItem()->getBaseOriginalPrice() : $item->getOrderItem()->getOriginalPrice();
-                $totalPrice     = $originalPrice * $qty;
-
-                if ($originalPrice == 0) {
-                    $originalPrice = $priceInclTax;
-                }
-
-                if ($storePriceIncTax) {
-                    $priceWithoutTax = $this->priceHandler->getPriceWithoutTax($originalPrice, $taxPercent);
-                    $price           = $priceInclTax;
-                    $unitPrice       = bcdiv($priceWithoutTax, 1, 2);
-                    $taxAmount       = $this->priceHandler->calculateTaxAmount($priceWithoutTax, $taxPercent, $qty);
+                if ($baseCurrency) {
+                    $unitPrice = $item->getBasePrice() !== null ? $item->getBasePrice() : 0;
                 } else {
-                    $price           = $baseCurrency ? $item->getBasePrice() : $item->getPrice();
-                    $unitPrice       = bcdiv($originalPrice, 1, 2);
-                    $taxAmount       = $this->priceHandler->calculateTaxAmount($unitPrice, $taxPercent, $qty);
+                    $unitPrice = $item->getPrice() !== null ? $item->getPrice() : 0;
                 }
-                $itemDiscountInformation = $this->discountHandler->getItemDiscountInformation(
-                    $totalPrice,
-                    $price,
-                    $discountAmount,
-                    $qty,
-                    $discountAllItems,
-                    $item,
-                    $taxAmount
-                );
+                $taxAmount = $item->getTaxAmount();
+
                 if ($item->getPriceInclTax()) {
-                    $discountedAmount = $itemDiscountInformation['discount'];
                     $orderLines[]     = $this->orderLines->itemOrderLine(
                         $item,
                         $unitPrice,
-                        $discountedAmount,
+                        0,
                         $taxAmount,
                         $memo->getOrder(),
                         false
                     );
-                    // Gateway and cms rounding amount
-                    $roundingCompensation = $this->priceHandler->compensationAmountCal(
-                        $item,
-                        $unitPrice,
-                        $taxAmount,
-                        $discountedAmount,
-                        false
-                    );
-                    //send the rounding mismatch value into separate orderline if any
-                    if ($roundingCompensation > 0 || $roundingCompensation < 0) {
-                        $orderLines[] = $this->orderLines->compensationOrderLine(
-                            "Compensation Amount",
-                            "comp-" . $item->getOrderItem()->getItemId(),
-                            $roundingCompensation
-                        );
-                    }
                 }
             }
         }
