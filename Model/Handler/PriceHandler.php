@@ -154,7 +154,7 @@ class PriceHandler
      * @param $total
      * @return float
      */
-    public function totalCompensationAmount($orderLines,$total)
+    public function totalCompensationAmount($orderLines, $total)
     {
         $orderLinesTotal = 0;
         foreach ($orderLines as $orderLine) {
