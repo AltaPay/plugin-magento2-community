@@ -23,8 +23,6 @@ use Magento\Sales\Model\Order;
 use SDM\Altapay\Helper\Data;
 use SDM\Altapay\Helper\Config as storeConfig;
 use SDM\Altapay\Model\Handler\OrderLinesHandler;
-use SDM\Altapay\Model\Handler\PriceHandler;
-use SDM\Altapay\Model\Handler\DiscountHandler;
 use Altapay\Api\Subscription\ChargeSubscription;
 use Magento\Framework\Math\Random;
 use SDM\Altapay\Model\ReconciliationIdentifierFactory;
@@ -60,14 +58,6 @@ class CaptureObserver implements ObserverInterface
      */
     private $orderLines;
     /**
-     * @var PriceHandler
-     */
-    private $priceHandler;
-    /**
-     * @var DiscountHandler
-     */
-    private $discountHandler;
-    /**
      * @var ReconciliationIdentifierFactory
      */
     private $reconciliation;
@@ -79,16 +69,14 @@ class CaptureObserver implements ObserverInterface
     /**
      * CaptureObserver constructor.
      *
-     * @param SystemConfig $systemConfig
-     * @param Logger $altapayLogger
-     * @param Order $order
-     * @param Data $helper
-     * @param storeConfig $storeConfig
-     * @param OrderLinesHandler $orderLines
-     * @param PriceHandler $priceHandler
-     * @param DiscountHandler $discountHandler
+     * @param SystemConfig                    $systemConfig
+     * @param Logger                          $altapayLogger
+     * @param Order                           $order
+     * @param Data                            $helper
+     * @param storeConfig                     $storeConfig
+     * @param OrderLinesHandler               $orderLines
      * @param ReconciliationIdentifierFactory $reconciliation
-     * @param Random $random
+     * @param Random                          $random
      */
     public function __construct(
         SystemConfig $systemConfig,
@@ -97,8 +85,6 @@ class CaptureObserver implements ObserverInterface
         Data $helper,
         storeConfig $storeConfig,
         OrderLinesHandler $orderLines,
-        PriceHandler $priceHandler,
-        DiscountHandler $discountHandler,
         ReconciliationIdentifierFactory $reconciliation,
         Random $random
     ) {
@@ -108,8 +94,6 @@ class CaptureObserver implements ObserverInterface
         $this->helper           = $helper;
         $this->storeConfig      = $storeConfig;
         $this->orderLines       = $orderLines;
-        $this->priceHandler     = $priceHandler;
-        $this->discountHandler  = $discountHandler;
         $this->reconciliation   = $reconciliation;
         $this->random           = $random;
     }
@@ -153,10 +137,8 @@ class CaptureObserver implements ObserverInterface
         $moduleVersion    = $invoice->getOrder()->getModuleVersion() ? $invoice->getOrder()->getModuleVersion() : '';
         $baseCurrency     = $this->storeConfig->useBaseCurrency($moduleVersion);
         $couponCodeAmount = $baseCurrency ? $invoice->getBaseDiscountAmount() : $invoice->getDiscountAmount();
-        //Return true if discount enabled on all items
-        $discountAllItems = $this->discountHandler->allItemsHaveDiscount($invoice->getOrder()->getAllVisibleItems());
         //order lines for items
-        $orderLines = $this->itemOrderLines($couponCodeAmount, $invoice, $discountAllItems);
+        $orderLines = $this->itemOrderLines($invoice);
         //send the discount into separate orderline if discount applied to all items
         if (abs($couponCodeAmount) > 0) {
             //order lines for discounts
@@ -164,16 +146,7 @@ class CaptureObserver implements ObserverInterface
         }
         if ($invoice->getShippingInclTax() > 0) {
             //order lines for shipping
-            $orderLines[] = $this->orderLines->handleShipping($invoice, $discountAllItems, false);
-            //Shipping Discount Tax Compensation Amount
-            $compAmount = $this->discountHandler->hiddenTaxDiscountCompensation($invoice, $discountAllItems, false);
-            if ($compAmount > 0 || $compAmount < 0) {
-                $orderLines[] = $this->orderLines->compensationOrderLine(
-                    "Shipping compensation",
-                    "comp-ship",
-                    $compAmount
-                );
-            }
+            $orderLines[] = $this->orderLines->shippingOrderLine($invoice, false);
         }
         if (!empty($this->fixedProductTax($invoice, $baseCurrency))) {
             //order lines for FPT
@@ -184,13 +157,11 @@ class CaptureObserver implements ObserverInterface
     }
 
     /**
-     * @param int|float $couponCodeAmount
      * @param Magento\Sales\Model\Order\Invoice $invoice
-     * @param bool $discountAllItems
      *
      * @return array
      */
-    private function itemOrderLines($couponCodeAmount, $invoice, $discountAllItems)
+    private function itemOrderLines($invoice)
     {
         $orderLines       = [];
         $moduleVersion    = $invoice->getOrder()->getModuleVersion() ? $invoice->getOrder()->getModuleVersion() : '';
@@ -204,21 +175,8 @@ class CaptureObserver implements ObserverInterface
                 ($qty > 0 && $productType != 'bundle' && $priceInclTax) ||
                 ($productType === "bundle" && $item->getOrderItem()->getProduct()->getPriceType() == Price::PRICE_TYPE_FIXED)
             ) {
-                if ($baseCurrency) {
-                    $unitPrice = $item->getBasePrice() !== null ? $item->getBasePrice() : 0;
-                } else {
-                    $unitPrice = $item->getPrice() !== null ? $item->getPrice() : 0;
-                }
                 $taxAmount = $item->getTaxAmount();
-
-                $orderLines[]            = $this->orderLines->itemOrderLine(
-                    $item,
-                    $unitPrice,
-                    0,
-                    $taxAmount,
-                    $invoice->getOrder(),
-                    false
-                );
+                $orderLines[] = $this->orderLines->itemOrderLine($item, $invoice->getOrder(), false);
 
             }
         }
@@ -286,11 +244,11 @@ class CaptureObserver implements ObserverInterface
                 $api->setInvoiceNumber($invoice->getTransactionId());
             }
 
-            $totalCompensationAmount = $this->priceHandler->totalCompensationAmount($orderLines, $grandTotal);
+            $totalCompensationAmount = $this->orderLines->totalCompensationAmount($orderLines, $grandTotal);
             if ($totalCompensationAmount > 0 || $totalCompensationAmount < 0) {
                 $orderLines[] = $this->orderLines->compensationOrderLine(
-                    "Total compensation",
-                    "comp-total",
+                    "Compensation Amount",
+                    "comp-amount",
                     $totalCompensationAmount
                 );
             }
