@@ -183,8 +183,6 @@ abstract class Index extends Action
             $resultRedirect->setPath('checkout/onepage/success');
         }
 
-        $this->checkoutSession->clearQuote();
-
         return $resultRedirect;
     }
     

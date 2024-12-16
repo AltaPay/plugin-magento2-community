@@ -16,9 +16,10 @@ define(
         'Magento_Customer/js/model/customer',
         'Magento_Checkout/js/model/full-screen-loader',
         'Magento_Checkout/js/action/redirect-on-success',
-        'underscore'
+        'underscore',
+        'Magento_Customer/js/customer-data'
     ],
-    function ($, quote, urlBuilder, storage, errorProcessor, customer, fullScreenLoader, redirectOnSuccessAction, _) {
+    function ($, quote, urlBuilder, storage, errorProcessor, customer, fullScreenLoader, redirectOnSuccessAction, _, customerData) {
         'use strict';
         var agreementIds = [];
         var checkoutConfig = window.checkoutConfig;
@@ -122,6 +123,7 @@ define(
                         dataType: 'json'
                     }).done(function (jsonResponse) {
                         if (jsonResponse.result == 'success') {
+                            customerData.invalidate(['checkout-data']);
                             window.location.href = jsonResponse.formurl;
                         } else {
                             fullScreenLoader.stopLoader();
