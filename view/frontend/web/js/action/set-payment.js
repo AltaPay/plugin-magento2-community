@@ -86,6 +86,7 @@ define(
                         dataType: 'JSON',
                         success: function (response) {
                             if (response && response.status === "success") {
+                                customerData.invalidate(['checkout-data']);
                                 applePay.session.completePayment(ApplePaySession.STATUS_SUCCESS);
                                 redirectOnSuccessAction.execute();
                             } else {
