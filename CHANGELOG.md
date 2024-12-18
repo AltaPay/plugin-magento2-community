@@ -1,7 +1,7 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
-## [unreleased]
+## [4.0.4]
 ### Added
 - Support for new PayPal integration.
 
