@@ -1,6 +1,10 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [4.0.3]
+### Fixed
+- Fix: Clear customer information from the checkout form on successful payment.
+
 ## [4.0.2]
 ### Fixed
 - Fix: Duplicate transactions are being created on the gateway with the same order ID.
