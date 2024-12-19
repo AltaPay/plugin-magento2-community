@@ -88,17 +88,17 @@ class ApplePayOrder {
 
     /**
      * @param OrderLoaderInterface $orderLoader
-     * @param Session $checkoutSession
-     * @param StockStateInterface $stockItem
-     * @param StockRegistryInterface $stockRegistry
+     * @param Session                        $checkoutSession
+     * @param StockStateInterface            $stockItem
+     * @param StockRegistryInterface         $stockRegistry
      * @param TransactionRepositoryInterface $transactionRepository
-     * @param SystemConfig $systemConfig
-     * @param Order $order
-     * @param CreatePaymentHandler $paymentHandler
-     * @param TransactionFactory $transactionFactory
-     * @param OrderSender $orderSender
-     * @param Data $helper
-     * @param Cart modelCart
+     * @param SystemConfig                   $systemConfig
+     * @param Order                          $order
+     * @param CreatePaymentHandler           $paymentHandler
+     * @param TransactionFactory             $transactionFactory
+     * @param OrderSender                    $orderSender
+     * @param Data                           $helper
+     * @param Cart                           $modelCart modelCart
      */
     public function __construct(
         OrderLoaderInterface $orderLoader,
@@ -129,8 +129,8 @@ class ApplePayOrder {
     }
 
     /**
-     * @param                  $comment
-     * @param RequestInterface $request
+     * @param $response
+     * @param $order
      *
      * @throws AlreadyExistsException
      */
@@ -217,10 +217,6 @@ class ApplePayOrder {
         }
     }
 
-    public function sortFunction($a, $b) {
-        return strtotime($b["date"]) - strtotime($a["date"]);
-    }
-
     protected function updateStockQty($order)
     {
         $cart = $this->modelCart;
@@ -256,6 +252,7 @@ class ApplePayOrder {
      * @param $response
      * @param $storeCode
      * @param $storeScope
+     * @param $latestTransKey
      *
      * @return bool|\Magento\Payment\Model\MethodInterface
      */

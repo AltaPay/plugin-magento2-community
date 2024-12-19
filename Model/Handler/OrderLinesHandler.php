@@ -29,14 +29,6 @@ class OrderLinesHandler
      */
     private $storeConfig;
     /**
-     * @var DiscountHandler
-     */
-    private $discountHandler;
-    /**
-     * @var PriceHandler
-     */
-    private $priceHandler;
-    /**
      * Escaper
      *
      * @var Escaper
@@ -46,23 +38,17 @@ class OrderLinesHandler
     /**
      * OrderLinesHandler constructor.
      *
-     * @param Data            $helper
-     * @param storeConfig     $storeConfig
-     * @param DiscountHandler $discountHandler
-     * @param PriceHandler    $priceHandler
-     * @param Escaper         $escaper
+     * @param Data        $helper
+     * @param storeConfig $storeConfig
+     * @param Escaper     $escaper
      */
     public function __construct(
         Data $helper,
         storeConfig $storeConfig,
-        DiscountHandler $discountHandler,
-        PriceHandler $priceHandler,
         Escaper $escaper
     ) {
         $this->helper          = $helper;
         $this->storeConfig     = $storeConfig;
-        $this->discountHandler = $discountHandler;
-        $this->priceHandler    = $priceHandler;
         $this->escaper         = $escaper;
     }
 
@@ -77,7 +63,6 @@ class OrderLinesHandler
     {
         $orderLine             = new OrderLine($description, $itemId, 1, $compensationAmount);
         $orderLine->taxAmount  = 0.00;
-        $orderLine->taxPercent = 0.00;
         $orderLine->unitCode   = 'unit';
         $orderLine->discount   = 0.00;
         $orderLine->setGoodsType('handling');
@@ -97,66 +82,42 @@ class OrderLinesHandler
             $couponCode = 'Cart Price Rule';
         }
         // Handling price reductions
-        $orderLine = new OrderLine($couponCode, 'discount', 1, round($couponAmount, 3));
-        $orderLine->setGoodsType('handling');
-
-        return $orderLine;
-    }
-
-    /**
-     * @param $shippingAmount
-     * @param $method
-     * @param $carrier_code
-     * @param $taxAmount
-     * @param $taxPercent
-     * @param $discount
-     *
-     * @return OrderLine
-     */
-    private function shippingOrderLine($shippingAmount, $method, $carrier_code, $taxAmount, $taxPercent, $discount)
-    {
-        $orderLine             = new OrderLine($method, $carrier_code, 1, $shippingAmount);
-        $orderLine->taxAmount  = $taxAmount;
-        $orderLine->discount   = $discount;
-        $orderLine->taxPercent = $taxPercent;
-        $orderLine->setGoodsType('shipment');
+        $orderLine = new OrderLine($couponCode, 'discount', 1, round($couponAmount, 2));
+        $orderLine->taxAmount = 0;
+        $orderLine->setGoodsType('discount');
 
         return $orderLine;
     }
 
     /**
      * @param $item
-     * @param $unitPrice
-     * @param $discount
-     * @param $taxAmount
      * @param $order
      * @param $newOrder
+     * @param $unitPrice
      *
      * @return OrderLine
      */
     public function itemOrderLine(
         $item,
-        $unitPrice,
-        $discount,
-        $taxAmount,
         $order,
         $newOrder
     ) {
         $itemName = $item->getName();
+        $taxAmount = $item->getTaxAmount();
+        $baseCurrency = $this->storeConfig->useBaseCurrency();
+        $unitPrice = $baseCurrency ? ($item->getBasePrice() ?? 0) : ($item->getPrice() ?? 0);
 
         if ($newOrder) {
             $quantity     = $item->getQtyOrdered();
             $itemId       = $item->getItemId();
             $productUrl   = $item->getProduct()->getProductUrl();
             $productThumb = $item->getProduct()->getThumbnail();
-            $taxPercent   = $item->getTaxPercent();
             $options      = $item->getData('product_options');
         } else {
             $quantity     = $item->getQty();
             $itemId       = $item->getOrderItem()->getItemId();
             $productUrl   = $item->getOrderItem()->getProduct()->getProductUrl();
             $productThumb = $item->getOrderItem()->getProduct()->getThumbnail();
-            $taxPercent   = $item->getOrderItem()->getTaxPercent();
             $options      = $item->getOrderItem()->getData('product_options');
         }
 
@@ -165,18 +126,13 @@ class OrderLinesHandler
         }
         $itemName              = $this->escaper->escapeHtml($itemName);
         $orderLine             = new OrderLine($itemName, $itemId, $quantity, $unitPrice);
-        $orderLine->discount   = $discount;
+        $orderLine->discount   = 0;
         $orderLine->taxAmount  = $taxAmount;
-        $orderLine->taxPercent = $taxPercent;
         $orderLine->productUrl = $productUrl;
         if (!empty($productThumb) && $productThumb !== 'no_selection') {
             $orderLine->imageUrl = $this->storeConfig->getProductImageUrl($order, $productThumb);
         }
-        if ($quantity > 1) {
-            $orderLine->unitCode = "units";
-        } else {
-            $orderLine->unitCode = "unit";
-        }
+        $orderLine->unitCode = $quantity > 1 ? 'units' : 'unit';
         $orderLine->setGoodsType('item');
 
         return $orderLine;
@@ -184,42 +140,30 @@ class OrderLinesHandler
 
     /**
      * @param $order
-     * @param $discountOnAllItems
      * @param $newOrder
      *
      * @return OrderLine
      */
-    public function handleShipping($order, $discountOnAllItems, $newOrder)
+    public function shippingOrderLine($order, $newOrder)
     {
-        //add shipping tax amount in separate column of request
-        $discount       = 0;
-        $shippingTax    = $order->getShippingTaxAmount();
-        $shippingAmount = $order->getShippingAmount();
-        $orderId        = $order->getId();
+        $baseCurrency = $this->storeConfig->useBaseCurrency();
+        $shippingTax    = $baseCurrency ? $order->getBaseShippingTaxAmount() : $order->getShippingTaxAmount();
+        $shippingAmount = $baseCurrency ? $order->getBaseShippingAmount() : $order->getShippingAmount();
         $shipping       = $order->getShippingMethod(true);
         if (!$newOrder) {
-            $orderId  = $order->getOrder()->getId();
             $shipping = $order->getOrder()->getShippingMethod(true);
         }
-        $taxPercent   = $this->helper->getOrderShippingTax($orderId);
         $method       = $shipping['method'] ?? '';
         $carrier_code = $shipping['carrier_code'] ?? '';
-        if ($discountOnAllItems) {
-            $discount = 0;
-        } else {
-            if ($shippingAmount > 0) {
-                $discount = ($order->getShippingDiscountAmount() / $shippingAmount) * 100;
-            }
-        }
 
-        if ($taxPercent > 0) {
-            $shippingTax = $shippingAmount * ($taxPercent / 100);
-            $shippingTax = round($shippingTax, 2);
-        }
+        $shippingAmount = round($shippingAmount, 2);
 
-        $shippingAmount = round($shippingAmount, 3);
+        $orderLine            = new OrderLine($method, $carrier_code, 1, $shippingAmount);
+        $orderLine->taxAmount = $shippingTax;
+        $orderLine->discount  = 0;
+        $orderLine->setGoodsType('shipment');
 
-        return $this->shippingOrderLine($shippingAmount, $method, $carrier_code, $shippingTax, $taxPercent, $discount);
+        return $orderLine;
     }
 
     /**
@@ -244,9 +188,25 @@ class OrderLinesHandler
      */
     public function fixedProductTaxOrderLine($fixedTaxAmount)
     {
-        $orderLine = new OrderLine('FPT', 'FPT', 1, round($fixedTaxAmount, 3));
+        $orderLine = new OrderLine('FPT', 'FPT', 1, round($fixedTaxAmount, 2));
         $orderLine->setGoodsType('handling');
  
         return $orderLine;
+    }
+
+    /**
+     * @param $orderLines
+     * @param $total
+     * @return float
+     */
+    public function totalCompensationAmount($orderLines, $total)
+    {
+        $orderLinesTotal = 0;
+        foreach ($orderLines as $orderLine) {
+            $orderLinePriceWithTax = ($orderLine->unitPrice * $orderLine->quantity) + $orderLine->taxAmount;
+            $orderLinesTotal += $orderLinePriceWithTax - ($orderLinePriceWithTax * ($orderLine->discount / 100));
+        }
+
+        return round(($total - $orderLinesTotal), 3);
     }
 }
