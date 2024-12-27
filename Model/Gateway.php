@@ -25,8 +25,6 @@ use SDM\Altapay\Helper\Config as storeConfig;
 use SDM\Altapay\Logger\Logger;
 use SDM\Altapay\Model\Handler\CustomerHandler;
 use SDM\Altapay\Model\Handler\OrderLinesHandler;
-use SDM\Altapay\Model\Handler\PriceHandler;
-use SDM\Altapay\Model\Handler\DiscountHandler;
 use SDM\Altapay\Model\Handler\CreatePaymentHandler;
 use SDM\Altapay\Model\TokenFactory;
 use Magento\Sales\Model\Order;
@@ -101,14 +99,6 @@ class Gateway implements GatewayInterface
      */
     private $orderLines;
     /**
-     * @var PriceHandler
-     */
-    private $priceHandler;
-    /**
-     * @var DiscountHandler
-     */
-    private $discountHandler;
-    /**
      * @var CreatePaymentHandler
      */
     private $paymentHandler;
@@ -151,29 +141,27 @@ class Gateway implements GatewayInterface
     /**
      * Gateway constructor.
      *
-     * @param Session                          $checkoutSession
-     * @param UrlInterface                     $urlInterface
-     * @param Http                             $request
-     * @param Order                            $order
-     * @param SystemConfig                     $systemConfig
-     * @param OrderLoaderInterface             $orderLoader
-     * @param Quote                            $quote
-     * @param Data                             $helper
-     * @param storeConfig                      $storeConfig
-     * @param Logger                           $altapayLogger
-     * @param CustomerHandler                  $customerHandler
-     * @param OrderLinesHandler                $orderLines
-     * @param PriceHandler                     $priceHandler
-     * @param DiscountHandler                  $discountHandler
-     * @param CreatePaymentHandler             $paymentHandler
-     * @param TokenFactory  $dataToken
-     * @param ApplePayOrder $applePayOrder
-     * @param StoreManagerInterface            $storeManager
-     * @param Random                           $random
-     * @param TransactionRepositoryInterface   $transactionRepository
-     * @param TransactionFactory               $transactionFactory
-     * @param InvoiceService                   $invoiceService
-     * @param ManagerInterface                 $_eventManager
+     * @param Session                        $checkoutSession
+     * @param UrlInterface                   $urlInterface
+     * @param Http                           $request
+     * @param Order                          $order
+     * @param SystemConfig                   $systemConfig
+     * @param OrderLoaderInterface           $orderLoader
+     * @param Quote                          $quote
+     * @param Data                           $helper
+     * @param storeConfig                    $storeConfig
+     * @param Logger                         $altapayLogger
+     * @param CustomerHandler                $customerHandler
+     * @param OrderLinesHandler              $orderLines
+     * @param CreatePaymentHandler           $paymentHandler
+     * @param TokenFactory                   $dataToken
+     * @param ApplePayOrder                  $applePayOrder
+     * @param StoreManagerInterface          $storeManager
+     * @param Random                         $random
+     * @param TransactionRepositoryInterface $transactionRepository
+     * @param TransactionFactory             $transactionFactory
+     * @param InvoiceService                 $invoiceService
+     * @param ManagerInterface               $eventManager
      */
     public function __construct(
         Session $checkoutSession,
@@ -188,8 +176,6 @@ class Gateway implements GatewayInterface
         Logger $altapayLogger,
         CustomerHandler $customerHandler,
         OrderLinesHandler $orderLines,
-        PriceHandler $priceHandler,
-        DiscountHandler $discountHandler,
         CreatePaymentHandler $paymentHandler,
         TokenFactory $dataToken,
         ApplePayOrder $applePayOrder,
@@ -213,8 +199,6 @@ class Gateway implements GatewayInterface
         $this->altapayLogger         = $altapayLogger;
         $this->customerHandler       = $customerHandler;
         $this->orderLines            = $orderLines;
-        $this->priceHandler          = $priceHandler;
-        $this->discountHandler       = $discountHandler;
         $this->paymentHandler        = $paymentHandler;
         $this->dataToken             = $dataToken;
         $this->applePayOrder         = $applePayOrder;
@@ -238,30 +222,7 @@ class Gateway implements GatewayInterface
     {
         $order = $this->order->load($orderId);
         if ($order->getId()) {
-            $baseCurrency = $this->storeConfig->useBaseCurrency();
-            $couponCode = $order->getDiscountDescription();
-            $couponCodeAmount = $baseCurrency ? $order->getBaseDiscountAmount() : $order->getDiscountAmount();
-            $discountAllItems = $this->discountHandler->allItemsHaveDiscount($order->getAllItems());
-            $orderLines = $this->itemOrderLines($couponCodeAmount, $order, $discountAllItems);
-            if ($this->orderLines->sendShipment($order) && !empty($order->getShippingMethod(true))) {
-                $orderLines[] = $this->orderLines->handleShipping($order, $discountAllItems, true);
-                //Shipping Discount Tax Compensation Amount
-                $compAmount = $this->discountHandler->hiddenTaxDiscountCompensation($order, $discountAllItems, true);
-                if ($compAmount > 0 || $compAmount < 0) {
-                    $orderLines[] = $this->orderLines->compensationOrderLine(
-                        "Shipping compensation",
-                        "comp-ship",
-                        $compAmount
-                    );
-                }
-            }
-            if ($discountAllItems && abs($couponCodeAmount) > 0) {
-                $orderLines[] = $this->orderLines->discountOrderLine($couponCodeAmount, $couponCode);
-            }
-            if (!empty($this->fixedProductTax($order))) {
-                $orderLines[] = $this->orderLines->fixedProductTaxOrderLine($this->fixedProductTax($order));
-            }
-
+            $orderLines = $this->getItemOrderLines($order);
             $this->_eventManager->dispatch('additional_orderline_event_observer',
                 [
                     'order_lines'   => &$orderLines,
@@ -287,34 +248,11 @@ class Gateway implements GatewayInterface
     public function createRequestApplepay($terminalId, $orderId, $providerData)
     {
         $order = $this->order->load($orderId);
-        $baseCurrency = $this->storeConfig->useBaseCurrency();
         if ($order->getId()) {
-            $couponCode = $order->getDiscountDescription();
-            $couponCodeAmount = $baseCurrency ? $order->getBaseDiscountAmount() : $order->getDiscountAmount();
-            $discountAllItems = $this->discountHandler->allItemsHaveDiscount($order->getAllItems());
-            $orderLines = $this->itemOrderLines($couponCodeAmount, $order, $discountAllItems);
-            if ($this->orderLines->sendShipment($order) && !empty($order->getShippingMethod(true))) {
-                $orderLines[] = $this->orderLines->handleShipping($order, $discountAllItems, true);
-                //Shipping Discount Tax Compensation Amount
-                $compAmount = $this->discountHandler->hiddenTaxDiscountCompensation($order, $discountAllItems, true);
-                if ($compAmount > 0 || $compAmount < 0) {
-                    $orderLines[] = $this->orderLines->compensationOrderLine(
-                        "Shipping compensation",
-                        "comp-ship",
-                        $compAmount
-                    );
-                }
-            }
-            if ($discountAllItems && abs($couponCodeAmount) > 0) {
-                $orderLines[] = $this->orderLines->discountOrderLine($couponCodeAmount, $couponCode);
-            }
-            if (!empty($this->fixedProductTax($order))) {
-                $orderLines[] = $this->orderLines->fixedProductTaxOrderLine($this->fixedProductTax($order));
-            }
-
+            $orderLines = $this->getItemOrderLines($order);
             $order->setModuleVersion($this->helper->getModuleVersion());
             $order->getResource()->save($order);
-            
+
             $request = $this->preparePaymentRequest($order, $orderLines, $orderId, $terminalId, $providerData);
             if ($request) {
                 try {
@@ -376,22 +314,14 @@ class Gateway implements GatewayInterface
     }
 
     /**
-     * @param $couponCodeAmount
      * @param $order
-     * @param $discountAllItems
-     *
      * @return array
      */
-    private function itemOrderLines($couponCodeAmount, $order, $discountAllItems)
+    private function itemOrderLines($order)
     {
         $orderLines = [];
-        $storePriceIncTax = $this->storeConfig->storePriceIncTax();
-        $baseCurrency = $this->storeConfig->useBaseCurrency();
         foreach ($order->getAllItems() as $item) {
             $productType = $item->getProductType();
-            $originalPrice = $baseCurrency ? $item->getBaseOriginalPrice() : $item->getOriginalPrice();
-            $taxPercent = $item->getTaxPercent();
-            $discountAmount = $baseCurrency ? $item->getBaseDiscountAmount() : $item->getDiscountAmount();
             $parentItemType = "";
             if ($item->getParentItem()) {
                 $parentItemType = $item->getParentItem()->getProductType();
@@ -402,59 +332,7 @@ class Gateway implements GatewayInterface
                     $parentItemType != "configurable") ||
                 ($productType === "bundle" && $item->getProduct()->getPriceType() == Price::PRICE_TYPE_FIXED)
             ) {
-                if ($originalPrice == 0) {
-                    if($baseCurrency){
-                        $originalPrice = $item->getBasePriceInclTax() !== null ? $item->getBasePriceInclTax() : 0;
-                    }else{
-                        $originalPrice = $item->getPriceInclTax() !== null ? $item->getPriceInclTax() : 0;
-                    }
-               }
-
-                if ($storePriceIncTax) {
-                    $unitPriceWithoutTax = $this->priceHandler->getPriceWithoutTax($originalPrice, $taxPercent);
-                    $unitPrice = bcdiv($unitPriceWithoutTax, 1, 2);
-                } else {
-                    $unitPrice = bcdiv($originalPrice, 1, 2);
-                }
-                $dataForPrice = $this->priceHandler->dataForPrice(
-                    $item,
-                    $unitPrice,
-                    $couponCodeAmount,
-                    $this->discountHandler->getItemDiscount($discountAmount, $originalPrice, $item->getQtyOrdered()),
-                    $discountAllItems
-                );
-                $taxAmount = $dataForPrice["taxAmount"];
-                $catalogDiscount = $dataForPrice["catalogDiscount"];
-                $discount = $this->discountHandler->orderLineDiscount(
-                    $discountAllItems,
-                    $dataForPrice["discount"],
-                    $catalogDiscount
-                );
-
-                $itemTaxAmount = $taxAmount;
-                $orderLines[] = $this->orderLines->itemOrderLine(
-                    $item,
-                    $unitPrice,
-                    $discount,
-                    $itemTaxAmount,
-                    $order,
-                    true
-                );
-                $roundingCompensation = $this->priceHandler->compensationAmountCal(
-                    $item,
-                    $unitPrice,
-                    $taxAmount,
-                    $discount,
-                    true
-                );
-                // check if rounding compensation amount, send in the separate orderline
-                if ($roundingCompensation > 0 || $roundingCompensation < 0) {
-                    $orderLines[] = $this->orderLines->compensationOrderLine(
-                        "Compensation Amount",
-                        "comp-" . $item->getItemId(),
-                        $roundingCompensation
-                    );
-                }
+                $orderLines[] = $this->orderLines->itemOrderLine($item, $order, true);
             }
         }
 
@@ -599,12 +477,12 @@ class Gateway implements GatewayInterface
             }
         }
 
-        $totalCompensationAmount = $this->priceHandler->totalCompensationAmount($orderLines, $grandTotal);
+        $totalCompensationAmount = $this->orderLines->totalCompensationAmount($orderLines, $grandTotal);
 
         if ($totalCompensationAmount > 0 || $totalCompensationAmount < 0) {
             $orderLines[] = $this->orderLines->compensationOrderLine(
-                "Total compensation",
-                "comp-total",
+                "Compensation Amount",
+                "comp-amount",
                 $totalCompensationAmount
             );
         }
@@ -911,5 +789,36 @@ class Gateway implements GatewayInterface
             }
         }
         return [];
+    }
+
+    /**
+     * @param $order
+     * @return array
+     */
+    public function getItemOrderLines($order)
+    {
+        $baseCurrency = $this->storeConfig->useBaseCurrency();
+        $total        = $baseCurrency ? $order->getBaseGrandTotal() : $order->getGrandTotal();
+        $orderLines   = $this->itemOrderLines($order);
+        if ($order->getShippingAmount() > 0 || $order->getShippingTaxAmount() > 0) {
+            $orderLines[] = $this->orderLines->shippingOrderLine($order, true);
+        }
+        $couponCodeAmount = $baseCurrency ? $order->getBaseDiscountAmount() : $order->getDiscountAmount();
+        if (abs($couponCodeAmount) > 0) {
+            $couponCode   = $order->getDiscountDescription();
+            $orderLines[] = $this->orderLines->discountOrderLine($couponCodeAmount, $couponCode);
+        }
+        if (!empty($this->fixedProductTax($order))) {
+            $orderLines[] = $this->orderLines->fixedProductTaxOrderLine($this->fixedProductTax($order));
+        }
+        $totalCompensationAmount = $this->orderLines->totalCompensationAmount($orderLines, $total);
+        if ($totalCompensationAmount > 0 || $totalCompensationAmount < 0) {
+            $orderLines[] = $this->orderLines->compensationOrderLine(
+                "Compensation Amount",
+                "comp-amount",
+                $totalCompensationAmount
+            );
+        }
+        return $orderLines;
     }
 }

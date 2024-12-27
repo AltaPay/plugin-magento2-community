@@ -1,6 +1,11 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [4.0.4]
+### Fixed
+- Streamline and simplify management of order lines and amounts.
+- Support for the new PayPal Integration.
+
 ## [4.0.3]
 ### Fixed
 - Fix: Clear customer information from the checkout form on successful payment.
