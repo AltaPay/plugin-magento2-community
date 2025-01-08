@@ -65,7 +65,7 @@ class TransactionRepository implements TransactionRepositoryInterface
         $paymentStatus = null,
         $paymentNature = null,
         $result = null,
-        $cardHolderMessageMustBeShown = null,
+        $cardHolderMessageMustBeShown = 0,
         $customerErrorMessage = null,
         $merchantErrorMessage = null,
         $fraudRiskScore = null,

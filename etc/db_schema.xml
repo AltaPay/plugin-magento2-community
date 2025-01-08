@@ -15,15 +15,17 @@
     <column xsi:type="varchar" name="orderid" nullable="true" length="255" comment="Order ID"/>
     <column xsi:type="varchar" name="transactionid" nullable="true" length="255" comment="Transaction ID"/>
     <column xsi:type="varchar" name="paymentid" nullable="true" length="255" comment="Payment ID"/>
+    <column xsi:type="text" name="transactiondata" nullable="true" comment="Transaction data" disabled="true"/>
+    <column xsi:type="text" name="parametersdata" nullable="true" comment="Parameters data" disabled="true"/>
     <column xsi:type="varchar" name="terminal" nullable="true" length="255" comment="Terminal"/>
-    <column xsi:type="varchar" name="require_capture" nullable="true" length="255" comment="Require Capture"/>
+    <column xsi:type="smallint" name="require_capture" nullable="true" default="0" comment="Require Capture"/>
     <column xsi:type="varchar" name="payment_status" nullable="true" length="100" comment="Payment Status"/>
     <column xsi:type="varchar" name="payment_nature" nullable="true" length="30" comment="Payment Nature"/>
     <column xsi:type="varchar" name="result" nullable="true" length="20" comment="Result"/>
-    <column xsi:type="varchar" name="card_holder_message_must_be_shown" nullable="true" length="255" comment="Card Holder Message Must Be Shown"/>
+    <column xsi:type="smallint" name="card_holder_message_must_be_shown" nullable="true" default="0" comment="Card Holder Message Must Be Shown"/>
     <column xsi:type="varchar" name="customer_error_message" nullable="true" length="255" comment="Customer Error Message"/>
     <column xsi:type="varchar" name="merchant_error_message" nullable="true" length="255" comment="Merchant Error Message"/>
-    <column xsi:type="varchar" name="fraud_risk_score" nullable="true" length="255" comment="Fraud Risk Score"/>
+    <column xsi:type="decimal" name="fraud_risk_score" nullable="true" precision="12" scale="4" comment="Fraud Risk Score"/>
     <column xsi:type="varchar" name="fraud_explanation" nullable="true" length="255" comment="Fraud Explanation"/>
     <column xsi:type="varchar" name="fraud_recommendation" nullable="true" length="20" comment="Fraud Recommendation"/>
     <column xsi:type="timestamp" name="created_at" on_update="false" nullable="false" default="CURRENT_TIMESTAMP" comment="Created date"/>

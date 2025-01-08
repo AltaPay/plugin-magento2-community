@@ -16,7 +16,9 @@
             "merchant_error_message": true,
             "fraud_risk_score": true,
             "fraud_explanation": true,
-            "fraud_recommendation": true
+            "fraud_recommendation": true,
+            "transactiondata": true,
+            "parametersdata": true
         },
         "index": {
             "SDM_ALTAPAY_ORDERID": true,

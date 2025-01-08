@@ -74,13 +74,13 @@ interface TransactionInterface
     public function getTerminal();
 
     /**
-     * @param string|null $requireCapture
+     * @param int|null $requireCapture
      * @return $this
      */
     public function setRequireCapture($requireCapture);
 
     /**
-     * @return string|null
+     * @return int|null
      */
     public function getRequireCapture();
 
@@ -118,13 +118,13 @@ interface TransactionInterface
     public function getResult();
 
     /**
-     * @param string|null $cardHolderMessageMustBeShown
+     * @param bool $cardHolderMessageMustBeShown
      * @return $this
      */
     public function setCardHolderMessageMustBeShown($cardHolderMessageMustBeShown);
 
     /**
-     * @return string|null
+     * @return bool|null
      */
     public function getCardHolderMessageMustBeShown();
 

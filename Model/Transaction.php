@@ -111,7 +111,7 @@ class Transaction extends AbstractModel implements TransactionInterface, Identit
     }
 
     /**
-     * @param string|null $requireCapture
+     * @param int|null $requireCapture
      */
     public function setRequireCapture($requireCapture)
     {
@@ -119,7 +119,7 @@ class Transaction extends AbstractModel implements TransactionInterface, Identit
     }
 
     /**
-     * @return string
+     * @return int
      */
     public function getRequireCapture()
     {
@@ -175,19 +175,19 @@ class Transaction extends AbstractModel implements TransactionInterface, Identit
     }
 
     /**
-     * @param string|null $cardHolderMessageMustBeShown
+     * @param bool|null $cardHolderMessageMustBeShown
      */
     public function setCardHolderMessageMustBeShown($cardHolderMessageMustBeShown)
     {
-        $this->setData(TransactionInterface::CARD_HOLDER_MESSAGE_MUST_BE_SHOWN, $cardHolderMessageMustBeShown);
+        $this->setData(TransactionInterface::CARD_HOLDER_MESSAGE_MUST_BE_SHOWN, (bool)$cardHolderMessageMustBeShown);
     }
 
     /**
-     * @return string
+     * @return bool
      */
     public function getCardHolderMessageMustBeShown()
     {
-        return (string)$this->getData(TransactionInterface::CARD_HOLDER_MESSAGE_MUST_BE_SHOWN);
+        return $this->getData(TransactionInterface::CARD_HOLDER_MESSAGE_MUST_BE_SHOWN);
     }
 
     /**
