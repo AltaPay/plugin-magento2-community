@@ -201,7 +201,7 @@ class RestoreQuote
             )
             ->where('orderid = ?', $orderId);
 
-        return $connection->fetchOne($sql);
+        return $connection->fetchRow($sql);
     }
 
     /**
