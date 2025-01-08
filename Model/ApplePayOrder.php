@@ -141,7 +141,6 @@ class ApplePayOrder {
         if ($response && $response->Result === 'Success' && isset($response->Transactions[$latestTransKey])) {
             $transaction = $response->Transactions[$latestTransKey];
             $paymentType    = $transaction->AuthType;
-            $responseStatus = $transaction->TransactionStatus;
             $storeScope = \Magento\Store\Model\ScopeInterface::SCOPE_STORE;
             $storeCode  = $order->getStore()->getCode();
             if ($order->getId()) {
@@ -172,14 +171,21 @@ class ApplePayOrder {
                     $this->orderSender->send($order);
                 }
                 //save transaction data
-                $parametersData  = null;
-                $transactionData = json_encode($response);
                 $this->transactionRepository->addTransactionData(
                     $order->getIncrementId(),
-                    $transaction->TransactionId,
-                    $transaction->PaymentId,
-                    $transactionData,
-                    $parametersData
+                    $transaction->TransactionId ?? null,
+                    $transaction->PaymentId ?? null,
+                    $transaction->Terminal ?? null,
+                    $response->requireCapture ?? null,
+                    $transaction->TransactionStatus ?? null,
+                    $transaction->PaymentNature ?? null,
+                    $response->Result ?? null,
+                    $response->CardHolderMessageMustBeShown ?? null,
+                    $response->CardHolderErrorMessage ?? null,
+                    $response->MerchantErrorMessage ?? null,
+                    $transaction->FraudRiskScore ?? null,
+                    $transaction->FraudExplanation ?? null,
+                    $transaction->FraudRecommendation ?? null
                 );
                 $orderStatusAfterPayment = $this->systemConfig->getStatusConfig('process', $storeScope, $storeCode);
                 $orderStatusCapture      = $this->systemConfig->getStatusConfig('autocapture', $storeScope, $storeCode);

@@ -148,26 +148,20 @@ class RestoreQuote
             $storeCode  = $order->getStore()->getCode();
 
             //get transaction details if failure and redirect to cart
-            $transactionDataJson = $this->getTransactionData($orderId);
-
-            //if fail set message and history
-            if (!empty($transactionDataJson)) {
+            $transactionData = $this->getTransactionData($orderId);
+            if (!empty($transactionData)) {
                 $shouldShowCardholderMessage = false;
                 $message = "Error with the Payment.";
-                $transactionData = json_decode($transactionDataJson);
-                $xml = simplexml_load_string($transactionData->xml);
-                $cardholderErrorMessage = $xml->Body->CardHolderErrorMessage;
-                if (isset($transactionData->cardholder_message_must_be_shown)) {
-                    $shouldShowCardholderMessage = (bool)($transactionData->cardholder_message_must_be_shown === "true");
+                $cardholderErrorMessage = $transactionData['customer_error_message'];
+                if (isset($transactionData['card_holder_message_must_be_shown'])) {
+                    $shouldShowCardholderMessage = (bool)($transactionData['card_holder_message_must_be_shown'] === "true");
                 }
                 $cardErrorMsgConfig = (bool)$this->scopeConfig->getValue(
                     'payment/sdm_altapay_config/error_message/enable',
                     \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
                     $this->storeManager->getStore()->getCode()
                 );
-                if (isset($transactionData->error_message) && empty($cardholderErrorMessage)) {
-                    $message = $transactionData->error_message;
-                } elseif ($cardholderErrorMessage && ($shouldShowCardholderMessage || $cardErrorMsgConfig)) {
+                if ($cardholderErrorMessage && ($shouldShowCardholderMessage || $cardErrorMsgConfig)) {
                     $message = $cardholderErrorMessage;
                 }
                 //show fail message
@@ -197,7 +191,14 @@ class RestoreQuote
         $connection = $this->modelResource->getConnection();
         $table      = $this->modelResource->getTableName('sdm_altapay');
         $sql        = $connection->select()
-            ->from($table, ['parametersdata'])
+            ->from(
+                $table,
+                [
+                    'card_holder_message_must_be_shown',
+                    'customer_error_message',
+                    'merchant_error_message'
+                ]
+            )
             ->where('orderid = ?', $orderId);
 
         return $connection->fetchOne($sql);

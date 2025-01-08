@@ -54,23 +54,40 @@ class TransactionRepository implements TransactionRepositoryInterface
     }
 
     /**
-     * It creates the entity and saves the JSON request.
-     *
-     * @param string $orderid
-     * @param string $transactionid
-     * @param string $paymentid
-     * @param string $transactiondata
-     * @param string $parametersdata
+     * {@inheritdoc}
      */
-    public function addTransactionData($orderid, $transactionid, $paymentid, $transactiondata, $parametersdata)
-    {
+    public function addTransactionData(
+        $orderid,
+        $transactionid,
+        $paymentid,
+        $terminal = null,
+        $requireCapture = null,
+        $paymentStatus = null,
+        $paymentNature = null,
+        $result = null,
+        $cardHolderMessageMustBeShown = null,
+        $customerErrorMessage = null,
+        $merchantErrorMessage = null,
+        $fraudRiskScore = null,
+        $fraudExplanation = null,
+        $fraudRecommendation = null
+    ) {
         /** @var Transaction $transaction */
         $transaction = $this->transactionFactory->create();
         $transaction->setOrderid($orderid);
         $transaction->setTransactionid($transactionid);
         $transaction->setPaymentid($paymentid);
-        $transaction->setTransactiondata($transactiondata);
-        $transaction->setParametersdata($parametersdata);
+        $transaction->setTerminal($terminal);
+        $transaction->setRequireCapture($requireCapture);
+        $transaction->setPaymentStatus($paymentStatus);
+        $transaction->setPaymentNature($paymentNature);
+        $transaction->setResult($result);
+        $transaction->setCardHolderMessageMustBeShown($cardHolderMessageMustBeShown);
+        $transaction->setCustomerErrorMessage($customerErrorMessage);
+        $transaction->setMerchantErrorMessage($merchantErrorMessage);
+        $transaction->setFraudRiskScore($fraudRiskScore);
+        $transaction->setFraudExplanation($fraudExplanation);
+        $transaction->setFraudRecommendation($fraudRecommendation);
         $transaction->getResource()->save($transaction);
     }
 
