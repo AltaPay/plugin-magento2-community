@@ -111,11 +111,11 @@ class Transaction extends AbstractModel implements TransactionInterface, Identit
     }
 
     /**
-     * @param int|null $requireCapture
+     * @param bool $requireCapture
      */
     public function setRequireCapture($requireCapture)
     {
-        $this->setData(TransactionInterface::REQUIRE_CAPTURE, $requireCapture);
+        $this->setData(TransactionInterface::REQUIRE_CAPTURE, filter_var($requireCapture, FILTER_VALIDATE_BOOLEAN));
     }
 
     /**
@@ -175,11 +175,11 @@ class Transaction extends AbstractModel implements TransactionInterface, Identit
     }
 
     /**
-     * @param bool|null $cardHolderMessageMustBeShown
+     * @param bool $cardHolderMessageMustBeShown
      */
     public function setCardHolderMessageMustBeShown($cardHolderMessageMustBeShown)
     {
-        $this->setData(TransactionInterface::CARD_HOLDER_MESSAGE_MUST_BE_SHOWN, (bool)$cardHolderMessageMustBeShown);
+        $this->setData(TransactionInterface::CARD_HOLDER_MESSAGE_MUST_BE_SHOWN, filter_var($cardHolderMessageMustBeShown, FILTER_VALIDATE_BOOLEAN));
     }
 
     /**

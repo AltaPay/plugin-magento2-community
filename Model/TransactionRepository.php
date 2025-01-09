@@ -61,7 +61,7 @@ class TransactionRepository implements TransactionRepositoryInterface
         $transactionid,
         $paymentid,
         $terminal = null,
-        $requireCapture = null,
+        $requireCapture = 0,
         $paymentStatus = null,
         $paymentNature = null,
         $result = null,
@@ -103,8 +103,6 @@ class TransactionRepository implements TransactionRepositoryInterface
             ->addFieldToSelect(TransactionInterface::TRANSACTION_ID)
             ->addFieldToFilter(TransactionInterface::ORDER_ID, $orderId);
 
-        $transactionId = $collection->getFirstItem()->getData(TransactionInterface::TRANSACTION_ID);
-
-        return $transactionId;
+        return $collection->getFirstItem()->getData(TransactionInterface::TRANSACTION_ID);
     }
 }
