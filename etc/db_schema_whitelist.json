@@ -5,9 +5,20 @@
             "orderid": true,
             "transactionid": true,
             "paymentid": true,
+            "created_at": true,
+            "terminal": true,
+            "require_capture": true,
+            "payment_status": true,
+            "payment_nature": true,
+            "result": true,
+            "card_holder_message_must_be_shown": true,
+            "customer_error_message": true,
+            "merchant_error_message": true,
+            "fraud_risk_score": true,
+            "fraud_explanation": true,
+            "fraud_recommendation": true,
             "transactiondata": true,
-            "parametersdata": true,
-            "created_at": true
+            "parametersdata": true
         },
         "index": {
             "SDM_ALTAPAY_ORDERID": true,

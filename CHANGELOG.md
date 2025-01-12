@@ -1,6 +1,10 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [4.0.5]
+### Fixed
+- Optimize saving of the transaction data.
+
 ## [4.0.4]
 ### Fixed
 - Streamline and simplify management of order lines and amounts.

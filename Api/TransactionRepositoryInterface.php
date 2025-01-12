@@ -18,10 +18,34 @@ interface TransactionRepositoryInterface
      * @param string $orderid
      * @param string $transactionid
      * @param string $paymentid
-     * @param string $transactiondata
-     * @param string $parametersdata
+     * @param string $terminal
+     * @param bool   $requireCapture
+     * @param string $paymentStatus
+     * @param string $paymentNature
+     * @param string $result
+     * @param bool   $cardHolderMessageMustBeShown
+     * @param string $customerErrorMessage
+     * @param string $merchantErrorMessage
+     * @param string $fraudRiskScore
+     * @param string $fraudExplanation
+     * @param string $fraudRecommendation
      */
-    public function addTransactionData($orderid, $transactionid, $paymentid, $transactiondata, $parametersdata);
+    public function addTransactionData(
+        $orderid,
+        $transactionid,
+        $paymentid,
+        $terminal = null,
+        $requireCapture = 0,
+        $paymentStatus = null,
+        $paymentNature = null,
+        $result = null,
+        $cardHolderMessageMustBeShown = 0,
+        $customerErrorMessage = null,
+        $merchantErrorMessage = null,
+        $fraudRiskScore = null,
+        $fraudExplanation = null,
+        $fraudRecommendation = null
+    );
 
     /**
      * Get transaction by Order ID

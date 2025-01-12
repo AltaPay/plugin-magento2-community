@@ -290,26 +290,36 @@ class Generator
             }
             $this->handleOrderStateAction($request, Order::STATE_CANCELED, $statusKey, $historyComment);
             //save failed transaction data
-            $this->saveTransactionData($request, $response, $order);
+            $this->saveTransactionData($response, $order);
         }
     }
 
     /**
-     * @param $request
      * @param $response
      * @param $order
      */
-    private function saveTransactionData($request, $response, $order)
+    private function saveTransactionData($response, $order)
     {
-        $parametersData  = json_encode($request->getPostValue());
-        $transactionData = json_encode($response);
-        $this->transactionRepository->addTransactionData(
-            $order->getIncrementId(),
-            $response->transactionId,
-            $response->paymentId,
-            $transactionData,
-            $parametersData
-        );
+        $latestTransKey = $this->helper->getLatestTransaction($response->Transactions);
+        if (isset($response->Transactions[$latestTransKey])) {
+            $transaction    = $response->Transactions[$latestTransKey];
+            $this->transactionRepository->addTransactionData(
+                $order->getIncrementId(),
+                $response->transactionId ?? null,
+                $response->paymentId ?? null,
+                $transaction->Terminal ?? null,
+                $response->requireCapture ?? null,
+                $response->paymentStatus ?? null,
+                $response->nature ?? null,
+                $response->Result ?? null,
+                $response->CardHolderMessageMustBeShown ?? null,
+                $response->CardHolderErrorMessage ?? null,
+                $response->MerchantErrorMessage ?? null,
+                $transaction->FraudRiskScore ?? null,
+                $transaction->FraudExplanation ?? null,
+                $transaction->FraudRecommendation ?? null
+            );
+        }
     }
 
     /**
@@ -357,7 +367,7 @@ class Generator
             }
             $this->handleOrderStateAction($request, Order::STATE_CANCELED, $statusKey, $historyComment, $transInfo);
             //save failed transaction data
-            $this->saveTransactionData($request, $response, $order);
+            $this->saveTransactionData($response, $order);
         }
     }
 
@@ -445,8 +455,6 @@ class Generator
             $ccToken                 = $response->creditCardToken;
             $paymentId               = $response->paymentId;
             $transactionId           = $response->transactionId;
-            $parametersData          = json_encode($request->getPostValue());
-            $transactionData         = json_encode($response);
             $orderState              = Order::STATE_PROCESSING;
             $statusKey               = 'process';
             $status                  = $response->status;
@@ -497,7 +505,7 @@ class Generator
                     }
                     $this->handleOrderStateAction($request, Order::STATE_CANCELED, $statusKey, $historyComment);
                     //save failed transaction data
-                    $this->saveTransactionData($request, $response, $order);
+                    $this->saveTransactionData($response, $order);
 
                     return false;
                 }
@@ -564,13 +572,7 @@ class Generator
                 //unset redirect if success
                 $this->checkoutSession->unsAltapayCustomerRedirect();
                 //save transaction data
-                $this->transactionRepository->addTransactionData(
-                    $order->getIncrementId(),
-                    $response->transactionId,
-                    $response->paymentId,
-                    $transactionData,
-                    $parametersData
-                );
+                $this->saveTransactionData($response, $order);
 
                 if ($this->isCaptured($response, $storeCode, $storeScope, $latestTransKey) && $orderStatusCapture == "complete")
                 {
@@ -701,7 +703,7 @@ class Generator
                 }
                 $this->handleOrderStateAction($request, Order::STATE_CANCELED, $statusKey, $historyComment, $transInfo);
                 //save failed transaction data
-                $this->saveTransactionData($request, $response, $order);
+                $this->saveTransactionData($response, $order);
             }
         }
 
@@ -901,7 +903,7 @@ class Generator
                 }
                 $this->handleOrderStateAction($request, Order::STATE_PAYMENT_REVIEW, "fraud", $message, $transInfo);
                 //save failed transaction data
-                $this->saveTransactionData($request, $response, $order);
+                $this->saveTransactionData($response, $order);
 
                 return true;
             }

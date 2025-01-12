@@ -95,40 +95,178 @@ class Transaction extends AbstractModel implements TransactionInterface, Identit
     }
 
     /**
-     * @param string $transactiondata
-     *
-     * @see TransactionInterface
+     * @param string|null $terminal
      */
-    public function setTransactiondata($transactiondata)
+    public function setTerminal($terminal)
     {
-        $this->setData(TransactionInterface::TRANSACTION_DATA, $transactiondata);
+        $this->setData(TransactionInterface::TERMINAL, $terminal);
     }
 
     /**
      * @return string
-     * @see TransactionInterface
      */
-    public function getTransactiondata()
+    public function getTerminal()
     {
-        return $this->getData(TransactionInterface::TRANSACTION_DATA);
+        return (string)$this->getData(TransactionInterface::TERMINAL);
     }
 
     /**
-     * @param string $parametersdata
-     *
-     * @see TransactionInterface
+     * @param bool $requireCapture
      */
-    public function setParametersdata($parametersdata)
+    public function setRequireCapture($requireCapture)
     {
-        $this->setData(TransactionInterface::PARAMETERS_DATA, $parametersdata);
+        $this->setData(TransactionInterface::REQUIRE_CAPTURE, filter_var($requireCapture, FILTER_VALIDATE_BOOLEAN));
+    }
+
+    /**
+     * @return int
+     */
+    public function getRequireCapture()
+    {
+        return (string)$this->getData(TransactionInterface::REQUIRE_CAPTURE);
+    }
+
+    /**
+     * @param string|null $paymentStatus
+     */
+    public function setPaymentStatus($paymentStatus)
+    {
+        $this->setData(TransactionInterface::PAYMENT_STATUS, $paymentStatus);
     }
 
     /**
      * @return string
-     * @see TransactionInterface
      */
-    public function getParametersdata()
+    public function getPaymentStatus()
     {
-        return $this->getData(TransactionInterface::PARAMETERS_DATA);
+        return (string)$this->getData(TransactionInterface::PAYMENT_STATUS);
+    }
+
+    /**
+     * @param string|null $paymentNature
+     */
+    public function setPaymentNature($paymentNature)
+    {
+        $this->setData(TransactionInterface::PAYMENT_NATURE, $paymentNature);
+    }
+
+    /**
+     * @return string
+     */
+    public function getPaymentNature()
+    {
+        return (string)$this->getData(TransactionInterface::PAYMENT_NATURE);
+    }
+
+    /**
+     * @param string|null $result
+     */
+    public function setResult($result)
+    {
+        $this->setData(TransactionInterface::RESULT, $result);
+    }
+
+    /**
+     * @return string
+     */
+    public function getResult()
+    {
+        return (string)$this->getData(TransactionInterface::RESULT);
+    }
+
+    /**
+     * @param bool $cardHolderMessageMustBeShown
+     */
+    public function setCardHolderMessageMustBeShown($cardHolderMessageMustBeShown)
+    {
+        $this->setData(TransactionInterface::CARD_HOLDER_MESSAGE_MUST_BE_SHOWN, filter_var($cardHolderMessageMustBeShown, FILTER_VALIDATE_BOOLEAN));
+    }
+
+    /**
+     * @return bool
+     */
+    public function getCardHolderMessageMustBeShown()
+    {
+        return $this->getData(TransactionInterface::CARD_HOLDER_MESSAGE_MUST_BE_SHOWN);
+    }
+
+    /**
+     * @param string|null $customerErrorMessage
+     */
+    public function setCustomerErrorMessage($customerErrorMessage)
+    {
+        $this->setData(TransactionInterface::CUSTOMER_ERROR_MESSAGE, $customerErrorMessage);
+    }
+
+    /**
+     * @return string
+     */
+    public function getCustomerErrorMessage()
+    {
+        return (string)$this->getData(TransactionInterface::CUSTOMER_ERROR_MESSAGE);
+    }
+
+    /**
+     * @param string|null $merchantErrorMessage
+     */
+    public function setMerchantErrorMessage($merchantErrorMessage)
+    {
+        $this->setData(TransactionInterface::MERCHANT_ERROR_MESSAGE, $merchantErrorMessage);
+    }
+
+    /**
+     * @return string
+     */
+    public function getMerchantErrorMessage()
+    {
+        return (string)$this->getData(TransactionInterface::MERCHANT_ERROR_MESSAGE);
+    }
+
+    /**
+     * @param string|null $fraudRiskScore
+     */
+    public function setFraudRiskScore($fraudRiskScore)
+    {
+        $this->setData(TransactionInterface::FRAUD_RISK_SCORE, $fraudRiskScore);
+    }
+
+    /**
+     * @return string
+     */
+    public function getFraudRiskScore()
+    {
+        return (string)$this->getData(TransactionInterface::FRAUD_RISK_SCORE);
+    }
+
+    /**
+     * @param string|null $fraudExplanation
+     */
+    public function setFraudExplanation($fraudExplanation)
+    {
+        $this->setData(TransactionInterface::FRAUD_EXPLANATION, $fraudExplanation);
+    }
+
+    /**
+     * @return string
+     */
+    public function getFraudExplanation()
+    {
+        return (string)$this->getData(TransactionInterface::FRAUD_EXPLANATION);
+    }
+
+    /**
+     * @param string|null $fraudRecommendation
+     */
+    public function setFraudRecommendation($fraudRecommendation)
+    {
+        $this->setData(TransactionInterface::FRAUD_RECOMMENDATION, $fraudRecommendation);
+    }
+
+    /**
+     * @return string
+     */
+    public function getFraudRecommendation()
+    {
+        return (string)$this->getData(TransactionInterface::FRAUD_RECOMMENDATION);
     }
 }
