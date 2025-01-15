@@ -81,6 +81,7 @@ class Fail extends Index implements CsrfAwareActionInterface
                 case "failed":
                 case "error":
                 case "incomplete":
+                case "declined":
                     $this->generator->handleFailedStatusAction($this->getRequest(), $msg, $merchantError, $status);
                     break;
                 default:
