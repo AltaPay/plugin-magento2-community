@@ -103,8 +103,8 @@ class Cancel extends Action implements CsrfAwareActionInterface
         $orderId = $this->_checkoutSession->getLastOrderId();
         if ($orderId) {
             $order = $this->_orderRepository->get($orderId);
-            $this->orderManagement->cancel($order->getId());
-            $order->addStatusHistoryComment("Apple Pay payment status - " . $order->getStatus());
+            $order->addStatusHistoryComment("Apple Pay payment status - Pending");
+            $order->setStatus(Order::STATE_PENDING_PAYMENT);
             $order->setIsNotified(false);
             $order->getResource()->save($order);
             $quote = $this->_quoteFactory->create()->loadByIdWithoutStore($order->getQuoteId());

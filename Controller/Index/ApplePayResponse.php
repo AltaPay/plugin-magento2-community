@@ -131,7 +131,7 @@ class ApplePayResponse extends Action implements CsrfAwareActionInterface
                 if ($status === 'error') {
                     $message     = (is_array($params) && isset($params['message'])) ? $params['message'] : 'error occured';
                     $order       = $this->_orderRepository->get($orderId);
-                    $orderStatus = Order::STATE_CANCELED;
+                    $orderStatus = Order::STATE_PENDING_PAYMENT;
                     $order->setState($orderStatus)->setStatus($orderStatus);
                     $order->addStatusHistoryComment($message);
                     $order->setIsNotified(false);

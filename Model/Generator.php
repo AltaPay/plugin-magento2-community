@@ -273,22 +273,12 @@ class Generator
         $callback = new Callback($request->getPostValue());
         $response = $callback->call();
         if ($response) {
-            $order             = $this->loadOrderFromCallback($response);
-            //check if order status set in configuration
-            $statusKey         = Order::STATE_CANCELED;
-            $storeCode         = $order->getStore()->getCode();
-            $storeScope        = ScopeInterface::SCOPE_STORE;
+            $order = $this->loadOrderFromCallback($response);
+            $orderTransactionId = $order->getPayment()->getLastTransId();
+            // Return if the incoming transaction id is different from order transaction id
+            if (!empty($orderTransactionId) && $orderTransactionId != $response->transactionId) return;
 
-            if (!$this->validateTransactionId($response->shopOrderId, $response->transactionId)) {
-                return false;
-            }
-
-            $orderStatusCancel = $this->systemConfig->getStatusConfig('cancel', $storeScope, $storeCode);
-            
-            if ($orderStatusCancel) {
-                $statusKey = $orderStatusCancel;
-            }
-            $this->handleOrderStateAction($request, Order::STATE_CANCELED, $statusKey, $historyComment);
+            $this->handleOrderStateAction($request, Order::STATE_PENDING_PAYMENT, $historyComment);
             //save failed transaction data
             $this->saveTransactionData($response, $order);
         }
@@ -343,29 +333,17 @@ class Generator
         $callback = new Callback($request->getPostValue());
         $response = $callback->call();
         if ($response) {
+            $order = $this->loadOrderFromCallback($response);
+            $orderTransactionId = $order->getPayment()->getLastTransId();
+            // Return if the incoming transaction id is different from order transaction id
+            if (!empty($orderTransactionId) && $orderTransactionId != $response->transactionId) return;
             $reservationAmount = $this->getReservedAmount($response);
-
-            if (!$this->validateTransactionId($response->shopOrderId, $response->transactionId)) {
-                return false;
-            }
-
             // Check if the payment status is "error" and if the reservation amount is greater than 0.
             if ($response->status === "error" && $reservationAmount > 0) {
                 return;
             }
-
-            $order             = $this->loadOrderFromCallback($response);
             $transInfo = $this->getTransactionInfoFromResponse($response);
-            //check if order status set in configuration
-            $statusKey         = Order::STATE_CANCELED;
-            $storeCode         = $order->getStore()->getCode();
-            $storeScope        = ScopeInterface::SCOPE_STORE;
-            $orderStatusCancel = $this->systemConfig->getStatusConfig('cancel', $storeScope, $storeCode);
-
-            if ($orderStatusCancel) {
-                $statusKey = $orderStatusCancel;
-            }
-            $this->handleOrderStateAction($request, Order::STATE_CANCELED, $statusKey, $historyComment, $transInfo);
+            $this->handleOrderStateAction($request, Order::STATE_PENDING_PAYMENT, $historyComment, $transInfo);
             //save failed transaction data
             $this->saveTransactionData($response, $order);
         }
@@ -384,17 +362,14 @@ class Generator
     /**
      * @param RequestInterface $request
      * @param string           $orderState
-     * @param string           $orderStatus
      * @param string           $historyComment
      * @param null             $transactionInfo
      *
      * @return bool
-     * @throws AlreadyExistsException
      */
     public function handleOrderStateAction(
         RequestInterface $request,
         $orderState = Order::STATE_NEW,
-        $orderStatus = Order::STATE_NEW,
         $historyComment = "Order state changed",
         $transactionInfo = null
     ) {
@@ -402,22 +377,17 @@ class Generator
         $response = $callback->call();
         if ($response) {
             $order = $this->loadOrderFromCallback($response);
-
-            if (!$this->validateTransactionId($response->shopOrderId, $response->transactionId)) {
-                return false;
-            }
-
-            if ($orderStatus === 'canceled') {
-                $order->cancel();
-            } else {
-                $this->checkoutSession->setAltapayCustomerRedirect(true);
-            }
+            $orderTransactionId = $order->getPayment()->getLastTransId();
+            // Return if the incoming transaction id is different from order transaction id
+            if(!empty($orderTransactionId) && $orderTransactionId != $response->transactionId) return;
+            $this->checkoutSession->setAltapayCustomerRedirect(true);
             $order->setState($orderState);
+            $order->setStatus($orderState);
             $order->setIsNotified(false);
             if ($transactionInfo !== null) {
                 $order->addStatusHistoryComment($transactionInfo);
             }
-            $order->addStatusHistoryComment($historyComment, $orderStatus);
+            $order->addStatusHistoryComment($historyComment);
             $order->getResource()->save($order);
 
             return true;
@@ -472,9 +442,8 @@ class Generator
 
             $latestTransKey = $this->helper->getLatestTransaction($response->Transactions);
             $transaction    = $response->Transactions[$latestTransKey];
-            if (!$this->validateTransactionId($shopOrderId, $transactionId)) {
-                return false;
-            }
+            // Return if the incoming transaction id is different from order transaction id
+            if(!empty($payment->getLastTransId()) && $payment->getLastTransId() != $transactionId) return;
 
             if ($paymentStatus === 'released') {
                 $this->handleCancelStatusAction($request, $response->status);
@@ -496,14 +465,7 @@ class Generator
                 $transStatus = $transaction->TransactionStatus;
 
                 if (isset($transaction) && $authType === 'subscription_payment' && $transStatus !== 'captured') {
-                    //check if order status set in configuration
-                    $statusKey         = Order::STATE_CANCELED;
-                    $orderStatusCancel = $this->systemConfig->getStatusConfig('cancel', $storeScope, $storeCode);
-
-                    if ($orderStatusCancel) {
-                        $statusKey = $orderStatusCancel;
-                    }
-                    $this->handleOrderStateAction($request, Order::STATE_CANCELED, $statusKey, $historyComment);
+                    $this->handleOrderStateAction($request, Order::STATE_PENDING_PAYMENT, $historyComment);
                     //save failed transaction data
                     $this->saveTransactionData($response, $order);
 
@@ -691,17 +653,11 @@ class Generator
                 }
             }
             if ($checkRejectionCase) {
-                //check if order status set in configuration
-                $statusKey         = Order::STATE_CANCELED;
-                $orderStatusCancel = $this->systemConfig->getStatusConfig('cancel', $storeScope, $storeCode);
                 //Save payment info in order to retrieve it for release operation
                 if ($order->getId()) {
                     $this->savePaymentData($response, $order);
                 }
-                if ($orderStatusCancel) {
-                    $statusKey = $orderStatusCancel;
-                }
-                $this->handleOrderStateAction($request, Order::STATE_CANCELED, $statusKey, $historyComment, $transInfo);
+                $this->handleOrderStateAction($request, Order::STATE_PENDING_PAYMENT, $historyComment, $transInfo);
                 //save failed transaction data
                 $this->saveTransactionData($response, $order);
             }
@@ -901,7 +857,7 @@ class Generator
                 if ($order->getId()) {
                     $this->savePaymentData($response, $order);
                 }
-                $this->handleOrderStateAction($request, Order::STATE_PAYMENT_REVIEW, "fraud", $message, $transInfo);
+                $this->handleOrderStateAction($request, Order::STATE_PAYMENT_REVIEW, $message, $transInfo);
                 //save failed transaction data
                 $this->saveTransactionData($response, $order);
 
