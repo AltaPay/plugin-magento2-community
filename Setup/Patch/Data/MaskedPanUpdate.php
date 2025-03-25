@@ -75,6 +75,6 @@ class MaskedPanUpdate implements DataPatchInterface
      */
     public static function getVersion()
     {
-        return '4.0.6';
+        return '4.0.7';
     }
 }

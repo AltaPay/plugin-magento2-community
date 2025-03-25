@@ -1,6 +1,10 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [4.0.7]
+### Added
+- Add "Cancel Forcefully" action to mark order as canceled in Magento only.
+
 ## [4.0.6]
 ### Fixed
 - Update handling of order statuses.

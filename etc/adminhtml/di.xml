@@ -17,4 +17,7 @@
             </argument>
         </arguments>
     </type>
+   <type name="Magento\Sales\Block\Adminhtml\Order\View">
+        <plugin name="addForceCancelButton" type="SDM\Altapay\Plugin\Block\Adminhtml\Order\View"/>
+   </type>
 </config>
