@@ -146,7 +146,7 @@ $block->getViewFileUrl('SDM_Altapay::css/ordersummary.css') ?>">
                                                 <?= $block->escapeHtml($item->getName()); ?>
                                             </strong>
                                             <div class="details-qty">
-                                                <span class="label"><span>Qty</span></span>
+                                                <span class="label"><span><?= $block->escapeHtml(__('Qty')) ?></span></span>
                                                 <span class="value">
                                                     <?= $block->escapeHtml((int)$item->getQtyOrdered()); ?>
                                                 </span>
