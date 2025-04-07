@@ -17,6 +17,7 @@ use Magento\Framework\Event\ObserverInterface;
 use SDM\Altapay\Model\SystemConfig;
 use Altapay\Api\Payments\RefundCapturedReservation;
 use SDM\Altapay\Helper\Config as storeConfig;
+use Magento\Framework\App\CacheInterface;
 
 class OrderCancelObserver implements ObserverInterface
 {
@@ -32,17 +33,25 @@ class OrderCancelObserver implements ObserverInterface
     private $storeConfig;
 
     /**
+     * @var CacheInterface
+     */
+    private $cache;
+
+    /**
      * OrderCancelObserver constructor.
      *
      * @param SystemConfig $systemConfig
      * @param storeConfig $storeConfig
+     * @param CacheInterface $cache
      */
     public function __construct(
         SystemConfig $systemConfig,
-        storeConfig $storeConfig)
+        storeConfig $storeConfig,
+        CacheInterface $cache)
     {
         $this->systemConfig = $systemConfig;
         $this->storeConfig  = $storeConfig;
+        $this->cache        = $cache;
     }
 
     /**
@@ -62,6 +71,13 @@ class OrderCancelObserver implements ObserverInterface
         $baseCurrency   = $this->storeConfig->useBaseCurrency($moduleVersion);
         $grandTotal     = $baseCurrency ? $order->getBaseGrandTotal() : $order->getGrandTotal();
 
+        $key              = 'altapay_cancel_forcefully_' . $order->getId();
+        $cancelForcefully = $this->cache->load($key);
+
+        if ($cancelForcefully) {
+            return;
+        }
+
         if (in_array($payment->getMethod(), SystemConfig::getTerminalCodes()) && $payment->getLastTransId()) {
             if ($payment->getAdditionalInformation('payment_type') === "paymentAndCapture") {
                 $api = new RefundCapturedReservation($this->systemConfig->getAuth($order->getStore()->getCode()));
@@ -76,7 +92,9 @@ class OrderCancelObserver implements ObserverInterface
                 if ($response->Result != 'Success') {
                     throw new \InvalidArgumentException('Could not release reservation');
                 }
-            } catch (ResponseHeaderException $e) {
+            } catch (\Exception $e) {
+                $key = 'altapay_release_failed_' . $order->getId();
+                $this->cache->save(true, $key, ['release_failed'], 60 * 60);
                 throw $e;
             }
         }
