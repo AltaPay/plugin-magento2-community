@@ -1,6 +1,10 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [4.0.8]
+### Added
+- Prevent duplicate status update.
+
 ## [4.0.7]
 ### Added
 - Add "Cancel Forcefully" action to mark order as canceled in Magento only.
