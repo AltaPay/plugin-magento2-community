@@ -552,8 +552,13 @@ class Generator
                 if ($setOrderStatus) {
                     $this->paymentHandler->setCustomOrderStatus($order, $orderState, $statusKey);
                 }
-                $order->addStatusHistoryComment($comment);
-                $order->addStatusHistoryComment($this->getTransactionInfoFromResponse($response));
+                $transactionComment = $this->getTransactionInfoFromResponse($response);
+                if (!$this->hasOrderComment($order, $comment)) {
+                    $order->addStatusHistoryComment($comment);
+                }
+                if (!$this->hasOrderComment($order, $transactionComment)) {
+                    $order->addStatusHistoryComment($transactionComment);
+                }
                 $order->setIsNotified(false);
                 $order->getResource()->save($order);
 
@@ -940,5 +945,20 @@ class Generator
 
         return true;
     }
-
+    /**
+     * Check if the given comment already exists in the order's status history.
+     *
+     * @param Order $order
+     * @param string $commentText
+     * @return bool
+     */
+    private function hasOrderComment(Order $order, $commentText)
+    {
+        foreach ($order->getStatusHistoryCollection() as $history) {
+            if (trim($history->getComment()) === trim($commentText)) {
+                return true;
+            }
+        }
+        return false;
+    }  
 }
