@@ -62,22 +62,17 @@ Before configuring the plugin, you need the below information. These can
 be provided by AltaPay.
 
 1.  AltaPay credentials:
-
--   Username
-
--   Password
-
+    -   Username
+    -   Password
 2.  AltaPay gateway information:
-
--   Terminal
-
--   Gateway
-
+    -   Terminal
+    -   Gateway
 3.  The package manager Composer (https://getcomposer.org/) must be
     installed on the server side.
-
-4.  Your private and public keys must be located at 'repo.magento.com'
+4.  Your private and public keys must be located at **repo.magento.com**
     when installing the AltaPay module.
+
+> **Note:** If the API user credentials have not yet been created, refer to the [Creating a New API User](#creating-a-new-api-user) section for step-by-step instructions.
 
 ## Installation
 
@@ -353,6 +348,27 @@ In order to reconcile payments on Magento please follow the steps below:
 _For Magneto 2.2 and below version please install the extension from
 here._  
 <https://packagist.org/packages/altapay/magento2-payment>
+
+## Creating a New API User
+
+To create a new API user in your AltaPay account, please follow these steps:
+
+- Log in to your AltaPay account.
+- From the left menu, navigate to **Settings** > **API Keys**.
+
+    ![api_key](docs/api_keys.png)
+    
+- Click on the **Create New API Key** button from top right corner.
+- Fill in the required fields:
+    - **Your current password**  
+    - **Username**  
+    - **Password**  
+    - **Assign Shops**
+    
+    ![api_key](docs/create_api_key.png)
+- After entering the details, click **Create**.
+
+The new credentials can now be used as the API Login and API Password in the AltaPay API Login section.
 
 ## Styling
 
