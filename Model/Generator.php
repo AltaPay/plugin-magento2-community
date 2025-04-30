@@ -34,6 +34,7 @@ use SDM\Altapay\Model\TokenFactory;
 use SDM\Altapay\Helper\Data;
 use SDM\Altapay\Model\ReconciliationIdentifierFactory;
 use SDM\Altapay\Model\Handler\CreateCreditMemo;
+use Magento\Sales\Api\OrderRepositoryInterface;
 /**
  * Class Generator
  * Handle the create payment related functionality.
@@ -137,6 +138,11 @@ class Generator
     protected $creditMemo;
 
     /**
+     * @var OrderRepositoryInterface
+     */
+    protected $orderRepository;
+
+    /**
      * Generator constructor.
      *
      * @param Quote                           $quote
@@ -180,7 +186,8 @@ class Generator
         TokenFactory $dataToken,
         Data $helper,
         ReconciliationIdentifierFactory $reconciliation,
-        CreateCreditMemo $creditMemo
+        CreateCreditMemo $creditMemo,
+        OrderRepositoryInterface $orderRepository
     ) {
         $this->quote                 = $quote;
         $this->checkoutSession       = $checkoutSession;
@@ -202,6 +209,7 @@ class Generator
         $this->helper                = $helper;
         $this->reconciliation        = $reconciliation;
         $this->creditMemo            = $creditMemo;
+        $this->orderRepository       = $orderRepository;
     }
 
     /**
@@ -412,36 +420,21 @@ class Generator
      */
     private function completeCheckout($comment, RequestInterface $request)
     {
-        $cardType       = '';
-        $expires        = '';
-        $setOrderStatus = true;
-        $unscheduledType = null;
-        $storeScope     = ScopeInterface::SCOPE_STORE;
         $callback       = new Callback($request->getPostValue());
-        try {
-            $response                = $callback->call();
-            $paymentType             = $response->type;
-            $paymentStatus           = strtolower($response->paymentStatus);
-            $ccToken                 = $response->creditCardToken;
-            $paymentId               = $response->paymentId;
-            $transactionId           = $response->transactionId;
-            $orderState              = Order::STATE_PROCESSING;
-            $statusKey               = 'process';
-            $status                  = $response->status;
-            $shopOrderId             = $response->shopOrderId;
-            $order                   = $this->orderLoader->getOrderByOrderIncrementId($shopOrderId);
-            $payment                 = $order->getPayment();
-            $storeCode               = $order->getStore()->getCode();
-            $orderStatusAfterPayment = $this->systemConfig->getStatusConfig('process', $storeScope, $storeCode);
-            $orderStatusCapture      = $this->systemConfig->getStatusConfig('autocapture', $storeScope, $storeCode);
-            $responseComment         = __(ConstantConfig::CONSUMER_CANCEL_PAYMENT);
-            $historyComment          = __(ConstantConfig::CANCELLED) . '|' . $responseComment;
-            $agreementConfig         = $this->getConfigValue($response, $storeScope, $storeCode, "agreementtype");
-            $unscheduledTypeConfig   = $this->getConfigValue($response, $storeScope, $storeCode, "unscheduledtype");
-            $saveCardToken           = $this->getConfigValue($response, $storeScope, $storeCode, "savecardtoken");
+        $response       = $callback->call();
+        if ($response) {
+            $order = $this->orderLoader->getOrderByOrderIncrementId($response->shopOrderId);
+            if (in_array($order->getStatus(), $this->getAllowedStatuses(), true)) {
+                if (!$order->getEmailSent()) {
+                    $this->orderSender->send($order);
+                }
+                return;
+            }
+            $paymentType = $response->type;
+            $paymentStatus = strtolower($response->paymentStatus);
+            $transactionId = $response->transactionId;
+            $payment = $order->getPayment();
 
-            $latestTransKey = $this->helper->getLatestTransaction($response->Transactions);
-            $transaction    = $response->Transactions[$latestTransKey];
             // Return if the incoming transaction id is different from order transaction id
             if(!empty($payment->getLastTransId()) && $payment->getLastTransId() != $transactionId) return;
 
@@ -449,6 +442,11 @@ class Generator
                 $this->handleCancelStatusAction($request, $response->status);
                 return false;
             }
+
+            $latestTransKey = $this->helper->getLatestTransaction($response->Transactions);
+            $transaction = $response->Transactions[$latestTransKey];
+            $status = $response->status;
+
             if ($status === 'succeeded' && $paymentStatus === 'bank_payment_refunded'
                 && $transactionId == $payment->getLastTransId()) {
 
@@ -465,6 +463,8 @@ class Generator
                 $transStatus = $transaction->TransactionStatus;
 
                 if (isset($transaction) && $authType === 'subscription_payment' && $transStatus !== 'captured') {
+                    $responseComment = __(ConstantConfig::CONSUMER_CANCEL_PAYMENT);
+                    $historyComment = __(ConstantConfig::CANCELLED) . '|' . $responseComment;
                     $this->handleOrderStateAction($request, Order::STATE_PENDING_PAYMENT, $historyComment);
                     //save failed transaction data
                     $this->saveTransactionData($response, $order);
@@ -473,16 +473,25 @@ class Generator
                 }
             }
 
+            $storeScope = ScopeInterface::SCOPE_STORE;
+            $storeCode = $order->getStore()->getCode();
             if ($order->getId()) {
                 //Update stock quantity
                 if ($order->getState() == 'canceled') {
                     $this->updateStockQty($order);
                 }
                 $this->resetCanceledQty($order);
+                $agreementConfig = $this->getConfigValue($response, $storeScope, $storeCode, "agreementtype");
+                $unscheduledTypeConfig = $this->getConfigValue($response, $storeScope, $storeCode, "unscheduledtype");
+                $saveCardToken = $this->getConfigValue($response, $storeScope, $storeCode, "savecardtoken");
+                $unscheduledType = null;
+                $lastFourDigits = '';
+                $cardType = '';
+                $expires = '';
                 if (isset($response->Transactions[$latestTransKey])) {
                     $transaction = $response->Transactions[$latestTransKey];
                     $lastFourDigits = $transaction->CardInformation->LastFourDigits;
-                    if (isset($transaction->CreditCardExpiry->Month) && isset($transaction->CreditCardExpiry->Year)) {
+                    if (isset($transaction->CreditCardExpiry->Month, $transaction->CreditCardExpiry->Year)) {
                         $expires = $transaction->CreditCardExpiry->Month . '/' . $transaction->CreditCardExpiry->Year;
                     }
                     if (isset($transaction->PaymentSchemeName)) {
@@ -500,8 +509,8 @@ class Generator
                         $model = $this->dataToken->create();
                         $model->addData([
                             "customer_id" => $order->getCustomerId(),
-                            "payment_id" => $paymentId,
-                            "token" => $ccToken,
+                            "payment_id" => $response->paymentId,
+                            "token" => $response->creditCardToken,
                             "agreement_id" => $transactionId,
                             "agreement_type" => $agreementType,
                             "agreement_unscheduled" => $unscheduledType,
@@ -519,10 +528,10 @@ class Generator
 
                     $this->saveReconciliationData($transaction, $order);
                 }
-                $payment->setPaymentId($paymentId);
+                $payment->setPaymentId($response->paymentId);
                 $payment->setLastTransId($transaction->TransactionId);
                 $payment->setCcTransId($response->creditCardToken);
-                $payment->setAdditionalInformation('cc_token', $ccToken);
+                $payment->setAdditionalInformation('cc_token', $response->creditCardToken);
                 $payment->setAdditionalInformation('last_four_digits', $lastFourDigits);
                 $payment->setAdditionalInformation('expires', $expires);
                 $payment->setAdditionalInformation('card_type', $cardType);
@@ -536,6 +545,11 @@ class Generator
                 //save transaction data
                 $this->saveTransactionData($response, $order);
 
+                $orderStatusAfterPayment = $this->systemConfig->getStatusConfig('process', $storeScope, $storeCode);
+                $orderStatusCapture = $this->systemConfig->getStatusConfig('autocapture', $storeScope, $storeCode);
+                $setOrderStatus  = true;
+                $orderState = Order::STATE_PROCESSING;
+                $statusKey  = 'process';
                 if ($this->isCaptured($response, $storeCode, $storeScope, $latestTransKey) && $orderStatusCapture == "complete")
                 {
                     if ($this->orderLines->sendShipment($order)) {
@@ -549,25 +563,77 @@ class Generator
                 } elseif ($orderStatusAfterPayment) {
                     $orderState = $orderStatusAfterPayment;
                 }
-                if ($setOrderStatus) {
+                if ($setOrderStatus && $order->getStatus() === $this->systemConfig->getStatusConfig('before', $storeScope, $storeCode)) {
                     $this->paymentHandler->setCustomOrderStatus($order, $orderState, $statusKey);
+                } elseif ($setOrderStatus && $order->getStatus() === 'canceled' && !in_array($paymentStatus, ['epayment_cancelled', 'released'])) {
+                    try {
+                        if ($order->isCanceled() || $order->getStatus() == 'canceled') {
+                            $productStockQty = [];
+                            foreach ($order->getAllVisibleItems() as $item) {
+                                $productStockQty[$item->getProductId()] = $item->getQtyCanceled();
+                                foreach ($item->getChildrenItems() as $child) {
+                                    $productStockQty[$child->getProductId()] = $item->getQtyCanceled();
+                                    $child->setQtyCanceled(0);
+                                    $child->setTaxCanceled(0);
+                                    $child->setDiscountTaxCompensationCanceled(0);
+                                }
+                                $item->setQtyCanceled(0);
+                                $item->setTaxCanceled(0);
+                                $item->setDiscountTaxCompensationCanceled(0);
+                            }
+
+                            $order->setSubtotalCanceled(0);
+                            $order->setBaseSubtotalCanceled(0);
+                            $order->setTaxCanceled(0);
+                            $order->setBaseTaxCanceled(0);
+                            $order->setShippingCanceled(0);
+                            $order->setBaseShippingCanceled(0);
+                            $order->setDiscountCanceled(0);
+                            $order->setBaseDiscountCanceled(0);
+                            $order->setTotalCanceled(0);
+                            $order->setBaseTotalCanceled(0);
+                            $order->setState(Order::STATE_PROCESSING);
+                            $order->setStatus(Order::STATE_PROCESSING);
+                            $comment = __("The order was un-canceled by the callback");
+                            $order->addStatusHistoryComment($comment, false);
+
+                            /* Reverting inventory (uncommented because it is handled by the Business Central integration) */
+                            $itemsForReindex = $this->stockManagement->registerProductsSale(
+                                $productStockQty,
+                                $order->getStore()->getWebsiteId()
+                            );
+                            $productIds = [];
+                            foreach ($itemsForReindex as $item) {
+                                $item->save();
+                                $productIds[] = $item->getProductId();
+                            }
+                            if (!empty($productIds)) {
+                                $this->stockIndexerProcessor->reindexList($productIds);
+                            }
+                            $order->setInventoryProcessed(true);
+                        }
+                    } catch (\Exception $e) {
+                        $this->altapayLogger->addCriticalLog('Exception', $e->getMessage());
+                    }
                 }
-                $transactionComment = $this->getTransactionInfoFromResponse($response);
                 if (!$this->hasOrderComment($order, $comment)) {
                     $order->addStatusHistoryComment($comment);
                 }
+                $transactionComment = $this->getTransactionInfoFromResponse($response);
                 if (!$this->hasOrderComment($order, $transactionComment)) {
                     $order->addStatusHistoryComment($transactionComment);
                 }
                 $order->setIsNotified(false);
-                $order->getResource()->save($order);
+                try {
+                    $this->orderRepository->save($order);
+                } catch (\Exception $e) {
+                    $this->orderRepository->save($order);
+                }
 
                 if (strtolower($paymentType) === 'paymentandcapture' || strtolower($paymentType) === 'subscriptionandcharge') {
                     $this->createInvoice($order);
                 }
             }
-        } catch (\Exception $e) {
-            $this->altapayLogger->addCriticalLog('Exception', $e->getMessage());
         }
     }
 
@@ -620,7 +686,7 @@ class Generator
      *
      * @param $order
      */
-    private function sendOrderConfirmationEmail($order)
+    public function sendOrderConfirmationEmail($order)
     {
         if ($order->getEmailSent()) {
             return;
@@ -960,5 +1026,15 @@ class Generator
             }
         }
         return false;
-    }  
+    }
+
+    /**
+     * Get a list of statuses that allow order email sending.
+     *
+     * @return array
+     */
+    public function getAllowedStatuses(): array
+    {
+        return ['processing', 'complete'];
+    }
 }

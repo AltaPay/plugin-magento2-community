@@ -41,7 +41,7 @@ abstract class ConstantConfig
     const CANCELLED = 'cancelled';
     const SUCCESS = 'success';
     const AUTH_MESSAGE = 'Could not authenticate with API';
-    const ERROR_MESSAGE = 'error occured';
+    const ERROR_MESSAGE = 'error occurred';
     const UNKNOWN_PAYMENT_STATUS_CONSUMER = 'An error has occured! Please contact the shop!';
     const UNKNOWN_PAYMENT_STATUS_MERCHANT = 'Unknown payment status. Please contact Altapay!';
 }

@@ -108,13 +108,13 @@ class OrderLinesHandler
         $unitPrice = $baseCurrency ? ($item->getBasePrice() ?? 0) : ($item->getPrice() ?? 0);
 
         if ($newOrder) {
-            $quantity     = $item->getQtyOrdered();
+            $quantity     = round($item->getQtyOrdered());
             $itemId       = $item->getItemId();
             $productUrl   = $item->getProduct()->getProductUrl();
             $productThumb = $item->getProduct()->getThumbnail();
             $options      = $item->getData('product_options');
         } else {
-            $quantity     = $item->getQty();
+            $quantity     = round($item->getQty());
             $itemId       = $item->getOrderItem()->getItemId();
             $productUrl   = $item->getOrderItem()->getProduct()->getProductUrl();
             $productThumb = $item->getOrderItem()->getProduct()->getThumbnail();
@@ -127,7 +127,7 @@ class OrderLinesHandler
         $itemName              = $this->escaper->escapeHtml($itemName);
         $orderLine             = new OrderLine($itemName, $itemId, $quantity, $unitPrice);
         $orderLine->discount   = 0;
-        $orderLine->taxAmount  = $taxAmount;
+        $orderLine->taxAmount  = round($taxAmount, 2);
         $orderLine->productUrl = $productUrl;
         if (!empty($productThumb) && $productThumb !== 'no_selection') {
             $orderLine->imageUrl = $this->storeConfig->getProductImageUrl($order, $productThumb);
@@ -159,7 +159,7 @@ class OrderLinesHandler
         $shippingAmount = round($shippingAmount, 2);
 
         $orderLine            = new OrderLine($method, $carrier_code, 1, $shippingAmount);
-        $orderLine->taxAmount = $shippingTax;
+        $orderLine->taxAmount = round($shippingTax, 2);
         $orderLine->discount  = 0;
         $orderLine->setGoodsType('shipment');
 

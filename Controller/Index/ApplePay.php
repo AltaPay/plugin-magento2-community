@@ -10,7 +10,6 @@
 namespace SDM\Altapay\Controller\Index;
 
 use SDM\Altapay\Model\SystemConfig;
-use Altapay\Api\Test\TestAuthentication;
 use Altapay\Api\Payments\CardWalletSession;
 use SDM\Altapay\Helper\Config as storeConfig;
 use Magento\Framework\App\ResponseInterface;
@@ -100,11 +99,6 @@ class ApplePay extends Action implements CsrfAwareActionInterface
         $currentUrl = $this->_urlInterface->getBaseUrl();
         $domain = parse_url($currentUrl, PHP_URL_HOST);
         $auth     = $this->systemConfig->getAuth($storeCode);
-        $api      = new TestAuthentication($auth);
-        $response = $api->call();
-        if (!$response) {
-            return false;
-        }
         $request = new CardWalletSession($auth);
         $request->setTerminal($terminalName)
                 ->setValidationUrl($validationUrl)

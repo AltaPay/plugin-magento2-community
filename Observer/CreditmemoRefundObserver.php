@@ -157,7 +157,7 @@ class CreditmemoRefundObserver implements ObserverInterface
      *
      * @return array
      */
-    private function itemOrderLines($memo)
+    public function itemOrderLines($memo)
     {
         $orderLines       = [];
         $moduleVersion    = $memo->getOrder()->getModuleVersion() ? $memo->getOrder()->getModuleVersion() : '';

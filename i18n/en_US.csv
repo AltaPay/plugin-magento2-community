@@ -79,5 +79,5 @@
 "error","error"
 "success","success"
 "Could not authenticate with API","Could not authenticate with API"
-"error occured","error occured"
+"error occurred","error occurred"
 "Please click on the link to complete the payment </br> <a href=""%formurl"">%formurl</a>","Please click on the link to complete the payment </br> <a href=""%formurl"">%formurl</a>"
