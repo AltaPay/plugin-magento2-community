@@ -11,7 +11,7 @@ on:
 jobs:
   terraform:
     name: 'Terraform'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     outputs:
       ip: ${{ steps.expose_ip.outputs.ip}}
 
