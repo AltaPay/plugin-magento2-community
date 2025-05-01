@@ -80,5 +80,5 @@
 "error","feil"
 "success","suksess"
 "Could not authenticate with API","Kunne ikke godkjenne med API"
-"error occured","feil oppstod"
+"error occurred","feil oppstod"
 "Please click on the link to complete the payment </br> <a href=""%formurl"">%formurl</a>","Klikk på lenken for å fullføre betalingen </br> <a href=""%formurl"">%formurl</a>"

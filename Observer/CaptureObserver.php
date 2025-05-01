@@ -161,7 +161,7 @@ class CaptureObserver implements ObserverInterface
      *
      * @return array
      */
-    private function itemOrderLines($invoice)
+    public function itemOrderLines($invoice)
     {
         $orderLines       = [];
         $moduleVersion    = $invoice->getOrder()->getModuleVersion() ? $invoice->getOrder()->getModuleVersion() : '';
@@ -175,7 +175,6 @@ class CaptureObserver implements ObserverInterface
                 ($qty > 0 && $productType != 'bundle' && $priceInclTax) ||
                 ($productType === "bundle" && $item->getOrderItem()->getProduct()->getPriceType() == Price::PRICE_TYPE_FIXED)
             ) {
-                $taxAmount = $item->getTaxAmount();
                 $orderLines[] = $this->orderLines->itemOrderLine($item, $invoice->getOrder(), false);
 
             }

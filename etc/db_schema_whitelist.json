@@ -34,6 +34,9 @@
             "altapay_price_includes_tax": true,
             "altapay_order_hash": true,
             "module_version": true
+        },
+        "index": {
+            "ALTAPAY_HASH": true
         }
     },
     "altapay_token": {

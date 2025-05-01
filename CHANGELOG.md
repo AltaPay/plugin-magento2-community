@@ -1,6 +1,15 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [4.0.9]
+### Added
+- Avoid unnecessary extra API calls in the daily flow.
+- Make `itemOrderLines` public to allow creation of plugins.
+- Return a generic error message to the customer when a payment fails.
+- Streamline order lines for payment, capture, and refund operations.
+### Fixed
+- Corrected a spelling mistake in an error message.
+
 ## [4.0.8]
 ### Added
 - Prevent duplicate status update.

@@ -16,7 +16,6 @@ use Altapay\Api\Payments\CardWalletAuthorize;
 use SDM\Altapay\Model\ApplePayOrder;
 use Altapay\Request\Config;
 use Altapay\Api\Ecommerce\PaymentRequest;
-use Altapay\Api\Test\TestAuthentication;
 use Altapay\Exceptions\ClientException;
 use Altapay\Exceptions\ResponseHeaderException;
 use Altapay\Exceptions\ResponseMessageException;
@@ -317,7 +316,7 @@ class Gateway implements GatewayInterface
      * @param $order
      * @return array
      */
-    private function itemOrderLines($order)
+    public function itemOrderLines($order)
     {
         $orderLines = [];
         foreach ($order->getAllItems() as $item) {
@@ -328,8 +327,7 @@ class Gateway implements GatewayInterface
             }
 
             if (
-                ($productType != "bundle" &&
-                    $parentItemType != "configurable") ||
+                ($productType != "bundle" && $parentItemType != "configurable") ||
                 ($productType === "bundle" && $item->getProduct()->getPriceType() == Price::PRICE_TYPE_FIXED)
             ) {
                 $orderLines[] = $this->orderLines->itemOrderLine($item, $order, true);
@@ -371,25 +369,13 @@ class Gateway implements GatewayInterface
         $baseUrl = $this->storeManager->getStore()->getBaseUrl();
         $storeCode = $order->getStore()->getCode();
         $isReservation = false;
-        //Authenticate the connection with the Payment Gateway
         $auth = $this->systemConfig->getAuth($storeCode);
-        $api = new TestAuthentication($auth);
-        $response = $api->call();
-        if (!$response) {
-            return false;
-        }
         $terminalName = $this->systemConfig->getTerminalConfig($terminalId, 'terminalname', $storeScope, $storeCode);
         $isApplePay = $this->systemConfig->getTerminalConfig($terminalId, 'isapplepay', $storeScope, $storeCode);
         $agreementConfig = $this->systemConfig->getTerminalConfig($terminalId, 'agreementtype', $storeScope, $storeCode);
         $unscheduledTypeConfig = $this->systemConfig->getTerminalConfig($terminalId, 'unscheduledtype', $storeScope, $storeCode);
         $savecardtoken = $this->systemConfig->getTerminalConfig($terminalId, 'savecardtoken', $storeScope, $storeCode);
-        $agreementType = null;
         $data = null;
-        $isCreditCard = false;
-        $nature = $this->terminalNature($auth, $terminalName);
-        if(count($nature) == 1 && $nature[0]->Nature === "CreditCard") {
-            $isCreditCard = true;
-        }
         //Transaction Info
         $transactionDetail = $this->helper->transactionDetail($orderId);
         $payment = $order->getPayment();
@@ -461,16 +447,22 @@ class Gateway implements GatewayInterface
         if (!$this->helper->validateQuote($quote) && $this->systemConfig->getTerminalConfig($terminalId, 'capture', $storeScope, $storeCode)) {
             $request->setType('paymentAndCapture');
         }
-        if ($isCreditCard) {
-            $shouldSaveCard = isset($post['savecard']) && $post['savecard'] && $savecardtoken;
-            $isRecurringProduct = $this->helper->validateQuote($quote);
+
+        $shouldSaveCard = isset($post['savecard']) && $post['savecard'] && $savecardtoken;
+        if ($shouldSaveCard) {
+            $isCreditCard = false;
+            $nature       = $this->terminalNature($auth, $terminalName);
+            if (count($nature) == 1 && $nature[0]->Nature === "CreditCard") {
+                $isCreditCard = true;
+            }
+            if ($isCreditCard) {
+                $isRecurringProduct = $this->helper->validateQuote($quote);
             
-            if ($agreementConfig === "recurring" || $agreementConfig === "instalment") {
-                if ($isRecurringProduct) {
-                    $request->setAgreement($this->agreementDetail($payment, $quote->getAllItems(), $baseUrl, $agreementConfig));
-                }
-            } elseif (empty($agreementConfig) || $agreementConfig === "unscheduled") {
-                if ($shouldSaveCard) {
+                if ($agreementConfig === "recurring" || $agreementConfig === "instalment") {
+                    if ($isRecurringProduct) {
+                        $request->setAgreement($this->agreementDetail($payment, $quote->getAllItems(), $baseUrl, $agreementConfig));
+                    }
+                } elseif (empty($agreementConfig) || $agreementConfig === "unscheduled") {
                     $request->setAgreement($this->agreementDetail($payment, $quote->getAllItems(), $baseUrl, "unscheduled", null, $unscheduledTypeConfig));
                     $request->setType('verifyCard');
                 }
@@ -539,23 +531,27 @@ class Gateway implements GatewayInterface
             $order->setAltapayPriceIncludesTax($this->storeConfig->storePriceIncTax());
             $order->setModuleVersion($this->helper->getModuleVersion());
             $order->getResource()->save($order);
-            //set flag if customer redirect to Altapay
+            //set flag if customer redirect to AltaPay
             $this->checkoutSession->setAltapayCustomerRedirect(true);
             return $requestParams;
         } catch (ClientException $e) {
             $requestParams['result']  = ConstantConfig::ERROR;
-            $requestParams['message'] = $e->getResponse()->getBody();
+            $requestParams['message'] = __(ConstantConfig::ERROR_MESSAGE);
+            $this->altapayLogger->addCriticalLog('PaymentRequest Exception:' , $e->getMessage());
         } catch (ResponseHeaderException $e) {
             $requestParams['result']  = ConstantConfig::ERROR;
-            $requestParams['message'] = $e->getHeader()->ErrorMessage;
+            $requestParams['message'] =  __(ConstantConfig::ERROR_MESSAGE);
+            $this->altapayLogger->addCriticalLog('PaymentRequest Exception:' , $e->getHeader()->ErrorMessage);
         } catch (ResponseMessageException $e) {
             $requestParams['result']  = ConstantConfig::ERROR;
-            $requestParams['message'] = $e->getMessage();
+            $requestParams['message'] =  __(ConstantConfig::ERROR_MESSAGE);
+            $this->altapayLogger->addCriticalLog('PaymentRequest Exception:' , $e->getMessage());
         } catch (\Exception $e) {
             $requestParams['result']  = ConstantConfig::ERROR;
-            $requestParams['message'] = $e->getMessage();
+            $requestParams['message'] =  __(ConstantConfig::ERROR_MESSAGE);
+            $this->altapayLogger->addCriticalLog('PaymentRequest Exception:' , $e->getMessage());
         }
-        
+
         $this->restoreOrderFromOrderId($order->getIncrementId());
         
         return $requestParams;

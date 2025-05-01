@@ -155,9 +155,8 @@ class ConfigProvider implements ConfigProviderInterface
         $activePaymentMethod = $this->getActivePaymentMethod();
         $baseUrl             = $this->_storeManager->getStore()->getBaseUrl();
         $baseCurrency        = $this->storeConfig->useBaseCurrency();
-        $currencyCode       = $baseCurrency ? $this->_storeManager->getStore()->getBaseCurrencyCode() : $this->_storeManager->getStore()->getCurrentCurrencyCode();
-        $countryCode         = $this->scopeConfig->getValue('general/country/default',
-        \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
+        $currencyCode        = $baseCurrency ? $this->_storeManager->getStore()->getBaseCurrencyCode() : $this->_storeManager->getStore()->getCurrentCurrencyCode();
+        $countryCode         = $this->scopeConfig->getValue('general/country/default', \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
 
         return [
             'payment' => [
@@ -165,8 +164,6 @@ class ConfigProvider implements ConfigProviderInterface
                     'url'          => $this->urlInterface->getDirectUrl(
                         $this->getData()->getConfigData('place_order_url')
                     ),
-                    'auth'              => $this->checkAuth(),
-                    'connection'        => $this->checkConn(),
                     'terminaldata'      => $activePaymentMethod,
                     'countryCode'       => $countryCode,
                     'currencyCode'      => $currencyCode,
@@ -277,6 +274,10 @@ class ConfigProvider implements ConfigProviderInterface
         return $path;
     }
 
+    /**
+     * @deprecated
+     * @return int|null
+     */
     public function checkAuth()
     {
         $auth     = 0;
@@ -293,6 +294,10 @@ class ConfigProvider implements ConfigProviderInterface
         return $auth;
     }
 
+    /**
+     * @deprecated
+     * @return int
+     */
     public function checkConn()
     {
         $conn     = 0;

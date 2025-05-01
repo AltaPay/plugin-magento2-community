@@ -83,5 +83,5 @@ Wenn Sie nur Download-Produkte verkaufen, die sofort geliefert werden, können S
 "error","error"
 "success","success"
 "Could not authenticate with API","Could not authenticate with API"
-"error occured","error occured"
+"error occurred","error occurred"
 "Please click on the link to complete the payment </br> <a href=""%formurl"">%formurl</a>","Bitte klicken Sie auf den Link, um die Zahlung abzuschließen </br> <a href=""%formurl"">%formurl</a>"

@@ -56,15 +56,6 @@ define(
                     return;
                 }
 
-                var auth = window.checkoutConfig.payment[this.getDefaultCode()].auth;
-                var connection = window.checkoutConfig.payment[this.getDefaultCode()].connection;
-                if (!auth || !connection) {
-                    this.messageContainer.addErrorMessage({
-                        message: $t('Could not authenticate with API')
-                    });
-                    return false;
-                }
-
                 var self = this;
                 if (self.validate() && additionalValidators.validate()) {
                     if (this.configData.terminaldata[this.getCode()].isapplepay === '1') {
