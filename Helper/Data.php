@@ -14,6 +14,7 @@ use Magento\Framework\Module\ModuleListInterface;
 use Magento\Framework\App\Helper\AbstractHelper;
 use Magento\Sales\Model\Order;
 use Magento\Framework\App\Config\ScopeConfigInterface;
+use Magento\Sales\Model\Order\ItemFactory;
 use Magento\Sales\Model\ResourceModel\Order\Tax\Item;
 use Magento\Quote\Model\Quote\Item\AbstractItem;
 use Magento\Framework\DataObject;
@@ -52,6 +53,10 @@ class Data extends AbstractHelper
      * @var ReconciliationIdentifierFactory
      */
     private $reconciliation;
+    /**
+     * @var ItemFactory
+     */
+    private $orderItemFactory;
 
     /**
      * Data constructor.
@@ -62,6 +67,7 @@ class Data extends AbstractHelper
      * @param Order                           $order
      * @param Item                            $taxItem
      * @param ReconciliationIdentifierFactory $reconciliation
+     * @param ItemFactory $orderItemFactory
      */
     public function __construct(
         ModuleListInterface $moduleList,
@@ -69,7 +75,8 @@ class Data extends AbstractHelper
         ScopeConfigInterface $scopeConfig,
         Order $order,
         Item $taxItem,
-        ReconciliationIdentifierFactory $reconciliation
+        ReconciliationIdentifierFactory $reconciliation,
+        ItemFactory $orderItemFactory
     ) {
         $this->moduleList       = $moduleList;
         $this->productMetadata  = $productMetadata;
@@ -77,6 +84,7 @@ class Data extends AbstractHelper
         $this->order            = $order;
         $this->taxItem          = $taxItem;
         $this->reconciliation   = $reconciliation;
+        $this->orderItemFactory = $orderItemFactory;
     }
 
     //Method for adding transaction info
@@ -306,5 +314,45 @@ class Data extends AbstractHelper
         }
 
         return $template;
+    }
+
+    /**
+     * Create surcharge item for order
+     *
+     * @param float $baseFeeAmount
+     * @param float $feeAmount
+     * @param int $storeId
+     * @param int $orderId
+     * @param string $text
+     * @return \Magento\Sales\Model\Order\Item
+     */
+    public function createSurchargeItem(
+        float $baseFeeAmount,
+        float $feeAmount,
+        int $storeId,
+        int $orderId,
+        string $text
+    ): \Magento\Sales\Model\Order\Item {
+        $feeItem = $this->orderItemFactory->create();
+        
+        return $feeItem->setSku('surcharge_fee')
+            ->setName($text)
+            ->setBaseCost($baseFeeAmount)
+            ->setBasePrice($baseFeeAmount)
+            ->setBasePriceInclTax($baseFeeAmount)
+            ->setBaseOriginalPrice($baseFeeAmount)
+            ->setBaseRowTotal($baseFeeAmount)
+            ->setBaseRowTotalInclTax($baseFeeAmount)
+            ->setCost($feeAmount)
+            ->setPrice($feeAmount)
+            ->setPriceInclTax($feeAmount)
+            ->setOriginalPrice($feeAmount)
+            ->setRowTotal($feeAmount)
+            ->setRowTotalInclTax($feeAmount)
+            ->setProductType(\Magento\Catalog\Model\Product\Type::TYPE_VIRTUAL)
+            ->setIsVirtual(1)
+            ->setQtyOrdered(1)
+            ->setStoreId($storeId)
+            ->setOrderId($orderId);
     }
 }

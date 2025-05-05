@@ -28,6 +28,18 @@ $order = $block->getOrder();
         <div class="sm:w-1/2 sm:mr-2 md:mr-4 order-2 sm:order-1">
             <div class="mb-8">
                 <div class="payment-form-wrapper">
+                    <div class="altapay-surcharge">
+                        <div class="surcharge-amount">
+                            <strong></strong>
+                            <span id="PensioSurcharge"></span>
+                            <span class="currency-symbol"></span>
+                        </div>
+                        <div class="total-amount">
+                            <strong></strong>
+                            <span id="PensioTotal"></span>
+                            <span class="currency-symbol"></span>
+                        </div>
+                    </div>
                     <form id="PensioPaymentForm"></form>
                 </div>
             </div>

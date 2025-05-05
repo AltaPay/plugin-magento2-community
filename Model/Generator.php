@@ -35,6 +35,8 @@ use SDM\Altapay\Helper\Data;
 use SDM\Altapay\Model\ReconciliationIdentifierFactory;
 use SDM\Altapay\Model\Handler\CreateCreditMemo;
 use Magento\Sales\Api\OrderRepositoryInterface;
+use Altapay\Api\Others\CalculateSurcharge;
+
 /**
  * Class Generator
  * Handle the create payment related functionality.
@@ -141,6 +143,11 @@ class Generator
      * @var OrderRepositoryInterface
      */
     protected $orderRepository;
+
+    /**
+     * @var CalculateSurcharge
+     */
+    protected $calculateSurcharge;
 
     /**
      * Generator constructor.
@@ -433,6 +440,7 @@ class Generator
             $paymentType = $response->type;
             $paymentStatus = strtolower($response->paymentStatus);
             $transactionId = $response->transactionId;
+            $baseFeeAmount = $transaction->SurchargeAmount ?? 0;
             $payment = $order->getPayment();
 
             // Return if the incoming transaction id is different from order transaction id
@@ -484,6 +492,7 @@ class Generator
                 $agreementConfig = $this->getConfigValue($response, $storeScope, $storeCode, "agreementtype");
                 $unscheduledTypeConfig = $this->getConfigValue($response, $storeScope, $storeCode, "unscheduledtype");
                 $saveCardToken = $this->getConfigValue($response, $storeScope, $storeCode, "savecardtoken");
+                $surchargeConfig = $this->getConfigValue($response, $storeScope, $storeCode, "surcharge");
                 $unscheduledType = null;
                 $lastFourDigits = '';
                 $cardType = '';
@@ -538,6 +547,38 @@ class Generator
                 $payment->setAdditionalInformation('payment_type', $paymentType);
                 $payment->setAdditionalInformation('require_capture', $response->requireCapture);
                 $payment->save();
+
+                // Calculate Surcharge
+                if ($surchargeConfig && $baseFeeAmount > 0) {
+                    $feeAmount = $order->getStore()->getBaseCurrency()->convert(
+                        $baseFeeAmount,
+                        $order->getOrderCurrencyCode()
+                    );
+
+                    $feeItem = $this->helper->createSurchargeItem(
+                        $baseFeeAmount,
+                        $feeAmount,
+                        $order->getStoreId(),
+                        $order->getId(),
+                        __("Surcharge fee")
+                    );
+                    $order->addItem($feeItem);
+                    $order->setBaseSubtotal($order->getBaseSubtotal() + $baseFeeAmount);
+                    $order->setBaseSubtotalInclTax(
+                        $order->getBaseSubtotalInclTax() + $baseFeeAmount
+                    );
+                    $order->setSubtotal($order->getSubtotal() + $feeAmount);
+                    $order->setSubtotalInclTax(
+                        $order->getSubtotalInclTax() + $feeAmount
+                    );
+                    $order->setBaseGrandTotal($order->getBaseGrandTotal() + $baseFeeAmount);
+                    $order->setGrandTotal($order->getGrandTotal() + $feeAmount);
+
+                    $feeMessage = __("An additional surcharge fee has been applied to the order.");
+                    $order->addStatusHistoryComment($feeMessage);
+                    $order->save();
+                }
+
                 //send order confirmation email
                 $this->sendOrderConfirmationEmail($order);
                 //unset redirect if success
