@@ -6,7 +6,7 @@
  * file that was distributed with this source code.
  */
 
-.creaditcard-callback-form.legacy input#pensioCreditCardPaymentSubmitButton {
+ .creaditcard-callback-form.legacy input#pensioCreditCardPaymentSubmitButton {
     background-image: none;
     background: #1979c3;
     border: 1px solid #1979c3;
@@ -87,6 +87,23 @@ footer.page-footer,
     line-height: 1.25;
     padding: 0.5rem 1rem;
     text-align: center;
+}
+
+.surcharge-total, .surcharge-amount {
+    display: none;
+}
+
+.surcharge-total small {
+    font-size: 12px;
+    color: #666666;
+}
+
+.Surcharged .surcharge-total {
+    display: table-row;
+}
+
+.Surcharged .surcharge-amount {
+    display: block;
 }
 
 @media (min-width: 992px) {

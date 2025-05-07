@@ -28,19 +28,12 @@ $order = $block->getOrder();
         <div class="sm:w-1/2 sm:mr-2 md:mr-4 order-2 sm:order-1">
             <div class="mb-8">
                 <div class="payment-form-wrapper">
-                    <div class="altapay-surcharge">
-                        <div class="surcharge-amount">
-                            <strong></strong>
-                            <span id="PensioSurcharge"></span>
-                            <span class="currency-symbol"></span>
-                        </div>
-                        <div class="total-amount">
-                            <strong></strong>
-                            <span id="PensioTotal"></span>
-                            <span class="currency-symbol"></span>
-                        </div>
-                    </div>
                     <form id="PensioPaymentForm"></form>
+                    <div class="surcharge-amount">
+                        <strong><?= $block->escapeHtml(__('Surcharge:')) ?></strong>
+                        <span id="PensioSurcharge"></span>
+                        <span><?= $config->getCurrencySymbol(); ?></span>
+                    </div>
                 </div>
             </div>
         </div>
@@ -113,6 +106,18 @@ $order = $block->getOrder();
                                         <span class="price">
                                             <?= $block->escapeHtml($block->getFormatedPrice($order->getGrandTotal())); ?>
                                         </span>
+                                </strong>
+                            </td>
+                        </tr>
+                        <tr class="grand totals surcharge-total">
+                            <th class="mark" scope="row">
+                                <strong><?= $block->escapeHtml(__('Order Total')) ?></strong>
+                                <small><?= $block->escapeHtml(__('(Incl. Surcharge)')) ?></small>
+                            </th>
+                            <td class="amount" data-th="Order Total">
+                                <strong>
+                                    <span class="price" id="PensioTotal"></span>
+                                    <span><?= $config->getCurrencySymbol(); ?></span>
                                 </strong>
                             </td>
                         </tr>

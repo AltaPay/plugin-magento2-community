@@ -16,4 +16,9 @@ $ccFormStyle = !empty($config->ccFormStyle()) ? $config->ccFormStyle() : 'legacy
 
 <div class="creaditcard-callback-form <?= $ccFormStyle ?>">
     <form id="PensioPaymentForm"></form>
+    <div class="surcharge-amount">
+        <strong><?= $block->escapeHtml(__('Surcharge:')) ?></strong>
+        <span id="PensioSurcharge"></span>
+        <span><?= $config->getCurrencySymbol(); ?></span>
+    </div>
 </div>
