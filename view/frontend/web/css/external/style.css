@@ -878,6 +878,23 @@ label.flex.justify-between.text-sm.px-5.py-3.bg-gray-500.border-gray-600 {
    text-align: center;
 }
 
+.surcharge-total, .surcharge-amount {
+   display: none;
+}
+
+.surcharge-total small {
+   font-size: 12px;
+   color: #666666;
+}
+
+.Surcharged .surcharge-total {
+   display: table-row;
+}
+
+.Surcharged .surcharge-amount {
+   display: block;
+}
+
 @media (min-width:768px) {
 
    div.pensio_payment_form_outer,

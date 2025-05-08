@@ -29,6 +29,11 @@ $order = $block->getOrder();
             <div class="mb-8">
                 <div class="payment-form-wrapper">
                     <form id="PensioPaymentForm"></form>
+                    <div class="surcharge-amount">
+                        <strong><?= $block->escapeHtml(__('Surcharge:')) ?></strong>
+                        <span id="PensioSurcharge"></span>
+                        <span><?= $config->getCurrencySymbol(); ?></span>
+                    </div>
                 </div>
             </div>
         </div>
@@ -101,6 +106,18 @@ $order = $block->getOrder();
                                         <span class="price">
                                             <?= $block->escapeHtml($block->getFormatedPrice($order->getGrandTotal())); ?>
                                         </span>
+                                </strong>
+                            </td>
+                        </tr>
+                        <tr class="grand totals surcharge-total">
+                            <th class="mark" scope="row">
+                                <strong><?= $block->escapeHtml(__('Order Total')) ?></strong>
+                                <small><?= $block->escapeHtml(__('(Incl. Surcharge)')) ?></small>
+                            </th>
+                            <td class="amount" data-th="Order Total">
+                                <strong>
+                                    <span class="price" id="PensioTotal"></span>
+                                    <span><?= $config->getCurrencySymbol(); ?></span>
                                 </strong>
                             </td>
                         </tr>

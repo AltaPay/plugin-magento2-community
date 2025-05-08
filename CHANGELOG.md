@@ -1,6 +1,9 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [4.1.0]
+- Support applying surcharge fee to order payments.
+
 ## [4.0.9]
 ### Added
 - Avoid unnecessary extra API calls in the daily flow.

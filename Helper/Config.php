@@ -12,6 +12,8 @@ namespace SDM\Altapay\Helper;
 use Magento\Framework\App\Helper\AbstractHelper;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\SalesRule\Model\RuleFactory;
+use Magento\Store\Model\StoreManagerInterface;
+use Magento\Directory\Model\CurrencyFactory;
 
 /**
  * Class Config for getting store configuration information.
@@ -32,17 +34,33 @@ class Config extends AbstractHelper
     protected $rule;
 
     /**
+     * @var StoreManagerInterface
+     */
+    protected $storeManager;
+
+    /**
+     * @var CurrencyFactory
+     */
+    protected $currencyFactory;
+
+    /**
      * Config constructor.
      *
      * @param ScopeConfigInterface $scopeConfig
-     * @param RuleFactory          $rule
+     * @param RuleFactory $rule
+     * @param StoreManagerInterface $storeManager
+     * @param CurrencyFactory $currencyFactory
      */
     public function __construct(
         ScopeConfigInterface $scopeConfig,
-        RuleFactory $rule
+        RuleFactory $rule,
+        StoreManagerInterface $storeManager,
+        CurrencyFactory $currencyFactory
     ) {
-        $this->scopeConfig = $scopeConfig;
-        $this->rule        = $rule;
+        $this->scopeConfig     = $scopeConfig;
+        $this->rule            = $rule;
+        $this->storeManager    = $storeManager;
+        $this->currencyFactory = $currencyFactory;
     }
 
     /**
@@ -140,5 +158,12 @@ class Config extends AbstractHelper
         }
     
         return false;
+    }
+
+    public function getCurrencySymbol()
+    {
+        $currencyCode = $this->storeManager->getStore()->getCurrentCurrencyCode();
+        $currency = $this->currencyFactory->create()->load($currencyCode);
+        return $currency->getCurrencySymbol();
     }
 }

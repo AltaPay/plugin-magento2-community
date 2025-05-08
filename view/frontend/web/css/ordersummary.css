@@ -89,6 +89,23 @@ footer.page-footer,
     text-align: center;
 }
 
+.surcharge-total, .surcharge-amount {
+    display: none;
+}
+
+.surcharge-total small {
+    font-size: 12px;
+    color: #666666;
+}
+
+.Surcharged .surcharge-total {
+    display: table-row;
+}
+
+.Surcharged .surcharge-amount {
+    display: block;
+}
+
 @media (min-width: 992px) {
 
     .creaditcard-callback-form {
