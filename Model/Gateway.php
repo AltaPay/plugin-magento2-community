@@ -37,9 +37,6 @@ use Magento\Store\Model\StoreManagerInterface;
 use Magento\Framework\Math\Random;
 use Altapay\Api\Payments\ReservationOfFixedAmount;
 use SDM\Altapay\Api\TransactionRepositoryInterface;
-use Magento\Sales\Model\Order\Invoice;
-use Magento\Framework\DB\TransactionFactory;
-use Magento\Sales\Model\Service\InvoiceService;
 use Altapay\Api\Others\Terminals;
 use Magento\Framework\Event\ManagerInterface;
 
@@ -118,16 +115,6 @@ class Gateway implements GatewayInterface
      * @var TransactionRepositoryInterface
      */
     private $transactionRepository;
-    
-    /**
-     * @var TransactionFactory
-     */
-    private $transactionFactory;
-    
-    /**
-     * @var InvoiceService
-     */
-    private $invoiceService;
     /**
      * @var Random
      */
@@ -158,8 +145,6 @@ class Gateway implements GatewayInterface
      * @param StoreManagerInterface          $storeManager
      * @param Random                         $random
      * @param TransactionRepositoryInterface $transactionRepository
-     * @param TransactionFactory             $transactionFactory
-     * @param InvoiceService                 $invoiceService
      * @param ManagerInterface               $eventManager
      */
     public function __construct(
@@ -181,8 +166,6 @@ class Gateway implements GatewayInterface
         StoreManagerInterface $storeManager,
         Random $random,
         TransactionRepositoryInterface $transactionRepository,
-        TransactionFactory $transactionFactory,
-        InvoiceService $invoiceService,
         ManagerInterface $eventManager
     )
     {
@@ -204,8 +187,6 @@ class Gateway implements GatewayInterface
         $this->storeManager          = $storeManager;
         $this->random                = $random;
         $this->transactionRepository = $transactionRepository;
-        $this->transactionFactory    = $transactionFactory;
-        $this->invoiceService        = $invoiceService;
         $this->_eventManager         = $eventManager;
     }
 
@@ -689,7 +670,7 @@ class Gateway implements GatewayInterface
                 || strtolower($paymentType) === 'subscriptionandcharge'
                 || ($paymentType === 'subscription_payment' && $transStatus === 'captured')
             ) {
-                $this->createInvoice($order);
+                $this->paymentHandler->createInvoice($order);
             }
         }
 
@@ -731,25 +712,6 @@ class Gateway implements GatewayInterface
         }
         
         return $isCaptured;
-    }
-    
-    /**
-     * @param Order $order
-     *
-     * @return void
-     */
-    public function createInvoice(Order $order)
-    {
-        if (!$order->getInvoiceCollection()->count()) {
-            $invoice = $this->invoiceService->prepareInvoice($order);
-            $invoice->setRequestedCaptureCase(Invoice::CAPTURE_ONLINE);
-            $invoice->register();
-            $invoice->getOrder()->setCustomerNoteNotify(false);
-            $invoice->getOrder()->setIsInProcess(true);
-            $transaction = $this->transactionFactory->create()->addObject($invoice)
-                                ->addObject($invoice->getOrder());
-            $transaction->save();
-        }
     }
 
     /**

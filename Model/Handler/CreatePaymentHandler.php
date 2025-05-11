@@ -11,6 +11,9 @@ namespace SDM\Altapay\Model\Handler;
 
 use SDM\Altapay\Model\SystemConfig;
 use Magento\Sales\Model\Order;
+use Magento\Sales\Model\Order\Invoice;
+use Magento\Sales\Model\Service\InvoiceService;
+use Magento\Framework\DB\TransactionFactory;
 
 /**
  * Class CreatePaymentHandler
@@ -23,23 +26,41 @@ class CreatePaymentHandler
      * @var SystemConfig
      */
     private $systemConfig;
+
     /**
      * @var Order
      */
     private $order;
 
     /**
+     * @var TransactionFactory
+     */
+    private $transactionFactory;
+
+    /**
+     * @var InvoiceService
+     */
+    private $invoiceService;
+
+    /**
      * Gateway constructor.
      *
-     * @param SystemConfig $systemConfig
-     * @param Order        $order
+     * @param SystemConfig          $systemConfig
+     * @param Order                 $order
+     * @param TransactionFactory    $transactionFactory
+     * @param InvoiceService        $invoiceService
      */
     public function __construct(
-        SystemConfig $systemConfig,
-        Order $order
-    ) {
-        $this->systemConfig = $systemConfig;
-        $this->order        = $order;
+        SystemConfig       $systemConfig,
+        Order              $order,
+        TransactionFactory $transactionFactory,
+        InvoiceService     $invoiceService
+    )
+    {
+        $this->systemConfig         = $systemConfig;
+        $this->order                = $order;
+        $this->transactionFactory   = $transactionFactory;
+        $this->invoiceService       = $invoiceService;
     }
 
     /**
@@ -69,6 +90,26 @@ class CreatePaymentHandler
 
         if ($saveOrder) {
             $order->getResource()->save($order);
+        }
+    }
+
+    /**
+     * Creates and registers an invoice for the given order if no invoice exists.
+     * @param Order $order
+     *
+     * @return void
+     */
+    public function createInvoice(Order $order)
+    {
+        if (!$order->getInvoiceCollection()->count()) {
+            $invoice = $this->invoiceService->prepareInvoice($order);
+            $invoice->setRequestedCaptureCase(Invoice::CAPTURE_ONLINE);
+            $invoice->register();
+            $invoice->getOrder()->setCustomerNoteNotify(false);
+            $invoice->getOrder()->setIsInProcess(true);
+            $transaction = $this->transactionFactory->create()->addObject($invoice)
+                ->addObject($invoice->getOrder());
+            $transaction->save();
         }
     }
 }

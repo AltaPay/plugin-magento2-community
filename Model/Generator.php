@@ -15,7 +15,6 @@ use Altapay\Response\CallbackResponse;
 use Magento\Checkout\Model\Session;
 use Magento\Framework\App\Request\Http;
 use Magento\Framework\App\RequestInterface;
-use Magento\Sales\Model\Order\Invoice;
 use Magento\Store\Model\ScopeInterface;
 use SDM\Altapay\Logger\Logger;
 use Magento\Quote\Model\Quote;
@@ -23,8 +22,6 @@ use Magento\Sales\Model\Order;
 use Magento\Sales\Model\Order\Email\Sender\OrderSender;
 use SDM\Altapay\Api\TransactionRepositoryInterface;
 use SDM\Altapay\Api\OrderLoaderInterface;
-use Magento\Framework\DB\TransactionFactory;
-use Magento\Sales\Model\Service\InvoiceService;
 use SDM\Altapay\Model\Handler\OrderLinesHandler;
 use SDM\Altapay\Model\Handler\CreatePaymentHandler;
 use Magento\Checkout\Model\Cart;
@@ -62,10 +59,7 @@ class Generator
      * @var Order
      */
     private $order;
-    /**
-     * @var InvoiceService
-     */
-    private $invoiceService;
+
     /**
      * @var OrderSender
      */
@@ -91,10 +85,6 @@ class Generator
      */
     private $orderLoader;
 
-    /**
-     * @var TransactionFactory
-     */
-    private $transactionFactory;
     /**
      * @var OrderLinesHandler
      */
@@ -161,8 +151,6 @@ class Generator
      * @param Logger                          $altapayLogger
      * @param TransactionRepositoryInterface  $transactionRepository
      * @param OrderLoaderInterface            $orderLoader
-     * @param TransactionFactory              $transactionFactory
-     * @param InvoiceService                  $invoiceService
      * @param OrderLinesHandler               $orderLines
      * @param CreatePaymentHandler            $paymentHandler
      * @param StockStateInterface             $stockItem
@@ -183,8 +171,6 @@ class Generator
         Logger $altapayLogger,
         TransactionRepositoryInterface $transactionRepository,
         OrderLoaderInterface $orderLoader,
-        TransactionFactory $transactionFactory,
-        InvoiceService $invoiceService,
         OrderLinesHandler $orderLines,
         CreatePaymentHandler $paymentHandler,
         StockStateInterface $stockItem,
@@ -201,11 +187,9 @@ class Generator
         $this->request               = $request;
         $this->order                 = $order;
         $this->orderSender           = $orderSender;
-        $this->invoiceService        = $invoiceService;
         $this->systemConfig          = $systemConfig;
         $this->altapayLogger         = $altapayLogger;
         $this->transactionRepository = $transactionRepository;
-        $this->transactionFactory    = $transactionFactory;
         $this->orderLoader           = $orderLoader;
         $this->orderLines            = $orderLines;
         $this->paymentHandler        = $paymentHandler;
@@ -245,24 +229,6 @@ class Generator
         }
 
         return false;
-    }
-
-    /**
-     * @param $order
-     *
-     * @return void
-     */
-    public function createInvoice($order)
-    {
-        if (!$order->getInvoiceCollection()->count()) {
-            $invoice = $this->invoiceService->prepareInvoice($order);
-            $invoice->setRequestedCaptureCase(Invoice::CAPTURE_ONLINE);
-            $invoice->register();
-            $invoice->getOrder()->setCustomerNoteNotify(false);
-            $invoice->getOrder()->setIsInProcess(true);
-            $transaction = $this->transactionFactory->create()->addObject($invoice)->addObject($invoice->getOrder());
-            $transaction->save();
-        }
     }
 
     /**
@@ -672,7 +638,7 @@ class Generator
                 }
 
                 if (strtolower($paymentType) === 'paymentandcapture' || strtolower($paymentType) === 'subscriptionandcharge') {
-                    $this->createInvoice($order);
+                    $this->paymentHandler->createInvoice($order);
                 }
             }
         }

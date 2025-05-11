@@ -214,6 +214,12 @@ class ApplePayOrder {
                 $order->setIsNotified(false);
                 $order->getResource()->save($order);
 
+                if (isset($response->Transactions[$latestTransKey])) {
+                    $paymentType = $response->Transactions[$latestTransKey]->AuthType ?? '';
+                    if (strtolower($paymentType) === 'paymentandcapture') {
+                        $this->paymentHandler->createInvoice($order);
+                    }
+                }
             }
         } else {
                 $this->paymentHandler->setCustomOrderStatus($order, Order::STATE_CANCELED, 'cancel');

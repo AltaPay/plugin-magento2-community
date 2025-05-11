@@ -1,7 +1,12 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [4.1.1]
+### Fixed
+- Missing invoice issue for Apple Pay orders when auto-capture is enabled.
+
 ## [4.1.0]
+### Added
 - Support applying surcharge fee to order payments.
 
 ## [4.0.9]
