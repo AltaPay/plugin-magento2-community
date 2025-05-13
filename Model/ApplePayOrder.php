@@ -218,6 +218,7 @@ class ApplePayOrder {
                     $paymentType = $response->Transactions[$latestTransKey]->AuthType ?? '';
                     if (strtolower($paymentType) === 'paymentandcapture') {
                         $this->paymentHandler->createInvoice($order);
+                        $this->paymentHandler->saveReconciliationData($transaction, $order);
                     }
                 }
             }

@@ -29,7 +29,6 @@ use Magento\CatalogInventory\Api\StockStateInterface;
 use Magento\CatalogInventory\Api\StockRegistryInterface;
 use SDM\Altapay\Model\TokenFactory;
 use SDM\Altapay\Helper\Data;
-use SDM\Altapay\Model\ReconciliationIdentifierFactory;
 use SDM\Altapay\Model\Handler\CreateCreditMemo;
 use Magento\Sales\Api\OrderRepositoryInterface;
 use Altapay\Api\Others\CalculateSurcharge;
@@ -120,11 +119,6 @@ class Generator
     private $helper;
 
     /**
-     * @var ReconciliationIdentifierFactory
-     */
-    protected $reconciliation;
-
-    /**
      * @var CreateCreditMemo
      */
     protected $creditMemo;
@@ -158,7 +152,6 @@ class Generator
      * @param Cart                            $modelCart
      * @param TokenFactory                    $dataToken
      * @param Data                            $helper
-     * @param ReconciliationIdentifierFactory $reconciliation
      * @param CreateCreditMemo                $creditMemo
      */
     public function __construct(
@@ -178,7 +171,6 @@ class Generator
         Cart $modelCart,
         TokenFactory $dataToken,
         Data $helper,
-        ReconciliationIdentifierFactory $reconciliation,
         CreateCreditMemo $creditMemo,
         OrderRepositoryInterface $orderRepository
     ) {
@@ -198,7 +190,6 @@ class Generator
         $this->modelCart             = $modelCart;
         $this->dataToken             = $dataToken;
         $this->helper                = $helper;
-        $this->reconciliation        = $reconciliation;
         $this->creditMemo            = $creditMemo;
         $this->orderRepository       = $orderRepository;
     }
@@ -427,7 +418,7 @@ class Generator
                 // Create Credit Memo
                 $this->creditMemo->createCreditMemo($order->getId());
 
-                $this->saveReconciliationData($transaction, $order);
+                $this->paymentHandler->saveReconciliationData($transaction, $order);
 
                 return false;
             }
@@ -501,7 +492,7 @@ class Generator
                         }
                     }
 
-                    $this->saveReconciliationData($transaction, $order);
+                    $this->paymentHandler->saveReconciliationData($transaction, $order);
                 }
                 $payment->setPaymentId($response->paymentId);
                 $payment->setLastTransId($transaction->TransactionId);
@@ -959,32 +950,6 @@ class Generator
         $response = $callback->call();
         
         return $response->CardHolderErrorMessage ?? null;
-    }
-
-    /**
-     * @param $transaction
-     * @param $order
-     * @return void
-     */
-    public function saveReconciliationData($transaction, $order)
-    {
-        $reconciliationData = $transaction->ReconciliationIdentifiers ?? '';
-
-        if ($reconciliationData && is_array($reconciliationData)) {
-            $model = $this->reconciliation->create();
-
-            foreach ($reconciliationData as $value) {
-                $collection = $this->helper->getReconciliationData($order->getIncrementId(), $value->Id);
-                if (!$collection->getSize()) {
-                    $model->addData([
-                        "order_id" => $order->getIncrementId(),
-                        "identifier" => $value->Id,
-                        "type" => $value->Type
-                    ]);
-                }
-            }
-            $model->save();
-        }
     }
 
     /**

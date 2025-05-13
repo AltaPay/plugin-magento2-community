@@ -14,6 +14,8 @@ use Magento\Sales\Model\Order;
 use Magento\Sales\Model\Order\Invoice;
 use Magento\Sales\Model\Service\InvoiceService;
 use Magento\Framework\DB\TransactionFactory;
+use SDM\Altapay\Model\ReconciliationIdentifierFactory;
+use SDM\Altapay\Helper\Data;
 
 /**
  * Class CreatePaymentHandler
@@ -43,6 +45,16 @@ class CreatePaymentHandler
     private $invoiceService;
 
     /**
+     * @var ReconciliationIdentifierFactory
+     */
+    protected $reconciliation;
+
+    /**
+     * @var Data
+     */
+    private $helper;
+
+    /**
      * Gateway constructor.
      *
      * @param SystemConfig          $systemConfig
@@ -51,16 +63,20 @@ class CreatePaymentHandler
      * @param InvoiceService        $invoiceService
      */
     public function __construct(
-        SystemConfig       $systemConfig,
-        Order              $order,
-        TransactionFactory $transactionFactory,
-        InvoiceService     $invoiceService
+        SystemConfig                    $systemConfig,
+        Order                           $order,
+        TransactionFactory              $transactionFactory,
+        InvoiceService                  $invoiceService,
+        ReconciliationIdentifierFactory $reconciliation,
+        Data $helper
     )
     {
         $this->systemConfig         = $systemConfig;
         $this->order                = $order;
         $this->transactionFactory   = $transactionFactory;
         $this->invoiceService       = $invoiceService;
+        $this->reconciliation       = $reconciliation;
+        $this->helper                = $helper;
     }
 
     /**
@@ -110,6 +126,32 @@ class CreatePaymentHandler
             $transaction = $this->transactionFactory->create()->addObject($invoice)
                 ->addObject($invoice->getOrder());
             $transaction->save();
+        }
+    }
+
+    /**
+     * @param $transaction
+     * @param $order
+     * @return void
+     */
+    public function saveReconciliationData($transaction, $order)
+    {
+        $reconciliationData = $transaction->ReconciliationIdentifiers ?? '';
+
+        if ($reconciliationData && is_array($reconciliationData)) {
+            $model = $this->reconciliation->create();
+
+            foreach ($reconciliationData as $value) {
+                $collection = $this->helper->getReconciliationData($order->getIncrementId(), $value->Id);
+                if (!$collection->getSize()) {
+                    $model->addData([
+                        "order_id" => $order->getIncrementId(),
+                        "identifier" => $value->Id,
+                        "type" => $value->Type
+                    ]);
+                }
+            }
+            $model->save();
         }
     }
 }
