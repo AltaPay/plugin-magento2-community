@@ -15,7 +15,6 @@ use Altapay\Response\CallbackResponse;
 use Magento\Checkout\Model\Session;
 use Magento\Framework\App\Request\Http;
 use Magento\Framework\App\RequestInterface;
-use Magento\Sales\Model\Order\Invoice;
 use Magento\Store\Model\ScopeInterface;
 use SDM\Altapay\Logger\Logger;
 use Magento\Quote\Model\Quote;
@@ -23,8 +22,6 @@ use Magento\Sales\Model\Order;
 use Magento\Sales\Model\Order\Email\Sender\OrderSender;
 use SDM\Altapay\Api\TransactionRepositoryInterface;
 use SDM\Altapay\Api\OrderLoaderInterface;
-use Magento\Framework\DB\TransactionFactory;
-use Magento\Sales\Model\Service\InvoiceService;
 use SDM\Altapay\Model\Handler\OrderLinesHandler;
 use SDM\Altapay\Model\Handler\CreatePaymentHandler;
 use Magento\Checkout\Model\Cart;
@@ -32,7 +29,6 @@ use Magento\CatalogInventory\Api\StockStateInterface;
 use Magento\CatalogInventory\Api\StockRegistryInterface;
 use SDM\Altapay\Model\TokenFactory;
 use SDM\Altapay\Helper\Data;
-use SDM\Altapay\Model\ReconciliationIdentifierFactory;
 use SDM\Altapay\Model\Handler\CreateCreditMemo;
 use Magento\Sales\Api\OrderRepositoryInterface;
 use Altapay\Api\Others\CalculateSurcharge;
@@ -62,10 +58,7 @@ class Generator
      * @var Order
      */
     private $order;
-    /**
-     * @var InvoiceService
-     */
-    private $invoiceService;
+
     /**
      * @var OrderSender
      */
@@ -91,10 +84,6 @@ class Generator
      */
     private $orderLoader;
 
-    /**
-     * @var TransactionFactory
-     */
-    private $transactionFactory;
     /**
      * @var OrderLinesHandler
      */
@@ -130,11 +119,6 @@ class Generator
     private $helper;
 
     /**
-     * @var ReconciliationIdentifierFactory
-     */
-    protected $reconciliation;
-
-    /**
      * @var CreateCreditMemo
      */
     protected $creditMemo;
@@ -161,8 +145,6 @@ class Generator
      * @param Logger                          $altapayLogger
      * @param TransactionRepositoryInterface  $transactionRepository
      * @param OrderLoaderInterface            $orderLoader
-     * @param TransactionFactory              $transactionFactory
-     * @param InvoiceService                  $invoiceService
      * @param OrderLinesHandler               $orderLines
      * @param CreatePaymentHandler            $paymentHandler
      * @param StockStateInterface             $stockItem
@@ -170,7 +152,6 @@ class Generator
      * @param Cart                            $modelCart
      * @param TokenFactory                    $dataToken
      * @param Data                            $helper
-     * @param ReconciliationIdentifierFactory $reconciliation
      * @param CreateCreditMemo                $creditMemo
      */
     public function __construct(
@@ -183,8 +164,6 @@ class Generator
         Logger $altapayLogger,
         TransactionRepositoryInterface $transactionRepository,
         OrderLoaderInterface $orderLoader,
-        TransactionFactory $transactionFactory,
-        InvoiceService $invoiceService,
         OrderLinesHandler $orderLines,
         CreatePaymentHandler $paymentHandler,
         StockStateInterface $stockItem,
@@ -192,7 +171,6 @@ class Generator
         Cart $modelCart,
         TokenFactory $dataToken,
         Data $helper,
-        ReconciliationIdentifierFactory $reconciliation,
         CreateCreditMemo $creditMemo,
         OrderRepositoryInterface $orderRepository
     ) {
@@ -201,11 +179,9 @@ class Generator
         $this->request               = $request;
         $this->order                 = $order;
         $this->orderSender           = $orderSender;
-        $this->invoiceService        = $invoiceService;
         $this->systemConfig          = $systemConfig;
         $this->altapayLogger         = $altapayLogger;
         $this->transactionRepository = $transactionRepository;
-        $this->transactionFactory    = $transactionFactory;
         $this->orderLoader           = $orderLoader;
         $this->orderLines            = $orderLines;
         $this->paymentHandler        = $paymentHandler;
@@ -214,7 +190,6 @@ class Generator
         $this->modelCart             = $modelCart;
         $this->dataToken             = $dataToken;
         $this->helper                = $helper;
-        $this->reconciliation        = $reconciliation;
         $this->creditMemo            = $creditMemo;
         $this->orderRepository       = $orderRepository;
     }
@@ -245,24 +220,6 @@ class Generator
         }
 
         return false;
-    }
-
-    /**
-     * @param $order
-     *
-     * @return void
-     */
-    public function createInvoice($order)
-    {
-        if (!$order->getInvoiceCollection()->count()) {
-            $invoice = $this->invoiceService->prepareInvoice($order);
-            $invoice->setRequestedCaptureCase(Invoice::CAPTURE_ONLINE);
-            $invoice->register();
-            $invoice->getOrder()->setCustomerNoteNotify(false);
-            $invoice->getOrder()->setIsInProcess(true);
-            $transaction = $this->transactionFactory->create()->addObject($invoice)->addObject($invoice->getOrder());
-            $transaction->save();
-        }
     }
 
     /**
@@ -461,7 +418,7 @@ class Generator
                 // Create Credit Memo
                 $this->creditMemo->createCreditMemo($order->getId());
 
-                $this->saveReconciliationData($transaction, $order);
+                $this->paymentHandler->saveReconciliationData($transaction, $order);
 
                 return false;
             }
@@ -535,7 +492,7 @@ class Generator
                         }
                     }
 
-                    $this->saveReconciliationData($transaction, $order);
+                    $this->paymentHandler->saveReconciliationData($transaction, $order);
                 }
                 $payment->setPaymentId($response->paymentId);
                 $payment->setLastTransId($transaction->TransactionId);
@@ -672,7 +629,7 @@ class Generator
                 }
 
                 if (strtolower($paymentType) === 'paymentandcapture' || strtolower($paymentType) === 'subscriptionandcharge') {
-                    $this->createInvoice($order);
+                    $this->paymentHandler->createInvoice($order);
                 }
             }
         }
@@ -993,32 +950,6 @@ class Generator
         $response = $callback->call();
         
         return $response->CardHolderErrorMessage ?? null;
-    }
-
-    /**
-     * @param $transaction
-     * @param $order
-     * @return void
-     */
-    public function saveReconciliationData($transaction, $order)
-    {
-        $reconciliationData = $transaction->ReconciliationIdentifiers ?? '';
-
-        if ($reconciliationData && is_array($reconciliationData)) {
-            $model = $this->reconciliation->create();
-
-            foreach ($reconciliationData as $value) {
-                $collection = $this->helper->getReconciliationData($order->getIncrementId(), $value->Id);
-                if (!$collection->getSize()) {
-                    $model->addData([
-                        "order_id" => $order->getIncrementId(),
-                        "identifier" => $value->Id,
-                        "type" => $value->Type
-                    ]);
-                }
-            }
-            $model->save();
-        }
     }
 
     /**
