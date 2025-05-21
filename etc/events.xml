@@ -38,4 +38,8 @@
         <observer name="SDM_Altapay_Checkout_Cart_Index" instance="SDM\Altapay\Observer\CheckoutCartIndex" />
     </event>
 
+    <event name="controller_action_predispatch">
+        <observer name="sdm_altapay_restore_quote" instance="SDM\Altapay\Observer\CheckoutCartIndex"/>
+    </event>
+
 </config>
