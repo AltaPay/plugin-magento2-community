@@ -115,7 +115,7 @@ class CaptureObserver implements ObserverInterface
         $storeCode   = $invoice->getStore()->getCode();
         
         if (in_array($payment->getMethod(), SystemConfig::getTerminalCodes())
-            && ((strtolower($paymentType) !== "paymentandcapture")
+            && ((!$paymentType || strtolower($paymentType) !== "paymentandcapture")
                 || (filter_var($capture, FILTER_VALIDATE_BOOLEAN) === true))
         ) {
             //Create orderlines from order items

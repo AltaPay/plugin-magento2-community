@@ -1,6 +1,11 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [4.1.2]
+### Fixed
+- Fix: Mini-cart does not refresh when a card payment is terminated by the user.
+- Fix: PHP 8.1+ deprecation warning by adding a null check before calling strtolower() in the capture and refund observer.
+
 ## [4.1.1]
 ### Fixed
 - Missing invoice issue for Apple Pay orders when auto-capture is enabled.
