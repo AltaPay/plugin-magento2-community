@@ -624,29 +624,19 @@ class Generator
                 $order->setIsNotified(false);
                 try {
                     $this->orderRepository->save($order);
+
+                    $quote = $this->quote->loadByIdWithoutStore($order->getQuoteId());
+                    if ($quote->getId()) {
+                        $quote->setIsActive(false)->setReservedOrderId(null)->save();
+
+                        $this->checkoutSession->clearQuote();
+                    }
                 } catch (\Exception $e) {
-                    $this->orderRepository->save($order);
+                    $this->altapayLogger->addCriticalLog('Exception during order/quote update', $e->getMessage());
                 }
 
                 if (strtolower($paymentType) === 'paymentandcapture' || strtolower($paymentType) === 'subscriptionandcharge') {
                     $this->paymentHandler->createInvoice($order);
-                }
-
-                // Properly deactivate the quote when order is successful
-                if ($status === 'succeeded' || $status === 'success') {
-                    $this->altapayLogger->addDebugLog('Deactivating quote for successful order', $order->getIncrementId());
-                    try {
-                        $quote = $this->quote->loadByIdWithoutStore($order->getQuoteId());
-                        if ($quote->getId()) {
-                            $quote->setIsActive(false)->setReservedOrderId(null)->save();
-                            
-                            // Clear the checkout session quote
-                            $this->checkoutSession->clearQuote();
-                            $this->checkoutSession->clearStorage();
-                        }
-                    } catch (\Exception $e) {
-                        $this->altapayLogger->addCriticalLog('Exception while deactivating quote', $e->getMessage());
-                    }
                 }
             }
         }
