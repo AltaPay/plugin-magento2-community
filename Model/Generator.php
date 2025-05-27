@@ -624,8 +624,15 @@ class Generator
                 $order->setIsNotified(false);
                 try {
                     $this->orderRepository->save($order);
+
+                    $quote = $this->quote->loadByIdWithoutStore($order->getQuoteId());
+                    if ($quote->getId()) {
+                        $quote->setIsActive(false)->setReservedOrderId(null)->save();
+
+                        $this->checkoutSession->clearQuote();
+                    }
                 } catch (\Exception $e) {
-                    $this->orderRepository->save($order);
+                    $this->altapayLogger->addCriticalLog('Exception during order/quote update', $e->getMessage());
                 }
 
                 if (strtolower($paymentType) === 'paymentandcapture' || strtolower($paymentType) === 'subscriptionandcharge') {
