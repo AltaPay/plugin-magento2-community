@@ -1,6 +1,10 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [4.1.3]
+### Fixed
+- Fixed order status not updating from "Pending Payment" after a successful payment.
+
 ## [4.1.2]
 ### Fixed
 - Fix: Mini-cart does not refresh when a card payment is terminated by the user.

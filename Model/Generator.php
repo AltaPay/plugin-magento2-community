@@ -561,7 +561,8 @@ class Generator
                 } elseif ($orderStatusAfterPayment) {
                     $orderState = $orderStatusAfterPayment;
                 }
-                if ($setOrderStatus && $order->getStatus() === $this->systemConfig->getStatusConfig('before', $storeScope, $storeCode)) {
+                if ($setOrderStatus && ($order->getStatus() === $this->systemConfig->getStatusConfig('before', $storeScope, $storeCode) ||
+                    $order->getStatus() === 'pending_payment')) {
                     $this->paymentHandler->setCustomOrderStatus($order, $orderState, $statusKey);
                 } elseif ($setOrderStatus && $order->getStatus() === 'canceled' && !in_array($paymentStatus, ['epayment_cancelled', 'released'])) {
                     try {
