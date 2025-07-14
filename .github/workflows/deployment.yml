@@ -31,7 +31,7 @@ jobs:
         with:
           repository: AltaPay/plugin-infrastructure
           token: ${{ secrets.ACCESS_TOKEN }}
-          ref: 'lock-mariadb-10.4-for-magento'
+          ref: 'install-mysql8-for-magento'
 
       # Install version 1.0.8 of Terraform CLI
       - name: Setup Terraform
