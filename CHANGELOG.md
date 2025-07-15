@@ -590,7 +590,6 @@ Fix: undefined variable maskedPan
 ### Changed
 - Updated the PHP client API
 
-
 ## [1.0.1]
 ### Added
 - First release
