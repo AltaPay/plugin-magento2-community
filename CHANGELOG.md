@@ -3,7 +3,7 @@ All notable changes to this project will be documented in this file.
 
 ## [4.1.3]
 ### Fixed
-- Fixed order status not updating from "Pending Payment" after a successful payment.
+- Fix: Order status not updating when payment failed on the first attempt but succeeded on retry.
 
 ## [4.1.2]
 ### Fixed
