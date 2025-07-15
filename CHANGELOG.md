@@ -1,6 +1,10 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [4.1.3]
+### Fixed
+- Fix: Order status not updating when payment failed on the first attempt but succeeded on retry.
+
 ## [4.1.2]
 ### Fixed
 - Fix: Mini-cart does not refresh when a card payment is terminated by the user.
