@@ -147,6 +147,13 @@ class RestoreQuote
             $storeScope = \Magento\Store\Model\ScopeInterface::SCOPE_STORE;
             $storeCode  = $order->getStore()->getCode();
 
+            if (!$orderId || !$order->getId()) {
+                $internalId = $this->checkoutSession->getLastOrderId();
+                if ($internalId) {
+                    $order = $this->orderFactory->create()->load($internalId);
+                    $orderId = $order->getIncrementId();
+                }
+            }
             //get transaction details if failure and redirect to cart
             $transactionData = $this->getTransactionData($orderId);
             if (!empty($transactionData)) {
