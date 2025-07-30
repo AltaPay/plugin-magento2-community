@@ -1,6 +1,15 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [4.1.4]
+### Added
+- Allow the use of a different logo on the payment page for each store when the `Payment Page Layout` is set to `Checkout Independent`.
+### Fixed
+- Fix: Failed payment error message is not being displayed.
+- Fix: Mini-cart does not refresh when a card payment is cancelled.
+- Fix: Pay button overlapping with text in the legacy form style.
+- Order status should not update after successful payment.
+
 ## [4.1.3]
 ### Fixed
 - Fix: Order status not updating when payment failed on the first attempt but succeeded on retry.
