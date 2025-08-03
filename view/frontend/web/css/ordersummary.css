@@ -19,7 +19,8 @@
     font-size: 1.4rem;
     box-sizing: border-box;
     vertical-align: middle;
-    margin-bottom: 5%;
+    margin: 10px 0 5px;
+    display: block;
 }
 
 #notice-cookie-block {

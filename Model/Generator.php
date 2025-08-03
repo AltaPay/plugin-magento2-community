@@ -246,9 +246,10 @@ class Generator
         $response = $callback->call();
         if ($response) {
             $order = $this->loadOrderFromCallback($response);
-            $orderTransactionId = $order->getPayment()->getLastTransId();
-            // Return if the incoming transaction id is different from order transaction id
-            if (!empty($orderTransactionId) && $orderTransactionId != $response->transactionId) return;
+
+            if ($this->shouldSkipOrderHandling($order, $response->transactionId)) {
+                return;
+            }
 
             $this->handleOrderStateAction($request, Order::STATE_PENDING_PAYMENT, $historyComment);
             //save failed transaction data
@@ -306,9 +307,11 @@ class Generator
         $response = $callback->call();
         if ($response) {
             $order = $this->loadOrderFromCallback($response);
-            $orderTransactionId = $order->getPayment()->getLastTransId();
-            // Return if the incoming transaction id is different from order transaction id
-            if (!empty($orderTransactionId) && $orderTransactionId != $response->transactionId) return;
+
+            if ($this->shouldSkipOrderHandling($order, $response->transactionId)) {
+                return;
+            }
+
             $reservationAmount = $this->getReservedAmount($response);
             // Check if the payment status is "error" and if the reservation amount is greater than 0.
             if ($response->status === "error" && $reservationAmount > 0) {
@@ -349,9 +352,11 @@ class Generator
         $response = $callback->call();
         if ($response) {
             $order = $this->loadOrderFromCallback($response);
-            $orderTransactionId = $order->getPayment()->getLastTransId();
-            // Return if the incoming transaction id is different from order transaction id
-            if(!empty($orderTransactionId) && $orderTransactionId != $response->transactionId) return;
+
+            if ($this->shouldSkipOrderHandling($order, $response->transactionId)) {
+                return;
+            }
+
             $this->checkoutSession->setAltapayCustomerRedirect(true);
             $order->setState($orderState);
             $order->setStatus($orderState);
@@ -1017,4 +1022,25 @@ class Generator
     {
         return ['processing', 'complete'];
     }
+
+    /**
+     * Determine if order handling should be skipped based on state or transaction ID.
+     *
+     * @param Order $order
+     * @param string|null $responseTransactionId
+     * @return bool
+     */
+    private function shouldSkipOrderHandling(Order $order, $responseTransactionId): bool
+    {
+        $authorizedStates = [
+            Order::STATE_PROCESSING,
+            Order::STATE_COMPLETE
+        ];
+
+        $orderTransactionId = $order->getPayment()->getLastTransId();
+
+        return in_array($order->getState(), $authorizedStates) ||
+            (!empty($orderTransactionId) && $orderTransactionId !== $responseTransactionId);
+    }
+
 }
