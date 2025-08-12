@@ -177,10 +177,9 @@ class RestoreQuote
 
             //set before state set in admin configuration
             $statusBefore = $this->systemConfig->getStatusConfig('before', $storeScope, $storeCode);
-            $statusCancel = $this->systemConfig->getStatusConfig('cancel', $storeScope, $storeCode);
 
             //if quote id exist and order status is from config
-            if ($quote->getId() && $this->verifyOrderStatus($statusBefore, $order->getStatus(), $statusCancel)) {
+            if ($quote->getId() && $this->verifyOrderStatus($statusBefore, $order->getStatus())) {
                 // Restore quote to load cart items
                 $this->checkoutSession->restoreQuote();
             }
@@ -214,14 +213,13 @@ class RestoreQuote
     /**
      * @param $statusBefore
      * @param $currentStatus
-     * @param $statusCancel
      *
      * @return bool
      */
-    public function verifyOrderStatus($statusBefore, $currentStatus, $statusCancel)
+    public function verifyOrderStatus($statusBefore, $currentStatus)
     {
-        if (!empty($statusBefore) || !empty($statusCancel)) {
-            if ($statusBefore == $currentStatus || $statusCancel == $currentStatus) {
+        if (!empty($statusBefore)) {
+            if ($currentStatus == $statusBefore || $currentStatus == Order::STATE_CANCELED) {
                 return true;
             }
         }

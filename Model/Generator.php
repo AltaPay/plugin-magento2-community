@@ -247,11 +247,8 @@ class Generator
         if ($response) {
             $order = $this->loadOrderFromCallback($response);
 
-            if ($this->shouldSkipOrderHandling($order, $response->transactionId)) {
-                return;
-            }
 
-            $this->handleOrderStateAction($request, Order::STATE_PENDING_PAYMENT, $historyComment);
+            $this->handleOrderStateAction($request, $historyComment);
             //save failed transaction data
             $this->saveTransactionData($response, $order);
         }
@@ -308,9 +305,6 @@ class Generator
         if ($response) {
             $order = $this->loadOrderFromCallback($response);
 
-            if ($this->shouldSkipOrderHandling($order, $response->transactionId)) {
-                return;
-            }
 
             $reservationAmount = $this->getReservedAmount($response);
             // Check if the payment status is "error" and if the reservation amount is greater than 0.
@@ -318,7 +312,7 @@ class Generator
                 return;
             }
             $transInfo = $this->getTransactionInfoFromResponse($response);
-            $this->handleOrderStateAction($request, Order::STATE_PENDING_PAYMENT, $historyComment, $transInfo);
+            $this->handleOrderStateAction($request, $historyComment, $transInfo);
             //save failed transaction data
             $this->saveTransactionData($response, $order);
         }
@@ -344,7 +338,6 @@ class Generator
      */
     public function handleOrderStateAction(
         RequestInterface $request,
-        $orderState = Order::STATE_NEW,
         $historyComment = "Order state changed",
         $transactionInfo = null
     ) {
@@ -358,8 +351,6 @@ class Generator
             }
 
             $this->checkoutSession->setAltapayCustomerRedirect(true);
-            $order->setState($orderState);
-            $order->setStatus($orderState);
             $order->setIsNotified(false);
             if ($transactionInfo !== null) {
                 $order->addStatusHistoryComment($transactionInfo);
@@ -435,7 +426,7 @@ class Generator
                 if (isset($transaction) && $authType === 'subscription_payment' && $transStatus !== 'captured') {
                     $responseComment = __(ConstantConfig::CONSUMER_CANCEL_PAYMENT);
                     $historyComment = __(ConstantConfig::CANCELLED) . '|' . $responseComment;
-                    $this->handleOrderStateAction($request, Order::STATE_PENDING_PAYMENT, $historyComment);
+                    $this->handleOrderStateAction($request, $historyComment);
                     //save failed transaction data
                     $this->saveTransactionData($response, $order);
 
@@ -739,7 +730,7 @@ class Generator
                 if ($order->getId()) {
                     $this->savePaymentData($response, $order);
                 }
-                $this->handleOrderStateAction($request, Order::STATE_PENDING_PAYMENT, $historyComment, $transInfo);
+                $this->handleOrderStateAction($request, $historyComment, $transInfo);
                 //save failed transaction data
                 $this->saveTransactionData($response, $order);
             }
@@ -939,7 +930,7 @@ class Generator
                 if ($order->getId()) {
                     $this->savePaymentData($response, $order);
                 }
-                $this->handleOrderStateAction($request, Order::STATE_PAYMENT_REVIEW, $message, $transInfo);
+                $this->handleOrderStateAction($request, $message, $transInfo);
                 //save failed transaction data
                 $this->saveTransactionData($response, $order);
 
@@ -1032,15 +1023,9 @@ class Generator
      */
     private function shouldSkipOrderHandling(Order $order, $responseTransactionId): bool
     {
-        $authorizedStates = [
-            Order::STATE_PROCESSING,
-            Order::STATE_COMPLETE
-        ];
-
         $orderTransactionId = $order->getPayment()->getLastTransId();
 
-        return in_array($order->getState(), $authorizedStates) ||
-            (!empty($orderTransactionId) && $orderTransactionId !== $responseTransactionId);
+        return !empty($orderTransactionId) && $orderTransactionId !== $responseTransactionId;
     }
 
 }

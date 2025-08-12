@@ -59,6 +59,27 @@ class Button extends Action
      */
     private $terminalLogo;
     /**
+     * @var TypeListInterface
+     */
+    protected $cacheTypeList;
+    /**
+     * @var ResponseHttp
+     */
+    protected $_response;
+    /**
+     * @var StoreManagerInterface
+     */
+    protected $storeManager;
+    /**
+     * @var State
+     */
+    protected $_state;
+    /**
+     * @var ResourceConnection
+     */
+    protected $_resource;
+
+    /**
      * @param Context               $context
      * @param SystemConfig          $systemConfig
      * @param Config                $resourceConfig
