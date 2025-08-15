@@ -84,12 +84,6 @@
                         <config_path>payment/altapay_status/process</config_path>
                     </field>
 
-                    <field id="orderstatus_cancel" translate="label comment" type="select" sortOrder="5" showInDefault="1" showInWebsite="1" showInStore="1">
-                        <label>Order status - cancel</label>
-                        <comment>The status on the order if a user cancel the order in the payment window</comment>
-                        <source_model>SDM\Altapay\Model\Config\Source\Order\Status\Cancel</source_model>
-                        <config_path>payment/altapay_status/cancel</config_path>
-                    </field>
                     <field id="orderstatus_autocapture" translate="label comment" type="select" sortOrder="6" showInDefault="1" showInWebsite="1" showInStore="1">
                         <label>Order status - autocapture</label>
                         <comment>The status on the order if autocapture is enabled</comment>

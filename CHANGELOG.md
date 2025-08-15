@@ -1,6 +1,12 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [4.1.5]
+### Fixed
+- Fix: Added proper admin error message when terminal sync fails for already configured terminals.
+- Fix: Prevent order status from changing from "Cancelled" to "Payment Pending".
+- Fix: Prevent order status from updating on fail callback, retaining the previous status.
+
 ## [4.1.4]
 ### Added
 - Allow the use of a different logo on the payment page for each store when the `Payment Page Layout` is set to `Checkout Independent`.
