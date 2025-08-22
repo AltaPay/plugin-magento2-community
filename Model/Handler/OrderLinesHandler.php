@@ -105,7 +105,9 @@ class OrderLinesHandler
         $itemName = $item->getName();
         $taxAmount = $item->getTaxAmount();
         $baseCurrency = $this->storeConfig->useBaseCurrency();
-        $unitPrice = $baseCurrency ? ($item->getBasePrice() ?? 0) : ($item->getPrice() ?? 0);
+        $unitPrice = $baseCurrency
+            ? round(($item->getBasePrice() ?? 0), 2)
+            : round(($item->getPrice() ?? 0), 2);
 
         if ($newOrder) {
             $quantity     = round($item->getQtyOrdered());
