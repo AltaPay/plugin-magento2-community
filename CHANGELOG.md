@@ -1,6 +1,10 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [4.1.6]
+### Fixed
+- Fix: Round off unit price in order line to 2 decimal digits.
+
 ## [4.1.5]
 ### Fixed
 - Fix: Added proper admin error message when terminal sync fails for already configured terminals.
