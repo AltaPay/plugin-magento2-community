@@ -763,7 +763,6 @@ class Gateway implements GatewayInterface
     public function getItemOrderLines($order)
     {
         $baseCurrency = $this->storeConfig->useBaseCurrency();
-        $total        = $baseCurrency ? $order->getBaseGrandTotal() : $order->getGrandTotal();
         $orderLines   = $this->itemOrderLines($order);
         if ($order->getShippingAmount() > 0 || $order->getShippingTaxAmount() > 0) {
             $orderLines[] = $this->orderLines->shippingOrderLine($order, true);
@@ -776,14 +775,7 @@ class Gateway implements GatewayInterface
         if (!empty($this->fixedProductTax($order))) {
             $orderLines[] = $this->orderLines->fixedProductTaxOrderLine($this->fixedProductTax($order));
         }
-        $totalCompensationAmount = $this->orderLines->totalCompensationAmount($orderLines, $total);
-        if ($totalCompensationAmount > 0 || $totalCompensationAmount < 0) {
-            $orderLines[] = $this->orderLines->compensationOrderLine(
-                "Compensation Amount",
-                "comp-amount",
-                $totalCompensationAmount
-            );
-        }
+
         return $orderLines;
     }
 }
