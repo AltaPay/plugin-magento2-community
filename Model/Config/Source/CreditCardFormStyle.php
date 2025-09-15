@@ -37,6 +37,7 @@ class CreditCardFormStyle implements ArrayInterface
     private static $designOptions = [
         'legacy' => 'Legacy',
         'checkout' => 'Checkout',
+        'checkout_v2' => 'Checkout V2',
         'custom' => 'Custom'
     ];
 

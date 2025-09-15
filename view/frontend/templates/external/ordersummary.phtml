@@ -14,10 +14,11 @@
 $block->getViewFileUrl('SDM_Altapay::css/external/style.css') ?>">
 <?php
 $config = $this->helper('SDM\Altapay\Helper\Config');
-$ccFormStyle = !empty($config->ccFormStyle()) ? $config->ccFormStyle() : 'legacy';
+$ccFormStyle = $config->ccFormStyle() ?: 'legacy';
+$cssClass = ($ccFormStyle === 'checkout_v2') ? 'checkout-v2 checkout' : $ccFormStyle;
 $order = $block->getOrder();
 ?>
-<body class="<?= $ccFormStyle ?>-style">
+<body class="<?= $cssClass ?>-style">
 <div class="w-full max-w-192 mx-auto flex-grow bg-white">
     <div class="banner-section">
         <div class="relative h-35 logo-cnt">

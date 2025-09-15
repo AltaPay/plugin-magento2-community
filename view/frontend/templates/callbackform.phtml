@@ -6,15 +6,13 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-?>
 
-
-<?php 
 $config = $this->helper('SDM\Altapay\Helper\Config');
-$ccFormStyle = !empty($config->ccFormStyle()) ? $config->ccFormStyle() : 'legacy';
+$ccFormStyle = $config->ccFormStyle() ?: 'legacy';
+$cssClass = ($ccFormStyle === 'checkout_v2') ? 'checkout-v2 checkout' : $ccFormStyle;
 ?>
 
-<div class="creaditcard-callback-form <?= $ccFormStyle ?>">
+<div class="creaditcard-callback-form <?= $cssClass ?>">
     <form id="PensioPaymentForm"></form>
     <div class="surcharge-amount">
         <strong><?= $block->escapeHtml(__('Surcharge:')) ?></strong>
