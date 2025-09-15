@@ -998,6 +998,22 @@ label.flex.justify-between.text-sm.px-5.py-3.bg-gray-500.border-gray-600 {
    max-width: 40px;
 }
 
+.checkout-v2.checkout-style .pensio_payment_form_cvc {
+   width: 50%;
+}
+.checkout-v2.checkout-style .pensio_payment_form_row.expiry_row {
+   float: none;
+   margin-top: 0;
+   gap: 0;
+}
+.checkout-v2.checkout-style .secure-payments-text {
+   width: 100%;
+   position: relative;
+   float: left;
+   text-align: right;
+   font-size: 12px;
+}
+
 @media (min-width:768px) {
 
    div.pensio_payment_form_outer,
