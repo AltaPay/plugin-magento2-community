@@ -256,7 +256,8 @@ body {
 .checkout-style .pensio_required_field_indicator,
 .checkout-style #invalid_amex_cvc,
 .checkout-style #invalid_cvc,
-.checkout-style #invalid_cardholdername {
+.checkout-style #invalid_cardholdername,
+.checkout-style #invalid_expire_year {
    color: red;
    margin-top: 4px;
 }
@@ -936,7 +937,7 @@ label.flex.justify-between.text-sm.px-5.py-3.bg-gray-500.border-gray-600 {
 .checkout-v2.checkout-style .pensio_payment_form_card-number,
 .checkout-v2.checkout-style .pensio_payment_form_cardholder,
 .checkout-v2.checkout-style .pensio_payment_form-cvc-input {
-   margin-top: 0;
+   margin-top: 0 !important;
 }
 
 .checkout-v2.checkout-style .pensio_payment_form_cardholder input {
@@ -963,8 +964,7 @@ label.flex.justify-between.text-sm.px-5.py-3.bg-gray-500.border-gray-600 {
    color: #666;
 }
 
-.checkout-v2.checkout-style .expire-month,
-.checkout-v2.checkout-style #emonth {
+.checkout-v2.checkout-style .expire-month, .checkout-v2.checkout-style #emonth {
    height: 51px;
    padding-top: 16px;
    padding-bottom: 16px;
@@ -976,6 +976,7 @@ label.flex.justify-between.text-sm.px-5.py-3.bg-gray-500.border-gray-600 {
    outline: none;
    cursor: pointer;
    font-size: 16px;
+   box-shadow: none !important;
    box-sizing: border-box;
    color: #666;
 }
@@ -1005,15 +1006,21 @@ label.flex.justify-between.text-sm.px-5.py-3.bg-gray-500.border-gray-600 {
    float: none;
    margin-top: 0;
    gap: 0;
+   justify-content: space-between;
 }
 .checkout-v2.checkout-style .secure-payments-text {
    width: 100%;
    position: relative;
    float: left;
    text-align: right;
-   font-size: 12px;
+   font-size: 10px;
+   padding-top: 5px;
 }
-
+.checkout-v2 div.payment-form-wrapper {
+   padding: 25px 25px 25px 25px !important;
+   display: inline-block;
+   width: 100%;
+}
 @media (min-width:768px) {
 
    div.pensio_payment_form_outer,
@@ -1104,7 +1111,7 @@ label.flex.justify-between.text-sm.px-5.py-3.bg-gray-500.border-gray-600 {
    clear: both
 }
 
-.pensio_payment_form_cvc_error {
+.pensio_payment_form_cvc_error, #invalid_expire_year {
    color: #e53e3e;
    font-size: .75rem
 }

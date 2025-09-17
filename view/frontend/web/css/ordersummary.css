@@ -148,7 +148,7 @@ footer.page-footer,
 .checkout-v2.checkout-style .pensio_payment_form_card-number,
 .checkout-v2.checkout-style .pensio_payment_form_cardholder,
 .checkout-v2.checkout-style .pensio_payment_form-cvc-input {
-    margin-top: 0;
+    margin-top: 0 !important;
 }
 
 .checkout-v2.checkout-style .pensio_payment_form_cardholder input {
@@ -175,8 +175,7 @@ footer.page-footer,
     color: #666;
 }
 
-.checkout-v2.checkout-style .expire-month,
-.checkout-v2.checkout-style #emonth {
+.checkout-v2.checkout-style .expire-month, .checkout-v2.checkout-style #emonth {
     height: 51px;
     padding-top: 16px;
     padding-bottom: 16px;
@@ -188,6 +187,7 @@ footer.page-footer,
     outline: none;
     cursor: pointer;
     font-size: 16px;
+    box-shadow: none !important;
     box-sizing: border-box;
     color: #666;
 }
@@ -217,15 +217,21 @@ footer.page-footer,
     float: none;
     margin-top: 0;
     gap: 0;
+    justify-content: space-between;
 }
 .checkout-v2.checkout-style .secure-payments-text {
     width: 100%;
     position: relative;
     float: left;
     text-align: right;
-    font-size: 12px;
+    font-size: 10px;
+    padding-top: 5px;
 }
-
+.checkout-v2 div.payment-form-wrapper {
+    padding: 25px 25px 25px 25px !important;
+    display: inline-block;
+    width: 100%;
+}
 @media (min-width: 992px) {
 
     .creaditcard-callback-form {
@@ -423,7 +429,11 @@ footer.page-footer,
 .creaditcard-callback-form.checkout .pensio_payment_form_label_cell {
     font-size: 16px
 }
-
+.checkout-style .cardholdername_row,
+.checkout-style .expiry_row,
+.checkout-style .cardnumber_row {
+    margin-top: 10px;
+}
 .creaditcard-callback-form.checkout .expiry_row,
 .cardnumber_row {
     margin-top: 10px;
