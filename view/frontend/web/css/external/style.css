@@ -120,6 +120,11 @@ body {
    width: 40%;
 }
 
+.creaditcard-callback-form.checkout.checkout-v2 .pensio_payment_form_cvc,
+.creaditcard-callback-form.checkout.checkout-v2 .pensio_payment_form_date-container{
+   width: 50%;
+}
+
 .checkout-style .pensio_payment_form-cvc-input {
    display: flex;
    position: relative;
@@ -257,6 +262,7 @@ body {
 .checkout-style #invalid_amex_cvc,
 .checkout-style #invalid_cvc,
 .checkout-style #invalid_cardholdername,
+.checkout-style #invalid_expire_month,
 .checkout-style #invalid_expire_year {
    color: red;
    margin-top: 4px;
