@@ -107,6 +107,125 @@ footer.page-footer,
     display: block;
 }
 
+.checkout-v2.checkout-style .pensio_payment_form_row.cardnumber_row {
+    margin-bottom: 0;
+}
+
+.checkout-v2.checkout-style .pensio_payment_form-date {
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    font-family: monospace !important;
+    border: 1px solid rgba(0, 0, 0, 0.16);
+    border-top: 0;
+    border-bottom-left-radius: 4px;
+    border-bottom-right-radius: 0px;
+}
+
+.checkout-v2.checkout-style .separator {
+    color: #a9a9ac;
+}
+
+.checkout-v2.checkout-style .pensio_payment_form_year {
+    width: 25%;
+}
+
+.checkout-v2.checkout-style .pensio_payment_form_card-number input {
+    padding: 16px 14px;
+    width: 100%;
+    cursor: pointer;
+    font-size: 16px;
+    box-sizing: border-box;
+    color: #666;
+    border-radius: 4px;
+    border: 1px solid rgba(0, 0, 0, 0.16);
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+    outline: none;
+    height: 51px;
+}
+
+.checkout-v2.checkout-style .pensio_payment_form_card-number,
+.checkout-v2.checkout-style .pensio_payment_form_cardholder,
+.checkout-v2.checkout-style .pensio_payment_form-cvc-input {
+    margin-top: 0;
+}
+
+.checkout-v2.checkout-style .pensio_payment_form_cardholder input {
+    color: #666;
+    outline: none;
+    height: 51px;
+}
+
+.checkout-v2.checkout-style .pensio_payment_form-cvc-input input {
+    padding: 16px 14px;
+    height: 52px;
+    box-sizing: border-box;
+    width: 100%;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.16) !important;
+    border-right: 1px solid rgba(0, 0, 0, 0.16) !important;
+    border-radius: 4px;
+    border-top: 0;
+    cursor: pointer;
+    font-size: 16px;
+    border-left: none;
+    border-bottom-left-radius: 0;
+    border-top-right-radius: 0;
+    outline: none;
+    color: #666;
+}
+
+.checkout-v2.checkout-style .expire-month,
+.checkout-v2.checkout-style #emonth {
+    height: 51px;
+    padding-top: 16px;
+    padding-bottom: 16px;
+    padding-left: 2px !important;
+    margin: auto 4px auto 14px;
+    font-family: monospace !important;
+    width: 100%;
+    border: none;
+    outline: none;
+    cursor: pointer;
+    font-size: 16px;
+    box-sizing: border-box;
+    color: #666;
+}
+
+.checkout-v2.checkout-style .expiry-year {
+    padding: 16px 4px;
+    height: 51px;
+    width: 100%;
+    border: none;
+    outline: none;
+    font-family: monospace !important;
+    cursor: pointer;
+    font-size: 16px;
+    box-sizing: border-box;
+    color: #666;
+}
+
+.checkout-v2.checkout-style .pensio_payment_form_month {
+    width: 20%;
+    max-width: 40px;
+}
+
+.checkout-v2.checkout-style .pensio_payment_form_cvc {
+    width: 50%;
+}
+.checkout-v2.checkout-style .pensio_payment_form_row.expiry_row {
+    float: none;
+    margin-top: 0;
+    gap: 0;
+}
+.checkout-v2.checkout-style .secure-payments-text {
+    width: 100%;
+    position: relative;
+    float: left;
+    text-align: right;
+    font-size: 12px;
+}
+
 @media (min-width: 992px) {
 
     .creaditcard-callback-form {

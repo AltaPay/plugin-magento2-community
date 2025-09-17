@@ -9,7 +9,7 @@
 
 $config = $this->helper('SDM\Altapay\Helper\Config');
 $ccFormStyle = $config->ccFormStyle() ?: 'legacy';
-$cssClass = ($ccFormStyle === 'checkout_v2') ? 'checkout-v2 checkout' : $ccFormStyle;
+$cssClass = ($ccFormStyle === 'checkout_v2') ? 'checkout checkout-v2 checkout-style' : $ccFormStyle;
 ?>
 
 <div class="creaditcard-callback-form <?= $cssClass ?>">
