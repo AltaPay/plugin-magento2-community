@@ -193,13 +193,17 @@ Choose one of the below options from `Checkout form style` dropdown to change th
 
 ![Checkout form styling configuration](docs/checkout_form_style.jpg)
 
-- `Legacy` Choose this option if legacy form is enabled from the gateway side.
+- `Legacy` Legacy design with basic form styling.
 
     ![altapay_cc_legacy_form.png](docs/legacy_style.jpg)
 
-- `Checkout` Select the option to show the Credit Card form in a modern look. Make sure the checkout form is enabled from the gateway side.
+- `Checkout` Select the option to show the Credit Card form in a modern look.
 
-    ![Checkout Style](docs/checkout_style.jpg)
+    ![Checkout Style](docs/custom_payment_page_layout.png)
+
+- `Checkout v2` Select this option to display the credit card form with a sleek design, showing the expiry date in two-digit month and year format, and the payment amount on the pay button.
+
+  ![Checkout Style_v2](docs/checkout_style_v2.jpg)
 
 - `Custom` This option can be selected to implement custom styling on the payment page. Selecting this option will remove all the styling from the payment page.
 

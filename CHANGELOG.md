@@ -1,6 +1,10 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [4.1.7]
+### Added
+- Add support for Checkout Design v2.
+
 ## [4.1.6]
 ### Fixed
 - Fix: Round off unit price in order line to 2 decimal digits.
