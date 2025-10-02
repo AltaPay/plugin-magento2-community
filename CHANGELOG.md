@@ -1,6 +1,10 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [4.1.7]
+### Fixed
+- Fix: Updated client session ID handling to use Magento’s default Encryptor class for secure encryption.
+
 ## [4.1.6]
 ### Fixed
 - Fix: Round off unit price in order line to 2 decimal digits.
