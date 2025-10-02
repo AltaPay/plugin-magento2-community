@@ -1,9 +1,13 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [4.1.8]
+### Added
+Fix: Updated client session ID handling to use Magento’s default Encryptor class for secure encryption.
+
 ## [4.1.7]
-### Fixed
-- Fix: Updated client session ID handling to use Magento’s default Encryptor class for secure encryption.
+### Added
+- Add support for Checkout Design v2.
 
 ## [4.1.6]
 ### Fixed

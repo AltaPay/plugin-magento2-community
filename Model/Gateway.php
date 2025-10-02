@@ -46,6 +46,7 @@ use Magento\Framework\Event\ManagerInterface;
  */
 class Gateway implements GatewayInterface
 {
+    const ALTAPAY_DEFAULT_FORM_TEMPLATE = 'custom';
     /**
      * @var Helper Data
      */
@@ -124,6 +125,12 @@ class Gateway implements GatewayInterface
      * @var ManagerInterface
      */
     protected $_eventManager;
+
+    private static $formTemplateMap = [
+        'legacy'      => 'form_dynamic_div',
+        'checkout'    => 'form_checkout_div',
+        'checkout_v2' => 'form_checkout'
+    ];
     /**
      * Gateway constructor.
      *
@@ -393,6 +400,7 @@ class Gateway implements GatewayInterface
         $baseCurrency = $this->storeConfig->useBaseCurrency();
         $grandTotal = $baseCurrency ? $order->getBaseGrandTotal() : $order->getGrandTotal();
         $currencyCode = $baseCurrency ? $order->getBaseCurrencyCode() : $order->getOrderCurrencyCode();
+        $formTemplate = $this->getFormTemplateFromConfig();
 
         $request->setTerminal($terminalName)
             ->setShopOrderId($order->getIncrementId())
@@ -403,7 +411,9 @@ class Gateway implements GatewayInterface
             ->setCookie($this->request->getServer('HTTP_COOKIE'))
             ->setSaleReconciliationIdentifier($this->random->getUniqueHash())
             ->setConfig($this->setConfig($storeScope, $storeCode));
-        
+        if ($formTemplate) {
+            $request->setFormTemplate($formTemplate);
+        }
         if(!$isReservation) {
             $request->setSalesTax(round($order->getTaxAmount(), 2));
         }
@@ -777,5 +787,17 @@ class Gateway implements GatewayInterface
         }
 
         return $orderLines;
+    }
+
+    /**
+     * @return string|null
+     */
+    private function getFormTemplateFromConfig()
+    {
+        $selectedDesign = $this->storeConfig->ccFormStyle();
+        if ($selectedDesign === self::ALTAPAY_DEFAULT_FORM_TEMPLATE) {
+            return null;
+        }
+        return self::$formTemplateMap[$selectedDesign] ?? null;
     }
 }
