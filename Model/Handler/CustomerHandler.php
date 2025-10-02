@@ -107,7 +107,8 @@ class CustomerHandler
             $customer->setClientIP($this->request->getServer('REMOTE_ADDR'));
             $customer->setClientAcceptLanguage(substr($this->request->getServer('HTTP_ACCEPT_LANGUAGE'), 0, 2));
             $customer->setHttpUserAgent($this->request->getServer('HTTP_USER_AGENT'));
-            $customer->setClientSessionID(crypt($this->session->getSessionId(),'$5$rounds=5000$customersessionid$'));
+            $salt = '$5$rounds=5000$' . bin2hex(random_bytes(8)) . '$';
+            $customer->setClientSessionID(crypt($this->session->getSessionId(), $salt));
         }
         if (!$order->getCustomerIsGuest()) {
             $customer->setUsername($order->getCustomerId());
