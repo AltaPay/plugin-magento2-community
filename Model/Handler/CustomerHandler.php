@@ -53,8 +53,8 @@ class CustomerHandler
      * @param Order                       $order
      * @param CustomerRepositoryInterface $customerRepositoryInterface
      * @param Http                        $request
-     * @param EncryptorInterface          $encryptor
      * @param SessionManagerInterface     $session
+     * @param EncryptorInterface          $encryptor
      */
     public function __construct(
         Order $order,
