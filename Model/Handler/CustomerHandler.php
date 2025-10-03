@@ -60,14 +60,14 @@ class CustomerHandler
         Order $order,
         CustomerRepositoryInterface $customerRepositoryInterface,
         Http $request,
-        EncryptorInterface $encryptor,
-        SessionManagerInterface $session
+        SessionManagerInterface $session,
+        EncryptorInterface $encryptor
     ) {
         $this->order                       = $order;
         $this->customerRepositoryInterface = $customerRepositoryInterface;
         $this->request                     = $request;
-        $this->encryptor                   = $encryptor;
         $this->session                     = $session;
+        $this->encryptor                   = $encryptor;
     }
     
     /**
