@@ -1,4 +1,4 @@
-name: Build
+name: SonarQube Analysis
 
 on:
   pull_request:
@@ -8,7 +8,7 @@ on:
     
 jobs:
   build:
-    name: Build and analyze
+    name: Run SonarQube Analysis
     runs-on: self-hosted
     
     steps:
