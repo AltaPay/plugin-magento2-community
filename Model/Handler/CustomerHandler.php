@@ -15,6 +15,7 @@ use Magento\Sales\Model\Order;
 use Magento\Customer\Api\CustomerRepositoryInterface;
 use Magento\Framework\App\Request\Http;
 use Magento\Framework\Session\SessionManagerInterface;
+use Magento\Framework\Encryption\EncryptorInterface;
 
 /**
  * Class CustomerHandler
@@ -42,23 +43,31 @@ class CustomerHandler
     protected $session;
 
     /**
+     * @var EncryptorInterface
+     */
+    protected $encryptor;
+
+    /**
      * Gateway constructor.
      *
      * @param Order                       $order
      * @param CustomerRepositoryInterface $customerRepositoryInterface
      * @param Http                        $request
      * @param SessionManagerInterface     $session
+     * @param EncryptorInterface          $encryptor
      */
     public function __construct(
         Order $order,
         CustomerRepositoryInterface $customerRepositoryInterface,
         Http $request,
-        SessionManagerInterface $session
+        SessionManagerInterface $session,
+        EncryptorInterface $encryptor
     ) {
         $this->order                       = $order;
         $this->customerRepositoryInterface = $customerRepositoryInterface;
         $this->request                     = $request;
         $this->session                     = $session;
+        $this->encryptor                   = $encryptor;
     }
     
     /**
@@ -107,7 +116,7 @@ class CustomerHandler
             $customer->setClientIP($this->request->getServer('REMOTE_ADDR'));
             $customer->setClientAcceptLanguage(substr($this->request->getServer('HTTP_ACCEPT_LANGUAGE'), 0, 2));
             $customer->setHttpUserAgent($this->request->getServer('HTTP_USER_AGENT'));
-            $customer->setClientSessionID(crypt($this->session->getSessionId(),'$5$rounds=5000$customersessionid$'));
+            $customer->setClientSessionID($this->encryptor->encrypt($this->session->getSessionId()));
         }
         if (!$order->getCustomerIsGuest()) {
             $customer->setUsername($order->getCustomerId());
