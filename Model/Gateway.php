@@ -411,7 +411,8 @@ class Gateway implements GatewayInterface
             ->setCookie($this->request->getServer('HTTP_COOKIE'))
             ->setSaleReconciliationIdentifier($this->random->getUniqueHash())
             ->setConfig($this->setConfig($storeScope, $storeCode));
-        if ($formTemplate) {
+
+        if ($formTemplate && !$isApplePay && !$isReservation) {
             $request->setFormTemplate($formTemplate);
         }
         if(!$isReservation) {
