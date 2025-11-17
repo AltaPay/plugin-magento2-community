@@ -1,6 +1,10 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [4.1.9]
+### Fixed
+Fix: Apply form template only when supported and not for Apple Pay or reservations.
+
 ## [4.1.8]
 ### Fixed
 Fix: Updated client session ID handling to use Magento’s default Encryptor class for secure encryption.
