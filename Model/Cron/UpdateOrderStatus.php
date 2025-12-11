@@ -101,7 +101,13 @@ class UpdateOrderStatus
             
             if (array_filter($orderCollection->getData())) {
                 foreach ($orderCollection as $order) {
-                    $this->orderManagement->cancel((int) $order->getEntityId());
+                    $orderId = $order->getEntityId();
+
+                    if (!is_numeric($orderId) || (int)$orderId <= 0) {
+                        throw new \InvalidArgumentException('Invalid order ID');
+                    }
+
+                    $this->orderManagement->cancel($orderId);
                 }
 
                 $this->logger->info('Order status has been changed from pending to canceled');
