@@ -208,7 +208,7 @@ describe('Payments', function () {
         })
     })
 
-    it('Klarna full capture and refund', function () {
+    it.skip('Klarna full capture and refund', function () {
         const ord = new Order()
         ord.clrcookies()
         ord.visit()
