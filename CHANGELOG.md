@@ -1,6 +1,10 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [4.2.0]
+### Fixed
+Fix: Stock is not restored correctly during order cancellation for pending orders during the cron scheduler run.
+
 ## [4.1.9]
 ### Fixed
 Fix: Apply form template only when supported and not for Apple Pay or reservations.

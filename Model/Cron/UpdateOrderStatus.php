@@ -9,12 +9,12 @@
 
 namespace SDM\Altapay\Model\Cron;
 
-use Magento\Sales\Api\OrderRepositoryInterface;
 use Magento\Store\Model\ScopeInterface;
 use Psr\Log\LoggerInterface;
 use Magento\Framework\Api\SearchCriteriaBuilder;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Sales\Model\ResourceModel\Order\CollectionFactory;
+use Magento\Sales\Api\OrderManagementInterface;
 
 class UpdateOrderStatus 
 {
@@ -26,11 +26,6 @@ class UpdateOrderStatus
      * @var LoggerInterface
      */
     protected $logger;
-
-    /**
-     * @var OrderRepositoryInterface
-     */
-    protected $orderRepository;
 
     /**
      * @var SearchCriteriaBuilder
@@ -48,32 +43,36 @@ class UpdateOrderStatus
     protected $scopeConfig;
 
     /**
+     * @var OrderManagementInterface
+     */
+    private $orderManagement;
+
+    /**
      * UpdateOrderStatus constructor.
      *
      * @param LoggerInterface          $logger
-     * @param OrderRepositoryInterface $orderRepository
      * @param SearchCriteriaBuilder    $searchCriteriaBuilder
      * @param ScopeConfigInterface     $scopeConfig
      * @param CollectionFactory        $orderCollection
+     * @param OrderManagementInterface $orderManagement
      */
 
     public function __construct(
         LoggerInterface $logger,
-        OrderRepositoryInterface $orderRepository,
         SearchCriteriaBuilder $searchCriteriaBuilder,
         ScopeConfigInterface $scopeConfig,
-        CollectionFactory $orderCollection
+        CollectionFactory $orderCollection,
+        OrderManagementInterface $orderManagement
     ) {
         $this->logger = $logger;
-        $this->orderRepository = $orderRepository;
         $this->searchCriteriaBuilder = $searchCriteriaBuilder;
         $this->scopeConfig = $scopeConfig;
         $this->orderCollection = $orderCollection;
+        $this->orderManagement = $orderManagement;
     }
 
     public function execute()
     {
-        $completeStatus = 'canceled';
         $storeScope = ScopeInterface::SCOPE_STORE;
         $cronEnabled = $this->scopeConfig->getValue(self::CRON_ENABLED, $storeScope);
 
@@ -102,11 +101,13 @@ class UpdateOrderStatus
             
             if (array_filter($orderCollection->getData())) {
                 foreach ($orderCollection as $order) {
+                    $orderId = $order->getEntityId();
 
-                    $order = $this->orderRepository->get($order->getEntityId());
-                    $order->setStatus($completeStatus)->setState($completeStatus);
+                    if (!is_numeric($orderId) || (int)$orderId <= 0) {
+                        throw new \InvalidArgumentException('Invalid order ID');
+                    }
 
-                    $this->orderRepository->save($order); 
+                    $this->orderManagement->cancel($orderId);
                 }
 
                 $this->logger->info('Order status has been changed from pending to canceled');
