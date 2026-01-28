@@ -19,4 +19,10 @@ $cssClass = ($ccFormStyle === 'checkout_v2') ? 'checkout checkout-v2 checkout-st
         <span id="PensioSurcharge"></span>
         <span><?= $config->getCurrencySymbol(); ?></span>
     </div>
+    <div class="payment-actions">
+        <a href="<?= $block->getUrl('checkout/cart') ?>"
+           class="action cancel secondary">
+            <?= $block->escapeHtml(__('Back to Shopping Cart')) ?>
+        </a>
+    </div>
 </div>

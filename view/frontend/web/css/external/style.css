@@ -23,6 +23,25 @@ body {
    box-sizing: inherit
 }
 
+.payment-actions {
+   margin-top: 20px;
+   text-align: center;
+}
+
+.payment-actions .action.cancel {
+   display: inline-block;
+   padding: 10px 18px;
+   background: #f5f5f5;
+   color: #333;
+   border: 1px solid #ccc;
+   text-decoration: none;
+   border-radius: 4px;
+}
+
+.payment-actions .action.cancel:hover {
+   background: #e6e6e6;
+}
+
 .checkout-style div.payment-form-wrapper {
    text-align: left;
    margin-left: auto;
@@ -1027,6 +1046,7 @@ label.flex.justify-between.text-sm.px-5.py-3.bg-gray-500.border-gray-600 {
    display: inline-block;
    width: 100%;
 }
+
 @media (min-width:768px) {
 
    div.pensio_payment_form_outer,

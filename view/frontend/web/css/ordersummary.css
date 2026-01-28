@@ -583,6 +583,25 @@ footer.page-footer,
     box-shadow: none !important;
 }
 
+.payment-actions {
+    margin-top: 20px;
+    text-align: center;
+}
+
+.payment-actions .action.cancel {
+    display: inline-block;
+    padding: 10px 18px;
+    background: #f5f5f5;
+    color: #333;
+    border: 1px solid #ccc;
+    text-decoration: none;
+    border-radius: 4px;
+}
+
+.payment-actions .action.cancel:hover {
+    background: #e6e6e6;
+}
+
 @media (max-width: 991px) {
     .creaditcard-callback-form.checkout {
         margin-top: 15px;

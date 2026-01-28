@@ -22,7 +22,7 @@ $order = $block->getOrder();
 <div class="w-full max-w-192 mx-auto flex-grow bg-white">
     <div class="banner-section">
         <div class="relative h-35 logo-cnt">
-            <a href="<?= $block->getCurrentUrl() ?>"><img src="<?= $block->getLogoSrc(); ?>" class="max-w-header-logo"/></a>
+            <img src="<?= $block->getLogoSrc(); ?>" class="max-w-header-logo"/>
         </div>
     </div>
     <div class="flex flex-col sm:flex-row payment-form-page-wrapper">
@@ -35,6 +35,12 @@ $order = $block->getOrder();
                         <span id="PensioSurcharge"></span>
                         <span><?= $config->getCurrencySymbol(); ?></span>
                     </div>
+                </div>
+                <div class="payment-actions">
+                    <a href="<?= $block->getUrl('checkout/cart') ?>"
+                       class="action cancel secondary">
+                        <?= $block->escapeHtml(__('Back to Shopping Cart')) ?>
+                    </a>
                 </div>
             </div>
         </div>
