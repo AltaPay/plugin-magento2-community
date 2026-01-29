@@ -583,6 +583,14 @@ footer.page-footer,
     box-shadow: none !important;
 }
 
+.payment-actions {
+    margin-top: 35px;
+}
+
+.payment-actions .action.cancel {
+    text-decoration: underline;
+}
+
 @media (max-width: 991px) {
     .creaditcard-callback-form.checkout {
         margin-top: 15px;

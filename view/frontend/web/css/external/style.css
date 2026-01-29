@@ -1027,6 +1027,13 @@ label.flex.justify-between.text-sm.px-5.py-3.bg-gray-500.border-gray-600 {
    display: inline-block;
    width: 100%;
 }
+
+.payment-actions .action.cancel {
+   text-decoration: underline;
+   color: #006bb4;
+   font-size: 14px;
+}
+
 @media (min-width:768px) {
 
    div.pensio_payment_form_outer,

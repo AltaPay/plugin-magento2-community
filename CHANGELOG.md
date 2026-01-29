@@ -1,17 +1,21 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [4.2.1]
+### Added
+- Added a **Back to Shopping Cart** button on the payment form, allowing customers to cancel the payment and return to the cart.
+
 ## [4.2.0]
 ### Fixed
-Fix: Stock is not restored correctly during order cancellation for pending orders during the cron scheduler run.
+- Fix: Stock is not restored correctly during order cancellation for pending orders during the cron scheduler run.
 
 ## [4.1.9]
 ### Fixed
-Fix: Apply form template only when supported and not for Apple Pay or reservations.
+- Fix: Apply form template only when supported and not for Apple Pay or reservations.
 
 ## [4.1.8]
 ### Fixed
-Fix: Updated client session ID handling to use Magento’s default Encryptor class for secure encryption.
+- Fix: Updated client session ID handling to use Magento’s default Encryptor class for secure encryption.
 
 ## [4.1.7]
 ### Added
