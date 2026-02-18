@@ -1,6 +1,11 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [4.2.2]
+### Added
+- Fixed compatibility issues with PHP 8.1.
+- Updated language settings to enforce correct German locale mapping.
+
 ## [4.2.1]
 ### Added
 - Added a **Back to Shopping Cart** button on the payment form, allowing customers to cancel the payment and return to the cart.

@@ -25,9 +25,14 @@ class Languages extends Locale implements ArrayInterface
         $languages     = [];
         $mainlanguages = parent::toOptionArray();
         $response      = new LanguageTypes();
-        foreach ($mainlanguages as $keylang => $language) {
-            list($key, $tmp) = explode('_', $language['value']);
-            if (in_array($key, $response->getAllowed())) {
+        foreach ($mainlanguages as $language) {
+            $value = $language['value'];
+            [$key] = explode('_', $value, 2);
+            // Allow only German (Germany)
+            if ($language['value'] === 'de_CH' || ($key === 'de' && $language['value'] !== 'de_DE')) {
+                continue;
+            }
+            if (in_array($key, $response->getAllowed(), true)) {
                 $languages[$key] = $language;
             }
         }
