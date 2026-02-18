@@ -1,6 +1,11 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [4.2.2]
+### Fixed
+- Fix: Issue where failed AltaPay orders stayed in pending status and were not cancelled automatically.
+- Improved the cancellation logic to keep stock in sync correctly.
+
 ## [4.2.1]
 ### Added
 - Added a **Back to Shopping Cart** button on the payment form, allowing customers to cancel the payment and return to the cart.
