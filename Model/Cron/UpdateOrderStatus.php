@@ -15,6 +15,7 @@ use Magento\Framework\Api\SearchCriteriaBuilder;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Sales\Model\ResourceModel\Order\CollectionFactory;
 use Magento\Sales\Api\OrderManagementInterface;
+use SDM\Altapay\Model\SystemConfig;
 
 class UpdateOrderStatus 
 {
@@ -91,10 +92,17 @@ class UpdateOrderStatus
             $orderCollection = $this->orderCollection->create();
             $orderCollection->addFieldToSelect('entity_id')
                             ->addFieldToFilter('created_at', ['lt' => date('Y-m-d H:i:s', $cutoffTime)])
-                            ->addAttributeToFilter('status','pending')
-                            ->addAttributeToFilter('state','new')
-                            ->addAttributeToFilter('altapay_payment_form_url', ['neq' => 'NULL']);
+                            ->addFieldToFilter('state', ['in' => ['new', 'pending_payment']]);
             
+            $orderCollection->getSelect()
+                ->join(
+                    ['payment' => $orderCollection->getTable('sales_order_payment')],
+                    'main_table.entity_id = payment.parent_id',
+                    []
+                )
+                ->where('payment.method IN (?)', SystemConfig::getTerminalCodes())
+                ->where('payment.last_trans_id IS NULL OR payment.last_trans_id = ?', '');
+
             if ($this->scopeConfig->getValue(self::EXCLUDE_ADMIN_ORDER, $storeScope)) {
                 $orderCollection->addFieldToFilter('remote_ip', ['neq' => null]);
             }
