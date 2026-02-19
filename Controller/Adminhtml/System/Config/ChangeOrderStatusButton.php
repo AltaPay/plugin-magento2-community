@@ -18,6 +18,7 @@ use Magento\Sales\Api\OrderRepositoryInterface;
 use Magento\Framework\Api\SearchCriteriaBuilder;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Sales\Model\ResourceModel\Order\CollectionFactory;
+use SDM\Altapay\Model\SystemConfig;
 
 class ChangeOrderStatusButton extends Action
 {
@@ -90,8 +91,16 @@ class ChangeOrderStatusButton extends Action
         try
         {
             $orderCollection = $this->orderCollection->create();
-            $orderCollection->addAttributeToFilter('status','pending')
-                            ->addAttributeToFilter('altapay_payment_form_url', ['neq' => 'NULL']);
+            $orderCollection->addFieldToFilter('state', ['in' => ['new', 'pending_payment']]);
+            
+            $orderCollection->getSelect()
+                ->join(
+                    ['payment' => $orderCollection->getTable('sales_order_payment')],
+                    'main_table.entity_id = payment.parent_id',
+                    []
+                )
+                ->where('payment.method IN (?)', SystemConfig::getTerminalCodes())
+                ->where('payment.last_trans_id IS NULL OR payment.last_trans_id = ?', '');
             
             if (array_filter($orderCollection->getData())) {
                 foreach ($orderCollection as $order) {
