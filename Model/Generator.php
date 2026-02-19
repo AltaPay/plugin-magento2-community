@@ -997,7 +997,9 @@ class Generator
     private function hasOrderComment(Order $order, $commentText)
     {
         foreach ($order->getStatusHistoryCollection() as $history) {
-            if (trim($history->getComment()) === trim($commentText)) {
+            $comment = $history->getComment();
+                
+            if (!empty($comment) && trim($comment) === trim($commentText)) {
                 return true;
             }
         }
