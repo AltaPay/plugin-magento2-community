@@ -1,7 +1,7 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
-## [4.2.2]
+## [unreleased]
 ### Fixed
 - Fix: Issue where failed AltaPay orders stayed in pending status and were not cancelled automatically.
 - Improved the cancellation logic to keep stock in sync correctly.
