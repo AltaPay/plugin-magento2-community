@@ -10,13 +10,41 @@
 namespace SDM\Altapay\Controller\Index;
 
 use Magento\Framework\App\ResponseInterface;
-use SDM\Altapay\Controller\Index;
 use Magento\Framework\App\CsrfAwareActionInterface;
 use Magento\Framework\App\RequestInterface;
 use Magento\Framework\App\Request\InvalidRequestException;
+use Magento\Framework\App\Action\Action;
+use Magento\Framework\App\Action\Context;
+use Magento\Framework\Controller\Result\RawFactory;
+use Magento\Framework\View\LayoutFactory;
 
-class Redirect extends Index implements CsrfAwareActionInterface
+class Redirect extends Action implements CsrfAwareActionInterface
 {
+    /**
+     * @var LayoutFactory
+     */
+    protected $layoutFactory;
+
+    /**
+     * @var RawFactory
+     */
+    protected $resultRawFactory;
+
+    /**
+     * Redirect constructor.
+     * @param Context $context
+     * @param LayoutFactory $layoutFactory
+     * @param RawFactory $resultRawFactory
+     */
+    public function __construct(
+        Context $context,
+        LayoutFactory $layoutFactory,
+        RawFactory $resultRawFactory
+    ) {
+        parent::__construct($context);
+        $this->layoutFactory = $layoutFactory;
+        $this->resultRawFactory = $resultRawFactory;
+    }
 
     /**
      * Dispatch request
@@ -40,11 +68,16 @@ class Redirect extends Index implements CsrfAwareActionInterface
     {
         return true;
     }
-
     public function execute()
     {
-        $this->writeLog();
+        $layout = $this->layoutFactory->create();
 
-        return $this->pageFactory->create();
+        $block = $layout->createBlock(\SDM\Altapay\Block\Callback\Redirect::class)
+            ->setTemplate('SDM_Altapay::callback_redirect.phtml');
+
+        $result = $this->resultRawFactory->create();
+        $result->setContents($block->toHtml());
+
+        return $result;
     }
 }
