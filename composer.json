@@ -4,8 +4,8 @@
   "description": "AltaPay: Payments less complicated",
   "version": "4.2.3",
    "require": {
-        "php": "^7.0 || ^8.1",
-        "altapay/api-php": "^3.5.4"
+        "php": "^7.1 || ^8.1",
+        "altapay/api-php": "^3.5.8"
   },
   "type": "magento2-module",
   "autoload": {
