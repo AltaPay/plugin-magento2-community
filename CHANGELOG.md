@@ -1,6 +1,10 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [4.2.3]
+### Fixed
+- Fix AltaPay callback redirect layout rendering.
+
 ## [4.2.2]
 ### Added
 - Fixed compatibility issues with PHP 8.1.

@@ -209,6 +209,6 @@ class OrderLinesHandler
             $orderLinesTotal += $orderLinePriceWithTax - ($orderLinePriceWithTax * ($orderLine->discount / 100));
         }
 
-        return round(($total - $orderLinesTotal), 3);
+        return (round($total * 100) - round($orderLinesTotal * 100)) / 100;
     }
 }
