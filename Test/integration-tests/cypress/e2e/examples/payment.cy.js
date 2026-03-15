@@ -96,7 +96,7 @@ describe('Payments', function () {
                             cy.visit(payment_link)
                             cy.get('#creditCardNumberInput').type('4111111111111111')
                             cy.get('#emonth').select('12')
-                            cy.get('#eyear').select('2025')
+                            cy.get('#eyear').select('2030')
                             cy.get('#cvcInput').type('123')
                             cy.get('#cardholderNameInput').type('testname')
                             cy.get('#pensioCreditCardPaymentSubmitButton').click().wait(3000)

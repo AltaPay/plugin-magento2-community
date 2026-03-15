@@ -47,7 +47,7 @@ class Order {
         }
         cy.get('#creditCardNumberInput').type('4111111111111111')
         cy.get('#emonth').select('12')
-        cy.get('#eyear').select('2025')
+        cy.get('#eyear').select('2030')
         cy.get('#cvcInput').type('123')
         cy.get('#cardholderNameInput').type('testname')
         cy.get('body').then(($p) => {
@@ -139,7 +139,7 @@ class Order {
             cy.get('._active > .payment-method-content > :nth-child(5) > div.primary > .action').click().wait(3000)
             cy.get('#creditCardNumberInput').type('4111111111111111')
             cy.get('#emonth').type('01')
-            cy.get('#eyear').type('2023')
+            cy.get('#eyear').type('2030')
             cy.get('#cvcInput').type('123')
             cy.get('#cardholderNameInput').type('testname')
             cy.get('#pensioCreditCardPaymentSubmitButton').click().wait(6000)
