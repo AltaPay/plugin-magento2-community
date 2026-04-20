@@ -1,6 +1,10 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [4.2.4]
+### Fixed
+- Fix typo in the terminal ID parameter.
+
 ## [4.2.3]
 ### Fixed
 - Fix AltaPay callback redirect layout rendering.
