@@ -1,6 +1,13 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [4.2.4]
+### Fixed
+- Fix typo in the Apple Pay merchant validation POST parameter (`termminalid` → `terminalId`).
+
+### Notes
+- **For custom integrations:** If you have a custom extension or server-side controller that reads the `termminalid` POST parameter from `sdmaltapay/index/applepay`, update it to read `terminalId` instead.
+
 ## [4.2.3]
 ### Fixed
 - Fix AltaPay callback redirect layout rendering.

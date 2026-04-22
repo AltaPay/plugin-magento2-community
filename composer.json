@@ -2,7 +2,7 @@
   "name": "altapay/magento2-community",
   "license": "MIT",
   "description": "AltaPay: Payments less complicated",
-  "version": "4.2.3",
+  "version": "4.2.4",
    "require": {
         "php": "^7.1 || ^8.1",
         "altapay/api-php": "^3.5.8"

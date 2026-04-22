@@ -95,7 +95,7 @@ class ApplePay extends Action implements CsrfAwareActionInterface
     {
         $storeCode     = $this->getStoreCode();
         $validationUrl = $this->getRequest()->getParam('validationUrl');
-        $terminalName = $this->getRequest()->getParam('termminalid');
+        $terminalName = $this->getRequest()->getParam('terminalId');
         $currentUrl = $this->_urlInterface->getBaseUrl();
         $domain = parse_url($currentUrl, PHP_URL_HOST);
         $auth     = $this->systemConfig->getAuth($storeCode);

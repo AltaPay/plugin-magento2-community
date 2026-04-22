@@ -163,7 +163,7 @@ define(
                         url: url,
                         data: {
                             validationUrl: event.validationURL,
-                            termminalid: terminal ? terminal : this.configData.terminaldata[this.getCode()].terminalname
+                            terminalId: terminal ? terminal : this.configData.terminaldata[this.getCode()].terminalname
                         },
                         type: 'post',
                         dataType: 'JSON',
