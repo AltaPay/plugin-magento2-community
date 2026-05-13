@@ -482,29 +482,42 @@ class Gateway implements GatewayInterface
     }
 
     /**
+     * @param $request
+     * @param $storeScope
+     * @param $storeCode
+     *
+     * @return array
+     */
+    private function getActiveTerminals($request, $storeScope, $storeCode)
+    {
+        $activeTerminals     = [];
+        $currentTerminalName = $request->unresolvedOptions['terminal'];
+        if (!empty(trim((string)$currentTerminalName))) {
+            $activeTerminals[] = $currentTerminalName;
+        }
+        foreach (SystemConfig::getTerminalCodes() as $terminalCode) {
+            $isActive = $this->systemConfig->getTerminalConfigFromTerminalName($terminalCode, 'active', $storeScope, $storeCode);
+            if ($isActive) {
+                $name = $this->systemConfig->getTerminalConfigFromTerminalName($terminalCode, 'terminalname', $storeScope, $storeCode);
+                if (!empty(trim((string)$name)) && $name !== $currentTerminalName) {
+                    $activeTerminals[] = $name;
+                }
+            }
+        }
+
+        return $activeTerminals;
+    }
+
+    /**
      * @param $order
      * @param $request
      */
     private function createCheckoutSession($order, $request)
     {
         if ($request instanceof PaymentRequest) {
-            $storeScope    = $this->storeConfig->getStoreScope();
-            $storeCode     = $order->getStore()->getCode();
-
-            $activeTerminals = [];
-            $currentTerminalName = $request->unresolvedOptions['terminal'];
-            if (!empty(trim((string)$currentTerminalName))) {
-                $activeTerminals[] = $currentTerminalName;
-            }
-            foreach (SystemConfig::getTerminalCodes() as $terminalCode) {
-                $isActive = $this->systemConfig->getTerminalConfigFromTerminalName($terminalCode, 'active', $storeScope, $storeCode);
-                if ($isActive) {
-                    $name = $this->systemConfig->getTerminalConfigFromTerminalName($terminalCode, 'terminalname', $storeScope, $storeCode);
-                    if (!empty(trim((string)$name)) && $name !== $currentTerminalName) {
-                        $activeTerminals[] = $name;
-                    }
-                }
-            }
+            $storeScope      = $this->storeConfig->getStoreScope();
+            $storeCode       = $order->getStore()->getCode();
+            $activeTerminals = $this->getActiveTerminals($request, $storeScope, $storeCode);
 
             try {
                 $checkoutSession = new CheckoutSession($this->systemConfig->getAuth($storeCode));
