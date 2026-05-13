@@ -39,6 +39,7 @@ use Altapay\Api\Payments\ReservationOfFixedAmount;
 use SDM\Altapay\Api\TransactionRepositoryInterface;
 use Altapay\Api\Others\Terminals;
 use Magento\Framework\Event\ManagerInterface;
+use Altapay\Api\Payments\CheckoutSession;
 
 /**
  * Class Gateway
@@ -218,6 +219,9 @@ class Gateway implements GatewayInterface
             );
             $request = $this->preparePaymentRequest($order, $orderLines, $orderId, $terminalId, null);
             if ($request) {
+                if ($request instanceof PaymentRequest) {
+                    $this->createCheckoutSession($order, $request);
+                }
                 return $this->sendPaymentRequest($order, $request);
             }
         }
@@ -475,6 +479,49 @@ class Gateway implements GatewayInterface
         $request->setOrderLines($orderLines);
 
         return $request;
+    }
+
+    /**
+     * @param $order
+     * @param $request
+     */
+    private function createCheckoutSession($order, $request)
+    {
+        if ($request instanceof PaymentRequest) {
+            $storeScope    = $this->storeConfig->getStoreScope();
+            $storeCode     = $order->getStore()->getCode();
+
+            $activeTerminals = [];
+            $currentTerminalName = $request->unresolvedOptions['terminal'];
+            if (!empty(trim((string)$currentTerminalName))) {
+                $activeTerminals[] = $currentTerminalName;
+            }
+            foreach (SystemConfig::getTerminalCodes() as $terminalCode) {
+                $isActive = $this->systemConfig->getTerminalConfigFromTerminalName($terminalCode, 'active', $storeScope, $storeCode);
+                if ($isActive) {
+                    $name = $this->systemConfig->getTerminalConfigFromTerminalName($terminalCode, 'terminalname', $storeScope, $storeCode);
+                    if (!empty(trim((string)$name)) && $name !== $currentTerminalName) {
+                        $activeTerminals[] = $name;
+                    }
+                }
+            }
+
+            try {
+                $checkoutSession = new CheckoutSession($this->systemConfig->getAuth($storeCode));
+                $checkoutSession->setTerminals($activeTerminals)
+                    ->setTerminal($request->unresolvedOptions['terminal'])
+                    ->setShopOrderId($order->getIncrementId())
+                    ->setAmount((float)$request->unresolvedOptions['amount'])
+                    ->setCurrency($request->unresolvedOptions['currency']);
+
+                $checkoutResponse = $checkoutSession->call();
+                if ($checkoutResponse->Session) {
+                    $request->setSessionID($checkoutResponse->Session->Id);
+                }
+            } catch (\Exception $e) {
+                $this->altapayLogger->addCriticalLog('CheckoutSession Exception', $e->getMessage());
+            }
+        }
     }
 
     /**
