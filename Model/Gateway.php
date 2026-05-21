@@ -519,20 +519,31 @@ class Gateway implements GatewayInterface
             $storeCode       = $order->getStore()->getCode();
             $activeTerminals = $this->getActiveTerminals($request, $storeScope, $storeCode);
 
-            try {
-                $checkoutSession = new CheckoutSession($this->systemConfig->getAuth($storeCode));
-                $checkoutSession->setTerminals($activeTerminals)
-                    ->setTerminal($request->unresolvedOptions['terminal'])
-                    ->setShopOrderId($order->getIncrementId())
-                    ->setAmount((float)$request->unresolvedOptions['amount'])
-                    ->setCurrency($request->unresolvedOptions['currency']);
+            $sessionId = $this->checkoutSession->getData('altapay_checkout_session_id');
 
-                $checkoutResponse = $checkoutSession->call();
-                if ($checkoutResponse->Session) {
-                    $request->setSessionID($checkoutResponse->Session->Id);
+            if ($sessionId !== 'session-' . $order->getQuoteId() . '-' . $order->getIncrementId()) {
+                try {
+                    $sessionId = 'session-' . $order->getQuoteId() . '-' . $order->getIncrementId();
+                    $marketPaySession = new CheckoutSession($this->systemConfig->getAuth($storeCode));
+                    $marketPaySession->setTerminals($activeTerminals)
+                        ->setTerminal($request->unresolvedOptions['terminal'])
+                        ->setShopOrderId($order->getIncrementId())
+                        ->setAmount((float)$request->unresolvedOptions['amount'])
+                        ->setCurrency($request->unresolvedOptions['currency'])
+                        ->setSessionId($sessionId);
+
+                    $checkoutResponse = $marketPaySession->call();
+                    if (isset($checkoutResponse->Session->Id)) {
+                        $sessionId = $checkoutResponse->Session->Id;
+                    }
+                    $this->checkoutSession->setData('altapay_checkout_session_id', $sessionId);
+                } catch (\Exception $e) {
+                    $this->altapayLogger->addCriticalLog('CheckoutSession Exception', $e->getMessage());
                 }
-            } catch (\Exception $e) {
-                $this->altapayLogger->addCriticalLog('CheckoutSession Exception', $e->getMessage());
+            }
+
+            if ($sessionId) {
+                $request->setSessionId($sessionId);
             }
         }
     }
