@@ -528,9 +528,9 @@ class Gateway implements GatewayInterface
             $storeCode       = $order->getStore()->getCode();
             $activeTerminals = $this->getActiveTerminals($request, $storeScope, $storeCode);
 
-            $sessionId = $this->checkoutSession->getData('altapay_checkout_session_id');
+            $sessionId = $this->checkoutSession->getData('altapay_checkout_session_id_' . $order->getIncrementId());
 
-            if ($sessionId !== 'session-' . $order->getQuoteId() . '-' . $order->getIncrementId()) {
+            if (empty($sessionId)) {
                 try {
                     $sessionId = 'session-' . $order->getQuoteId() . '-' . $order->getIncrementId();
                     $marketPaySession = new CheckoutSession($this->systemConfig->getAuth($storeCode));
@@ -545,7 +545,7 @@ class Gateway implements GatewayInterface
                     if (isset($checkoutResponse->Session->Id)) {
                         $sessionId = $checkoutResponse->Session->Id;
                     }
-                    $this->checkoutSession->setData('altapay_checkout_session_id', $sessionId);
+                    $this->checkoutSession->setData('altapay_checkout_session_id_' . $order->getIncrementId(), $sessionId);
                 } catch (\Exception $e) {
                     $this->altapayLogger->addCriticalLog('CheckoutSession Exception', $e->getMessage());
                 }
