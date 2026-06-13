@@ -528,24 +528,24 @@ class Gateway implements GatewayInterface
             $storeCode       = $order->getStore()->getCode();
             $activeTerminals = $this->getActiveTerminals($request, $storeScope, $storeCode);
 
-            $sessionId = $this->checkoutSession->getData('altapay_checkout_session_id_' . $order->getIncrementId());
+            $sessionKey = 'altapay_checkout_session_id_' . $order->getQuoteId();
+            $sessionId  = $this->checkoutSession->getData($sessionKey);
 
             if (empty($sessionId)) {
                 try {
-                    $sessionId = 'session-' . $order->getQuoteId() . '-' . $order->getIncrementId();
                     $marketPaySession = new CheckoutSession($this->systemConfig->getAuth($storeCode));
                     $marketPaySession->setTerminals($activeTerminals)
                         ->setTerminal($request->unresolvedOptions['terminal'])
                         ->setShopOrderId($order->getIncrementId())
                         ->setAmount((float)$request->unresolvedOptions['amount'])
                         ->setCurrency($request->unresolvedOptions['currency'])
-                        ->setSessionId($sessionId);
+                        ->setSessionId($order->getProtectCode());
 
                     $checkoutResponse = $marketPaySession->call();
                     if (isset($checkoutResponse->Session->Id)) {
                         $sessionId = $checkoutResponse->Session->Id;
                     }
-                    $this->checkoutSession->setData('altapay_checkout_session_id_' . $order->getIncrementId(), $sessionId);
+                    $this->checkoutSession->setData($sessionKey, $sessionId);
                 } catch (\Exception $e) {
                     $this->altapayLogger->addCriticalLog('CheckoutSession Exception', $e->getMessage());
                 }
