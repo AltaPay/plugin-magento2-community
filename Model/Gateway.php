@@ -39,6 +39,7 @@ use Altapay\Api\Payments\ReservationOfFixedAmount;
 use SDM\Altapay\Api\TransactionRepositoryInterface;
 use Altapay\Api\Others\Terminals;
 use Magento\Framework\Event\ManagerInterface;
+use Magento\Framework\Encryption\EncryptorInterface;
 use Altapay\Api\Payments\CheckoutSession;
 
 /**
@@ -127,6 +128,11 @@ class Gateway implements GatewayInterface
      */
     protected $_eventManager;
 
+    /**
+     * @var EncryptorInterface
+     */
+    private $encryptor;
+
     private static $formTemplateMap = [
         'legacy'      => 'form_dynamic_div',
         'checkout'    => 'form_checkout_div',
@@ -154,6 +160,7 @@ class Gateway implements GatewayInterface
      * @param Random                         $random
      * @param TransactionRepositoryInterface $transactionRepository
      * @param ManagerInterface               $eventManager
+     * @param EncryptorInterface             $encryptor
      */
     public function __construct(
         Session $checkoutSession,
@@ -174,7 +181,8 @@ class Gateway implements GatewayInterface
         StoreManagerInterface $storeManager,
         Random $random,
         TransactionRepositoryInterface $transactionRepository,
-        ManagerInterface $eventManager
+        ManagerInterface $eventManager,
+        EncryptorInterface $encryptor
     )
     {
         $this->checkoutSession       = $checkoutSession;
@@ -196,6 +204,7 @@ class Gateway implements GatewayInterface
         $this->random                = $random;
         $this->transactionRepository = $transactionRepository;
         $this->_eventManager         = $eventManager;
+        $this->encryptor             = $encryptor;
     }
 
     /**
@@ -528,8 +537,9 @@ class Gateway implements GatewayInterface
             $storeCode       = $order->getStore()->getCode();
             $activeTerminals = $this->getActiveTerminals($request, $storeScope, $storeCode);
 
-            $sessionKey = 'altapay_checkout_session_id_' . $order->getQuoteId();
-            $sessionId  = $this->checkoutSession->getData($sessionKey);
+            $sessionKey   = 'altapay_checkout_session_id_' . $order->getQuoteId();
+            $sessionId    = $this->checkoutSession->getData($sessionKey);
+            $sessionToken = $this->encryptor->hash((string)$order->getQuoteId());
 
             if (empty($sessionId)) {
                 try {
@@ -539,7 +549,7 @@ class Gateway implements GatewayInterface
                         ->setShopOrderId($order->getIncrementId())
                         ->setAmount((float)$request->unresolvedOptions['amount'])
                         ->setCurrency($request->unresolvedOptions['currency'])
-                        ->setSessionId($order->getProtectCode());
+                        ->setSessionId($sessionToken);
 
                     $checkoutResponse = $marketPaySession->call();
                     if (isset($checkoutResponse->Session->Id)) {
