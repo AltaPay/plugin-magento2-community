@@ -530,7 +530,9 @@ class Gateway implements GatewayInterface
 
             $sessionKey   = 'altapay_checkout_session_id_' . $order->getQuoteId();
             $sessionId    = $this->checkoutSession->getData($sessionKey);
-            $sessionToken = $this->encryptor->hash((string)$order->getQuoteId());
+            // Re-encode the full SHA-256 hash (64 hex chars) as base64url (43 chars) so the
+            // entire 256-bit digest fits within AltaPay's 50-char session_id limit without truncation.
+            $sessionToken = rtrim(strtr(base64_encode(hex2bin($this->encryptor->hash((string)$order->getQuoteId()))), '+/', '-_'), '=');
 
             if (empty($sessionId)) {
                 try {
