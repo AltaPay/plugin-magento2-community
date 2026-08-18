@@ -39,6 +39,8 @@ use Altapay\Api\Payments\ReservationOfFixedAmount;
 use SDM\Altapay\Api\TransactionRepositoryInterface;
 use Altapay\Api\Others\Terminals;
 use Magento\Framework\Event\ManagerInterface;
+use Magento\Framework\Encryption\EncryptorInterface;
+use Altapay\Api\Payments\CheckoutSession;
 
 /**
  * Class Gateway
@@ -126,6 +128,11 @@ class Gateway implements GatewayInterface
      */
     protected $_eventManager;
 
+    /**
+     * @var EncryptorInterface
+     */
+    private $encryptor;
+
     private static $formTemplateMap = [
         'legacy'      => 'form_dynamic_div',
         'checkout'    => 'form_checkout_div',
@@ -153,6 +160,7 @@ class Gateway implements GatewayInterface
      * @param Random                         $random
      * @param TransactionRepositoryInterface $transactionRepository
      * @param ManagerInterface               $eventManager
+     * @param EncryptorInterface             $encryptor
      */
     public function __construct(
         Session $checkoutSession,
@@ -173,7 +181,8 @@ class Gateway implements GatewayInterface
         StoreManagerInterface $storeManager,
         Random $random,
         TransactionRepositoryInterface $transactionRepository,
-        ManagerInterface $eventManager
+        ManagerInterface $eventManager,
+        EncryptorInterface $encryptor
     )
     {
         $this->checkoutSession       = $checkoutSession;
@@ -195,6 +204,7 @@ class Gateway implements GatewayInterface
         $this->random                = $random;
         $this->transactionRepository = $transactionRepository;
         $this->_eventManager         = $eventManager;
+        $this->encryptor             = $encryptor;
     }
 
     /**
@@ -218,6 +228,9 @@ class Gateway implements GatewayInterface
             );
             $request = $this->preparePaymentRequest($order, $orderLines, $orderId, $terminalId, null);
             if ($request) {
+                if ($request instanceof PaymentRequest) {
+                    $this->createCheckoutSession($order, $request);
+                }
                 return $this->sendPaymentRequest($order, $request);
             }
         }
@@ -475,6 +488,76 @@ class Gateway implements GatewayInterface
         $request->setOrderLines($orderLines);
 
         return $request;
+    }
+
+    /**
+     * @param $request
+     * @param $storeScope
+     * @param $storeCode
+     *
+     * @return array
+     */
+    private function getActiveTerminals($request, $storeScope, $storeCode)
+    {
+        $activeTerminals     = [];
+        $currentTerminalName = $request->unresolvedOptions['terminal'];
+        if (!empty(trim((string)$currentTerminalName))) {
+            $activeTerminals[] = $currentTerminalName;
+        }
+        foreach (SystemConfig::getTerminalCodes() as $terminalCode) {
+            $isActive = $this->systemConfig->getTerminalConfigFromTerminalName($terminalCode, 'active', $storeScope, $storeCode);
+            if ($isActive) {
+                $name = $this->systemConfig->getTerminalConfigFromTerminalName($terminalCode, 'terminalname', $storeScope, $storeCode);
+                if (!empty(trim((string)$name)) && $name !== $currentTerminalName) {
+                    $activeTerminals[] = $name;
+                }
+            }
+        }
+
+        return $activeTerminals;
+    }
+
+    /**
+     * @param $order
+     * @param $request
+     */
+    private function createCheckoutSession($order, $request)
+    {
+        if ($request instanceof PaymentRequest) {
+            $storeScope      = $this->storeConfig->getStoreScope();
+            $storeCode       = $order->getStore()->getCode();
+            $activeTerminals = $this->getActiveTerminals($request, $storeScope, $storeCode);
+
+            $sessionKey   = 'altapay_checkout_session_id_' . $order->getQuoteId();
+            $sessionId    = $this->checkoutSession->getData($sessionKey);
+            // Re-encode the full SHA-256 hash (64 hex chars) as base64url (43 chars) so the
+            // entire 256-bit digest fits within AltaPay's 50-char session_id limit without truncation.
+            $sessionToken = rtrim(strtr(base64_encode(hex2bin($this->encryptor->hash((string)$order->getQuoteId()))), '+/', '-_'), '=');
+
+            if (empty($sessionId)) {
+                try {
+                    $marketPaySession = new CheckoutSession($this->systemConfig->getAuth($storeCode));
+                    $marketPaySession->setTerminals($activeTerminals)
+                        ->setTerminal($request->unresolvedOptions['terminal'])
+                        ->setShopOrderId($order->getIncrementId())
+                        ->setAmount((float)$request->unresolvedOptions['amount'])
+                        ->setCurrency($request->unresolvedOptions['currency'])
+                        ->setSessionId($sessionToken);
+
+                    $checkoutResponse = $marketPaySession->call();
+                    if (isset($checkoutResponse->Session->Id)) {
+                        $sessionId = $checkoutResponse->Session->Id;
+                    }
+                    $this->checkoutSession->setData($sessionKey, $sessionId);
+                } catch (\Exception $e) {
+                    $this->altapayLogger->addCriticalLog('CheckoutSession Exception', $e->getMessage());
+                }
+            }
+
+            if ($sessionId) {
+                $request->setSessionId($sessionId);
+            }
+        }
     }
 
     /**
