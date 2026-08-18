@@ -1,9 +1,9 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
-## [4.3.4]
+## [4.2.5]
 ### Added
-- Add support for MarketPay payment methods.
+- Add support for `checkoutSession` for reusable checkout sessions improving fraud detection and conversion.
 
 ## [4.2.4]
 ### Fixed
