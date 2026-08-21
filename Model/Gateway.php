@@ -372,6 +372,15 @@ class Gateway implements GatewayInterface
         if ($isApplePay) {
             $request = new CardWalletAuthorize($auth);
             $request->setProviderData($providerData);
+
+            $legacyFlow = $this->systemConfig->getTerminalConfig($terminalId, 'legacyapplepayflow', $storeScope, $storeCode);
+            if (!$this->systemConfig->isLegacyApplePayFlow($legacyFlow)) {
+                $paymentId = $this->checkoutSession->getData('altapay_payment_id');
+                if ($paymentId) {
+                    $request->setPaymentId($paymentId);
+                }
+                $this->checkoutSession->unsetData('altapay_payment_id');
+            }
         }
 
         if (!empty($post['tokenid'])) {

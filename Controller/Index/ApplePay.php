@@ -21,6 +21,7 @@ use Magento\Framework\App\Request\InvalidRequestException;
 use Magento\Store\Model\StoreManagerInterface;
 use Magento\Framework\App\Action\Context;
 use Magento\Framework\UrlInterface;
+use Magento\Checkout\Model\Session as CheckoutSession;
 
 class ApplePay extends Action implements CsrfAwareActionInterface
 {
@@ -43,6 +44,11 @@ class ApplePay extends Action implements CsrfAwareActionInterface
     private $_urlInterface;
 
     /**
+     * @var CheckoutSession
+     */
+    private $checkoutSession;
+
+    /**
      * Apple Pay constructor.
      *
      * @param Context $context
@@ -50,19 +56,22 @@ class ApplePay extends Action implements CsrfAwareActionInterface
      * @param SystemConfig $systemConfig
      * @param StoreManagerInterface $storeManager
      * @param UrlInterface $urlInterface
+     * @param CheckoutSession $checkoutSession
      */
     public function __construct(
         Context $context,
         storeConfig $storeConfig,
         SystemConfig $systemConfig,
         StoreManagerInterface $storeManager,
-        UrlInterface $urlInterface
+        UrlInterface $urlInterface,
+        CheckoutSession $checkoutSession
     ) {
         parent::__construct($context);
         $this->storeConfig   = $storeConfig;
         $this->systemConfig  = $systemConfig;
         $this->_storeManager = $storeManager;
         $this->_urlInterface = $urlInterface;
+        $this->checkoutSession = $checkoutSession;
     }
 
     /**
@@ -94,8 +103,10 @@ class ApplePay extends Action implements CsrfAwareActionInterface
     public function execute()
     {
         $storeCode     = $this->getStoreCode();
+        $storeScope    = $this->storeConfig->getStoreScope();
         $validationUrl = $this->getRequest()->getParam('validationUrl');
         $terminalName = $this->getRequest()->getParam('terminalId');
+        $terminalCode = $this->getRequest()->getParam('terminalCode');
         $currentUrl = $this->_urlInterface->getBaseUrl();
         $domain = parse_url($currentUrl, PHP_URL_HOST);
         $auth     = $this->systemConfig->getAuth($storeCode);
@@ -104,14 +115,78 @@ class ApplePay extends Action implements CsrfAwareActionInterface
                 ->setValidationUrl($validationUrl)
                 ->setDomain($domain);
 
-        $response = $request->call();
-        if ($response->Result === 'Success') {
-            $response = $this->resultFactory
-            ->create(\Magento\Framework\Controller\ResultFactory::TYPE_JSON)
-            ->setData($response->ApplePaySession);
-    
-            return $response;
+        if (!$this->isLegacyApplePayFlow($terminalCode, $storeScope, $storeCode)) {
+            $quote = $this->checkoutSession->getQuote();
+            if (!$quote || !$quote->getId()) {
+                return $this->resultFactory
+                    ->create(\Magento\Framework\Controller\ResultFactory::TYPE_JSON)
+                    ->setData(['message' => __('Payment failed. Please try again.')]);
+            }
+
+            $baseCurrency = $this->storeConfig->useBaseCurrency();
+            $grandTotal   = $baseCurrency ? $quote->getBaseGrandTotal() : $quote->getGrandTotal();
+            $currencyCode = $baseCurrency ? $quote->getBaseCurrencyCode() : $quote->getQuoteCurrencyCode();
+
+            $request->setShopOrderId($quote->reserveOrderId()->getReservedOrderId())
+                    ->setAmount(round($grandTotal, 2))
+                    ->setCurrency($currencyCode)
+                    ->setApplePayRequestData([
+                        'validationUrl' => $validationUrl,
+                        'domain'        => $domain,
+                    ]);
         }
+
+        $response = $request->call();
+        if ($response->Result !== 'Success') {
+            return $this->resultFactory
+                ->create(\Magento\Framework\Controller\ResultFactory::TYPE_JSON)
+                ->setData(['message' => __('Payment failed. Please try again.')]);
+        }
+
+        if (isset($response->ApplePaySession)) {
+            return $this->resultFactory
+                ->create(\Magento\Framework\Controller\ResultFactory::TYPE_JSON)
+                ->setData($response->ApplePaySession);
+        }
+
+        if (isset($response->WalletData->Session)) {
+            $transaction = !empty($response->Transactions) ? reset($response->Transactions) : null;
+            if ($transaction && isset($transaction->PaymentId)) {
+                $this->checkoutSession->setData('altapay_payment_id', $transaction->PaymentId);
+            }
+
+            return $this->resultFactory
+                ->create(\Magento\Framework\Controller\ResultFactory::TYPE_JSON)
+                ->setData($response->WalletData->Session);
+        }
+
+        return $this->resultFactory
+            ->create(\Magento\Framework\Controller\ResultFactory::TYPE_JSON)
+            ->setData(['message' => __('Payment failed. Please try again.')]);
+    }
+
+    /**
+     * Whether the Apple Pay has the legacy flow enabled.
+     *
+     * @param string $terminalCode The Magento payment method code (e.g. "terminal1")
+     * @param mixed  $storeScope
+     * @param string $storeCode
+     * @return bool
+     */
+    private function isLegacyApplePayFlow($terminalCode, $storeScope, $storeCode)
+    {
+        if (!$terminalCode) {
+            return true;
+        }
+
+        $legacyFlow = $this->systemConfig->getTerminalConfigFromTerminalName(
+            $terminalCode,
+            'legacyapplepayflow',
+            $storeScope,
+            $storeCode
+        );
+
+        return $this->systemConfig->isLegacyApplePayFlow($legacyFlow);
     }
 
     /**
