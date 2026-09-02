@@ -39,7 +39,6 @@ use Altapay\Api\Payments\ReservationOfFixedAmount;
 use SDM\Altapay\Api\TransactionRepositoryInterface;
 use Altapay\Api\Others\Terminals;
 use Magento\Framework\Event\ManagerInterface;
-use Magento\Framework\Encryption\EncryptorInterface;
 use Altapay\Api\Payments\CheckoutSession;
 
 /**
@@ -128,11 +127,6 @@ class Gateway implements GatewayInterface
      */
     protected $_eventManager;
 
-    /**
-     * @var EncryptorInterface
-     */
-    private $encryptor;
-
     private static $formTemplateMap = [
         'legacy'      => 'form_dynamic_div',
         'checkout'    => 'form_checkout_div',
@@ -160,7 +154,6 @@ class Gateway implements GatewayInterface
      * @param Random                         $random
      * @param TransactionRepositoryInterface $transactionRepository
      * @param ManagerInterface               $eventManager
-     * @param EncryptorInterface             $encryptor
      */
     public function __construct(
         Session $checkoutSession,
@@ -181,8 +174,7 @@ class Gateway implements GatewayInterface
         StoreManagerInterface $storeManager,
         Random $random,
         TransactionRepositoryInterface $transactionRepository,
-        ManagerInterface $eventManager,
-        EncryptorInterface $encryptor
+        ManagerInterface $eventManager
     )
     {
         $this->checkoutSession       = $checkoutSession;
@@ -204,7 +196,6 @@ class Gateway implements GatewayInterface
         $this->random                = $random;
         $this->transactionRepository = $transactionRepository;
         $this->_eventManager         = $eventManager;
-        $this->encryptor             = $encryptor;
     }
 
     /**
@@ -530,12 +521,10 @@ class Gateway implements GatewayInterface
 
             $sessionKey   = 'altapay_checkout_session_id_' . $order->getQuoteId();
             $sessionId    = $this->checkoutSession->getData($sessionKey);
-            // Re-encode the full SHA-256 hash (64 hex chars) as base64url (43 chars) so the
-            // entire 256-bit digest fits within AltaPay's 50-char session_id limit without truncation.
-            $sessionToken = rtrim(strtr(base64_encode(hex2bin($this->encryptor->hash((string)$order->getQuoteId()))), '+/', '-_'), '=');
 
             if (empty($sessionId)) {
                 try {
+                    $sessionToken     = $this->random->getUniqueHash();
                     $marketPaySession = new CheckoutSession($this->systemConfig->getAuth($storeCode));
                     $marketPaySession->setTerminals($activeTerminals)
                         ->setTerminal($request->unresolvedOptions['terminal'])
