@@ -1,13 +1,9 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
-## [4.2.6]
+## [4.2.5]
 ### Added
-- Extended Apple Pay support to include the MarketPay acquirer. For the updated payment methods settings please see [Configure terminals](https://github.com/AltaPay/plugin-magento2-community/wiki#configure-terminals)
-
-## [4.2.6]
-### Added
-- Extended Apple Pay support to include the MarketPay acquirer. For the updated payment methods settings please see [Configure terminals](https://github.com/AltaPay/plugin-magento2-community/wiki#configure-terminals)
+- Add support for MarketPay payment methods.
 
 ## [4.2.4]
 ### Fixed
