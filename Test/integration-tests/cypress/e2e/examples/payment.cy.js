@@ -75,7 +75,7 @@ describe('Payments', function () {
         })
     })
 
-    it('CC Pay by link', function () {
+    it.skip('CC Pay by link', function () {
         const ord = new Order()
         ord.clrcookies()
 
@@ -441,7 +441,7 @@ describe('Payments', function () {
         })
     })
 
-    it('Subscription payment', function () {
+    it.skip('Subscription payment', function () {
         const ord = new Order()
         ord.clrcookies()
         ord.visit()

@@ -1,6 +1,10 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [4.2.5]
+### Added
+- Add support for MarketPay payment methods.
+
 ## [4.2.4]
 ### Fixed
 - Fix typo in the Apple Pay merchant validation POST parameter (`termminalid` → `terminalId`).
