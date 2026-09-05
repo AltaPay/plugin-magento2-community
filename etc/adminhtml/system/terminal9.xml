@@ -43,6 +43,12 @@
             <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
             <config_path>payment/terminal9/isapplepay</config_path>
         </field>
+        <field id="legacyapplepayflow" translate="label comment" type="select" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
+            <label>Legacy Apple Pay flow</label>
+            <comment>Supports the legacy Apple Pay flow. If your AltaPay gateway is on version 20260113 or later, set this to No to use the new integration. If your gateway is on an older version, leave this set to Yes.</comment>
+            <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+            <config_path>payment/terminal9/legacyapplepayflow</config_path>
+        </field>
         <field id="applepaylabel" translate="label comment" type="text" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
             <label>Apple Pay Form Label</label>
             <comment>Add custom text for the Apple Pay popup label</comment>
