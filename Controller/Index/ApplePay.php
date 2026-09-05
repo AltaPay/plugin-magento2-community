@@ -10,6 +10,7 @@
 namespace SDM\Altapay\Controller\Index;
 
 use SDM\Altapay\Model\SystemConfig;
+use SDM\Altapay\Model\ConstantConfig;
 use Altapay\Api\Payments\CardWalletSession;
 use SDM\Altapay\Helper\Config as storeConfig;
 use Magento\Framework\App\ResponseInterface;
@@ -120,7 +121,7 @@ class ApplePay extends Action implements CsrfAwareActionInterface
             if (!$quote || !$quote->getId()) {
                 return $this->resultFactory
                     ->create(\Magento\Framework\Controller\ResultFactory::TYPE_JSON)
-                    ->setData(['message' => __('Payment failed. Please try again.')]);
+                    ->setData(['message' => __(ConstantConfig::PAYMENT_FAILED)]);
             }
 
             $baseCurrency = $this->storeConfig->useBaseCurrency();
@@ -136,33 +137,35 @@ class ApplePay extends Action implements CsrfAwareActionInterface
                     ]);
         }
 
-        $response = $request->call();
-        if ($response->Result !== 'Success') {
-            return $this->resultFactory
-                ->create(\Magento\Framework\Controller\ResultFactory::TYPE_JSON)
-                ->setData(['message' => __('Payment failed. Please try again.')]);
-        }
-
-        if (isset($response->ApplePaySession)) {
-            return $this->resultFactory
-                ->create(\Magento\Framework\Controller\ResultFactory::TYPE_JSON)
-                ->setData($response->ApplePaySession);
-        }
-
-        if (isset($response->WalletData->Session)) {
-            $transaction = !empty($response->Transactions) ? reset($response->Transactions) : null;
-            if ($transaction && isset($transaction->PaymentId)) {
-                $this->checkoutSession->setData('altapay_payment_id', $transaction->PaymentId);
-            }
-
-            return $this->resultFactory
-                ->create(\Magento\Framework\Controller\ResultFactory::TYPE_JSON)
-                ->setData($response->WalletData->Session);
-        }
-
         return $this->resultFactory
             ->create(\Magento\Framework\Controller\ResultFactory::TYPE_JSON)
-            ->setData(['message' => __('Payment failed. Please try again.')]);
+            ->setData($this->getSessionData($request->call()));
+    }
+
+    /**
+     * Extract the wallet session payload from the gateway response.
+     *
+     * @param mixed $response
+     * @return mixed
+     */
+    private function getSessionData($response)
+    {
+        $data = ['message' => __(ConstantConfig::PAYMENT_FAILED)];
+
+        if ($response->Result === 'Success') {
+            if (isset($response->ApplePaySession)) {
+                $data = $response->ApplePaySession;
+            } elseif (isset($response->WalletData->Session)) {
+                $transaction = !empty($response->Transactions) ? reset($response->Transactions) : null;
+                if ($transaction && isset($transaction->PaymentId)) {
+                    $this->checkoutSession->setData('altapay_payment_id', $transaction->PaymentId);
+                }
+
+                $data = $response->WalletData->Session;
+            }
+        }
+
+        return $data;
     }
 
     /**
