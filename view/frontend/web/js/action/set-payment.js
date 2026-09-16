@@ -40,19 +40,19 @@ define(
             });
         };
 
-        var followRedirect = function (response) {
+        const followRedirect = function (response) {
             if ((response.method || 'GET').toUpperCase() !== 'POST') {
                 window.location = response.redirect;
 
                 return;
             }
 
-            var form = document.createElement('form');
+            const form = document.createElement('form');
             form.method = 'POST';
             form.action = response.redirect;
 
             $.each(response.data || {}, function (name, value) {
-                var field = document.createElement('input');
+                const field = document.createElement('input');
                 field.type = 'hidden';
                 field.name = name;
                 field.value = value;
@@ -125,7 +125,7 @@ define(
                         }
                     });
                 } else if (googlePay) {
-                    var googlePayFailed = function () {
+                    const googlePayFailed = function () {
                         fullScreenLoader.stopLoader();
                         $(".payment-method._active").find('#altapay-error-message').text(googlePay.mag_trans('error occured')).show().delay(5000).fadeOut();
                     };
@@ -140,7 +140,7 @@ define(
                             screenHeight: window.screen.height,
                             colorDepth: window.screen.colorDepth,
                             timezone: new Date().getTimezoneOffset(),
-                            javaEnabled: (navigator.javaEnabled && navigator.javaEnabled()) ? 1 : 0
+                            javaEnabled: navigator.javaEnabled?.() ? 1 : 0
                         },
                         type: 'post',
                         dataType: 'JSON',

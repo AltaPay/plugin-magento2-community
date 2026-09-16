@@ -24,7 +24,7 @@ define(
     function ($, Component, storage, Action, quote, totals, additionalValidators, $t, fullScreenLoader) {
         'use strict';
 
-        var terminalComponents = {};
+        const terminalComponents = {};
 
         return Component.extend({
             defaults: {
@@ -246,7 +246,7 @@ define(
                 session.begin();
             },
             onGooglePayButtonClicked: function () {
-                var self = this;
+                const self = this;
 
                 if (typeof google === 'undefined' || !this.googlePayConfig) {
                     console.error('MarketPay Google Pay unavailable. sdk: ' + (typeof google) + ', config: ' + !!this.googlePayConfig);
@@ -254,8 +254,8 @@ define(
                     return;
                 }
 
-                var total = totals.getSegment('grand_total').value;
-                var grandTotal = this.configData.currencyConfig ? quote.totals().base_grand_total : total;
+                const total = totals.getSegment('grand_total').value;
+                const grandTotal = this.configData.currencyConfig ? quote.totals().base_grand_total : total;
                 this.googlePaymentsClient = this.googlePaymentsClient || new google.payments.api.PaymentsClient({
                     environment: this.googlePayConfig.environment
                 });
@@ -304,7 +304,7 @@ define(
                     if (err && err.statusCode === 'CANCELED') {
                         return;
                     }
-                    self.showGooglePayError((err && err.statusMessage) || $t('Payment failed. Please try again.'));
+                    self.showGooglePayError(err?.statusMessage || $t('Payment failed. Please try again.'));
                 });
             },
             showGooglePayError: function (message) {
