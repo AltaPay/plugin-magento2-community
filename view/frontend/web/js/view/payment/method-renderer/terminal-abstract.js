@@ -329,7 +329,7 @@ define(
                 return terminallogo;
             },
             savedTokenList: function () {
-                var self = this;
+                const self = this;
                 var savedtokenlist;
                 var paymentMethod = window.checkoutConfig.payment[this.getDefaultCode()].terminaldata;
                 for (var obj in paymentMethod) {
