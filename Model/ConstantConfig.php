@@ -37,4 +37,5 @@ abstract class ConstantConfig
     const SUCCESS = 'success';
     const ERROR_MESSAGE = 'error occurred';
     const UNKNOWN_PAYMENT_STATUS_MERCHANT = 'Unknown payment status. Please contact Altapay!';
+    const PAYMENT_FAILED = 'Payment failed. Please try again.';
 }

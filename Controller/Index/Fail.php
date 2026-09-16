@@ -92,7 +92,11 @@ class Fail extends Index implements CsrfAwareActionInterface
         }
 
         if ($status == 'failed' || $status == 'error' || $status == 'cancelled' || $status == 'incomplete') {
-            $resultRedirect = $this->prepareRedirect('checkout/cart', [], $msg);
+            $resultRedirect = $this->prepareRedirect(
+                'checkout/cart',
+                $this->getRestoreParams($this->getRequest()->getPostValue('shop_orderid'), $msg),
+                $msg
+            );
         } else {
             $resultRedirect = $this->prepareRedirect('checkout', ['_fragment' => 'payment'], $msg);
         }

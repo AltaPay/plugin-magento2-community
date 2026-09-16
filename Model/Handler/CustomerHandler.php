@@ -147,4 +147,34 @@ class CustomerHandler
     
         return $addObject;
     }
+
+    /**
+     * Add browser information
+     *
+     * @param $customer
+     * @param $post
+     *
+     * @return void
+     */
+    public function setBrowserInfo($customer, $post)
+    {
+        $customer->setClientJavascriptEnabled(true);
+        $customer->setClientJavaEnabled(!empty($post['javaEnabled']));
+
+        if (!empty($post['screenWidth'])) {
+            $customer->setClientScreenWidth((string)(int)$post['screenWidth']);
+        }
+        if (!empty($post['screenHeight'])) {
+            $customer->setClientScreenHeight((string)(int)$post['screenHeight']);
+        }
+        if (!empty($post['colorDepth'])) {
+            $customer->setClientColorDepth((string)(int)$post['colorDepth']);
+        }
+        if (isset($post['timezone']) && $post['timezone'] !== '') {
+            $customer->setClientTimeZone((string)$post['timezone']);
+        }
+        if ($accept = $this->request->getServer('HTTP_ACCEPT')) {
+            $customer->setClientAccept($accept);
+        }
+    }
 }

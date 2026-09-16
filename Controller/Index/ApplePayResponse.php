@@ -129,21 +129,14 @@ class ApplePayResponse extends Action implements CsrfAwareActionInterface
                 $status = isset($params->Result) ? strtolower($params->Result) : 'error';
 
                 if ($status === 'error') {
-                    $message     = (is_array($params) && isset($params['message'])) ? $params['message'] : 'error occured';
-                    $order       = $this->_orderRepository->get($orderId);
-                    $orderStatus = Order::STATE_PENDING_PAYMENT;
-                    $order->setState($orderStatus)->setStatus($orderStatus);
-                    $order->addStatusHistoryComment($message);
-                    $order->setIsNotified(false);
-                    $order->getResource()->save($order);
-                    $quote = $this->_quoteFactory->create()->loadByIdWithoutStore($order->getQuoteId());
-                    if ($quote->getId()) {
-                        $quote->setIsActive(1)->setReservedOrderId(null)->save();
-                        $this->_checkoutSession->replaceQuote($quote);
-                        $resultRedirect = $this->resultRedirectFactory->create();
-                        $resultRedirect->setPath('checkout/cart');
+                    $resultRedirect = $this->restoreOrder($orderId, $params);
+                    if ($resultRedirect) {
                         return $resultRedirect;
                     }
+                }
+
+                if ($status === 'redirect') {
+                    return $this->createJsonResponse($this->getRedirectResponse($params));
                 }
 
                 return $this->createJsonResponse(['status' => $status]);
@@ -174,5 +167,62 @@ class ApplePayResponse extends Action implements CsrfAwareActionInterface
     private function createJsonResponse($data)
     {
         return $this->resultFactory->create(ResultFactory::TYPE_JSON)->setData($data);
+    }
+
+    /**
+     * The RedirectResponse in case of 3D Secure.
+     *
+     * @param $params
+     * @return array
+     */
+    private function getRedirectResponse($params)
+    {
+        $redirect = $params->RedirectResponse ?? null;
+
+        if (!$redirect || empty($redirect->Url)) {
+            return ['status' => 'error', 'message' => 'Redirect without a URL.'];
+        }
+
+        $data = [];
+        foreach ((array)($redirect->Data ?? []) as $item) {
+            if (isset($item->key)) {
+                $data[$item->key] = $item->Item;
+            }
+        }
+
+        return [
+            'status'   => 'redirect',
+            'redirect' => $redirect->Url,
+            'method'   => !empty($redirect->Method) ? $redirect->Method : 'GET',
+            'data'     => $data
+        ];
+    }
+
+    /**
+     * Restore the order of a payment the gateway did not accept.
+     *
+     * @param $orderId
+     * @param $params
+     * @return \Magento\Framework\Controller\Result\Redirect|null
+     */
+    private function restoreOrder($orderId, $params)
+    {
+        $message     = (is_array($params) && isset($params['message'])) ? $params['message'] : 'error occured';
+        $order       = $this->_orderRepository->get($orderId);
+        $orderStatus = Order::STATE_PENDING_PAYMENT;
+        $order->setState($orderStatus)->setStatus($orderStatus);
+        $order->addStatusHistoryComment($message);
+        $order->setIsNotified(false);
+        $order->getResource()->save($order);
+        $quote = $this->_quoteFactory->create()->loadByIdWithoutStore($order->getQuoteId());
+        if (!$quote->getId()) {
+            return null;
+        }
+        $quote->setIsActive(1)->setReservedOrderId(null)->save();
+        $this->_checkoutSession->replaceQuote($quote);
+        $resultRedirect = $this->resultRedirectFactory->create();
+        $resultRedirect->setPath('checkout/cart');
+
+        return $resultRedirect;
     }
 }

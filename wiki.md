@@ -232,12 +232,16 @@ To synchronize the terminals with the gateway, click on the **Synchronize Termin
 
 4.  Select the terminal name in the drop-down list
 
-5.  Optional fields: 'Custom Message', 'Force language', 'Secret',  'Is Apple Pay?', 'Apple Pay Form Label', 'Auto
+5.  Optional fields: 'Custom Message', 'Force language', 'Secret',  'Is Apple Pay?', 'Legacy Apple Pay flow', 'Apple Pay Form Label', 'Auto
     capture', 'Terminal Logo', 'Show both Logo and Title', 'Enable Customer Token Control', 'AVS', 'Enforce AVS', 'AVS accepted codes', 'Sort Order'.
 
 6.  If Apple Pay terminal is selected from the Terminal dropdown, make sure to enable isapplepay option.
 
-7.  Save changes by clicking 'Save Config'
+7.  'Legacy Apple Pay flow' supports the legacy Apple Pay flow. If your AltaPay gateway is on version 20260113 or later, disable this to use the new MarketPay integration. If your gateway is on an older version, leave it enabled (the default).
+
+8.  If you have already configured the plugin and are now adding Google Pay, make sure to press 'Synchronize payment methods' or save the configuration.
+
+9.  Save changes by clicking 'Save Config'
 
     ![gateway_terminal_configuration](docs/gateway_terminal_configuration.jpg)
 
