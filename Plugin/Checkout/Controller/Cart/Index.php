@@ -72,25 +72,22 @@ class Index
             $hash
         );
         $collectionInfo = $collectionData->getData();
+        $msg = $subject->getRequest()->getParam('msg');
         foreach ($collectionInfo as $data) {
-            $orderId = $data['increment_id'];
-            if ($orderId) {
-                $order = $this->orderFactory->create()->loadByIncrementId($orderId);
-                if ($order && $order->getId() && $order->getAltapayOrderHash() !== null) {
-                    $quote = $this->quoteFactory->create()->loadByIdWithoutStore($order->getQuoteId());
-                    if ($quote->getId()) {
-                        $quote->setIsActive(1)->setReservedOrderId(null)->save();
-                        $this->checkoutSession->replaceQuote($quote);
-                    }
-                    $msg = $subject->getRequest()->getParam('msg');
-                    if (!empty($msg)) {
-                        $this->messageManager->addErrorMessage(__($msg));
-                    }
-                    $order->setAltapayOrderHash(null);
-                    $order->getResource()->save($order);
-                }
-
+            $order = $this->orderFactory->create()->loadByIncrementId($data['increment_id']);
+            if (!$order->getId() || $order->getAltapayOrderHash() === null) {
+                continue;
             }
+            $quote = $this->quoteFactory->create()->loadByIdWithoutStore($order->getQuoteId());
+            if ($quote->getId()) {
+                $quote->setIsActive(1)->setReservedOrderId(null)->save();
+                $this->checkoutSession->replaceQuote($quote);
+            }
+            if (!empty($msg)) {
+                $this->messageManager->addErrorMessage(__($msg));
+            }
+            $order->setAltapayOrderHash(null);
+            $order->getResource()->save($order);
         }
     }
 }

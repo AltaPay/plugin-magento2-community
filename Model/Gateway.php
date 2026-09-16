@@ -420,7 +420,7 @@ class Gateway implements GatewayInterface
         $customerInfo = $this->customerHandler->setCustomer($order, $isReservation);
 
         if ($isGooglePay) {
-            $this->setBrowserInfo($customerInfo, $post);
+            $this->customerHandler->setBrowserInfo($customerInfo, $post);
         }
 
         $request->setTerminal($terminalName)
@@ -496,49 +496,10 @@ class Gateway implements GatewayInterface
         $request->setOrderLines($orderLines);
 
         if ($isGooglePay) {
-            $this->createWalletSession(
-                $order,
-                $request,
-                $terminalName,
-                round($grandTotal, 2),
-                $currencyCode,
-                $customerInfo,
-                $storeScope,
-                $storeCode
-            );
+            $this->createWalletSession($order, $request, $customerInfo);
         }
 
         return $request;
-    }
-
-    /**
-     * Add browser information
-     *
-     * @param $customerInfo
-     * @param $post
-     *
-     * @return void
-     */
-    private function setBrowserInfo($customerInfo, $post)
-    {
-        $customerInfo->setClientJavascriptEnabled(true);
-        $customerInfo->setClientJavaEnabled(!empty($post['javaEnabled']));
-
-        if (!empty($post['screenWidth'])) {
-            $customerInfo->setClientScreenWidth((string)(int)$post['screenWidth']);
-        }
-        if (!empty($post['screenHeight'])) {
-            $customerInfo->setClientScreenHeight((string)(int)$post['screenHeight']);
-        }
-        if (!empty($post['colorDepth'])) {
-            $customerInfo->setClientColorDepth((string)(int)$post['colorDepth']);
-        }
-        if (isset($post['timezone']) && $post['timezone'] !== '') {
-            $customerInfo->setClientTimeZone((string)$post['timezone']);
-        }
-        if ($accept = $this->request->getServer('HTTP_ACCEPT')) {
-            $customerInfo->setClientAccept($accept);
-        }
     }
 
     /**
@@ -546,26 +507,16 @@ class Gateway implements GatewayInterface
      *
      * @param $order
      * @param $request
-     * @param $terminalName
-     * @param $amount
-     * @param $currency
      * @param $customerInfo
-     * @param $storeScope
-     * @param $storeCode
      *
      * @return void
      */
-    private function createWalletSession(
-        $order,
-        $request,
-        $terminalName,
-        $amount,
-        $currency,
-        $customerInfo,
-        $storeScope,
-        $storeCode
-    ) {
-        $sessionId = $this->createCheckoutSession($order, $request, [$terminalName]);
+    private function createWalletSession($order, $request, $customerInfo)
+    {
+        $storeScope   = $this->storeConfig->getStoreScope();
+        $storeCode    = $order->getStore()->getCode();
+        $terminalName = $request->unresolvedOptions['terminal'];
+        $sessionId    = $this->createCheckoutSession($order, $request, [$terminalName]);
 
         if (!$sessionId) {
             return;
@@ -575,8 +526,8 @@ class Gateway implements GatewayInterface
             $walletSession = new CardWalletSession($this->systemConfig->getAuth($storeCode));
             $walletSession->setTerminal($terminalName)
                 ->setShopOrderId($order->getIncrementId())
-                ->setAmount($amount)
-                ->setCurrency($currency)
+                ->setAmount((float)$request->unresolvedOptions['amount'])
+                ->setCurrency($request->unresolvedOptions['currency'])
                 ->setSessionId($sessionId)
                 ->setCustomerInfo($customerInfo)
                 ->setConfig($this->setConfig($storeScope, $storeCode));

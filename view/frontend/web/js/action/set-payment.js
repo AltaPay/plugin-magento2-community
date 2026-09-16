@@ -139,8 +139,7 @@ define(
                             screenWidth: window.screen.width,
                             screenHeight: window.screen.height,
                             colorDepth: window.screen.colorDepth,
-                            timezone: new Date().getTimezoneOffset(),
-                            javaEnabled: navigator.javaEnabled?.() ? 1 : 0
+                            timezone: new Date().getTimezoneOffset()
                         },
                         type: 'post',
                         dataType: 'JSON',
