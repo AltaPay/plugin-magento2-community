@@ -129,19 +129,8 @@ class ApplePayResponse extends Action implements CsrfAwareActionInterface
                 $status = isset($params->Result) ? strtolower($params->Result) : 'error';
 
                 if ($status === 'error') {
-                    $message     = (is_array($params) && isset($params['message'])) ? $params['message'] : 'error occured';
-                    $order       = $this->_orderRepository->get($orderId);
-                    $orderStatus = Order::STATE_PENDING_PAYMENT;
-                    $order->setState($orderStatus)->setStatus($orderStatus);
-                    $order->addStatusHistoryComment($message);
-                    $order->setIsNotified(false);
-                    $order->getResource()->save($order);
-                    $quote = $this->_quoteFactory->create()->loadByIdWithoutStore($order->getQuoteId());
-                    if ($quote->getId()) {
-                        $quote->setIsActive(1)->setReservedOrderId(null)->save();
-                        $this->_checkoutSession->replaceQuote($quote);
-                        $resultRedirect = $this->resultRedirectFactory->create();
-                        $resultRedirect->setPath('checkout/cart');
+                    $resultRedirect = $this->restoreOrder($orderId, $params);
+                    if ($resultRedirect) {
                         return $resultRedirect;
                     }
                 }
@@ -207,5 +196,33 @@ class ApplePayResponse extends Action implements CsrfAwareActionInterface
             'method'   => !empty($redirect->Method) ? $redirect->Method : 'GET',
             'data'     => $data
         ];
+    }
+
+    /**
+     * Restore the order of a payment the gateway did not accept.
+     *
+     * @param $orderId
+     * @param $params
+     * @return \Magento\Framework\Controller\Result\Redirect|null
+     */
+    private function restoreOrder($orderId, $params)
+    {
+        $message     = (is_array($params) && isset($params['message'])) ? $params['message'] : 'error occured';
+        $order       = $this->_orderRepository->get($orderId);
+        $orderStatus = Order::STATE_PENDING_PAYMENT;
+        $order->setState($orderStatus)->setStatus($orderStatus);
+        $order->addStatusHistoryComment($message);
+        $order->setIsNotified(false);
+        $order->getResource()->save($order);
+        $quote = $this->_quoteFactory->create()->loadByIdWithoutStore($order->getQuoteId());
+        if (!$quote->getId()) {
+            return null;
+        }
+        $quote->setIsActive(1)->setReservedOrderId(null)->save();
+        $this->_checkoutSession->replaceQuote($quote);
+        $resultRedirect = $this->resultRedirectFactory->create();
+        $resultRedirect->setPath('checkout/cart');
+
+        return $resultRedirect;
     }
 }
