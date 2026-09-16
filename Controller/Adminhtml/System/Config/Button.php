@@ -18,6 +18,7 @@ use Magento\Framework\Controller\Result\JsonFactory;
 use Magento\Store\Model\StoreManagerInterface;
 use Altapay\Api\Others\Terminals;
 use SDM\Altapay\Model\SystemConfig;
+use SDM\Altapay\Model\TerminalData;
 use Magento\Config\Model\ResourceModel\Config;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Store\Model\ScopeInterface;
@@ -78,6 +79,10 @@ class Button extends Action
      * @var ResourceConnection
      */
     protected $_resource;
+    /**
+     * @var TerminalData
+     */
+    private $terminalData;
 
     /**
      * @param Context               $context
@@ -102,7 +107,8 @@ class Button extends Action
         State $state,
         StoreManagerInterface $storeManager,
         ResourceConnection $resource,
-        TerminalLogo $terminalLogo
+        TerminalLogo $terminalLogo,
+        TerminalData $terminalData
     ) {
         $this->resultJsonFactory = $resultJsonFactory;
         $this->systemConfig      = $systemConfig;
@@ -114,6 +120,7 @@ class Button extends Action
         $this->_state            = $state;
         $this->_resource         = $resource;
         $this->terminalLogo      = $terminalLogo;
+        $this->terminalData      = $terminalData;
         parent::__construct($context);
     }
 
@@ -139,6 +146,7 @@ class Button extends Action
             $call = new Terminals($this->systemConfig->getAuth());
             /** @var TerminalsResponse $response */
             $response     = $call->call();
+            $this->terminalData->save($response, $scopeCode, $currentStoreID);
             $terminalList = $this->getTerminal($response, $currentCurrency);
 
             if (!empty($terminalList)) {

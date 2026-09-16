@@ -239,7 +239,9 @@ To synchronize the terminals with the gateway, click on the **Synchronize Termin
 
 7.  'Legacy Apple Pay flow' supports the legacy Apple Pay flow. If your AltaPay gateway is on version 20260113 or later, disable this to use the new MarketPay integration. If your gateway is on an older version, leave it enabled (the default).
 
-8.  Save changes by clicking 'Save Config'
+8.  If you have already configured the plugin and are now adding Google Pay, make sure to press 'Synchronize payment methods' or save the configuration.
+
+9.  Save changes by clicking 'Save Config'
 
     ![gateway_terminal_configuration](docs/gateway_terminal_configuration.jpg)
 

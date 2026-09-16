@@ -146,6 +146,10 @@ class ApplePayResponse extends Action implements CsrfAwareActionInterface
                     }
                 }
 
+                if ($status === 'redirect') {
+                    return $this->createJsonResponse($this->getRedirectResponse($params));
+                }
+
                 return $this->createJsonResponse(['status' => $status]);
             } else {
                 $result = ['status' => 'error', 'message' => 'Invalid request.'];
@@ -174,5 +178,34 @@ class ApplePayResponse extends Action implements CsrfAwareActionInterface
     private function createJsonResponse($data)
     {
         return $this->resultFactory->create(ResultFactory::TYPE_JSON)->setData($data);
+    }
+
+    /**
+     * The RedirectResponse in case of 3D Secure.
+     *
+     * @param $params
+     * @return array
+     */
+    private function getRedirectResponse($params)
+    {
+        $redirect = $params->RedirectResponse ?? null;
+
+        if (!$redirect || empty($redirect->Url)) {
+            return ['status' => 'error', 'message' => 'Redirect without a URL.'];
+        }
+
+        $data = [];
+        foreach ((array)($redirect->Data ?? []) as $item) {
+            if (isset($item->key)) {
+                $data[$item->key] = $item->Item;
+            }
+        }
+
+        return [
+            'status'   => 'redirect',
+            'redirect' => $redirect->Url,
+            'method'   => !empty($redirect->Method) ? $redirect->Method : 'GET',
+            'data'     => $data
+        ];
     }
 }

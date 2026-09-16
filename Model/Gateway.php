@@ -40,6 +40,7 @@ use SDM\Altapay\Api\TransactionRepositoryInterface;
 use Altapay\Api\Others\Terminals;
 use Magento\Framework\Event\ManagerInterface;
 use Altapay\Api\Payments\CheckoutSession;
+use Altapay\Api\Payments\CardWalletSession;
 
 /**
  * Class Gateway
@@ -364,6 +365,7 @@ class Gateway implements GatewayInterface
         $auth = $this->systemConfig->getAuth($storeCode);
         $terminalName = $this->systemConfig->getTerminalConfig($terminalId, 'terminalname', $storeScope, $storeCode);
         $isApplePay = $this->systemConfig->getTerminalConfig($terminalId, 'isapplepay', $storeScope, $storeCode);
+        $isGooglePay = $this->systemConfig->getTerminalConfig($terminalId, 'isgooglepay', $storeScope, $storeCode);
         $agreementConfig = $this->systemConfig->getTerminalConfig($terminalId, 'agreementtype', $storeScope, $storeCode);
         $unscheduledTypeConfig = $this->systemConfig->getTerminalConfig($terminalId, 'unscheduledtype', $storeScope, $storeCode);
         $savecardtoken = $this->systemConfig->getTerminalConfig($terminalId, 'savecardtoken', $storeScope, $storeCode);
@@ -373,10 +375,11 @@ class Gateway implements GatewayInterface
         $payment = $order->getPayment();
         $post = $this->request->getPostValue();
         $request = new PaymentRequest($auth);
-        if ($isApplePay) {
+        if ($isApplePay || $isGooglePay) {
             $request = new CardWalletAuthorize($auth);
             $request->setProviderData($providerData);
-
+        }
+        if ($isApplePay) {
             $legacyFlow = $this->systemConfig->getTerminalConfig($terminalId, 'legacyapplepayflow', $storeScope, $storeCode);
             if (!$this->systemConfig->isLegacyApplePayFlow($legacyFlow)) {
                 $paymentId = $this->checkoutSession->getData('altapay_payment_id');
@@ -414,18 +417,23 @@ class Gateway implements GatewayInterface
         $grandTotal = $baseCurrency ? $order->getBaseGrandTotal() : $order->getGrandTotal();
         $currencyCode = $baseCurrency ? $order->getBaseCurrencyCode() : $order->getOrderCurrencyCode();
         $formTemplate = $this->getFormTemplateFromConfig();
+        $customerInfo = $this->customerHandler->setCustomer($order, $isReservation);
+
+        if ($isGooglePay) {
+            $this->setBrowserInfo($customerInfo, $post);
+        }
 
         $request->setTerminal($terminalName)
             ->setShopOrderId($order->getIncrementId())
             ->setAmount(round($grandTotal, 2))
             ->setCurrency($currencyCode)
-            ->setCustomerInfo($this->customerHandler->setCustomer($order, $isReservation))
+            ->setCustomerInfo($customerInfo)
             ->setTransactionInfo($transactionDetail)
             ->setCookie($this->request->getServer('HTTP_COOKIE'))
             ->setSaleReconciliationIdentifier($this->random->getUniqueHash())
             ->setConfig($this->setConfig($storeScope, $storeCode));
 
-        if ($formTemplate && !$isApplePay && !$isReservation) {
+        if ($formTemplate && !$isApplePay && !$isGooglePay && !$isReservation) {
             $request->setFormTemplate($formTemplate);
         }
         if(!$isReservation) {
@@ -487,7 +495,101 @@ class Gateway implements GatewayInterface
         //set orderlines to the request
         $request->setOrderLines($orderLines);
 
+        if ($isGooglePay) {
+            $this->createWalletSession(
+                $order,
+                $request,
+                $terminalName,
+                round($grandTotal, 2),
+                $currencyCode,
+                $customerInfo,
+                $storeScope,
+                $storeCode
+            );
+        }
+
         return $request;
+    }
+
+    /**
+     * Add browser information
+     *
+     * @param $customerInfo
+     * @param $post
+     *
+     * @return void
+     */
+    private function setBrowserInfo($customerInfo, $post)
+    {
+        $customerInfo->setClientJavascriptEnabled(true);
+        $customerInfo->setClientJavaEnabled(!empty($post['javaEnabled']));
+
+        if (!empty($post['screenWidth'])) {
+            $customerInfo->setClientScreenWidth((string)(int)$post['screenWidth']);
+        }
+        if (!empty($post['screenHeight'])) {
+            $customerInfo->setClientScreenHeight((string)(int)$post['screenHeight']);
+        }
+        if (!empty($post['colorDepth'])) {
+            $customerInfo->setClientColorDepth((string)(int)$post['colorDepth']);
+        }
+        if (isset($post['timezone']) && $post['timezone'] !== '') {
+            $customerInfo->setClientTimeZone((string)$post['timezone']);
+        }
+        if ($accept = $this->request->getServer('HTTP_ACCEPT')) {
+            $customerInfo->setClientAccept($accept);
+        }
+    }
+
+    /**
+     * Register the payment with the terminal through the cardWallet/session API.
+     *
+     * @param $order
+     * @param $request
+     * @param $terminalName
+     * @param $amount
+     * @param $currency
+     * @param $customerInfo
+     * @param $storeScope
+     * @param $storeCode
+     *
+     * @return void
+     */
+    private function createWalletSession(
+        $order,
+        $request,
+        $terminalName,
+        $amount,
+        $currency,
+        $customerInfo,
+        $storeScope,
+        $storeCode
+    ) {
+        $sessionId = $this->createCheckoutSession($order, $request, [$terminalName]);
+
+        if (!$sessionId) {
+            return;
+        }
+
+        try {
+            $walletSession = new CardWalletSession($this->systemConfig->getAuth($storeCode));
+            $walletSession->setTerminal($terminalName)
+                ->setShopOrderId($order->getIncrementId())
+                ->setAmount($amount)
+                ->setCurrency($currency)
+                ->setSessionId($sessionId)
+                ->setCustomerInfo($customerInfo)
+                ->setConfig($this->setConfig($storeScope, $storeCode));
+
+            $response    = $walletSession->call();
+            $transaction = !empty($response->Transactions) ? reset($response->Transactions) : null;
+
+            if ($response->Result === 'Success' && isset($transaction->PaymentId)) {
+                $request->setPaymentId($transaction->PaymentId);
+            }
+        } catch (\Exception $e) {
+            $this->altapayLogger->addCriticalLog('CardWalletSession Exception', $e->getMessage());
+        }
     }
 
     /**
@@ -497,10 +599,9 @@ class Gateway implements GatewayInterface
      *
      * @return array
      */
-    private function getActiveTerminals($request, $storeScope, $storeCode)
+    private function getActiveTerminals($currentTerminalName, $storeScope, $storeCode)
     {
         $activeTerminals     = [];
-        $currentTerminalName = $request->unresolvedOptions['terminal'];
         if (!empty(trim((string)$currentTerminalName))) {
             $activeTerminals[] = $currentTerminalName;
         }
@@ -520,42 +621,50 @@ class Gateway implements GatewayInterface
     /**
      * @param $order
      * @param $request
+     * @param $terminals
+     *
+     * @return string|null
      */
-    private function createCheckoutSession($order, $request)
+    private function createCheckoutSession($order, $request, $terminals = null)
     {
-        if ($request instanceof PaymentRequest) {
-            $storeScope      = $this->storeConfig->getStoreScope();
-            $storeCode       = $order->getStore()->getCode();
-            $activeTerminals = $this->getActiveTerminals($request, $storeScope, $storeCode);
+        $storeScope   = $this->storeConfig->getStoreScope();
+        $storeCode    = $order->getStore()->getCode();
+        $terminalName = $request->unresolvedOptions['terminal'];
 
-            $sessionKey   = 'altapay_checkout_session_id_' . $order->getQuoteId();
-            $sessionId    = $this->checkoutSession->getData($sessionKey);
+        if (!$terminals) {
+            $terminals = $this->getActiveTerminals($terminalName, $storeScope, $storeCode);
+        }
 
-            if (empty($sessionId)) {
-                try {
-                    $sessionToken     = $this->random->getUniqueHash();
-                    $marketPaySession = new CheckoutSession($this->systemConfig->getAuth($storeCode));
-                    $marketPaySession->setTerminals($activeTerminals)
-                        ->setTerminal($request->unresolvedOptions['terminal'])
-                        ->setShopOrderId($order->getIncrementId())
-                        ->setAmount((float)$request->unresolvedOptions['amount'])
-                        ->setCurrency($request->unresolvedOptions['currency'])
-                        ->setSessionId($sessionToken);
+        $sessionKey = 'altapay_checkout_session_id_' . $order->getQuoteId();
+        $sessionId  = $this->checkoutSession->getData($sessionKey);
 
-                    $checkoutResponse = $marketPaySession->call();
-                    if (isset($checkoutResponse->Session->Id)) {
-                        $sessionId = $checkoutResponse->Session->Id;
-                    }
-                    $this->checkoutSession->setData($sessionKey, $sessionId);
-                } catch (\Exception $e) {
-                    $this->altapayLogger->addCriticalLog('CheckoutSession Exception', $e->getMessage());
+        if (empty($sessionId)) {
+            try {
+                $sessionToken     = $this->random->getUniqueHash();
+                $marketPaySession = new CheckoutSession($this->systemConfig->getAuth($storeCode));
+                $marketPaySession->setTerminals($terminals)
+                    ->setTerminal($terminalName)
+                    ->setShopOrderId($order->getIncrementId())
+                    ->setAmount((float)$request->unresolvedOptions['amount'])
+                    ->setCurrency($request->unresolvedOptions['currency'])
+                    ->setSessionId($sessionToken)
+                    ->setConfig($this->setConfig($storeScope, $storeCode));
+
+                $checkoutResponse = $marketPaySession->call();
+                if (isset($checkoutResponse->Session->Id)) {
+                    $sessionId = $checkoutResponse->Session->Id;
                 }
-            }
-
-            if ($sessionId) {
-                $request->setSessionId($sessionId);
+                $this->checkoutSession->setData($sessionKey, $sessionId);
+            } catch (\Exception $e) {
+                $this->altapayLogger->addCriticalLog('CheckoutSession Exception', $e->getMessage());
             }
         }
+
+        if ($sessionId) {
+            $request->setSessionId($sessionId);
+        }
+
+        return $sessionId;
     }
 
     /**

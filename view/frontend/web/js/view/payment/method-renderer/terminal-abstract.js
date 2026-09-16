@@ -24,27 +24,42 @@ define(
     function ($, Component, storage, Action, quote, totals, additionalValidators, $t, fullScreenLoader) {
         'use strict';
 
+        var terminalComponents = {};
+
         return Component.extend({
             defaults: {
                 template: 'SDM_Altapay/payment/terminal',
                 terminal: '1'
             },
             configData: null,
+            googlePayConfig: null,
             redirectAfterPlaceOrder: false,
             initialized: false,
             initialize() {
                 this._super();
                 this.configData = window.checkoutConfig.payment[this.getDefaultCode()];
-                if (this.configData.terminaldata[this.getCode()].isapplepay === '1' && !this.initialized) {
+                terminalComponents[this.getCode()] = this;
+                if (this.configData.terminaldata[this.getCode()].isgooglepay === '1') {
+                    this.googlePayConfig = this.configData.terminaldata[this.getCode()].googlepayconfig;
+                }
+                if ((this.configData.terminaldata[this.getCode()].isapplepay === '1' ||
+                    this.configData.terminaldata[this.getCode()].isgooglepay === '1') && !this.initialized) {
                     let self = this;
                     this.initialized = true;
                     $('body').off('fc:placeOrderBefore.altapayHandler').on('fc:placeOrderBefore.altapayHandler', function() {
                         let paymentMethod = window.checkoutConfig.payment['sdm_altapay'].terminaldata,
                             selectedTerminal = $('input[name="payment[method]"]:checked').attr('id');
                         for (let method in paymentMethod) {
-                            if (method === selectedTerminal && paymentMethod[method].isapplepay === '1' && self.validate() && additionalValidators.validate()) {
-                                self.onApplePayButtonClicked();
-                                break;
+                            if (method === selectedTerminal && self.validate() && additionalValidators.validate()) {
+                                let component = terminalComponents[method] || self;
+                                if (paymentMethod[method].isapplepay === '1') {
+                                    component.onApplePayButtonClicked();
+                                    break;
+                                }
+                                if (paymentMethod[method].isgooglepay === '1') {
+                                    component.onGooglePayButtonClicked();
+                                    break;
+                                }
                             }
                         }
                     });
@@ -52,7 +67,8 @@ define(
                 return this;
             },
             placeOrder: function() {
-                if(quote.firecheckout && this.configData.terminaldata[this.getCode()].isapplepay === '1'){
+                if(quote.firecheckout && (this.configData.terminaldata[this.getCode()].isapplepay === '1' ||
+                    this.configData.terminaldata[this.getCode()].isgooglepay === '1')){
                     return;
                 }
 
@@ -60,6 +76,8 @@ define(
                 if (self.validate() && additionalValidators.validate()) {
                     if (this.configData.terminaldata[this.getCode()].isapplepay === '1') {
                        this.onApplePayButtonClicked();
+                    } else if (this.configData.terminaldata[this.getCode()].isgooglepay === '1') {
+                       this.onGooglePayButtonClicked();
                     } else {
                         Action(
                             this.messageContainer,
@@ -226,6 +244,71 @@ define(
                 };
 
                 session.begin();
+            },
+            onGooglePayButtonClicked: function () {
+                var self = this;
+
+                if (typeof google === 'undefined' || !this.googlePayConfig) {
+                    console.error('MarketPay Google Pay unavailable. sdk: ' + (typeof google) + ', config: ' + !!this.googlePayConfig);
+                    this.showGooglePayError($t('Google Pay is not available.'));
+                    return;
+                }
+
+                var total = totals.getSegment('grand_total').value;
+                var grandTotal = this.configData.currencyConfig ? quote.totals().base_grand_total : total;
+                this.googlePaymentsClient = this.googlePaymentsClient || new google.payments.api.PaymentsClient({
+                    environment: this.googlePayConfig.environment
+                });
+
+                this.googlePaymentsClient.loadPaymentData({
+                    apiVersion: 2,
+                    apiVersionMinor: 0,
+                    allowedPaymentMethods: [{
+                        type: 'CARD',
+                        parameters: {
+                            allowedAuthMethods: this.googlePayConfig.allowedAuthMethods,
+                            allowedCardNetworks: this.googlePayConfig.allowedCardNetworks
+                        },
+                        tokenizationSpecification: {
+                            type: 'PAYMENT_GATEWAY',
+                            parameters: {
+                                gateway: this.googlePayConfig.gateway,
+                                gatewayMerchantId: this.googlePayConfig.gatewayMerchantId
+                            }
+                        }
+                    }],
+                    merchantInfo: {
+                        merchantId: this.googlePayConfig.merchantId,
+                        merchantName: this.googlePayConfig.merchantName
+                    },
+                    transactionInfo: {
+                        countryCode: this.configData.countryCode,
+                        currencyCode: this.configData.currencyCode,
+                        totalPriceStatus: 'FINAL',
+                        totalPrice: parseFloat(grandTotal).toFixed(2)
+                    }
+                }).then(function (paymentData) {
+                    Action(
+                        self.messageContainer,
+                        self.terminal,
+                        false,
+                        {
+                            providerData: paymentData.paymentMethodData.tokenizationData.token,
+                            method: self.terminal.substr(self.terminal.indexOf(" ") + 1),
+                            url: self.configData.baseUrl + "sdmaltapay/index/applepayresponse",
+                            mag_trans: $t
+                        }
+                    );
+                }).catch(function (err) {
+                    fullScreenLoader.stopLoader();
+                    if (err && err.statusCode === 'CANCELED') {
+                        return;
+                    }
+                    self.showGooglePayError((err && err.statusMessage) || $t('Payment failed. Please try again.'));
+                });
+            },
+            showGooglePayError: function (message) {
+                $(".payment-method._active").find('#altapay-error-message').text(message).show().delay(5000).fadeOut();
             },
             getDefaultCode: function () {
                 return 'sdm_altapay';
