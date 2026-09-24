@@ -41,10 +41,14 @@ define(
         };
 
         const followRedirect = function (response) {
+            if (typeof response.redirect !== 'string' || !/^https?:\/\//i.test(response.redirect)) {
+                return false;
+            }
+
             if ((response.method || 'GET').toUpperCase() !== 'POST') {
                 window.location = response.redirect;
 
-                return;
+                return true;
             }
 
             const form = document.createElement('form');
@@ -61,6 +65,8 @@ define(
 
             document.body.appendChild(form);
             form.submit();
+
+            return true;
         };
 
         return function (messageContainer, method, applePay, googlePay) {
@@ -148,8 +154,11 @@ define(
                                 customerData.invalidate(['checkout-data']);
                                 redirectOnSuccessAction.execute();
                             } else if (response && response.status === "redirect" && response.redirect) {
-                                customerData.invalidate(['checkout-data']);
-                                followRedirect(response);
+                                if (followRedirect(response)) {
+                                    customerData.invalidate(['checkout-data']);
+                                } else {
+                                    googlePayFailed();
+                                }
                             } else {
                                 googlePayFailed();
                             }

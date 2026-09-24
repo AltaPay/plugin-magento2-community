@@ -175,7 +175,7 @@ abstract class Index extends Action
         $resultRedirect = $this->redirectFactory->create();
         if ($orderId) {
             $order = $this->order->loadByIncrementId($orderId);
-            $uniqueHash = $this->random->getUniqueHash();
+            $uniqueHash = $this->random->getRandomString(32);
             $order->setAltapayOrderHash($uniqueHash);
             $order->getResource()->save($order);
             $resultRedirect->setPath('checkout/onepage/success',['success_token' => $uniqueHash]);
@@ -262,7 +262,7 @@ abstract class Index extends Action
             return [];
         }
 
-        $uniqueHash = $this->random->getUniqueHash();
+        $uniqueHash = $this->random->getRandomString(32);
         $order->setAltapayOrderHash($uniqueHash);
         $order->getResource()->save($order);
 

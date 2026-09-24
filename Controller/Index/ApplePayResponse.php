@@ -120,6 +120,13 @@ class ApplePayResponse extends Action implements CsrfAwareActionInterface
         try {
             if ($this->checkPost()) {
                 $orderId = $this->getRequest()->getParam('orderid');
+                if (!$this->isOrderFromCurrentSession($orderId)) {
+                    return $this->createJsonResponse([
+                        'status' => 'error',
+                        'message' => 'Invalid request.'
+                    ]);
+                }
+
                 $params  = $this->gateway->createRequestApplepay(
                     $this->getRequest()->getParam('paytype'),
                     $orderId,
@@ -196,6 +203,26 @@ class ApplePayResponse extends Action implements CsrfAwareActionInterface
             'method'   => !empty($redirect->Method) ? $redirect->Method : 'GET',
             'data'     => $data
         ];
+    }
+
+    /**
+     * Check whether the requested order belongs to the active checkout session.
+     *
+     * @param $orderId
+     * @return bool
+     */
+    private function isOrderFromCurrentSession($orderId)
+    {
+        if (!is_scalar($orderId) || !$orderId) {
+            return false;
+        }
+
+        $lastOrder = $this->_checkoutSession->getLastRealOrder();
+        $lastQuoteId = $this->_checkoutSession->getLastQuoteId();
+
+        return $lastOrder->getId()
+            && (string)$lastOrder->getId() === (string)$orderId
+            && (string)$lastOrder->getQuoteId() === (string)$lastQuoteId;
     }
 
     /**
