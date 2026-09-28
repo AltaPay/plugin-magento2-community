@@ -175,7 +175,7 @@ abstract class Index extends Action
         $resultRedirect = $this->redirectFactory->create();
         if ($orderId) {
             $order = $this->order->loadByIncrementId($orderId);
-            $uniqueHash = $this->random->getUniqueHash();
+            $uniqueHash = $this->random->getRandomString(32);
             $order->setAltapayOrderHash($uniqueHash);
             $order->getResource()->save($order);
             $resultRedirect->setPath('checkout/onepage/success',['success_token' => $uniqueHash]);
@@ -241,5 +241,34 @@ abstract class Index extends Action
             }
         }
         return true;
+    }
+
+    /**
+     * The token the cart is restored with, as the gateway returns the customer in a request
+     * of its own that does not carry the session of the shop.
+     *
+     * @param string $orderId
+     * @param string $message
+     * @return array
+     */
+    protected function getRestoreParams($orderId, $message = '')
+    {
+        if (!$orderId) {
+            return [];
+        }
+
+        $order = $this->order->loadByIncrementId($orderId);
+        if (!$order->getId()) {
+            return [];
+        }
+
+        $uniqueHash = $this->random->getRandomString(32);
+        $order->setAltapayOrderHash($uniqueHash);
+        $order->getResource()->save($order);
+
+        return [
+            'restore_token' => $uniqueHash,
+            '_query'        => ['msg' => $message]
+        ];
     }
 }

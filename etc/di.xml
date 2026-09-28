@@ -30,6 +30,9 @@
     <type name="Magento\Checkout\Controller\Onepage\Success">
         <plugin name="checkout.success" type="SDM\Altapay\Plugin\Checkout\Controller\Onepage\Success" sortOrder="1"/>
     </type>
+    <type name="Magento\Checkout\Controller\Cart\Index">
+        <plugin name="checkout.cart.restore" type="SDM\Altapay\Plugin\Checkout\Controller\Cart\Index" sortOrder="1"/>
+    </type>
     <type name="Magento\Checkout\Controller\Index\Index">
         <plugin name="restrictcheckout" type="SDM\Altapay\Model\Plugin\Checkout\Controller\Restrict"/>
     </type>

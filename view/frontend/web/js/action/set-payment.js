@@ -40,7 +40,36 @@ define(
             });
         };
 
-        return function (messageContainer, method, applePay) {
+        const followRedirect = function (response) {
+            if (typeof response.redirect !== 'string' || !/^https?:\/\//i.test(response.redirect)) {
+                return false;
+            }
+
+            if ((response.method || 'GET').toUpperCase() !== 'POST') {
+                window.location = response.redirect;
+
+                return true;
+            }
+
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = response.redirect;
+
+            $.each(response.data || {}, function (name, value) {
+                const field = document.createElement('input');
+                field.type = 'hidden';
+                field.name = name;
+                field.value = value;
+                form.appendChild(field);
+            });
+
+            document.body.appendChild(form);
+            form.submit();
+
+            return true;
+        };
+
+        return function (messageContainer, method, applePay, googlePay) {
 
             var serviceUrl,
                 payload,
@@ -100,6 +129,41 @@ define(
                             fullScreenLoader.stopLoader();
                             $(".payment-method._active").find('#altapay-error-message').text(applePay.mag_trans('error occured')).show().delay(5000).fadeOut();
                         }
+                    });
+                } else if (googlePay) {
+                    const googlePayFailed = function () {
+                        fullScreenLoader.stopLoader();
+                        $(".payment-method._active").find('#altapay-error-message').text(googlePay.mag_trans('error occured')).show().delay(5000).fadeOut();
+                    };
+
+                    $.ajax({
+                        url: googlePay.url,
+                        data: {
+                            providerData: googlePay.providerData,
+                            paytype: googlePay.method,
+                            orderid: data,
+                            screenWidth: window.screen.width,
+                            screenHeight: window.screen.height,
+                            colorDepth: window.screen.colorDepth,
+                            timezone: new Date().getTimezoneOffset()
+                        },
+                        type: 'post',
+                        dataType: 'JSON',
+                        success: function (response) {
+                            if (response && response.status === "success") {
+                                customerData.invalidate(['checkout-data']);
+                                redirectOnSuccessAction.execute();
+                            } else if (response && response.status === "redirect" && response.redirect) {
+                                if (followRedirect(response)) {
+                                    customerData.invalidate(['checkout-data']);
+                                } else {
+                                    googlePayFailed();
+                                }
+                            } else {
+                                googlePayFailed();
+                            }
+                        },
+                        error: googlePayFailed
                     });
                 } else {
                     var tokenId = '';

@@ -224,6 +224,7 @@ class ConfigProvider implements ConfigProviderInterface
             $saveCardToken = $this->scopeConfig->getValue($paymentCode . '/savecardtoken', $storeScope, $storeCode);
             $isApplePay    = $this->scopeConfig->getValue($paymentCode . '/isapplepay', $storeScope, $storeCode);
             $applePayLabel = $this->scopeConfig->getValue($paymentCode . '/applepaylabel', $storeScope, $storeCode);
+            $isGooglePay   = $this->scopeConfig->getValue($paymentCode . '/isgooglepay', $storeScope, $storeCode);
             $agreementType = $this->scopeConfig->getValue($paymentCode . '/agreementtype', $storeScope, $storeCode);
             if($agreementType === "recurring" || $agreementType === "instalment") {
                 $savedTokenList = null;
@@ -241,6 +242,8 @@ class ConfigProvider implements ConfigProviderInterface
                     'enabledsavetokens' => $saveCardToken,
                     'isapplepay'        => $isApplePay,
                     'applepaylabel'     => $applePayLabel,
+                    'isgooglepay'       => $isGooglePay,
+                    'googlepayconfig'   => $isGooglePay ? $this->getGooglePayConfig($paymentCode, $storeScope, $storeCode) : null,
                     'isLoggedIn'        => $currentCustomerId
                 ];
                 if ($saveCardToken == 1 && !empty($savedTokenList)) {
@@ -251,6 +254,52 @@ class ConfigProvider implements ConfigProviderInterface
         }
 
         return $methods;
+    }
+
+    /**
+     * The Google Pay configuration of the terminal.
+     *
+     * @param string $paymentCode
+     * @param mixed  $storeScope
+     * @param string $storeCode
+     * @return array|null
+     */
+    public function getGooglePayConfig($paymentCode, $storeScope, $storeCode)
+    {
+        $merchantId = $this->scopeConfig->getValue($paymentCode . '/walletmerchantid', $storeScope, $storeCode);
+        $networks   = $this->getGooglePayNetworks($paymentCode, $storeScope, $storeCode);
+
+        if (empty($merchantId) || empty($networks)) {
+            return null;
+        }
+
+        $environment = $this->scopeConfig->getValue($paymentCode . '/walletenvironment', $storeScope, $storeCode);
+        $environment = $environment === 'PRODUCTION' ? 'PRODUCTION' : 'TEST';
+
+        return [
+            'environment'         => $environment,
+            'merchantId'          => $merchantId,
+            'merchantName'        => $this->scopeConfig->getValue($paymentCode . '/walletmerchantname', $storeScope, $storeCode),
+            'gateway'             => 'marketpay',
+            'gatewayMerchantId'   => $merchantId,
+            'allowedCardNetworks' => $networks,
+            'allowedAuthMethods'  => ['PAN_ONLY', 'CRYPTOGRAM_3DS']
+        ];
+    }
+
+    /**
+     * The card networks to offer, which are the schemes stored with the terminal.
+     *
+     * @param string $paymentCode
+     * @param mixed  $storeScope
+     * @param string $storeCode
+     * @return array
+     */
+    private function getGooglePayNetworks($paymentCode, $storeScope, $storeCode)
+    {
+        $schemes = $this->scopeConfig->getValue($paymentCode . '/terminalschemes', $storeScope, $storeCode);
+
+        return empty($schemes) ? [] : explode(',', $schemes);
     }
 
     /**

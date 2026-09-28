@@ -185,6 +185,17 @@ class SystemConfig
     }
 
     /**
+     * Whether the legacy Apple Pay flow is enabled.
+     *
+     * @param mixed $legacyFlowValue
+     * @return bool
+     */
+    public function isLegacyApplePayFlow($legacyFlowValue)
+    {
+        return $legacyFlowValue === null || $legacyFlowValue === '' || (bool) $legacyFlowValue;
+    }
+
+    /**
      * @param string               $configKey
      * @param ScopeConfigInterface $storeScope
      * @param null|string          $storeCode

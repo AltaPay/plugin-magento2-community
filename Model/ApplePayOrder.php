@@ -136,7 +136,7 @@ class ApplePayOrder {
      */
     public function handleCardWalletPayment($response, $order)
     {
-        $latestTransKey = $this->helper->getLatestTransaction($response->Transactions);
+        $latestTransKey = $this->helper->getLatestTransaction($response->Transactions ?? []);
 
         if ($response && $response->Result === 'Success' && isset($response->Transactions[$latestTransKey])) {
             $transaction = $response->Transactions[$latestTransKey];
@@ -222,9 +222,14 @@ class ApplePayOrder {
                     }
                 }
             }
+        } elseif ($response && $response->Result === 'Redirect') {
+                $order->addStatusHistoryComment("Order status: ". $response->Result);
+                $order->setIsNotified(false);
+                $order->getResource()->save($order);
         } else {
                 $this->paymentHandler->setCustomOrderStatus($order, Order::STATE_CANCELED, 'cancel');
-                $order->addStatusHistoryComment("Order status: ". $response->Result);
+                $errorMessage = $response->MerchantErrorMessage ?? '';
+                $order->addStatusHistoryComment("Order status: " . $response->Result . ($errorMessage ? ' - ' . $errorMessage : ''));
                 $order->setIsNotified(false);
                 $order->getResource()->save($order);
         }

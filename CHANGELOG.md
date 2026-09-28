@@ -1,9 +1,10 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
-## [4.2.5]
+## [4.3.0]
 ### Added
 - Add support for MarketPay payment methods.
+- Add support for Google Pay.
 
 ## [4.2.4]
 ### Fixed
