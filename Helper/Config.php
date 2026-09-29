@@ -149,7 +149,7 @@ class Config extends AbstractHelper
      * @param string $moduleVersion
      * @return bool
      */
-    public function useBaseCurrency(string $moduleVersion = null): bool
+    public function useBaseCurrency(?string $moduleVersion = null): bool
     {
         $config = $this->scopeConfig->getValue(self::ALTAPAY_CHARGED_CURRENCY);
     
