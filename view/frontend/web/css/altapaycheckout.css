@@ -33,11 +33,14 @@ span.terminal-logos {
     display: flex;
 }
 
-.terminal-logos>img {
+.terminal-logos > img {
     vertical-align: middle;
     display: inline-block;
-    max-width: 40px;
-    max-height: 30px;
+    max-width: 60px;
+    max-height: none;
+    height: 24px;
+    width: auto;
+    object-fit: contain;
     margin: 3px;
 }
 
@@ -54,18 +57,4 @@ span.terminal-logos {
 .one-step-checkout-wrapper .payment-method [type=radio] + label.terminal-cnt:before {
     top: 50%;
     margin-top: -9px;
-}
-
-@media (min-width: 769px) {
-    .terminal-logos>img {
-        max-width: 60px;
-        max-height: 40px;
-    }
-}
-
-@media (min-width: 993px) {
-    .terminal-logos>img {
-        max-width: 65px;
-        margin: 5px 3px;
-    }
 }

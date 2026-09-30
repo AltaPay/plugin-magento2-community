@@ -1,6 +1,11 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [4.3.1]
+### Added
+- Add Magento 2.4.9 and PHP 8.4 compatibility.
+- Add support for the Wero payment method.
+
 ## [4.3.0]
 ### Added
 - Add support for MarketPay payment methods.
