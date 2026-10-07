@@ -68,7 +68,8 @@ class TerminalLogo
             'viabill'               => 'ViaBill',
             'vipps'                 => 'Vipps',
             'visa'                  => 'Visa',
-            'visa_electron'         => 'Visa Electron'
+            'visa_electron'         => 'Visa Electron',
+            'wero'                  => 'Wero'
         ];
 
         foreach ($terminalLogos as $key => $val) {

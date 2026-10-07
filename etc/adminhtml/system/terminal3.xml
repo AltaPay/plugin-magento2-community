@@ -105,7 +105,7 @@
         </field>
         <field id="enforceavs" translate="label comment" type="select" sortOrder="90" showInDefault="1" showInWebsite="1" showInStore="1">
             <label>Enforce AVS</label>
-            <comment>All transactions <u>without</u> AVS response will be rejected</comment>
+            <comment>All transactions without AVS response will be rejected</comment>
             <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
             <config_path>payment/terminal3/enforceavs</config_path>
         </field>
