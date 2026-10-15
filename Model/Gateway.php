@@ -210,6 +210,9 @@ class Gateway implements GatewayInterface
     public function createRequest($terminalId, $orderId)
     {
         $order = $this->order->load($orderId);
+        if ($order->getId() && !$this->canPayOrder($order)) {
+            return $this->accessDeniedError();
+        }
         if ($order->getId()) {
             $orderLines = $this->getItemOrderLines($order);
             $this->_eventManager->dispatch('additional_orderline_event_observer',
@@ -231,6 +234,34 @@ class Gateway implements GatewayInterface
     }
 
     /**
+     * Only the order placed in the current checkout session, and still awaiting payment, may start a payment request.
+     *
+     * @param Order $order
+     *
+     * @return bool
+     */
+    private function canPayOrder($order)
+    {
+        if (!in_array($order->getState(), [Order::STATE_NEW, Order::STATE_PENDING_PAYMENT], true)) {
+            return false;
+        }
+        $sessionOrderId = $this->checkoutSession->getLastOrderId();
+
+        return $sessionOrderId && (int)$sessionOrderId === (int)$order->getId();
+    }
+
+    /**
+     * @return array
+     */
+    private function accessDeniedError()
+    {
+        return [
+            'result'  => ConstantConfig::ERROR,
+            'message' => (string)__(ConstantConfig::ERROR_MESSAGE)
+        ];
+    }
+
+    /**
      * @param $terminalId
      * @param $orderId
      * @param $providerData
@@ -240,6 +271,9 @@ class Gateway implements GatewayInterface
     public function createRequestApplepay($terminalId, $orderId, $providerData)
     {
         $order = $this->order->load($orderId);
+        if ($order->getId() && !$this->canPayOrder($order)) {
+            return $this->accessDeniedError();
+        }
         if ($order->getId()) {
             $orderLines = $this->getItemOrderLines($order);
             $order->setModuleVersion($this->helper->getModuleVersion());
@@ -339,7 +373,7 @@ class Gateway implements GatewayInterface
     {
         $this->restoreOrderFromOrderId($order->getIncrementId());
         $requestParams['result'] = ConstantConfig::ERROR;
-        $requestParams['message'] = __(ConstantConfig::ERROR_MESSAGE);
+        $requestParams['message'] = (string)__(ConstantConfig::ERROR_MESSAGE);
 
         return $requestParams;
     }

@@ -1,6 +1,11 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [4.3.2]
+### Fixed
+- Remove the unused web API route.
+- Prevent payment requests from resetting the status of orders that are already paid.
+
 ## [4.3.1]
 ### Added
 - Add Magento 2.4.9 and PHP 8.4 compatibility.
