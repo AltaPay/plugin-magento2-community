@@ -339,7 +339,7 @@ class Gateway implements GatewayInterface
     {
         $this->restoreOrderFromOrderId($order->getIncrementId());
         $requestParams['result'] = ConstantConfig::ERROR;
-        $requestParams['message'] = __(ConstantConfig::ERROR_MESSAGE);
+        $requestParams['message'] = (string)__(ConstantConfig::ERROR_MESSAGE);
 
         return $requestParams;
     }
