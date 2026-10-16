@@ -210,16 +210,6 @@ class Gateway implements GatewayInterface
     public function createRequest($terminalId, $orderId)
     {
         $order = $this->order->load($orderId);
-        // Only an order awaiting payment that belongs to the current checkout session may be processed
-        if ($order->getId() && (
-            !in_array($order->getState(), [Order::STATE_NEW, Order::STATE_PENDING_PAYMENT], true)
-            || (int)$this->checkoutSession->getLastOrderId() !== (int)$order->getId()
-        )) {
-            return [
-                'result'  => ConstantConfig::ERROR,
-                'message' => (string)__(ConstantConfig::ERROR_MESSAGE)
-            ];
-        }
         if ($order->getId()) {
             $orderLines = $this->getItemOrderLines($order);
             $this->_eventManager->dispatch('additional_orderline_event_observer',
@@ -250,16 +240,6 @@ class Gateway implements GatewayInterface
     public function createRequestApplepay($terminalId, $orderId, $providerData)
     {
         $order = $this->order->load($orderId);
-        // Only an order awaiting payment that belongs to the current checkout session may be processed
-        if ($order->getId() && (
-            !in_array($order->getState(), [Order::STATE_NEW, Order::STATE_PENDING_PAYMENT], true)
-            || (int)$this->checkoutSession->getLastOrderId() !== (int)$order->getId()
-        )) {
-            return [
-                'result'  => ConstantConfig::ERROR,
-                'message' => (string)__(ConstantConfig::ERROR_MESSAGE)
-            ];
-        }
         if ($order->getId()) {
             $orderLines = $this->getItemOrderLines($order);
             $order->setModuleVersion($this->helper->getModuleVersion());
