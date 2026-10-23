@@ -1,6 +1,13 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [4.3.2]
+### Fixed
+- Remove the unused web API route.
+- Prevent payment requests from resetting the status of orders that are already paid.
+### Notes
+- **For custom integrations:** The `/V1/altapay/createrequest` web API route has been removed. If you call it, use the `sdmaltapay/index/request` checkout endpoint within the customer's session instead.
+
 ## [4.3.1]
 ### Added
 - Add Magento 2.4.9 and PHP 8.4 compatibility.

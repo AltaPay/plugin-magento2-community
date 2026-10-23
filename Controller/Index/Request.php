@@ -46,6 +46,18 @@ class Request extends Index
     {
         $this->writeLog();
         $order        = $this->order->load($this->getRequest()->getParam('orderid'));
+        // Only an order awaiting payment that belongs to the current checkout session may be processed
+        if (!$order->getId()
+            || !in_array($order->getState(), [Order::STATE_NEW, Order::STATE_PENDING_PAYMENT], true)
+            || (int)$this->checkoutSession->getLastOrderId() !== (int)$order->getId()
+        ) {
+            $result = new DataObject([
+                'result'  => 'error',
+                'message' => (string)__('Invalid request.')
+            ]);
+
+            return $this->getResponse()->representJson($result->toJson());
+        }
         $payment      = $order->getPayment();
         $terminalCode = $payment->getMethod();
         $paymentType  = $this->getRequest()->getParam('paytype');
