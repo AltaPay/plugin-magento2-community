@@ -115,9 +115,9 @@ class Callbackform extends Action implements CsrfAwareActionInterface
             $storeCode
         );
         // Verify if the secret matches with the gateway
-        if (!empty($secret) && !empty($post['checksum'])) {
-             $checksumData = $this->helper->calculateCheckSum($post, $secret);
-            if ($post['checksum'] != $checksumData) {
+        if (!empty($secret)) {
+            $checksumData = $this->helper->calculateCheckSum($post, $secret);
+            if (!is_string($post['checksum'] ?? null) || !hash_equals($checksumData, $post['checksum'])) {
                 $this->altapayLogger->addCriticalLog('Exception', 'Checksum validation failed!');
                 return;
             }

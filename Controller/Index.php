@@ -233,9 +233,9 @@ abstract class Index extends Action
      * @return bool
      */
     protected function validateChecksum($post, $secret) {
-        if (!empty($secret) && !empty($post['checksum'])) {
+        if (!empty($secret)) {
             $checksumData = $this->helper->calculateCheckSum($post, $secret);
-            if ($post['checksum'] != $checksumData) {
+            if (!is_string($post['checksum'] ?? null) || !hash_equals($checksumData, $post['checksum'])) {
                 $this->altapayLogger->addCriticalLog('Exception', 'Checksum validation failed!');
                 return false;
             }
