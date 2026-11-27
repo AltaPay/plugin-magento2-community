@@ -1,6 +1,10 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [4.3.3]
+### Fixed
+- Reject callbacks without a checksum when a terminal secret is configured.
+
 ## [4.3.2]
 ### Fixed
 - Remove the unused web API route.
